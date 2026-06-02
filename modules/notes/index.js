@@ -177,7 +177,7 @@
       + window.ICONS['arrow-left'] + '</button>';
     left.onclick = function() { app.navigateTo('main'); };
 
-    center.innerHTML = '<div class="hc-default">Заметки</div>';
+    center.innerHTML = '<div class="hc-module">Заметки</div>';
 
     /* Right: ellipsis-vertical menu */
     var hasAnyNotes = _cachedDrawNotes.length > 0 || _cachedTextNotes.length > 0;
@@ -260,7 +260,7 @@
       + (window.ICONS['edit-3'] || '') + '</span>';
     left.onclick = null;
 
-    center.innerHTML = '<div class="hc-default">Рисование</div>';
+    center.innerHTML = '<div class="hc-module">Рисование</div>';
 
     /* Right: X close button */
     right.innerHTML = '<button class="icon-btn" aria-label="Закрыть">'
@@ -284,7 +284,7 @@
       + (window.ICONS['type'] || '') + '</span>';
     left.onclick = null;
 
-    center.innerHTML = '<div class="hc-default">'
+    center.innerHTML = '<div class="hc-module">'
       + (_editingTextId ? 'Редактирование' : 'Текстовая заметка') + '</div>';
 
     /* Right: X close button */

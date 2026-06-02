@@ -1,4 +1,7 @@
-/* modules/worktime.js — Модуль «Рабочее время» FTL расчёт */
+/* ═══════════════════════════════════════════
+   Pilot's Tool — modules/worktime/index.js
+   Модуль «Рабочее время»
+   ═══════════════════════════════════════════ */
 (function() {
   'use strict';
 
@@ -203,7 +206,7 @@
       + window.ICONS['arrow-left'] + '</button>';
     left.onclick = function() { app.navigateTo('main'); };
 
-    center.innerHTML = '<div class="hc-default">Рабочее время</div>';
+    center.innerHTML = '<div class="hc-module">Рабочее время</div>';
 
     // Ellipsis-vertical menu with "Очистить рейс"
     right.innerHTML = '<button class="icon-btn" id="wtHeaderMenuBtn" aria-label="Меню">'
@@ -384,7 +387,7 @@
         totalFlight += _wtSegments[j].flightTime;
         totalAir    += _wtSegments[j].airTime;
       }
-      html += '<div class="total-stats" style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">'
+      html += '<div class="wt-total-stats" style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">'
         + '<span><strong>Итого:</strong></span>'
         + '<span>Полётное <strong class="ct-mono-time">' + wtFmtMin(totalFlight) + '</strong></span>'
         + '<span style="color:var(--color-border);">|</span>'
@@ -463,7 +466,7 @@
   function wtRenderSegmentCard(seg, idx) {
     var colorIdx = idx % 5;
     return '<div class="wt-segment-card">'
-      + '<div class="segment-info">'
+      + '<div class="wt-segment-info">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
       + '<span class="wt-segment-color-' + colorIdx + '" style="width:12px;height:12px;border-radius:3px;display:inline-block;flex-shrink:0;"></span>'
       + '<strong class="ct-heading-md">Сегмент ' + (idx + 1) + '</strong>'
@@ -484,7 +487,7 @@
       + '<span class="ct-mono-time">' + wtFormatTime(seg.engineStop) + '</span>'
       + '</div>'
       + '</div>'
-      + '<button class="delete-segment" data-idx="' + idx + '" aria-label="Удалить сегмент ' + (idx + 1) + '">'
+      + '<button class="wt-delete-segment" data-idx="' + idx + '" aria-label="Удалить сегмент ' + (idx + 1) + '">'
       + window.ICONS.trash + '</button>'
       + '</div>';
   }
@@ -520,7 +523,7 @@
     html += '</div>';
 
     if (!allOk) {
-      html += '<div class="warning-block" style="display:flex;flex-direction:column;gap:6px;">';
+      html += '<div class="wt-warning-block" style="display:flex;flex-direction:column;gap:6px;">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
         + window.ICONS['alert-triangle'] + ' <strong>Нарушения FTL</strong></div>';
       for (var i = 0; i < results.warnings.length; i++) {
@@ -528,7 +531,7 @@
       }
       html += '</div>';
     } else {
-      html += '<div class="ok-block" style="display:flex;align-items:center;gap:10px;">'
+      html += '<div class="wt-ok-block" style="display:flex;align-items:center;gap:10px;">'
         + window.ICONS['check-circle'] + ' <span>Нарушений не обнаружено.</span></div>';
     }
 
@@ -1057,7 +1060,7 @@
 
     if (!container.dataset.delegated) {
       container.addEventListener('click', function(e) {
-        var delBtn = e.target.closest('.delete-segment');
+        var delBtn = e.target.closest('.wt-delete-segment');
         if (delBtn) {
           var idx = parseInt(delBtn.dataset.idx, 10);
           wtDeleteSegment(idx);

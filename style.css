@@ -252,6 +252,8 @@ button:focus:not(:focus-visible) { outline: none; }
   letter-spacing: 0.02em;
 }
 
+.hc-search { display: none; }
+.hc-search.visible { display: block; }
 .hc-module {
   font-size: 0.9375rem;
   font-weight: 600;
@@ -259,12 +261,8 @@ button:focus:not(:focus-visible) { outline: none; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-
-.hc-search { display: none; }
-.hc-search.visible { display: block; }
 .hc-default.hidden, .hc-module.hidden { display: none; }
 
 #headerSearchInput {
@@ -698,35 +696,21 @@ button:focus:not(:focus-visible) { outline: none; }
   position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh; width: 100%;
-  padding: 0 16px;
+  padding: calc(var(--header-height) + env(safe-area-inset-top, 0px)) 24px 32px;
   box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  #mainScreen .main-content {
-    padding: 0 24px;
-  }
 }
 
 #mainScreen .main-quote-wrapper {
   position: relative;
+  display: inline-block;
   max-width: 600px;
   width: 100%;
-  margin: 0 auto;
-  padding: 0 1em;
-  box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  #mainScreen .main-quote-wrapper {
-    padding: 0 1.4em;
-  }
 }
 
 #mainScreen .main-quote-mark {
   position: absolute;
-  font-size: 1.4em;
-  color: rgba(255,255,255,0.38);
+  font-size: 2.4em;
+  color: rgba(255,255,255,0.45);
   font-family: var(--font-accent);
   line-height: 1;
   pointer-events: none;
@@ -735,13 +719,13 @@ button:focus:not(:focus-visible) { outline: none; }
 }
 
 #mainScreen .main-quote-mark--open {
-  top: -0.12em;
-  left: 0;
+  top: -0.25em;
+  left: -0.5em;
 }
 
 #mainScreen .main-quote-mark--close {
-  bottom: -0.2em;
-  right: 0;
+  bottom: -0.35em;
+  right: -0.5em;
 }
 
 #mainScreen .main-quote {
@@ -751,45 +735,33 @@ button:focus:not(:focus-visible) { outline: none; }
   text-shadow: 0 2px 20px rgba(0,0,0,0.5);
   text-align: center;
   margin: 0;
-  padding: 10px 0;
-  border-top: 1px solid rgba(255,255,255,0.3);
-  border-bottom: 1px solid rgba(255,255,255,0.3);
-  line-height: 1.35;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.35);
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  line-height: 1.3;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-@media (min-width: 768px) {
-  #mainScreen .main-quote {
-    padding: 14px 0;
-  }
-}
-
 /* ─── Responsive quote scaling ─── */
-@media (max-width: 374px) {
-  #mainScreen .main-quote { font-size: 1.45rem; }
-  #mainScreen .main-quote-mark { font-size: 1.3em; }
-  #mainScreen .main-quote-wrapper { margin: -8px auto; padding: 0 0.8em; }
-}
-
 @media (min-width: 375px) {
-  #mainScreen .main-quote { font-size: 1.55rem; }
-  #mainScreen .main-quote-mark { font-size: 1.4em; }
+  #mainScreen .main-quote { font-size: 1.5rem; }
+  #mainScreen .main-quote-mark { font-size: 2.6em; }
 }
 
 @media (min-width: 414px) {
-  #mainScreen .main-quote { font-size: 1.7rem; }
-  #mainScreen .main-quote-mark { font-size: 1.5em; }
+  #mainScreen .main-quote { font-size: 1.625rem; }
+  #mainScreen .main-quote-mark { font-size: 2.8em; }
 }
 
 @media (min-width: 768px) {
   #mainScreen .main-quote { font-size: 1.875rem; }
-  #mainScreen .main-quote-mark { font-size: 1.8em; }
+  #mainScreen .main-quote-mark { font-size: 3.2em; }
 }
 
 @media (min-width: 1024px) {
   #mainScreen .main-quote { font-size: 2rem; }
-  #mainScreen .main-quote-mark { font-size: 2em; }
+  #mainScreen .main-quote-mark { font-size: 3.5em; }
 }
 
 .main-quote-text {
@@ -822,28 +794,27 @@ button:focus:not(:focus-visible) { outline: none; }
 #notesQuickBtn {
   position: absolute;
   z-index: 10;
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: linear-gradient(135deg, rgba(205,32,44,0.4), rgba(160,26,36,0.55));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: none;
+  background: linear-gradient(135deg, rgba(160, 26, 36, 0.45), rgba(205, 32, 44, 0.65));
   color: var(--color-text-white);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
-  box-shadow: 0 4px 16px rgba(205,32,44,0.35),
-              0 1px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 16px var(--color-shadow-primary),
+              0 1px 4px rgba(0,0,0,0.3);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   transition: box-shadow 0.2s var(--transition-ease),
-              transform  0.2s var(--transition-ease),
-              background 0.2s var(--transition-ease);
+              transform  0.2s var(--transition-ease);
   bottom: calc(32px + env(safe-area-inset-bottom, 0px));
-  right: 16px;
+  right: 20px;
 }
 
 #notesQuickBtn svg {
@@ -854,26 +825,23 @@ button:focus:not(:focus-visible) { outline: none; }
 
 #notesQuickBtn.dragging {
   cursor: grabbing;
-  transform: scale(1.1);
-  background: linear-gradient(135deg, rgba(205,32,44,0.6), rgba(160,26,36,0.75));
-  box-shadow: 0 8px 28px rgba(205,32,44,0.5),
-              0 2px 8px rgba(0,0,0,0.3);
+  transform: scale(1.08);
+  box-shadow: 0 8px 24px var(--color-shadow-primary),
+              0 2px 8px rgba(0,0,0,0.4);
   transition: none;
 }
 
 body.dark-theme #notesQuickBtn {
-  background: linear-gradient(135deg, rgba(205,32,44,0.3), rgba(160,26,36,0.45));
-  border-color: rgba(255,255,255,0.15);
-  box-shadow: 0 4px 16px rgba(205,32,44,0.25),
-              0 1px 6px rgba(0,0,0,0.35);
+  background: linear-gradient(135deg, rgba(230, 57, 70, 0.4), rgba(205, 32, 44, 0.6));
+  box-shadow: 0 4px 16px rgba(107, 18, 25, 0.5),
+              0 1px 4px rgba(0,0,0,0.5);
 }
 
 @media (hover: hover) {
   #notesQuickBtn:hover {
     transform: scale(1.06);
-    background: linear-gradient(135deg, rgba(205,32,44,0.55), rgba(160,26,36,0.7));
-    box-shadow: 0 6px 20px rgba(205,32,44,0.45),
-                0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 20px var(--color-shadow-primary),
+                0 2px 6px rgba(0,0,0,0.35);
   }
 }
 
@@ -897,7 +865,10 @@ body.dark-theme #notesQuickBtn {
   white-space: nowrap;
 }
 
-.marquee-inner.is-overflowing {
+.krs-block.open       .marquee-inner.is-overflowing,
+.checklist-block.open .marquee-inner.is-overflowing,
+.fp-phase.open        .marquee-inner.is-overflowing,
+.fp-procedure.open    .marquee-inner.is-overflowing {
   animation: marquee 10s linear infinite;
   padding-right: 48px;
 }
@@ -965,7 +936,7 @@ body.dark-theme #notesQuickBtn {
 }
 
 /* ─── Module screen containers ─── */
-/* Per SHELL_CONTRACT v3.10 §4: все модули используют .module-container */
+/* Per SHELL_CONTRACT v3.9 §4: все модули используют .module-container */
 /* Модулям с широкой раскладкой — переопределить в своём CSS:
    #phonebookScreen .module-container { max-width: 1100px; } */
 
@@ -1271,15 +1242,31 @@ body.dark-theme #notesQuickBtn {
 .pdf-modal-canvas-wrap {
   flex: 1;
   overflow: auto;
-  display: flex;
-  justify-content: center;
+  display: block;
+  text-align: center;
   padding: 16px;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  min-height: 0;
 }
 .pdf-modal-canvas {
   display: block;
-  max-width: 100%;
+  margin: 0 auto;
   box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.pdf-modal-zoom-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pdf-modal-zoom-btn {
+  color: var(--color-text-main);
+}
+.pdf-modal-zoom-label {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  min-width: 40px;
+  text-align: center;
 }
 .pdf-modal-nav {
   display: flex;
@@ -1296,25 +1283,6 @@ body.dark-theme #notesQuickBtn {
   color: var(--color-text-secondary);
   min-width: 60px;
   text-align: center;
-}
-.pdf-modal-zoom-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.pdf-modal-zoom-label {
-  font-size: var(--font-xs);
-  color: var(--color-text-secondary);
-  min-width: 40px;
-  text-align: center;
-  font-family: var(--font-mono);
-}
-.pdf-modal-zoom-btn {
-  color: var(--color-text-main);
-}
-.pdf-modal-zoom-btn svg {
-  width: 18px;
-  height: 18px;
 }
 
 .skeleton-block .skeleton-line {

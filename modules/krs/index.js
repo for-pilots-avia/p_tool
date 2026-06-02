@@ -124,7 +124,7 @@
     left.onclick = function() { app.navigateTo('main'); };
 
     // Центр: название модуля
-    center.innerHTML = '<div class="hc-default">Указания КРС</div>';
+    center.innerHTML = '<div class="hc-module">Указания КРС</div>';
 
     // Правая кнопка: меню сортировки
     right.innerHTML = '<button class="icon-btn krs-sort-toggle" aria-label="Сортировка">'

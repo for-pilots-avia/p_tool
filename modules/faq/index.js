@@ -22,7 +22,7 @@
       + window.ICONS['arrow-left'] + '</button>';
     left.onclick = function() { app.navigateTo('main'); };
 
-    center.innerHTML = '<div class="hc-default">FAQ</div>';
+    center.innerHTML = '<div class="hc-module">FAQ</div>';
 
     right.innerHTML = '';
     right.onclick = null;

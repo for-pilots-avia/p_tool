@@ -71,7 +71,7 @@
       + window.ICONS['arrow-left'] + '</button>';
     left.onclick = function() { app.navigateTo('main'); };
 
-    center.innerHTML = '<div class="hc-default">Телефонный справочник</div>';
+    center.innerHTML = '<div class="hc-module">Телефонный справочник</div>';
 
     right.innerHTML = '';
     right.onclick = null;

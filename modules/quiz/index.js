@@ -970,7 +970,7 @@
     left.onclick = leftAction;
 
     /* Center: title + optional timer */
-    center.innerHTML = '<div class="hc-default">' + titleText + '</div>'
+    center.innerHTML = '<div class="hc-module">' + titleText + '</div>'
       + (showTimer
         ? '<div class="quiz-header-timer ct-mono-time" style="font-size:var(--font-xs);color:var(--color-on-primary-text-dim)">' + timerText + '</div>'
         : '');

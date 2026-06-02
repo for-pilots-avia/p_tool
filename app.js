@@ -6,7 +6,7 @@
 window.app = {};
 
 /* ─── Current module tracker (for destroy on navigation) ─── */
-var _currentModule = 'main';
+var _currentModule = null;
 
 /* ═══════════════════════════════════════════
    NAVIGATION
@@ -92,17 +92,6 @@ window.app.typewriterQuote = function(text, speed) {
   var textEl   = document.getElementById('mainQuoteText');
   var cursorEl = document.getElementById('mainQuoteCursor');
   if (!textEl) return;
-
-  /* Remove stray whitespace text nodes in .main-quote (pre-wrap shows them) */
-  var quoteDiv = textEl.parentNode;
-  if (quoteDiv) {
-    for (var n = quoteDiv.firstChild; n; n = n.nextSibling) {
-      if (n.nodeType === 3 && n !== textEl && n !== cursorEl) {
-        quoteDiv.removeChild(n);
-        break;
-      }
-    }
-  }
 
   window.app._twCancel = true;
 
@@ -291,7 +280,7 @@ function initNotesQuickBtn() {
         }));
       } catch(e2) {}
     } else {
-      // Контракт v3.10 §1: pointerup без перемещения → notes с флагом
+      // Navigate to notes module with pending action (контракт SHELL_CONTRACT §1)
       window.app._pendingNoteAction = 'new-draw';
       window.app.navigateTo('notes');
     }
@@ -538,7 +527,7 @@ window.app.showConfirm = function(message, onConfirm, okLabel) {
 };
 
 /* ═══════════════════════════════════════════
-   LAZY LIB LOADER — SHELL_CONTRACT v3.10 §6
+   LAZY LIB LOADER — SHELL_CONTRACT v3.9 §6
    ═══════════════════════════════════════════ */
 
 window.app._loadedLibs = {};
@@ -685,8 +674,11 @@ window.app.openPhotoSwipe = function(thumbEl, container) {
 
 window.app.openPDFModal = function(url, startPage) {
   if (!url) return;
-  app.ensureLib('pdfjs', function() {
 
+  app.ensureLib('pdfjs', function() {
+    if (!window.pdfjsLib) { window.open(url, '_blank'); return; }
+
+  // Создать оверлей динамически (контракт SHELL_CONTRACT §6)
   var overlay = document.createElement('div');
   overlay.className = 'pdf-modal-overlay';
 
@@ -734,12 +726,10 @@ window.app.openPDFModal = function(url, startPage) {
 
   var canvasWrap = document.createElement('div');
   canvasWrap.className = 'pdf-modal-canvas-wrap';
-  canvasWrap.style.justifyContent = 'flex-start';
 
   var canvas = document.createElement('canvas');
   canvas.className = 'pdf-modal-canvas';
   canvas.style.margin = '0 auto';
-  canvas.style.alignSelf = 'flex-start';
   canvasWrap.appendChild(canvas);
 
   var navBar = document.createElement('div');
@@ -767,12 +757,6 @@ window.app.openPDFModal = function(url, startPage) {
 
   var baseWrapWidth = canvasWrap.clientWidth;
 
-  function handleResize() {
-    baseWrapWidth = canvasWrap.clientWidth;
-    if (currentPdf) renderPage(currentPage);
-  }
-  window.addEventListener('resize', handleResize);
-
   var currentPdf = null;
   var currentPage = startPage || 1;
   var rendering = false;
@@ -784,8 +768,31 @@ window.app.openPDFModal = function(url, startPage) {
   function updateZoomLabel() {
     var pct = (zoomLevel === 1)
       ? Math.round(fitScale * 100)
-      : Math.round(fitScale * zoomLevel * 100);
+      : Math.round(zoomLevel * 100);
     zoomLabel.textContent = pct + '%';
+  }
+
+  function zoomIn() {
+    var idx = ZOOM_STEPS.indexOf(zoomLevel);
+    if (idx < 0) idx = ZOOM_STEPS.findIndex(function(s) { return s > zoomLevel; });
+    if (idx < 0) idx = ZOOM_STEPS.length - 1;
+    else if (idx < ZOOM_STEPS.length - 1) idx++;
+    zoomLevel = ZOOM_STEPS[idx];
+    if (currentPdf) renderPage(currentPage);
+  }
+
+  function zoomOut() {
+    var idx = ZOOM_STEPS.indexOf(zoomLevel);
+    if (idx < 0) idx = ZOOM_STEPS.findIndex(function(s) { return s >= zoomLevel; }) - 1;
+    if (idx < 0) idx = 0;
+    else if (idx > 0) idx--;
+    zoomLevel = ZOOM_STEPS[idx];
+    if (currentPdf) renderPage(currentPage);
+  }
+
+  function zoomFit() {
+    zoomLevel = 1;
+    if (currentPdf) renderPage(currentPage);
   }
 
   function renderPage(num) {
@@ -795,20 +802,17 @@ window.app.openPDFModal = function(url, startPage) {
     currentPdf.getPage(num).then(function(page) {
       var baseViewport = page.getViewport({ scale: 1.5 });
       var wrapWidth = baseWrapWidth - 32;
-      if (wrapWidth <= 0) wrapWidth = canvasWrap.clientWidth - 32;
-      var computedFit = 1.5;
-      if (wrapWidth > 0 && baseViewport.width > wrapWidth) {
-        computedFit = wrapWidth / (baseViewport.width / 1.5);
+      if (wrapWidth > 0) {
+        fitScale = wrapWidth / baseViewport.width;
+      } else {
+        fitScale = 1.5;
       }
-      fitScale = computedFit;
       var scale = fitScale * zoomLevel;
       var viewport = page.getViewport({ scale: scale });
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      page.render({
-        canvasContext: canvas.getContext('2d'),
-        viewport: viewport
-      }).promise.then(function() {
+      var ctx = canvas.getContext('2d');
+      page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function() {
         rendering = false;
         pageLabel.textContent = num + ' / ' + currentPdf.numPages;
         prevBtn.disabled = (num <= 1);
@@ -819,42 +823,75 @@ window.app.openPDFModal = function(url, startPage) {
           pendingPage = null;
           renderPage(p);
         }
-      }).catch(function(err) {
-        rendering = false;
-        console.error('PDF render error:', err);
-        if (pendingPage !== null) {
-          var p2 = pendingPage;
-          pendingPage = null;
-          renderPage(p2);
-        }
       });
-    }).catch(function(err) {
-      rendering = false;
-      console.error('PDF page load error:', err);
     });
   }
 
-  function zoomIn() {
-    var idx = 0;
-    for (var i = 0; i < ZOOM_STEPS.length; i++) {
-      if (ZOOM_STEPS[i] <= zoomLevel + 0.01) idx = i;
-    }
-    if (idx < ZOOM_STEPS.length - 1) {
-      zoomLevel = ZOOM_STEPS[idx + 1];
-      renderPage(currentPage);
-    }
+  function handleResize() {
+    baseWrapWidth = canvasWrap.clientWidth;
+    if (currentPdf) renderPage(currentPage);
   }
-  function zoomOut() {
-    var idx = ZOOM_STEPS.length - 1;
-    for (var i = ZOOM_STEPS.length - 1; i >= 0; i--) {
-      if (ZOOM_STEPS[i] >= zoomLevel - 0.01) idx = i;
+
+  // Pinch-to-zoom
+  var pinchStartDist = 0;
+  var pinchStartZoom = 1;
+  canvasWrap.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStartDist = Math.sqrt(dx * dx + dy * dy);
+      pinchStartZoom = zoomLevel;
     }
-    if (idx > 0) {
-      zoomLevel = ZOOM_STEPS[idx - 1];
-      renderPage(currentPage);
+  }, { passive: true });
+  canvasWrap.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2) {
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      var ratio = dist / pinchStartDist;
+      zoomLevel = pinchStartZoom * ratio;
+      if (currentPdf) renderPage(currentPage);
     }
-  }
-  function zoomFit() { zoomLevel = 1; renderPage(currentPage); }
+  }, { passive: true });
+  canvasWrap.addEventListener('touchend', function(e) {
+    if (e.touches.length < 2 && pinchStartDist > 0) {
+      // Snap to nearest step
+      var best = ZOOM_STEPS[0];
+      for (var i = 0; i < ZOOM_STEPS.length; i++) {
+        if (Math.abs(ZOOM_STEPS[i] - zoomLevel) < Math.abs(best - zoomLevel)) {
+          best = ZOOM_STEPS[i];
+        }
+      }
+      zoomLevel = best;
+      pinchStartDist = 0;
+      if (currentPdf) renderPage(currentPage);
+    }
+  }, { passive: true });
+
+  // Double-tap zoom
+  var lastTap = 0;
+  canvasWrap.addEventListener('touchend', function(e) {
+    if (e.touches.length > 0) return;
+    var now = Date.now();
+    if (now - lastTap < 350) {
+      if (zoomLevel > 1) { zoomFit(); }
+      else { zoomLevel = 2; if (currentPdf) renderPage(currentPage); }
+    }
+    lastTap = now;
+  }, { passive: true });
+
+  // Ctrl+Scroll zoom
+  canvasWrap.addEventListener('wheel', function(e) {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    if (e.deltaY < 0) zoomIn();
+    else zoomOut();
+  }, { passive: false });
+
+  // Zoom button listeners
+  zoomInBtn.addEventListener('click', zoomIn);
+  zoomOutBtn.addEventListener('click', zoomOut);
+  fitBtn.addEventListener('click', zoomFit);
 
   pdfjsLib.getDocument(url).promise.then(function(pdf) {
     currentPdf = pdf;
@@ -864,87 +901,12 @@ window.app.openPDFModal = function(url, startPage) {
     closePDF();
   });
 
-  zoomInBtn.addEventListener('click', zoomIn);
-  zoomOutBtn.addEventListener('click', zoomOut);
-  fitBtn.addEventListener('click', zoomFit);
   prevBtn.addEventListener('click', function() {
     if (currentPage > 1) { currentPage--; renderPage(currentPage); }
   });
   nextBtn.addEventListener('click', function() {
-    if (currentPdf && currentPage < currentPdf.numPages) {
-      currentPage++; renderPage(currentPage);
-    }
+    if (currentPdf && currentPage < currentPdf.numPages) { currentPage++; renderPage(currentPage); }
   });
-
-  // Pinch-to-zoom
-  var pinchStartDist = 0, pinchStartZoom = 1, pinchActive = false;
-
-  canvasWrap.addEventListener('touchstart', function(e) {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      pinchActive = true;
-      var dx = e.touches[0].clientX - e.touches[1].clientX;
-      var dy = e.touches[0].clientY - e.touches[1].clientY;
-      pinchStartDist = Math.sqrt(dx * dx + dy * dy);
-      pinchStartZoom = zoomLevel;
-    }
-  }, { passive: false });
-
-  canvasWrap.addEventListener('touchmove', function(e) {
-    if (!pinchActive || e.touches.length !== 2) return;
-    e.preventDefault();
-    var dx = e.touches[0].clientX - e.touches[1].clientX;
-    var dy = e.touches[0].clientY - e.touches[1].clientY;
-    var dist = Math.sqrt(dx * dx + dy * dy);
-    if (pinchStartDist < 1) return;
-    var newZoom = pinchStartZoom * (dist / pinchStartDist);
-    newZoom = Math.max(ZOOM_STEPS[0], Math.min(ZOOM_STEPS[ZOOM_STEPS.length - 1], newZoom));
-    for (var s = 0; s < ZOOM_STEPS.length; s++) {
-      if (Math.abs(newZoom - ZOOM_STEPS[s]) < 0.08) { newZoom = ZOOM_STEPS[s]; break; }
-    }
-    zoomLevel = newZoom;
-    renderPage(currentPage);
-  }, { passive: false });
-
-  canvasWrap.addEventListener('touchend', function(e) {
-    if (pinchActive && e.touches.length < 2) {
-      pinchActive = false;
-      var best = ZOOM_STEPS[0], bestDist = Math.abs(zoomLevel - ZOOM_STEPS[0]);
-      for (var s = 1; s < ZOOM_STEPS.length; s++) {
-        var d = Math.abs(zoomLevel - ZOOM_STEPS[s]);
-        if (d < bestDist) { bestDist = d; best = ZOOM_STEPS[s]; }
-      }
-      zoomLevel = best;
-      renderPage(currentPage);
-    }
-  });
-
-  // Double-tap
-  var lastTapTime = 0, lastTapX = 0, lastTapY = 0;
-
-  canvasWrap.addEventListener('touchend', function(e) {
-    if (pinchActive || e.touches.length > 0) return;
-    var touch = e.changedTouches[0];
-    if (!touch) return;
-    var now = Date.now();
-    var dx = touch.clientX - lastTapX;
-    var dy = touch.clientY - lastTapY;
-    if (now - lastTapTime < 350 && Math.sqrt(dx*dx+dy*dy) < 30) {
-      e.preventDefault();
-      if (zoomLevel > 1.01) zoomFit();
-      else { zoomLevel = 2; renderPage(currentPage); }
-      lastTapTime = 0;
-    } else {
-      lastTapTime = now; lastTapX = touch.clientX; lastTapY = touch.clientY;
-    }
-  });
-
-  // Ctrl+scroll
-  canvasWrap.addEventListener('wheel', function(e) {
-    if (!e.ctrlKey) return;
-    e.preventDefault();
-    if (e.deltaY < 0) zoomIn(); else zoomOut();
-  }, { passive: false });
 
   function closePDF() {
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -956,16 +918,16 @@ window.app.openPDFModal = function(url, startPage) {
     if (e.key === 'Escape') closePDF();
     else if (e.key === 'ArrowLeft') prevBtn.click();
     else if (e.key === 'ArrowRight') nextBtn.click();
-    else if ((e.key === '+' || e.key === '=') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); zoomIn(); }
-    else if (e.key === '-' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); zoomOut(); }
-    else if (e.key === '0' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); zoomFit(); }
+    else if (e.key === '=' && e.ctrlKey) { e.preventDefault(); zoomIn(); }
+    else if (e.key === '-' && e.ctrlKey) { e.preventDefault(); zoomOut(); }
+    else if (e.key === '0' && e.ctrlKey) { e.preventDefault(); zoomFit(); }
   }
   document.addEventListener('keydown', handleKey);
+  window.addEventListener('resize', handleResize);
 
   closeBtn.addEventListener('click', closePDF);
   overlay.addEventListener('click', function(e) { if (e.target === overlay) closePDF(); });
-
-  }); // end ensureLib('pdfjs')
+  }); // end ensureLib('pdfjs', callback)
 };
 
 /* ═══════════════════════════════════════════
