@@ -1,7 +1,7 @@
-/* modules/faq.js — Stub (WIP) */
+/* modules/checklists.js — Stub (WIP) */
 
-function initFAQ() {
-  var container = document.getElementById('faqContainer');
+function initChecklists() {
+  var container = document.getElementById('checklistsContainer');
   if (!container) return;
 
   var left   = document.getElementById('headerLeft');
@@ -12,13 +12,13 @@ function initFAQ() {
       + window.ICONS['arrow-left'] + '</button>';
     left.onclick = function() { app.navigateTo('main'); };
   }
-  if (center) center.innerHTML = '<div class="hc-default">FAQ</div>';
+  if (center) center.innerHTML = '<div class="hc-default">Чеклисты (SAFA / Customs)</div>';
   if (right)  { right.innerHTML = ''; right.onclick = null; }
 
   container.innerHTML = '<div class="module-container" style="padding-top:16px;padding-bottom:32px;">'
     + '<div class="ct-empty-state">'
-    + window.ICONS['help-circle']
-    + '<div class="ct-empty-title">FAQ</div>'
-    + '<div class="ct-empty-text">Часто задаваемые вопросы. Модуль в разработке.</div>'
+    + window.ICONS.checklist
+    + '<div class="ct-empty-title">Чеклисты</div>'
+    + '<div class="ct-empty-text">SAFA и Customs чеклисты. Модуль в разработке.</div>'
     + '</div></div>';
 }

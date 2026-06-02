@@ -2,276 +2,206 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Pilot's Tool</title>
-  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#cd202c">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PilotTool">
+  <meta name="description" content="Авиационный инструмент пилота — ФРВ, справочники">
+  <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-  <!-- PhotoSwipe 4.1.3 CSS -->
-  <link rel="stylesheet" href="libs/photoswipe/photoswipe.css">
-  <link rel="stylesheet" href="libs/photoswipe/default-skin/default-skin.css">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="modules.css">
+  <title>Pilot's Tool</title>
 </head>
 <body>
 
-<!-- Прогресс-бар первой загрузки (inline стили – исключение) -->
-<div id="cacheProgressOverlay" style="display: none; position: fixed; inset: 0; z-index: 9999; background: #CD202C; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: sans-serif;">
-  <div style="font-size: 2rem; margin-bottom: 16px;">✈️</div>
-  <p style="margin-bottom: 16px; font-size: 1rem;">Подготовка к работе offline...</p>
-  <div style="width: 240px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px;">
-    <div id="cacheProgressBar" style="height: 4px; width: 0%; background: #fff; border-radius: 2px; transition: width 0.2s ease;"></div>
+  <!-- Прогресс-бар SW: первый элемент в <body>, до #cacheProgressOverlay -->
+  <div id="swProgressBar" style="
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+    height: 3px; pointer-events: none;
+  ">
+    <div id="swProgressFill" style="
+      height: 3px; width: 0%; background: #CD202C;
+      transition: width 0.2s ease;
+    "></div>
   </div>
-  <p id="cacheProgressText" style="margin-top: 12px; font-size: 0.875rem; opacity: 0.8;">0%</p>
-</div>
 
-<div id="app">
-  <!-- HEADER -->
-  <header class="header" id="appHeader">
-    <div class="header-inner">
-      <div id="headerLeft"></div>
-      <div id="headerCenter"></div>
-      <div id="headerRight"></div>
+  <!-- Оверлей прогресса первой установки SW -->
+  <div id="cacheProgressOverlay" style="
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: #CD202C;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #fff; font-family: sans-serif;
+  ">
+    <div style="font-size: 2rem; margin-bottom: 16px;">✈️</div>
+    <p style="margin-bottom: 16px; font-size: 1rem;">Подготовка к работе offline...</p>
+    <div style="width: 240px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px;">
+      <div id="cacheProgressBar" style="
+        height: 4px; width: 0%; background: #fff;
+        border-radius: 2px; transition: width 0.2s ease;
+      "></div>
     </div>
-  </header>
+    <p id="cacheProgressText" style="margin-top: 12px; font-size: 0.875rem; opacity: 0.8;">0%</p>
+  </div>
 
-  <!-- ГЛАВНЫЙ ЭКРАН -->
-  <div id="mainScreen" class="screen">
-    <div class="main-bg"></div>
-    <div class="main-content">
-      <div class="main-quote-wrapper">
-        <span class="main-quote-mark" aria-hidden="true">❝</span>
-        <div class="main-quote" id="mainQuote" aria-live="polite" aria-atomic="true">
-          <span class="main-quote-text" id="mainQuoteText"></span>
-          <span class="main-quote-cursor" id="mainQuoteCursor" aria-hidden="true"></span>
+  <div id="app">
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="header" id="appHeader">
+      <div class="header-inner">
+        <div id="headerLeft"></div>
+        <div id="headerCenter"></div>
+        <div id="headerRight"></div>
+      </div>
+    </header>
+
+    <!-- ═══ SIDE MENU ═══ -->
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <nav id="sideMenu" class="side-menu">
+      <div class="menu-banner">
+        <span class="menu-banner-icon" id="menuBannerIcon"></span>
+        <div class="menu-banner-info">
+          <span class="menu-banner-title">Fly safe!</span>
+          <span class="menu-banner-network" id="menuNetworkStatus"></span>
         </div>
       </div>
-    </div>
-    <button id="notesQuickBtn" class="notes-quick-btn" aria-label="Рукописные заметки"></button>
-  </div>
 
-  <!-- ЭКРАН ТЕЛЕФОННЫЙ СПРАВОЧНИК -->
-  <div id="phonebookScreen" class="screen">
-    <div class="phonebook-container" id="phonebookContainer"></div>
-  </div>
+      <ul class="menu-list" id="menuList">
+        <!-- Menu items are generated dynamically by app.js from registry -->
+      </ul>
 
-  <!-- ЭКРАН ЧЕКЛИСТЫ -->
-  <div id="checklistsScreen" class="screen">
-    <div class="checklists-container" id="checklistsContainer"></div>
-  </div>
+      <div class="menu-divider"></div>
 
-  <!-- ЭКРАН УКАЗАНИЯ КРС -->
-  <div id="krsScreen" class="screen">
-    <div class="krs-container" id="krsContainer"></div>
-  </div>
+      <ul class="menu-list menu-list--controls">
+        <li class="menu-item" id="themeToggle">
+          <span class="menu-icon" id="themeIcon"></span>
+          <span id="themeLabel">Ночной режим</span>
+        </li>
+      </ul>
 
-  <!-- ЭКРАН ЛЁТНЫЕ ПРОЦЕДУРЫ -->
-  <div id="flightproceduresScreen" class="screen">
-    <div class="fp-container" id="fpContainer"></div>
-  </div>
-
-  <!-- ЭКРАН ЗАМЕТКИ -->
-  <div id="notesScreen" class="screen">
-    <div class="notes-container" id="notesContainer"></div>
-  </div>
-
-  <!-- ЭКРАН FAQ -->
-  <div id="faqScreen" class="screen">
-    <div class="faq-container" id="faqContainer"></div>
-  </div>
-
-  <!-- ЭКРАН РАБОЧЕЕ ВРЕМЯ -->
-  <div id="worktimeScreen" class="screen">
-    <div class="worktime-container" id="worktimeContainer"></div>
-  </div>
-
-  <!-- БОКОВОЕ МЕНЮ -->
-  <div id="menuOverlay" class="menu-overlay" onclick="window.app.closeMenu()"></div>
-  <nav id="sideMenu" class="side-menu">
-    <div class="menu-banner">
-      <span class="menu-banner-icon" id="menuBannerIcon"></span>
-      <div class="menu-banner-info">
-        <span class="menu-banner-title">Fly safe!</span>
-        <div class="menu-banner-meta">
-          <span class="menu-banner-version">v3.0</span>
-          <span class="menu-banner-network" id="menuNetworkStatus">● Онлайн</span>
+      <div id="offlineStatus" class="menu-offline-status">
+        <div class="menu-offline-row">
+          <span class="menu-offline-icon" id="offlineStatusIcon"></span>
+          <span id="offlineStatusText">Загрузка ресурсов...</span>
         </div>
       </div>
-    </div>
-    <ul class="menu-list">
-      <li class="menu-item" data-nav="phonebook">
-        <span class="menu-icon"></span>Телефонный справочник
-      </li>
-      <li class="menu-item" data-nav="checklists">
-        <span class="menu-icon"></span>Чеклисты (SAFA / Customs)
-      </li>
-      <li class="menu-item" data-nav="krs">
-        <span class="menu-icon"></span>Указания КРС
-      </li>
-      <li class="menu-item" data-nav="flightprocedures">
-        <span class="menu-icon"></span>Лётные процедуры
-      </li>
-      <li class="menu-item" data-nav="notes">
-        <span class="menu-icon" id="menuIconNotes"></span>Рукописные заметки
-      </li>
-      <li class="menu-item" data-nav="faq">
-        <span class="menu-icon"></span>FAQ
-      </li>
-      <li class="menu-item" data-nav="worktime">
-        <span class="menu-icon"></span>Рабочее время
-      </li>
-    </ul>
-    <div class="menu-divider"></div>
-    <ul class="menu-list menu-list--controls">
-      <li class="menu-item" id="themeToggle">
-        <span class="menu-icon" id="themeIcon"></span>
-        <span id="themeLabel">Ночной режим</span>
-      </li>
-    </ul>
-    <div id="offlineStatus" class="menu-offline-status">
-      <div class="menu-offline-row">
-        <span class="menu-offline-icon" id="offlineStatusIcon"></span>
-        <span id="offlineStatusText">Загрузка ресурсов...</span>
-      </div>
-    </div>
-  </nav>
 
-  <!-- BOTTOM PANEL (Документы рейса) -->
-  <div id="bottomPanelOverlay" class="bottom-panel-overlay"></div>
-  <div id="bottomPanel" class="bottom-panel">
-    <div class="bottom-panel-header">
-      <button class="bottom-panel-clear" id="bottomPanelClearBtn">Очистить</button>
-      <span class="bottom-panel-title">Документы рейса</span>
-      <button class="icon-btn bottom-panel-close" id="bottomPanelCloseBtn" aria-label="Закрыть"></button>
-    </div>
-    <div class="bottom-panel-body" id="bottomPanelBody">
-      <div class="bottom-panel-section">
-        <div class="bottom-panel-section-header">
-          <span class="bottom-panel-section-title">Фото</span>
-          <button class="icon-btn bottom-panel-add-photo" id="bottomPanelAddPhotoBtn" aria-label="Добавить фото"></button>
-        </div>
-        <div class="bottom-panel-photos" id="bottomPanelPhotos"></div>
-        <div class="bottom-panel-photos-empty" id="bottomPanelPhotosEmpty">Нет прикреплённых фото</div>
+      <!-- Плашка обновления JSON-данных -->
+      <div id="updateBadge" class="update-badge update-badge-hidden">
+        <span id="updateBadgeIcon"></span>
+        <span class="update-badge-text"></span>
       </div>
-      <div class="bottom-panel-section">
-        <div class="bottom-panel-section-header">
-          <span class="bottom-panel-section-title">Комментарии</span>
-        </div>
-        <div class="bottom-panel-comments">
-          <div class="bottom-panel-comments-header">
-            <span class="bottom-panel-comments-title">Комментарии к рейсу</span>
-            <button id="bottomPanelAddCommentBtn" class="icon-btn" aria-label="Добавить комментарий">+</button>
+    </nav>
+
+    <!-- ═══ SCREENS ═══ -->
+
+    <!-- Main Screen -->
+    <div id="mainScreen" class="screen">
+      <div class="main-bg"></div>
+      <div class="main-content">
+        <div class="main-quote-wrapper">
+          <span class="main-quote-mark main-quote-mark--open" aria-hidden="true">❝</span>
+          <div class="main-quote" id="mainQuote" aria-live="polite" aria-atomic="true">
+            <span class="main-quote-text" id="mainQuoteText"></span><span class="main-quote-cursor" id="mainQuoteCursor" aria-hidden="true"></span>
           </div>
-          <div id="bottomPanelCommentsList" class="bottom-panel-comments-list"></div>
+          <span class="main-quote-mark main-quote-mark--close" aria-hidden="true">❞</span>
+        </div>
+      </div>
+      <button id="notesQuickBtn" class="notes-quick-btn" aria-label="Быстрый доступ"></button>
+    </div>
+
+    <!-- Worktime Screen -->
+    <div id="worktimeScreen" class="screen">
+      <div class="module-container" id="worktimeContainer"></div>
+    </div>
+
+    <!-- Phonebook Screen -->
+    <div id="phonebookScreen" class="screen">
+      <div class="module-container" id="phonebookContainer"></div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="screen">
+      <div class="module-container" id="quizContainer"></div>
+    </div>
+
+    <!-- Checklists Screen -->
+    <div id="checklistsScreen" class="screen">
+      <div class="module-container" id="checklistsContainer"></div>
+    </div>
+
+    <!-- KRS Screen -->
+    <div id="krsScreen" class="screen">
+      <div class="module-container" id="krsContainer"></div>
+    </div>
+
+    <!-- Flight Procedures Screen -->
+    <div id="flightproceduresScreen" class="screen">
+      <div class="module-container" id="flightproceduresContainer"></div>
+    </div>
+
+    <!-- Notes Screen -->
+    <div id="notesScreen" class="screen">
+      <div class="module-container" id="notesContainer"></div>
+    </div>
+
+    <!-- FAQ Screen -->
+    <div id="faqScreen" class="screen">
+      <div class="module-container" id="faqContainer"></div>
+    </div>
+
+    <!-- Metbriefing Screen -->
+    <div id="metbriefingScreen" class="screen">
+      <div class="module-container" id="metbriefingContainer"></div>
+    </div>
+
+    <!-- Checkride Screen -->
+    <div id="checkrideScreen" class="screen">
+      <div class="module-container" id="checkrideContainer"></div>
+    </div>
+
+    <!-- FFS Training Screen -->
+    <div id="ffstrainingScreen" class="screen">
+      <div class="module-container" id="ffstrainingContainer"></div>
+    </div>
+
+    <!-- ═══ GLOBAL TOAST ═══ -->
+    <div id="globalToast" class="global-toast"></div>
+
+    <!-- ═══ GLOBAL CONFIRM DIALOG ═══ -->
+    <div id="globalConfirmOverlay" class="global-confirm-overlay">
+      <div class="global-confirm-sheet">
+        <p id="globalConfirmMessage" class="global-confirm-message"></p>
+        <div class="global-confirm-actions">
+          <button id="globalConfirmOk" class="global-confirm-btn-ok">Подтвердить</button>
+          <button id="globalConfirmCancel" class="global-confirm-btn-cancel">Отмена</button>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- GLOBAL TOAST -->
-  <div id="globalToast" class="global-toast"></div>
-
-  <!-- GLOBAL CONFIRM DIALOG -->
-  <div id="globalConfirmOverlay" class="global-confirm-overlay">
-    <div class="global-confirm-sheet">
-      <p id="globalConfirmMessage" class="global-confirm-message"></p>
-      <div class="global-confirm-actions">
-        <button id="globalConfirmOk" class="global-confirm-btn-ok">Подтвердить</button>
-        <button id="globalConfirmCancel" class="global-confirm-btn-cancel">Отмена</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- МОДАЛЬНОЕ ОКНО ДЛЯ КОММЕНТАРИЕВ (Checklists) -->
-  <div id="commentModalOverlay" class="comment-modal-overlay">
-    <div class="comment-modal">
-      <div class="comment-modal-header">
-        <span>Комментарий к рейсу</span>
-        <button class="comment-modal-close" id="commentModalClose">&times;</button>
-      </div>
-      <textarea id="commentInput" placeholder="Введите текст комментария..."></textarea>
-      <div class="comment-modal-actions">
-        <button id="commentSaveBtn" class="comment-save-btn">Сохранить</button>
-        <button id="commentCancelBtn" class="comment-cancel-btn">Отмена</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM-SHEET НАСТРОЕК WORKTIME -->
-  <div id="wtSettingsOverlay" class="wt-settings-overlay"></div>
-  <div id="wtSettingsSheet" class="wt-settings-sheet">
-    <div class="wt-settings-header">
-      <h2 class="wt-settings-title">Настройки и сегменты</h2>
-      <button class="icon-btn" id="wtCloseSettingsBtn" aria-label="Закрыть"></button>
-    </div>
-    <div class="ct-dialog-summary" id="wtSettingsSummary"></div>
-    <div id="wtSettingsContent" class="wt-settings-content"></div>
-    <div class="ct-dialog-actions">
-      <button class="btn-primary" id="wtSaveSegmentBtn">Сохранить сегмент</button>
-      <button class="btn-outline" id="wtCloseSettingsBtn2">Закрыть</button>
-    </div>
-  </div>
-
-  <!-- PHOTOSWIPE TEMPLATE (v4) -->
-  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="pswp__bg"></div>
-    <div class="pswp__scroll-wrap">
-      <div class="pswp__container">
-        <div class="pswp__item"></div>
-        <div class="pswp__item"></div>
-        <div class="pswp__item"></div>
-      </div>
-      <div class="pswp__ui pswp__ui--hidden">
-        <div class="pswp__top-bar">
-          <div class="pswp__counter"></div>
-          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-          <div class="pswp__preloader"></div>
-        </div>
-        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-          <div class="pswp__share-tooltip"></div>
-        </div>
-        <button class="pswp__button pswp__button--arrow--left" title="Previous"></button>
-        <button class="pswp__button pswp__button--arrow--right" title="Next"></button>
-        <div class="pswp__caption">
-          <div class="pswp__caption__center"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- INPUT FILE ДЛЯ ФОТО BOTTOM PANEL -->
-  <input type="file" id="bottomPanelFileInput" accept="image/*">
-</div>
-
-<!-- SCRIPTS (порядок строго по 0_SYSTEM.txt) -->
-<script src="icons.js"></script>
-<script src="libs/pdfjs/pdf.min.js"></script>
-<script>
-  // Установка worker для PDF.js
-  if (window.pdfjsLib) {
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdfjs/pdf.worker.min.js';
-  }
-</script>
-<script src="libs/photoswipe/photoswipe.min.js"></script>
-<script src="libs/photoswipe/photoswipe-ui-default.min.js"></script>
-<script src="app.js"></script>
-<script src="modules/phonebook.js"></script>
-<script src="modules/checklist.js"></script>
-<script src="modules/krs.js"></script>
-<script src="modules/flightprocedures.js"></script>
-<script src="modules/notes.js"></script>
-<script src="modules/faq.js"></script>
-<script src="modules/worktime.js"></script>
-<script>
-  if (window.app && typeof window.app.initServiceWorker === 'function') {
-    window.app.initServiceWorker();
-  }
-</script>
+  <!-- ═══ SCRIPTS (loaded in order) ═══ -->
+  <script src="/icons.js"></script>
+  <script src="/modules/registry.js"></script>
+  <script src="/modules/worktime/index.js"></script>
+  <script src="/modules/checklists/index.js"></script>
+  <script src="/modules/flightprocedures/index.js"></script>
+  <script src="/modules/krs/index.js"></script>
+  <script src="/modules/phonebook/index.js"></script>
+  <script src="/modules/quiz/index.js"></script>
+  <script src="/modules/notes/index.js"></script>
+  <script src="/modules/faq/index.js"></script>
+  <script src="/modules/metbriefing/index.js"></script>
+  <script src="/modules/checkride/index.js"></script>
+  <script src="/modules/ffstraining/index.js"></script>
+  <script src="/app.js"></script>
+  <script>app.initServiceWorker();</script>
 </body>
 </html>

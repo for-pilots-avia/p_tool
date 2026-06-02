@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" fill="#E3F2FD"/>
+  <text x="320" y="30" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#1565C0">Boeing 737-800</text>
+  <!-- Fuselage -->
+  <ellipse cx="320" cy="190" rx="220" ry="30" fill="#B0BEC5" stroke="#78909C" stroke-width="2"/>
+  <!-- Nose -->
+  <ellipse cx="530" cy="190" rx="30" ry="28" fill="#CFD8DC" stroke="#78909C" stroke-width="2"/>
+  <!-- Tail -->
+  <polygon points="100,190 130,100 170,190" fill="#CD202C" stroke="#8B1A24" stroke-width="2"/>
+  <rect x="130" y="130" width="15" height="60" fill="#90A4AE" rx="3"/>
+  <!-- Wings -->
+  <polygon points="250,185 320,185 280,280 210,280" fill="#90A4AE" stroke="#78909C" stroke-width="1.5"/>
+  <polygon points="390,185 320,185 360,280 430,280" fill="#90A4AE" stroke="#78909C" stroke-width="1.5"/>
+  <!-- Engines -->
+  <ellipse cx="265" cy="270" rx="22" ry="12" fill="#78909C" stroke="#546E7A" stroke-width="1.5"/>
+  <ellipse cx="375" cy="270" rx="22" ry="12" fill="#78909C" stroke="#546E7A" stroke-width="1.5"/>
+  <!-- Windows -->
+  <g fill="#1565C0" opacity="0.6">
+    <rect x="400" y="178" width="6" height="8" rx="2"/>
+    <rect x="412" y="178" width="6" height="8" rx="2"/>
+    <rect x="424" y="178" width="6" height="8" rx="2"/>
+    <rect x="436" y="178" width="6" height="8" rx="2"/>
+    <rect x="448" y="178" width="6" height="8" rx="2"/>
+    <rect x="460" y="178" width="6" height="8" rx="2"/>
+    <rect x="472" y="178" width="6" height="8" rx="2"/>
+    <rect x="484" y="178" width="6" height="8" rx="2"/>
+    <rect x="496" y="178" width="6" height="8" rx="2"/>
+  </g>
+  <!-- Door -->
+  <rect x="510" y="175" width="10" height="20" rx="2" fill="none" stroke="#546E7A" stroke-width="1"/>
+  <!-- Landing gear -->
+  <line x1="340" y1="220" x2="340" y2="250" stroke="#546E7A" stroke-width="3"/>
+  <circle cx="340" cy="253" r="6" fill="#546E7A"/>
+  <line x1="480" y1="220" x2="480" y2="250" stroke="#546E7A" stroke-width="3"/>
+  <circle cx="480" cy="253" r="6" fill="#546E7A"/>
+</svg>

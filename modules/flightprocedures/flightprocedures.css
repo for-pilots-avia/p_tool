@@ -1,0 +1,43 @@
+/* ═══════════════════════════════════════════
+   МОДУЛЬ: Лётные процедуры (flightprocedures)
+   ═══════════════════════════════════════════ */
+
+.fp-phase {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.fp-phase-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  min-height: 48px;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.15s var(--transition-ease);
+}
+.fp-phase-header .collapsible-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+.fp-phase-header svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@media (hover: hover) {
+  .fp-phase-header:hover {
+    background: var(--color-bg-hover);
+  }
+}
+
+.fp-phase.open > .fp-phase-header {
+  border-bottom: 1px solid var(--color-border-subtle);
+}
