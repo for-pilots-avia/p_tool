@@ -6,7 +6,7 @@
 window.app = {};
 
 /* ─── Current module tracker (for destroy on navigation) ─── */
-var _currentModule = null;
+var _currentModule = 'main';
 
 /* ═══════════════════════════════════════════
    NAVIGATION
@@ -92,6 +92,17 @@ window.app.typewriterQuote = function(text, speed) {
   var textEl   = document.getElementById('mainQuoteText');
   var cursorEl = document.getElementById('mainQuoteCursor');
   if (!textEl) return;
+
+  /* Remove stray whitespace text nodes in .main-quote (pre-wrap shows them) */
+  var quoteDiv = textEl.parentNode;
+  if (quoteDiv) {
+    for (var n = quoteDiv.firstChild; n; n = n.nextSibling) {
+      if (n.nodeType === 3 && n !== textEl && n !== cursorEl) {
+        quoteDiv.removeChild(n);
+        break;
+      }
+    }
+  }
 
   window.app._twCancel = true;
 
