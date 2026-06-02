@@ -157,7 +157,7 @@ window.app.renderMainQuote = function() {
     return;
   }
 
-  fetch('/modules/aviation_sayings.json')
+  fetch('modules/aviation_sayings.json')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var sayings = (data && data.sayings)
@@ -538,12 +538,12 @@ window.app.ensureLib = function(id, callback) {
   var configs = {
     'photoswipe': {
       css: [
-        '/libs/photoswipe/photoswipe.css',
-        '/libs/photoswipe/default-skin/default-skin.css'
+        'libs/photoswipe/photoswipe.css',
+        'libs/photoswipe/default-skin/default-skin.css'
       ],
       js: [
-        '/libs/photoswipe/photoswipe.min.js',
-        '/libs/photoswipe/photoswipe-ui-default.min.js'
+        'libs/photoswipe/photoswipe.min.js',
+        'libs/photoswipe/photoswipe-ui-default.min.js'
       ],
       onload: function() {
         // PhotoSwipe требует статический .pswp шаблон в DOM
@@ -574,10 +574,10 @@ window.app.ensureLib = function(id, callback) {
     },
     'pdfjs': {
       css: [],
-      js: ['/libs/pdfjs/pdf.min.js'],
+      js: ['libs/pdfjs/pdf.min.js'],
       onload: function() {
         if (window.pdfjsLib) {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = '/libs/pdfjs/pdf.worker.min.js';
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdfjs/pdf.worker.min.js';
         }
       }
     }

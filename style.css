@@ -6,7 +6,7 @@
 /* ─── CUSTOM FONTS ─── */
 @font-face {
   font-family: 'Caveat';
-  src: url('/fonts/Caveat-Bold.woff2') format('woff2');
+  src: url('fonts/Caveat-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -641,8 +641,8 @@ button:focus:not(:focus-visible) { outline: none; }
   position: absolute; inset: 0; z-index: 0;
   background-image:
     image-set(
-      url('/background-mobile.webp') type('image/webp'),
-      url('/background-mobile.jpg')  type('image/jpeg')
+      url('background-mobile.webp') type('image/webp'),
+      url('background-mobile.jpg')  type('image/jpeg')
     );
   background-size: cover;
   background-position: center;
@@ -653,8 +653,8 @@ button:focus:not(:focus-visible) { outline: none; }
   #mainScreen .main-bg {
     background-image:
       image-set(
-        url('/background-desktop.webp') type('image/webp'),
-        url('/background-desktop.jpg')  type('image/jpeg')
+        url('background-desktop.webp') type('image/webp'),
+        url('background-desktop.jpg')  type('image/jpeg')
       );
   }
 }
