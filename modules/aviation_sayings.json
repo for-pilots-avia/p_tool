@@ -1,19 +1,864 @@
 {
+  "metadata": {
+    "title": "Объединённый сборник авиационных пословиц и поговорок",
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "total_unique_items": 245,
+    "sources_merged": 3
+  },
   "sayings": [
-    { "ru": "Лучше тупой карандаш, чем острая память!", "en": "A dull pencil is better than a sharp memory!" },
-    { "ru": "В авиации нет мелочей.", "en": "In aviation, there are no trifles." },
-    { "ru": "Семь раз отмерь, один раз отрежь.", "en": "Measure seven times, cut once." },
-    { "ru": "Авиация — это не профессия, это образ жизни.", "en": "Aviation is not a profession, it's a way of life." },
-    { "ru": "Хороший пилот — это тот, кто знает, что он не знает.", "en": "A good pilot is one who knows what he doesn't know." },
-    { "ru": "Безопасность полётов начинается на земле.", "en": "Flight safety begins on the ground." },
-    { "ru": "Небо не прощает ошибок, но учит не повторять их.", "en": "The sky doesn't forgive mistakes, but teaches not to repeat them." },
-    { "ru": "Лучше быть на земле и жалеть, что не в небе, чем в небе и жалеть, что не на земле.", "en": "Better to be on the ground wishing you were in the air, than in the air wishing you were on the ground." },
-    { "ru": "Чеклист написан кровью.", "en": "The checklist is written in blood." },
-    { "ru": "Опыт — это то, что ты получаешь, когда не получил того, что хотел.", "en": "Experience is what you get when you didn't get what you wanted." },
-    { "ru": "Воздух — прекрасный слуга, но суровый хозяин.", "en": "The air is a wonderful servant but a harsh master." },
-    { "ru": "Скорость жизни — один взлёт и одна посадка.", "en": "The speed of life is one takeoff and one landing." },
-    { "ru": "Каждая посадка — это контролируемое столкновение с землёй.", "en": "Every landing is a controlled collision with the earth." },
-    { "ru": "Тот, кто не боится, не понимает ситуацию.", "en": "He who is not afraid does not understand the situation." },
-    { "ru": "Аэродинамика — это не мнение, это закон физики.", "en": "Aerodynamics is not an opinion, it's a law of physics." }
+    {
+      "id": 1,
+      "en": "Better to be on the ground wishing you were flying than flying wishing you were on the ground.",
+      "category": "safety"
+    },
+    {
+      "id": 2,
+      "ru": "Взлёт — по желанию, посадка — обязательна.",
+      "category": "humor"
+    },
+    {
+      "id": 3,
+      "ru": "Любая посадка, после которой можно уйти пешком — хорошая посадка.",
+      "category": "landing"
+    },
+    {
+      "id": 4,
+      "ru": "Есть старые пилоты и есть смелые пилоты, но старых смелых пилотов не бывает.",
+      "category": "safety"
+    },
+    {
+      "id": 5,
+      "ru": "Высота — это жизнь.",
+      "category": "flight"
+    },
+    {
+      "id": 6,
+      "en": "Speed is no substitute for altitude.",
+      "category": "flight"
+    },
+    {
+      "id": 7,
+      "en": "Weather is always stronger than the airplane.",
+      "category": "weather"
+    },
+    {
+      "id": 8,
+      "ru": "Если сомневаешься — не взлетай.",
+      "category": "decision"
+    },
+    {
+      "id": 9,
+      "ru": "Хорошее решение приходит с опытом. Опыт приходит после плохих решений.",
+      "category": "experience"
+    },
+    {
+      "id": 10,
+      "ru": "Чек-листы написаны кровью.",
+      "category": "checklist"
+    },
+    {
+      "id": 11,
+      "en": "Never fly faster than your guardian angel can fly.",
+      "category": "humor"
+    },
+    {
+      "id": 12,
+      "ru": "Лучший навигационный прибор — полный бак.",
+      "category": "navigation"
+    },
+    {
+      "id": 13,
+      "en": "The sky does not forgive mistakes.",
+      "category": "safety"
+    },
+    {
+      "id": 14,
+      "en": "A superior pilot uses superior judgment to avoid situations requiring superior skill.",
+      "category": "judgment"
+    },
+    {
+      "id": 15,
+      "ru": "В авиации нет мелочей.",
+      "category": "discipline"
+    },
+    {
+      "id": 16,
+      "en": "Better one more go-around than one last landing.",
+      "category": "landing"
+    },
+    {
+      "id": 18,
+      "en": "The best emergency procedure is prevention.",
+      "category": "safety"
+    },
+    {
+      "id": 19,
+      "en": "Bad weather is always faster than your airplane.",
+      "category": "weather"
+    },
+    {
+      "id": 20,
+      "en": "A checklist is shorter than an accident report.",
+      "category": "checklist"
+    },
+    {
+      "id": 21,
+      "ru": "Самоуверенность опаснее турбулентности.",
+      "category": "safety"
+    },
+    {
+      "id": 22,
+      "ru": "Летать легко. Сложно летать безопасно.",
+      "category": "safety"
+    },
+    {
+      "id": 23,
+      "en": "There is no such thing as too many preflight checks.",
+      "category": "checklist"
+    },
+    {
+      "id": 24,
+      "en": "Every accident begins with a small mistake.",
+      "category": "safety"
+    },
+    {
+      "id": 25,
+      "en": "There is no pause button in the sky.",
+      "category": "humor"
+    },
+    {
+      "id": 26,
+      "ru": "Самолёт не прощает спешку.",
+      "category": "discipline"
+    },
+    {
+      "id": 27,
+      "en": "Every flight is a test.",
+      "category": "training"
+    },
+    {
+      "id": 28,
+      "en": "Better a canceled flight than an accident investigation.",
+      "category": "decision"
+    },
+    {
+      "id": 29,
+      "en": "Aviation begins with respect for procedures.",
+      "category": "procedures"
+    },
+    {
+      "id": 30,
+      "en": "Nothing is more expensive than cheap maintenance.",
+      "category": "maintenance"
+    },
+    {
+      "id": 31,
+      "ru": "Самая опасная часть полёта — дорога в аэропорт.",
+      "category": "statistics"
+    },
+    {
+      "id": 32,
+      "en": "Patience wins in the sky.",
+      "category": "discipline"
+    },
+    {
+      "id": 33,
+      "en": "A good captain makes timely decisions.",
+      "category": "leadership"
+    },
+    {
+      "id": 34,
+      "ru": "Лучше потерять минуту, чем жизнь.",
+      "category": "safety"
+    },
+    {
+      "id": 35,
+      "en": "Airplanes favor attentive pilots.",
+      "category": "discipline"
+    },
+    {
+      "id": 36,
+      "en": "Fuel in the tanks matters more than coffee in the thermos.",
+      "category": "fuel"
+    },
+    {
+      "id": 37,
+      "ru": "Лучший полёт — тот, после которого хочется летать снова.",
+      "category": "motivation"
+    },
+    {
+      "id": 39,
+      "en": "Aviation demands discipline every day.",
+      "category": "discipline"
+    },
+    {
+      "id": 40,
+      "en": "Good flying starts on the ground.",
+      "category": "training"
+    },
+    {
+      "id": 45,
+      "en": "A good pilot is always ahead of the airplane.",
+      "category": "judgment"
+    },
+    {
+      "id": 46,
+      "en": "Flying is hours of boredom punctuated by moments of sheer terror.",
+      "category": "humor"
+    },
+    {
+      "id": 48,
+      "en": "Never argue with the weather.",
+      "category": "weather"
+    },
+    {
+      "id": 50,
+      "en": "Aviation has no room for lazy people.",
+      "category": "discipline"
+    },
+    {
+      "id": 51,
+      "en": "The best alternate is the one planned ahead.",
+      "category": "planning"
+    },
+    {
+      "id": 52,
+      "ru": "Плохой план лучше отсутствия плана.",
+      "category": "planning"
+    },
+    {
+      "id": 53,
+      "en": "Turbulence passes, mistakes remain.",
+      "category": "safety"
+    },
+    {
+      "id": 56,
+      "ru": "Авиация не любит героев.",
+      "category": "safety"
+    },
+    {
+      "id": 57,
+      "en": "The safest flight is the canceled one.",
+      "category": "decision"
+    },
+    {
+      "id": 58,
+      "en": "Every gallon of fuel buys thinking time.",
+      "category": "fuel"
+    },
+    {
+      "id": 59,
+      "ru": "Лётчик учится всю жизнь.",
+      "category": "training"
+    },
+    {
+      "id": 60,
+      "ru": "Ошибки пилота редко повторяются дважды.",
+      "category": "humor"
+    },
+    {
+      "id": 61,
+      "en": "An undisciplined pilot is worse than a failed engine.",
+      "category": "discipline"
+    },
+    {
+      "id": 62,
+      "en": "Never rush toward bad weather.",
+      "category": "weather"
+    },
+    {
+      "id": 63,
+      "en": "Aviation favors the prepared.",
+      "category": "training"
+    },
+    {
+      "id": 64,
+      "ru": "Если всё идёт слишком хорошо — ты что-то пропустил.",
+      "category": "humor"
+    },
+    {
+      "id": 65,
+      "en": "A bad decision in the air is worse than a late decision on the ground.",
+      "category": "decision"
+    },
+    {
+      "id": 66,
+      "en": "Airplanes obey physics, not manuals.",
+      "category": "flight"
+    },
+    {
+      "id": 67,
+      "en": "Never trust a single instrument.",
+      "category": "instruments"
+    },
+    {
+      "id": 68,
+      "en": "Better a wet pilot than a dry accident report.",
+      "category": "humor"
+    },
+    {
+      "id": 69,
+      "ru": "Полёт заканчивается только после выключения двигателя.",
+      "category": "procedures"
+    },
+    {
+      "id": 70,
+      "en": "Poor communication creates good accidents.",
+      "category": "communication"
+    },
+    {
+      "id": 71,
+      "ru": "Авиация — это командная работа.",
+      "category": "crew"
+    },
+    {
+      "id": 74,
+      "en": "A clean airplane flies better.",
+      "category": "maintenance"
+    },
+    {
+      "id": 75,
+      "en": "An extra minute of inspection is cheaper than a minute of emergency.",
+      "category": "checklist"
+    },
+    {
+      "id": 76,
+      "ru": "Тишина в эфире подозрительна.",
+      "category": "communication"
+    },
+    {
+      "id": 77,
+      "en": "Better to ask than assume.",
+      "category": "communication"
+    },
+    {
+      "id": 78,
+      "en": "Luck favors the prepared in aviation.",
+      "category": "training"
+    },
+    {
+      "id": 79,
+      "ru": "Усталый пилот принимает плохие решения.",
+      "category": "fatigue"
+    },
+    {
+      "id": 81,
+      "en": "The best emergency plan is the one never used.",
+      "category": "safety"
+    },
+    {
+      "id": 82,
+      "en": "Experience is surviving your mistakes.",
+      "category": "experience"
+    },
+    {
+      "id": 83,
+      "ru": "Хорошая посадка начинается с хорошего захода.",
+      "category": "landing"
+    },
+    {
+      "id": 85,
+      "en": "Don't fly where you're not prepared to return from.",
+      "category": "planning"
+    },
+    {
+      "id": 86,
+      "en": "Memory is a poor substitute for notes.",
+      "category": "procedures"
+    },
+    {
+      "id": 89,
+      "ru": "Чем проще решение — тем оно безопаснее.",
+      "category": "judgment"
+    },
+    {
+      "id": 90,
+      "en": "A bad landing teaches more than a smooth one.",
+      "category": "training"
+    },
+    {
+      "id": 91,
+      "en": "Extra fuel never hurts.",
+      "category": "fuel"
+    },
+    {
+      "id": 93,
+      "ru": "Спокойный пилот — безопасный пилот.",
+      "category": "leadership"
+    },
+    {
+      "id": 94,
+      "en": "Never stop learning to fly.",
+      "category": "training"
+    },
+    {
+      "id": 95,
+      "en": "Aviation punishes arrogance.",
+      "category": "safety"
+    },
+    {
+      "id": 97,
+      "en": "Safety begins with discipline.",
+      "category": "discipline"
+    },
+    {
+      "id": 98,
+      "ru": "Авиация — это внимание к деталям.",
+      "category": "discipline"
+    },
+    {
+      "id": 99,
+      "en": "There are no unimportant warnings.",
+      "category": "safety"
+    },
+    {
+      "id": 100,
+      "en": "Fly with your head, not your emotions.",
+      "category": "judgment"
+    },
+    {
+      "id": 101,
+      "ru": "Небо любит подготовленных пилотов.",
+      "category": "training"
+    },
+    {
+      "id": 102,
+      "en": "Poor preparation creates accidents.",
+      "category": "training"
+    },
+    {
+      "id": 104,
+      "en": "Aviation is a profession for the patient.",
+      "category": "discipline"
+    },
+    {
+      "id": 107,
+      "ru": "Погода не обязана соответствовать прогнозу.",
+      "category": "weather"
+    },
+    {
+      "id": 108,
+      "en": "Every safe landing is the result of preparation.",
+      "category": "landing"
+    },
+    {
+      "id": 109,
+      "en": "Never be afraid to cancel a flight.",
+      "category": "decision"
+    },
+    {
+      "id": 110,
+      "ru": "В авиации мелкие нарушения приводят к большим последствиям.",
+      "category": "safety"
+    },
+    {
+      "id": 111,
+      "en": "Better a boring flight than an interesting investigation.",
+      "category": "humor"
+    },
+    {
+      "id": 112,
+      "ru": "Безопасность — это привычка.",
+      "category": "safety"
+    },
+    {
+      "id": 113,
+      "en": "An experienced pilot respects limitations.",
+      "category": "judgment"
+    },
+    {
+      "id": 114,
+      "ru": "Не доверяй удаче дважды.",
+      "category": "safety"
+    },
+    {
+      "id": 115,
+      "en": "There is no room for pride in the sky.",
+      "category": "discipline"
+    },
+    {
+      "id": 116,
+      "ru": "Хороший полёт начинается с хорошего брифинга.",
+      "category": "crew"
+    },
+    {
+      "id": 117,
+      "ru": "Топливо — это время.",
+      "category": "fuel"
+    },
+    {
+      "id": 122,
+      "ru": "Рожденный ползать — летать не может.",
+      "category": "general"
+    },
+    {
+      "id": 123,
+      "ru": "Лучше потерять жену, чем скорость на четвертом развороте.",
+      "category": "general"
+    },
+    {
+      "id": 124,
+      "ru": "В авиации нет мелочей.",
+      "category": "general"
+    },
+    {
+      "id": 125,
+      "ru": "Хорошая посадка — это та, после которой ты смог выйти из самолета. Отличная посадка — это когда самолет можно использовать снова.",
+      "category": "general"
+    },
+    {
+      "id": 126,
+      "ru": "Летчик — это не профессия, а диагноз.",
+      "category": "general"
+    },
+    {
+      "id": 127,
+      "ru": "Выше неба не поднимешься, ниже земли не упадешь.",
+      "category": "general"
+    },
+    {
+      "id": 128,
+      "ru": "Каждое правило в авиации написано кровью.",
+      "category": "general"
+    },
+    {
+      "id": 131,
+      "en": "There are old pilots and there are bold pilots. There are no old, bold pilots.",
+      "category": "general"
+    },
+    {
+      "id": 132,
+      "en": "Gravity: it's not just a good idea, it's the law.",
+      "category": "general"
+    },
+    {
+      "id": 133,
+      "en": "The only time you have too much fuel is when you're on fire.",
+      "category": "general"
+    },
+    {
+      "id": 134,
+      "en": "The propeller is just a big fan to keep the pilot cool. When it stops, you can see the pilot start sweating.",
+      "category": "general"
+    },
+    {
+      "id": 136,
+      "en": "The three most useless things in aviation are: altitude above you, runway behind you, and a tenth of a second ago.",
+      "category": "general"
+    },
+    {
+      "id": 138,
+      "en": "Autopilot is your best friend until it decides to kill you.",
+      "category": "general"
+    },
+    {
+      "id": 139,
+      "en": "There are no roads in the sky, but everyone follows the same path.",
+      "category": "general"
+    },
+    {
+      "id": 140,
+      "ru": "Летчик без пуза — что самолет без груза.",
+      "category": "general"
+    },
+    {
+      "id": 141,
+      "ru": "Не уверен — не взлетай.",
+      "category": "general"
+    },
+    {
+      "id": 143,
+      "ru": "Вертолет — это куча запчастей, летящих в одном направлении.",
+      "category": "general"
+    },
+    {
+      "id": 144,
+      "ru": "Чем больше в кабине кнопок, тем меньше шансов нажать на нужную.",
+      "category": "general"
+    },
+    {
+      "id": 147,
+      "ru": "Инструктор всегда прав.",
+      "category": "general"
+    },
+    {
+      "id": 148,
+      "en": "Good judgment comes from experience. Experience comes from bad judgment.",
+      "category": "general"
+    },
+    {
+      "id": 151,
+      "en": "He who falls in love with the sky feels homesick on the ground.",
+      "category": "general"
+    },
+    {
+      "id": 153,
+      "ru": "Небо — это единственный океан, у которого нет берегов.",
+      "category": "general"
+    },
+    {
+      "id": 156,
+      "ru": "Чем круче пилот, тем меньше он об этом говорит.",
+      "category": "general"
+    },
+    {
+      "id": 157,
+      "en": "If the engine quits, you have a lot of time for thinking.",
+      "category": "general"
+    },
+    {
+      "id": 160,
+      "ru": "Удача — это когда ты не совершил ошибку, которую мог совершить.",
+      "category": "general"
+    },
+    {
+      "id": 161,
+      "en": "The engine is the heart, the wings are the soul.",
+      "category": "general"
+    },
+    {
+      "id": 162,
+      "ru": "Лучше быть на земле и хотеть в небо, чем быть в небе и хотеть на землю.",
+      "category": "general"
+    },
+    {
+      "id": 163,
+      "ru": "Штурман — это человек, который знает, где мы заблудились.",
+      "category": "general"
+    },
+    {
+      "id": 164,
+      "ru": "Бортмеханик — это тот, кто чинит то, что сломал пилот.",
+      "category": "general"
+    },
+    {
+      "id": 165,
+      "ru": "Диспетчер — это бог, пока ты в его зоне.",
+      "category": "general"
+    },
+    {
+      "id": 166,
+      "en": "Don't argue with the sky — it is stronger.",
+      "category": "general"
+    },
+    {
+      "id": 167,
+      "en": "The flight begins in the head, not in the cockpit.",
+      "category": "general"
+    },
+    {
+      "id": 168,
+      "en": "The sky calls those who were born to fly.",
+      "category": "general"
+    },
+    {
+      "id": 169,
+      "en": "To become a pilot, you need to learn how to wait for the weather.",
+      "category": "general"
+    },
+    {
+      "id": 170,
+      "en": "If the sky is overcast, read the flight manual.",
+      "category": "general"
+    },
+    {
+      "id": 176,
+      "en": "Clouds are mountains of cotton, but with rocks inside.",
+      "category": "general"
+    },
+    {
+      "id": 177,
+      "en": "The main part of the airplane is the pilot's head.",
+      "category": "general"
+    },
+    {
+      "id": 179,
+      "en": "Look first, then turn.",
+      "category": "general"
+    },
+    {
+      "id": 180,
+      "en": "Don't fly faster than you think.",
+      "category": "general"
+    },
+    {
+      "id": 181,
+      "en": "Tailwind brings joy to speed.",
+      "category": "general"
+    },
+    {
+      "id": 182,
+      "ru": "Гроза — это повод выпить чаю на земле.",
+      "category": "general"
+    },
+    {
+      "id": 183,
+      "en": "The cockpit is your office, keep it clean.",
+      "category": "general"
+    },
+    {
+      "id": 184,
+      "ru": "Человек без мечты — как птица без крыльев.",
+      "category": "general"
+    },
+    {
+      "id": 185,
+      "ru": "Авиация держится на заклепках и матах.",
+      "category": "general"
+    },
+    {
+      "id": 186,
+      "ru": "В авиации всё работает до тех пор, пока не сломается.",
+      "category": "general"
+    },
+    {
+      "id": 187,
+      "ru": "Небо любит смелых, но наказывает дерзких.",
+      "category": "general"
+    },
+    {
+      "id": 188,
+      "ru": "Тормоза придумали трусы, а реверс — умные.",
+      "category": "general"
+    },
+    {
+      "id": 189,
+      "en": "If you see the ground, you're not in the clouds yet.",
+      "category": "general"
+    },
+    {
+      "id": 191,
+      "ru": "Кто не летал, тот не поймет.",
+      "category": "general"
+    },
+    {
+      "id": 192,
+      "ru": "Свобода начинается там, где заканчивается ВПП.",
+      "category": "general"
+    },
+    {
+      "id": 193,
+      "ru": "Пилот — это тот, кто видит мир сверху вниз.",
+      "category": "general"
+    },
+    {
+      "id": 195,
+      "ru": "Небо — это лучший учитель.",
+      "category": "general"
+    },
+    {
+      "id": 196,
+      "en": "Pre-flight check is the pilot's prayer.",
+      "category": "general"
+    },
+    {
+      "id": 198,
+      "ru": "В авиации нет слова 'последний', есть только 'крайний'.",
+      "category": "general"
+    },
+    {
+      "id": 199,
+      "en": "An airplane obeys only a steady hand.",
+      "category": "general"
+    },
+    {
+      "id": 206,
+      "ru": "В небе все равны.",
+      "category": "general"
+    },
+    {
+      "id": 207,
+      "ru": "Чем больше знаешь, тем меньше боишься.",
+      "category": "general"
+    },
+    {
+      "id": 208,
+      "ru": "Авиация — это болезнь, которая не лечится.",
+      "category": "general"
+    },
+    {
+      "id": 209,
+      "en": "Hold the yoke tight and keep your nerves in check.",
+      "category": "general"
+    },
+    {
+      "id": 218,
+      "ru": "В авиации случайностей не бывает.",
+      "category": "general"
+    },
+    {
+      "id": 219,
+      "en": "Fly where the sun shines.",
+      "category": "general"
+    },
+    {
+      "id": 220,
+      "en": "Kerosene smells like romance.",
+      "category": "general"
+    },
+    {
+      "id": 221,
+      "ru": "Самолет — это чудо техники в руках мастера.",
+      "category": "general"
+    },
+    {
+      "id": 222,
+      "en": "Every flight is a new story.",
+      "category": "general"
+    },
+    {
+      "id": 225,
+      "en": "A good pilot is always learning.",
+      "category": "training"
+    },
+    {
+      "id": 226,
+      "en": "Altitude is life insurance and airspeed is cash.",
+      "category": "flight"
+    },
+    {
+      "id": 231,
+      "en": "Checklists are written in blood.",
+      "category": "checklist"
+    },
+    {
+      "id": 232,
+      "en": "Flying is hours of boredom punctuated by moments of sheer terror.",
+      "category": "humor"
+    },
+    {
+      "id": 233,
+      "en": "A superior pilot uses superior judgment to avoid situations requiring superior skill.",
+      "category": "judgment"
+    },
+    {
+      "id": 234,
+      "en": "In aviation, there are no small details.",
+      "category": "maintenance"
+    },
+    {
+      "id": 236,
+      "ru": "Нормальная посадка — это случайность, хорошая посадка — результат опыта.",
+      "category": "landing"
+    },
+    {
+      "id": 241,
+      "en": "Never save on fuel or preparation time.",
+      "category": "fuel"
+    },
+    {
+      "id": 242,
+      "en": "Overconfidence is more dangerous than turbulence.",
+      "category": "safety"
+    },
+
+    {
+      "id": 245,
+      "en": "Pilots fly the weather they see, not the forecast.",
+      "category": "weather"
+    }
   ]
 }
