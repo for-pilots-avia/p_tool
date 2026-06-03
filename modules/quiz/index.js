@@ -440,7 +440,7 @@
     show(loaderEl); hide(errorEl); hide(contentEl);
 
     /* Load main test from questions.txt */
-    fetch('/modules/quiz/data/questions.txt')
+    fetch('modules/quiz/data/questions.txt')
       .then(function (res) {
         if (!res.ok) throw new Error('Failed to load questions.txt');
         return res.text();
@@ -451,10 +451,10 @@
 
         /* Load additional JSON tests */
         return Promise.all([
-          fetch('/modules/quiz/data/test-visual.json')
+          fetch('modules/quiz/data/test-visual.json')
             .then(function (res) { if (!res.ok) return null; return res.json(); })
             .catch(function () { return null; }),
-          fetch('/modules/quiz/data/test-TB.json')
+          fetch('modules/quiz/data/test-TB.json')
             .then(function (res) { if (!res.ok) return null; return res.json(); })
             .catch(function () { return null; })
         ]);
