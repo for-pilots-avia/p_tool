@@ -400,6 +400,13 @@ window.app.showUpdateBadge = function(moduleName) {
   badge.classList.remove('update-badge-hidden');
   void badge.offsetWidth;
   badge.classList.add('update-badge-visible');
+
+  // Авто-скрытие через 5 секунд
+  if (window.app._updateBadgeTimer) clearTimeout(window.app._updateBadgeTimer);
+  window.app._updateBadgeTimer = setTimeout(function() {
+    badge.classList.remove('update-badge-visible');
+    badge.classList.add('update-badge-hidden');
+  }, 5000);
 };
 
 window.app.initServiceWorker = function() {
@@ -460,6 +467,43 @@ window.app.initServiceWorker = function() {
       var swBar   = document.getElementById('swProgressBar');
       if (overlay) overlay.style.display = 'flex';
       if (swBar)   swBar.style.display   = 'block';
+    }
+
+    // ── Обнаружение обновления SW → показать баннер ──
+    reg.addEventListener('updatefound', function() {
+      var newWorker = reg.installing;
+      if (!newWorker) return;
+
+      var banner  = document.getElementById('swUpdateBanner');
+      var text    = document.getElementById('swUpdateBannerText');
+      var fill    = document.getElementById('swUpdateProgressFill');
+      var reloadBtn = document.getElementById('swUpdateReloadBtn');
+      if (!banner) return;
+
+      banner.style.display = 'flex';
+      if (text) text.textContent = 'Загружается обновление...';
+      if (reloadBtn) reloadBtn.style.display = 'none';
+
+      newWorker.addEventListener('statechange', function() {
+        if (newWorker.state === 'installed') {
+          if (fill) fill.style.width = '100%';
+          if (text) text.textContent = 'Доступно обновление приложения';
+          if (reloadBtn) reloadBtn.style.display = 'inline-block';
+        }
+      });
+    });
+
+    // Кнопка «Обновить» → пропустить ожидание и перезагрузить
+    var reloadBtn = document.getElementById('swUpdateReloadBtn');
+    if (reloadBtn) {
+      reloadBtn.addEventListener('click', function() {
+        if (reg.waiting) {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          window.location.reload();
+        });
+      });
     }
   }).catch(function(err) {
     console.error('SW registration failed:', err);
@@ -996,6 +1040,22 @@ function _appInit() {
   // Build menu from registry
   buildMenuFromRegistry();
   initMenuIcons();
+
+  // Update badge close button
+  var updateBadgeClose = document.getElementById('updateBadgeClose');
+  if (updateBadgeClose) {
+    updateBadgeClose.addEventListener('click', function() {
+      var badge = document.getElementById('updateBadge');
+      if (badge) {
+        badge.classList.remove('update-badge-visible');
+        badge.classList.add('update-badge-hidden');
+      }
+      if (window.app._updateBadgeTimer) {
+        clearTimeout(window.app._updateBadgeTimer);
+        window.app._updateBadgeTimer = null;
+      }
+    });
+  }
 
   // Theme toggle
   var themeToggle = document.getElementById('themeToggle');

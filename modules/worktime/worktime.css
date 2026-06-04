@@ -187,11 +187,11 @@
 }
 
 /* ─── Segment colors (timeline + card indicators) ─── */
-.wt-segment-color-0 { background-color: #3b82f6; }
-.wt-segment-color-1 { background-color: #8b5cf6; }
-.wt-segment-color-2 { background-color: #ec4899; }
-.wt-segment-color-3 { background-color: #f59e0b; }
-.wt-segment-color-4 { background-color: #10b981; }
+.wt-segment-color-0 { background-color: var(--color-seg-0); }
+.wt-segment-color-1 { background-color: var(--color-seg-1); }
+.wt-segment-color-2 { background-color: var(--color-seg-2); }
+.wt-segment-color-3 { background-color: var(--color-seg-3); }
+.wt-segment-color-4 { background-color: var(--color-seg-4); }
 
 /* ─── Empty state — используется глобальный .ct-empty-* из style.css ─── */
 
@@ -721,34 +721,4 @@
   flex-shrink: 0;
 }
 
-/* ─── Dark theme overrides ─── */
-body.dark-theme .wt-field-input {
-  background: var(--color-bg-card);
-  border-color: var(--color-border);
-  color: var(--color-text-main);
-}
-body.dark-theme .wt-settings-sheet {
-  background: var(--color-bg-card);
-}
-body.dark-theme .wt-settings-title {
-  color: var(--color-text-main);
-}
-body.dark-theme .wt-header-menu {
-  background: var(--color-bg-card);
-  box-shadow: 0 4px 16px var(--color-shadow-lg), 0 0 0 1px var(--color-border-subtle);
-}
-body.dark-theme .wt-settings-header .icon-btn {
-  color: var(--color-text-secondary) !important;
-}
-body.dark-theme .wt-sub-card {
-  background: var(--color-bg-main);
-}
-body.dark-theme .wt-segment-card {
-  background: var(--color-bg-main);
-}
-body.dark-theme .wt-settings-group {
-  background: var(--color-bg-main);
-}
-body.dark-theme .wt-dialog-summary {
-  background: var(--color-bg-main);
-}
+

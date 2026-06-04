@@ -656,7 +656,10 @@
       _menuOutsideHandler = null;
     }
     var container = document.getElementById('notesContainer');
-    if (container) container.innerHTML = '';
+    if (container) {
+      container.classList.remove('notes-fullscreen');
+      container.innerHTML = '';
+    }
     renderListHeader();
     renderAll();
   }
@@ -671,11 +674,27 @@
 
     var container = document.getElementById('notesContainer');
     if (!container) return;
+    container.classList.add('notes-fullscreen');
 
     var html = '<div class="notes-draw-screen">';
     html += '<div class="notes-draw-wrap">';
 
-    /* Category selector */
+    /* Toolbar — stroke/eraser (top) */
+    html += '<div class="notes-draw-toolbar">';
+    html += '<div class="notes-stroke-controls">';
+    html += '<button class="notes-stroke-btn notes-stroke-thin' + (_drawStrokeWidth === 2 ? ' notes-stroke-active' : '') + '" data-stroke="2"></button>';
+    html += '<button class="notes-stroke-btn notes-stroke-mid' + (_drawStrokeWidth === 5 ? ' notes-stroke-active' : '') + '" data-stroke="5"></button>';
+    html += '<button class="notes-stroke-btn notes-stroke-thick' + (_drawStrokeWidth === 10 ? ' notes-stroke-active' : '') + '" data-stroke="10"></button>';
+    html += '</div>';
+    html += '<button class="notes-tool-eraser' + (_drawEraser ? ' notes-eraser-active' : '') + '" id="notesDrawEraser" aria-label="Ластик">'
+      + (window.ICONS.eraser || '') + '</button>';
+    html += '</div>';
+
+    /* Canvas */
+    html += '<canvas class="notes-canvas" id="notesDrawCanvas"></canvas>';
+
+    /* Bottom bar — categories left, actions right */
+    html += '<div class="notes-draw-bottom-bar">';
     html += '<div class="notes-draw-category-bar">';
     var catKeys = ['Важно', 'Работа', 'Личное'];
     for (var c = 0; c < catKeys.length; c++) {
@@ -687,21 +706,10 @@
       html += '<button class="' + catPillClass + '"' + catStyle + ' data-cat="' + catKeys[c] + '">' + catKeys[c] + '</button>';
     }
     html += '</div>';
-
-    /* Canvas */
-    html += '<canvas class="notes-canvas" id="notesDrawCanvas"></canvas>';
-
-    /* Toolbar (save button is here, NOT in header) */
-    html += '<div class="notes-draw-toolbar">';
+    html += '<div class="notes-draw-actions">';
     html += '<button class="notes-tool-clear" id="notesDrawClear">Очистить</button>';
-    html += '<div class="notes-stroke-controls">';
-    html += '<button class="notes-stroke-btn notes-stroke-thin' + (_drawStrokeWidth === 2 ? ' notes-stroke-active' : '') + '" data-stroke="2"></button>';
-    html += '<button class="notes-stroke-btn notes-stroke-mid' + (_drawStrokeWidth === 5 ? ' notes-stroke-active' : '') + '" data-stroke="5"></button>';
-    html += '<button class="notes-stroke-btn notes-stroke-thick' + (_drawStrokeWidth === 10 ? ' notes-stroke-active' : '') + '" data-stroke="10"></button>';
-    html += '</div>';
-    html += '<button class="notes-tool-eraser' + (_drawEraser ? ' notes-eraser-active' : '') + '" id="notesDrawEraser" aria-label="Ластик">'
-      + (window.ICONS.eraser || '') + '</button>';
     html += '<button class="btn-primary" id="notesDrawSaveBtn" style="padding:6px 16px;font-size:var(--font-sm);min-height:32px;border-radius:16px">Сохранить</button>';
+    html += '</div>';
     html += '</div>';
 
     html += '</div>';
@@ -716,6 +724,7 @@
     _currentView = 'text';
     var container = document.getElementById('notesContainer');
     if (!container) return;
+    container.classList.add('notes-fullscreen');
 
     var title = existingNote ? escHtml(existingNote.title || '') : '';
     var body = existingNote ? escHtml(existingNote.body || '') : '';
@@ -762,29 +771,38 @@
     var wrap = canvas.parentElement;
     if (!wrap) return;
 
-    /* Size canvas to available space */
-    var rect = wrap.getBoundingClientRect();
-    var toolbarEl = wrap.querySelector('.notes-draw-toolbar');
-    var catBarEl = wrap.querySelector('.notes-draw-category-bar');
-    var usedH = (toolbarEl ? toolbarEl.offsetHeight : 0) + (catBarEl ? catBarEl.offsetHeight : 0);
+    /* Defer sizing so CSS layout is fully resolved */
+    setTimeout(function() {
+      var c = document.getElementById('notesDrawCanvas');
+      var w2 = c ? c.parentElement : null;
+      if (!c || !w2) return;
 
-    var dpr = window.devicePixelRatio || 1;
-    var w = Math.max(1, Math.floor(rect.width));
-    var h = Math.max(200, Math.floor(window.innerHeight - 56 - usedH));
+      var dpr = window.devicePixelRatio || 1;
 
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
+      /* Wrap has CSS height = 100dvh - header - safe-area, use it directly */
+      var wrapRect = w2.getBoundingClientRect();
+      var w = Math.max(1, Math.floor(wrapRect.width));
 
-    _drawCtx = canvas.getContext('2d');
-    _drawCtx.scale(dpr, dpr);
-    _drawCtx.fillStyle = '#ffffff';
-    _drawCtx.fillRect(0, 0, w, h);
-    _drawCtx.lineCap = 'round';
-    _drawCtx.lineJoin = 'round';
-    _drawCtx.strokeStyle = '#1a1a1a';
-    _drawCtx.lineWidth = _drawStrokeWidth;
+      /* Subtract toolbar and bottom bar from wrap height */
+      var toolbarEl = w2.querySelector('.notes-draw-toolbar');
+      var bottomBarEl = w2.querySelector('.notes-draw-bottom-bar');
+      var barsH = (toolbarEl ? toolbarEl.offsetHeight : 0) + (bottomBarEl ? bottomBarEl.offsetHeight : 0);
+      var h = Math.max(200, Math.floor(wrapRect.height - barsH));
+
+      c.width = Math.round(w * dpr);
+      c.height = Math.round(h * dpr);
+      c.style.width = w + 'px';
+      c.style.height = h + 'px';
+
+      _drawCtx = c.getContext('2d');
+      _drawCtx.scale(dpr, dpr);
+      _drawCtx.fillStyle = '#ffffff';
+      _drawCtx.fillRect(0, 0, w, h);
+      _drawCtx.lineCap = 'round';
+      _drawCtx.lineJoin = 'round';
+      _drawCtx.strokeStyle = '#1a1a1a';
+      _drawCtx.lineWidth = _drawStrokeWidth;
+    }, 50);
 
     /* Pointer events */
     canvas.addEventListener('pointerdown', onDrawStart, { passive: false });

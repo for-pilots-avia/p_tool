@@ -105,7 +105,7 @@
     left.onclick = function() { app.navigateTo('main'); };
 
     // Центр: название модуля (не зависит от вкладки)
-    center.innerHTML = '<div class="hc-module">Чеклисты SAFA / Customs</div>';
+    center.innerHTML = '<div class="hc-module">Чеклисты</div>';
 
     // Правая кнопка: меню действий (три точки)
     right.innerHTML = '<button class="icon-btn" aria-label="Действия">'

@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v18 */
+/* Pilot's Tool — Service Worker v24 */
 
-var CACHE_NAME = 'pilots-tool-v1';
+var CACHE_NAME = 'pilots-tool-v25';
 
 var JSON_MODULE_NAMES = {
   'modules/phonebook/data/phonebook.json':               'Телефонный справочник',
@@ -27,9 +27,6 @@ var STATIC_ASSETS = [
   './icons.js',
   // Шрифты
   './fonts/Caveat-Bold.woff2',
-  './fonts/Roboto-Regular.woff2',
-  './fonts/Roboto-Medium.woff2',
-  './fonts/Roboto-Bold.woff2',
   // Модули JS
   './modules/registry.js',
   './modules/worktime/index.js',
@@ -124,6 +121,13 @@ self.addEventListener('activate', function(event) {
       })
       .then(function() { return self.clients.claim(); })
   );
+});
+
+// Обработка SKIP_WAITING от кнопки «Обновить»
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 /* ── FETCH — стратегии + детекция обновления JSON ── */

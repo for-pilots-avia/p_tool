@@ -225,7 +225,7 @@
     var isOpen = !!_openBlocks[inst.id];
     var ageCat = getAgeCategory(inst.date);
     var ageLabel = getAgeLabel(ageCat);
-    var blockClass = 'krs-block' + (isOpen ? ' krs-block--open' : '');
+    var blockClass = 'krs-block' + (isOpen ? ' krs-block--open open' : '');
 
     var html = '<div class="' + blockClass + '" data-block-id="' + inst.id + '">';
 
@@ -234,7 +234,7 @@
     if (ageLabel) {
       html += '<span class="krs-age-badge krs-age-badge--' + ageCat + '">' + ageLabel + '</span>';
     }
-    html += '<span class="krs-block-title">' + escapeHtml(inst.title) + '</span>';
+    html += '<span class="collapsible-title"><span class="marquee-inner">' + escapeHtml(inst.title) + '</span></span>';
     html += '<span class="collapsible-chevron' + (isOpen ? ' open' : '') + '">'
       + (window.ICONS['chevron-down'] || '') + '</span>';
     html += '</div>';
@@ -380,6 +380,11 @@
     }
 
     app.hideSkeleton(container, html);
+
+    // Инициализировать marquee для заголовков аккордеонов
+    if (window.app && window.app.initMarquee) {
+      window.app.initMarquee(container);
+    }
   }
 
   /* ═══════════════════════════════════════════

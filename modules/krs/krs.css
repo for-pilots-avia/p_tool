@@ -191,8 +191,11 @@ body.dark-theme #krsScreen {
   border-left-color: var(--color-badge-old-text);
 }
 
-/* ─── Block Title ─── */
-.krs-block-title {
+/* ─── Block Title (marquee on open) ─── */
+/* Заголовок обёрнут в .collapsible-title > .marquee-inner (глобальные классы).
+   Marquee активируется при раскрытии аккордеона через CSS в style.css:
+   .krs-block.open .marquee-inner.is-overflowing { animation: marquee ... } */
+.krs-block-header .collapsible-title {
   flex: 1;
   min-width: 0;
   font-size: var(--font-base);
@@ -200,7 +203,12 @@ body.dark-theme #krsScreen {
   color: var(--color-text-main);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.krs-block-header .marquee-inner {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text-main);
 }
 
 /* ─── Block Content (collapsible) ─── */

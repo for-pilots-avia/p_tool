@@ -320,9 +320,16 @@
     }
     html += '</div>';
 
-    // Settings button — bottom right corner of the card
-    html += '<div style="display:flex;justify-content:flex-end;margin-top:8px;">';
-    html += '<button class="icon-btn wt-card-action-btn" id="wtFlightSettingsBtn" aria-label="Настройки рейса">'
+    // Settings button + report-time reminder — bottom of the card, one line
+    var reportIsDefault = (_wtSettings.reportTime === WT_DEFAULT_SETTINGS.reportTime);
+    html += '<div style="display:flex;align-items:center;margin-top:8px;position:relative;">';
+    if (reportIsDefault) {
+      html += '<span style="font-size:var(--font-sm);color:var(--color-text-secondary);line-height:1.45;flex:1;text-align:center;">'
+        + 'Нажмите ⚙ чтобы ввести время явки</span>';
+    } else {
+      html += '<span style="flex:1;"></span>';
+    }
+    html += '<button class="icon-btn wt-card-action-btn" id="wtFlightSettingsBtn" aria-label="Настройки рейса" style="position:absolute;right:0;">'
       + window.ICONS.settings + '</button>';
     html += '</div>';
 
@@ -640,9 +647,7 @@
       + '<div class="wt-settings-group" style="background:var(--color-badge-ok-bg);border-color:rgba(0,176,80,0.15);">'
       + '<div style="font-size:var(--font-sm);color:var(--color-badge-ok-text);display:flex;align-items:center;gap:8px;">'
       + '<span class="wt-info-inline-icon">' + window.ICONS['plane-landing'] + '</span>'
-      + '<span><strong>Посадки</strong> определяются автоматически по количеству сегментов: '
-      + (_wtSegments.length <= 2 ? '1–2 посадки' : '3–4 посадки')
-      + ' (' + _wtSegments.length + ' сегм.)</span></div></div>';
+      + '<span><strong>Посадки</strong> определяются автоматически по количеству сегментов.</span></div></div>';
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -1014,8 +1019,10 @@
   function wtReset() {
     _wtSegments  = [];
     _wtFinalized = false;
+    _wtSettings  = JSON.parse(JSON.stringify(WT_DEFAULT_SETTINGS));
     wtSaveSegments(_wtSegments);
     wtSaveFinalized(false);
+    wtSaveSettings(_wtSettings);
     app.showToast('Рейс очищен');
     wtRenderAll();
   }
@@ -1143,7 +1150,7 @@
   /* ─── Регистрация в ModuleRegistry ─── */
   window.ModuleRegistry.register('worktime', {
     title:        'Рабочее время',
-    icon:         'clock',
+    icon:         'calendar-clock',
     init:          init,
     renderHeader:  wtRenderHeader,
     destroy:       destroy
