@@ -492,7 +492,7 @@
     // AVWX data
     avwxStation: {},    // { ICAO: stationInfo }
     avwxStationLoading: false,
-    metarHistory: {},      // { ICAO: [{ raw, parsed, observedAt }] } — accumulated from refreshes
+    metarHistory: {},      // { ICAO: [{ raw, observedAt, flightCat }] } — fetched from AWC on demand
     metarHistoryLoading: {} // { ICAO: true/false }
   };
 
@@ -839,24 +839,45 @@
     } catch(e) {}
   }
 
-  // ===== Unified Weather Cache: localStorage persistence =====
-  // Save old METAR to history before overwriting with new data
-  function pushMetarHistory(icao, oldEntry) {
-    if (!oldEntry || !oldEntry.metar) return;
-    if (!state.metarHistory[icao]) state.metarHistory[icao] = [];
-    // Avoid duplicates — check if this exact raw METAR already stored
-    var hist = state.metarHistory[icao];
-    for (var i = 0; i < hist.length; i++) {
-      if (hist[i].raw === oldEntry.metar) return;
-    }
-    hist.push({
-      raw: oldEntry.metar,
-      parsed: oldEntry.parsed || null,
-      observedAt: oldEntry.observedAt || '',
-      savedAt: Date.now()
-    });
-    // Keep max 8 entries per airport
-    if (hist.length > 8) hist.splice(0, hist.length - 8);
+  // ===== METAR History: fetched on demand from AWC proxy =====
+  // Fetches last 2 hours of METAR observations via aviationweather.gov
+  function fetchMetarHistory(icao) {
+    if (!AWC_PROXY_URL) return Promise.resolve();
+    state.metarHistoryLoading[icao] = true;
+    renderCurrentTab();
+
+    return fetch(AWC_PROXY_URL + '/metar?ids=' + icao + '&hours=2')
+      .then(function(res) {
+        if (!res.ok) throw new Error('AWC HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(arr) {
+        if (!Array.isArray(arr)) { state.metarHistory[icao] = []; return; }
+        // AWC returns newest first; skip the first (current METAR), keep the rest
+        var hist = [];
+        for (var i = 1; i < arr.length; i++) {
+          var item = arr[i];
+          var raw = (item.rawOb || '').replace(/^(METAR|SPECI)\s+/i, '');
+          if (!raw) continue;
+          var obsTs = item.obsTime ? new Date(item.obsTime * 1000).toISOString() :
+                      item.reportTime || '';
+          hist.push({
+            raw: raw,
+            observedAt: obsTs,
+            flightCat: item.fltCat || ''
+          });
+        }
+        state.metarHistory[icao] = hist;
+        console.info('[History] Fetched', hist.length, 'METAR for', icao);
+      })
+      .catch(function(err) {
+        console.warn('[History] Failed for', icao, ':', err.message);
+        state.metarHistory[icao] = [];
+      })
+      .then(function() {
+        state.metarHistoryLoading[icao] = false;
+        renderCurrentTab();
+      });
   }
 
   function saveWxCache() {
@@ -871,18 +892,6 @@
       });
       localStorage.setItem('wx-cache', JSON.stringify(cacheToSave));
     } catch(e) {}
-    // Also persist METAR history
-    try {
-      var histSave = {};
-      var hKeys = Object.keys(state.metarHistory);
-      hKeys.forEach(function(icao) {
-        var arr = state.metarHistory[icao];
-        if (arr && arr.length > 0) {
-          histSave[icao] = arr; // Save all — stale data is better than nothing
-        }
-      });
-      localStorage.setItem('wx-metar-history', JSON.stringify(histSave));
-    } catch(e) {}
   }
 
   function loadWxCache() {
@@ -895,20 +904,6 @@
           var entry = parsed[icao];
           if (entry && entry.cachedAt) {
             state.weatherCache[icao] = entry; // Load all — stale data is better than nothing
-          }
-        });
-      }
-    } catch(e) {}
-    // Also load METAR history
-    try {
-      var histStored = localStorage.getItem('wx-metar-history');
-      if (histStored) {
-        var histParsed = JSON.parse(histStored);
-        var hKeys = Object.keys(histParsed);
-        hKeys.forEach(function(icao) {
-          var arr = histParsed[icao];
-          if (Array.isArray(arr)) {
-            state.metarHistory[icao] = arr; // Load all — stale data is better than nothing
           }
         });
       }
@@ -1126,15 +1121,12 @@
 
   // ===== Batched METAR Fetch =====
   // Uses CheckWX /v2/metar/{ICAO1,ICAO2,...} — single batch request
-  // METAR history: saved to state.metarHistory when refreshing (old METAR pushed before overwriting)
   function fetchMetarBatch(icaos, forceRefresh) {
     if (!icaos || icaos.length === 0) return Promise.resolve();
 
     var needFetch = icaos;
     if (forceRefresh) {
-      // Save old METARs to history BEFORE deleting cache
       icaos.forEach(function(icao) {
-        pushMetarHistory(icao, state.weatherCache[icao]);
         delete state.weatherCache[icao];
         delete state.wxErrors[icao];
       });
@@ -1210,8 +1202,6 @@
             var parsed = parseMetar(entry.raw);
             // Determine flight rules from parsed data if not provided by API
             var flightRules = entry.flight_category || determineFlightRules(parsed);
-            // Save old METAR to history before overwriting
-            pushMetarHistory(icao, state.weatherCache[icao]);
             state.weatherCache[icao] = {
               icao: icao,
               airportName: airportName,
@@ -1246,7 +1236,6 @@
               }
               var rawMetar = (d.raw || '').replace(/^(METAR|SPECI)\s+/i, '');
               if (rawMetar) {
-                pushMetarHistory(icao, state.weatherCache[icao]);
                 state.weatherCache[icao] = {
                   icao: icao,
                   airportName: AIRPORT_NAMES[icao] || (d.info && d.info.name) || icao,
@@ -1293,7 +1282,6 @@
             }
             var rawMetar = (d.raw || '').replace(/^(METAR|SPECI)\s+/i, '');
             if (rawMetar) {
-              pushMetarHistory(icao, state.weatherCache[icao]);
               state.weatherCache[icao] = {
                 icao: icao,
                 airportName: AIRPORT_NAMES[icao] || (d.info && d.info.name) || icao,
@@ -2434,30 +2422,28 @@
             html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code">' + data.taf + '</code></div>';
           }
 
-          // METAR History — accumulated from refreshes
-          var metarHist = state.metarHistory[icao];
-          if (metarHist && metarHist.length > 0) {
-            html += '<div class="metbriefing-wx-metar-history">';
-            html += '<div class="metbriefing-wx-metar-history-title">' + icon('clock', 14) + '<span>\u0418\u0441\u0442\u043E\u0440\u0438\u044F METAR</span></div>';
-            metarHist.forEach(function(h) {
-              var timeLabel = h.observedAt ? formatTime(h.observedAt) : '';
-              html += '<div class="metbriefing-wx-metar-history-item">';
-              html += '<span class="metbriefing-wx-metar-history-label">' + timeLabel + '</span>';
-              html += '<code class="metbriefing-wx-metar-history-code">' + h.raw + '</code>';
-              if (h.parsed) {
-                html += '<div class="metbriefing-wx-metar-history-fields">';
-                html += '<span class="metbriefing-wx-hist-field">' + formatWind(h.parsed.wind) + '</span>';
-                html += '<span class="metbriefing-wx-hist-field">' + formatBriefVis(h.parsed.visibility) + '</span>';
-                html += '<span class="metbriefing-wx-hist-field">' + formatTemp(h.parsed.temperature) + '</span>';
-                html += '<span class="metbriefing-wx-hist-field">' + formatQNH(h.parsed.qnh) + '</span>';
+          // METAR History — fetched on demand from AWC proxy (last 2 hours)
+          if (data.metar && AWC_PROXY_URL) {
+            var metarHist = state.metarHistory[icao];
+            var histLoading = state.metarHistoryLoading[icao];
+            if (histLoading) {
+              html += '<div class="metbriefing-wx-metar-history-hint">' + icon('rotate-ccw', 12, 'metbriefing-spin') + '<span>\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430 \u0438\u0441\u0442\u043E\u0440\u0438\u0438...</span></div>';
+            } else if (metarHist && metarHist.length > 0) {
+              html += '<div class="metbriefing-wx-metar-history">';
+              html += '<div class="metbriefing-wx-metar-history-title">' + icon('clock', 14) + '<span>\u0418\u0441\u0442\u043E\u0440\u0438\u044F METAR (2 \u0447)</span></div>';
+              metarHist.forEach(function(h) {
+                var timeLabel = h.observedAt ? formatTime(h.observedAt) : '';
+                var catClass = h.flightCat ? ' metbriefing-condition--' + h.flightCat.toLowerCase() : '';
+                html += '<div class="metbriefing-wx-metar-history-item' + catClass + '">';
+                html += '<span class="metbriefing-wx-metar-history-label">' + timeLabel + (h.flightCat ? ' <span class="metbriefing-wx-hist-cat">' + h.flightCat + '</span>' : '') + '</span>';
+                html += '<code class="metbriefing-wx-metar-history-code">' + h.raw + '</code>';
                 html += '</div>';
-              }
+              });
               html += '</div>';
-            });
-            html += '</div>';
-          } else if (data.metar) {
-            // Show hint that history will appear after refreshes
-            html += '<div class="metbriefing-wx-metar-history-hint">' + icon('clock', 12) + '<span>\u0418\u0441\u0442\u043E\u0440\u0438\u044F METAR \u043D\u0430\u043A\u0430\u043F\u043B\u0438\u0432\u0430\u0435\u0442\u0441\u044F \u043F\u0440\u0438 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u0438</span></div>';
+            } else {
+              // Show button to load history
+              html += '<button class="metbriefing-wx-metar-history-btn" data-hist-icao="' + icao + '">' + icon('clock', 14) + '<span>\u0418\u0441\u0442\u043E\u0440\u0438\u044F METAR (2 \u0447)</span></button>';
+            }
           }
 
           // Footer
@@ -2529,6 +2515,13 @@
     el.querySelectorAll('[data-wx-card-retry]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         refreshAirportWeather(btn.getAttribute('data-wx-card-retry'));
+      });
+    });
+
+    // METAR history buttons
+    el.querySelectorAll('[data-hist-icao]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        fetchMetarHistory(btn.getAttribute('data-hist-icao'));
       });
     });
     el.querySelectorAll('[data-wx-card-remove]').forEach(function(btn) {
