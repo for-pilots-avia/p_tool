@@ -37,7 +37,8 @@
   var CHECKWX_KEY = '730ac83e902c466cae2626a7f134cbdc';
   var NOTAM_API_URL = 'https://notams.online/api/notams.php';
   var NOTAM_XOR_KEY = 'NotamViewer@1.0.0-OZ_2026!#';
-  // NOAA removed — CheckWX (primary) → AVWX (fallback) chain for all weather
+  var AWC_PROXY_URL = 'https://aviation-proxy.777b737.workers.dev';
+  // Priority: CheckWX (primary) → AVWX (fallback) → AWC proxy (last resort) for all weather
 
   // FIR fallback mapping: airport ICAO prefix → FIR code(s)
   // When the API returns 0 NOTAMs for a specific airport, we try the relevant FIR
@@ -1321,12 +1322,104 @@
 
     return Promise.all(promises)
       .then(function() {
+        // AWC proxy fallback: try for any ICAOs still missing METAR
+        if (AWC_PROXY_URL) {
+          var stillMissing = needFetch.filter(function(icao) {
+            return !state.weatherCache[icao] || !state.weatherCache[icao].metar;
+          });
+          if (stillMissing.length > 0) {
+            return fetchAwcFallback(stillMissing, 'metar');
+          }
+        }
+      })
+      .then(function() {
         saveWxCache();
       })
       .catch(function() {})
       .then(function() {
         needFetch.forEach(function(icao) { state.wxLoading[icao] = false; });
         renderCurrentTab();
+      });
+  }
+
+  // AWC proxy fallback — batch request to aviationweather.gov via Cloudflare Worker
+  // Called when both CheckWX and AVWX fail for some ICAOs
+  function fetchAwcFallback(icaos, type) {
+    var ids = icaos.join(',').toUpperCase();
+    var endpoint = type === 'taf' ? 'taf' : 'metar';
+    console.info('[AWC] Trying fallback for', ids, '(' + endpoint + ')');
+
+    return fetch(AWC_PROXY_URL + '/' + endpoint + '?ids=' + encodeURIComponent(ids))
+      .then(function(res) {
+        if (!res.ok) throw new Error('AWC HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(arr) {
+        if (!Array.isArray(arr) || arr.length === 0) return;
+        arr.forEach(function(item) {
+          var icao = (item.icaoId || '').toUpperCase();
+          if (!icao) return;
+
+          if (type === 'metar') {
+            var raw = (item.rawOb || '').replace(/^(METAR|SPECI)\s+/i, '');
+            if (!raw) return;
+            var flightCat = item.flightCateg || item.category || item.flight_category || '';
+            var observedAt = item.obsTime || new Date().toISOString();
+
+            if (state.weatherCache[icao]) {
+              if (!state.weatherCache[icao].metar) {
+                state.weatherCache[icao].metar = raw;
+                state.weatherCache[icao].observedAt = observedAt;
+                state.weatherCache[icao].flight_rules = flightCat;
+                state.weatherCache[icao].source = 'AWC';
+              }
+            } else {
+              state.weatherCache[icao] = {
+                icao: icao,
+                airportName: AIRPORT_NAMES[icao] || icao,
+                metar: raw,
+                taf: '',
+                parsed: null,
+                observedAt: observedAt,
+                station: state.avwxStation[icao] || null,
+                flight_rules: flightCat,
+                source: 'AWC',
+                cachedAt: Date.now()
+              };
+            }
+          } else {
+            // TAF
+            var rawTaf = (item.rawTaf || '').replace(/^TAF\s+/i, '');
+            if (!rawTaf) return;
+
+            if (state.weatherCache[icao]) {
+              if (!state.weatherCache[icao].taf) {
+                state.weatherCache[icao].taf = rawTaf;
+                if (!state.weatherCache[icao].source || state.weatherCache[icao].source === 'AWC') {
+                  state.weatherCache[icao].source = 'AWC';
+                }
+              }
+            } else {
+              state.weatherCache[icao] = {
+                icao: icao,
+                airportName: AIRPORT_NAMES[icao] || icao,
+                metar: '',
+                taf: rawTaf,
+                parsed: null,
+                observedAt: new Date().toISOString(),
+                station: state.avwxStation[icao] || null,
+                flight_rules: '',
+                source: 'AWC',
+                cachedAt: Date.now()
+              };
+            }
+          }
+          state.weatherLoaded = true;
+        });
+        console.info('[AWC] Fallback resolved for', arr.length, 'item(s)');
+      })
+      .catch(function(err) {
+        console.warn('[AWC] Fallback failed:', err.message);
       });
   }
 
@@ -1528,6 +1621,17 @@
     });
 
     return Promise.all(promises)
+      .then(function() {
+        // AWC proxy fallback: try for any ICAOs still missing TAF
+        if (AWC_PROXY_URL) {
+          var stillMissingTaf = needFetch.filter(function(icao) {
+            return !state.weatherCache[icao] || !state.weatherCache[icao].taf;
+          });
+          if (stillMissingTaf.length > 0) {
+            return fetchAwcFallback(stillMissingTaf, 'taf');
+          }
+        }
+      })
       .then(function() {
         saveWxCache();
       })
