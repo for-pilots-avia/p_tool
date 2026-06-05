@@ -1,43 +1,834 @@
 /* ═══════════════════════════════════════════
-   МОДУЛЬ: Лётные процедуры (flightprocedures)
+   МОДУЛЬ: Лётные процедуры
    ═══════════════════════════════════════════ */
 
-.fp-phase {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--border-radius-sm);
-  margin-bottom: 10px;
-  overflow: hidden;
-}
-
-.fp-phase-header {
+/* ─── Search bar ─── */
+.flightprocedures-search-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  cursor: pointer;
-  min-height: 48px;
-  user-select: none;
-  -webkit-user-select: none;
-  transition: background 0.15s var(--transition-ease);
+  gap: 8px;
+  padding: 16px 0 12px;
 }
-.fp-phase-header .collapsible-title {
+.flightprocedures-search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+.flightprocedures-search-input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+}
+.flightprocedures-search-input-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+}
+.flightprocedures-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px 0 40px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+  color: var(--color-text-main);
   font-size: var(--font-base);
-  font-weight: 600;
+  font-family: var(--font-main);
+  box-sizing: border-box;
+  transition: border-color 0.2s var(--transition-ease);
+}
+.flightprocedures-search-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-ghost);
+}
+body.dark-theme .flightprocedures-search-input {
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
+  border-color: var(--color-border);
   color: var(--color-text-main);
 }
-.fp-phase-header svg {
+.flightprocedures-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--border-radius-sm);
+  transition: color 0.15s var(--transition-ease), background 0.15s var(--transition-ease);
+}
+.flightprocedures-search-clear svg {
   width: 20px;
   height: 20px;
-  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
 }
-
 @media (hover: hover) {
-  .fp-phase-header:hover {
+  .flightprocedures-search-clear:hover {
+    color: var(--color-danger);
     background: var(--color-bg-hover);
   }
 }
 
-.fp-phase.open > .fp-phase-header {
+/* ─── Section Toggle (clickable divider) ─── */
+.flightprocedures-section-toggle {
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  margin-bottom: 4px;
+}
+
+.flightprocedures-section-toggle .ffs-section-count {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  background: var(--color-bg-card);
+  border-radius: 10px;
+  padding: 2px 8px;
+  min-width: 24px;
+  text-align: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.flightprocedures-section-toggle.is-open + .flightprocedures-section-cards {
+  max-height: none;
+}
+
+.flightprocedures-section-toggle:not(.is-open) + .flightprocedures-section-cards {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.flightprocedures-section-cards {
+  transition: max-height 0.35s var(--transition-ease-out);
+  overflow: hidden;
+}
+
+.flightprocedures-section-cards.open {
+  max-height: none;
+}
+
+/* ─── Procedure Card ─── */
+.flightprocedures-card {
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 10px;
+  border: 1px solid var(--color-border-subtle);
+  overflow: hidden;
+  transition: box-shadow var(--transition-speed) var(--transition-ease);
+}
+
+@media (hover: hover) {
+  .flightprocedures-card:hover {
+    box-shadow: 0 2px 12px var(--color-shadow-sm);
+  }
+}
+
+.flightprocedures-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.dark-theme .flightprocedures-card-header {
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
+}
+
+/* ─── Card Info ─── */
+.flightprocedures-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.flightprocedures-card-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text-main);
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.flightprocedures-card-ref {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.flightprocedures-card-meta {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.flightprocedures-card-aircraft,
+.flightprocedures-card-duration {
+  white-space: nowrap;
+}
+
+.flightprocedures-card-sep {
+  margin: 0 6px;
+  color: var(--color-border);
+}
+
+/* ─── Status Indicator ─── */
+.flightprocedures-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.flightprocedures-status::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.flightprocedures-status--completed {
+  color: var(--color-success);
+}
+
+.flightprocedures-status--completed::before {
+  background: var(--color-success);
+}
+
+.flightprocedures-status--pending {
+  color: var(--color-warning);
+}
+
+.flightprocedures-status--pending::before {
+  background: var(--color-warning);
+}
+
+.flightprocedures-status--overdue {
+  color: var(--color-danger);
+}
+
+.flightprocedures-status--overdue::before {
+  background: var(--color-danger);
+}
+
+.flightprocedures-card-chevron {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform var(--transition-speed) var(--transition-ease);
+}
+
+.flightprocedures-card-chevron svg {
+  width: 100%;
+  height: 100%;
+}
+
+.flightprocedures-card.open > .flightprocedures-card-header > .flightprocedures-card-chevron {
+  transform: rotate(180deg);
+}
+
+/* ─── Card Expanded Body ─── */
+.flightprocedures-card-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s var(--transition-ease-out);
+}
+
+.flightprocedures-card.open > .flightprocedures-card-body {
+  max-height: 3000px;
+}
+
+.flightprocedures-card-content {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* ─── Description ─── */
+.flightprocedures-description {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  padding-top: 14px;
+  margin-bottom: 16px;
+}
+
+/* ─── Memory Items ─── */
+.flightprocedures-memory {
+  background: rgba(205, 32, 44, 0.06);
+  border: 1px solid rgba(205, 32, 44, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.flightprocedures-memory-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-danger);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flightprocedures-memory-title svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.flightprocedures-memory-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flightprocedures-memory-item {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+}
+
+.flightprocedures-memory-item::before {
+  content: '\25B8';
+  position: absolute;
+  left: 0;
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+/* ─── Steps ─── */
+.flightprocedures-steps {
+  margin-bottom: 16px;
+}
+
+.flightprocedures-steps-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.flightprocedures-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: flightprocedures-step;
+}
+
+.flightprocedures-step {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  padding: 5px 0 5px 32px;
+  position: relative;
   border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.flightprocedures-step:last-child {
+  border-bottom: none;
+}
+
+.flightprocedures-step::before {
+  counter-increment: flightprocedures-step;
+  content: counter(flightprocedures-step);
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ─── Equipment List ─── */
+.flightprocedures-equipment {
+  margin-bottom: 16px;
+}
+
+.flightprocedures-equipment-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.flightprocedures-equipment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flightprocedures-equipment-list li {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  padding: 3px 0 3px 14px;
+  position: relative;
+}
+
+.flightprocedures-equipment-list li::before {
+  content: '\2022';
+  position: absolute;
+  left: 0;
+  color: var(--color-info);
+  font-weight: 700;
+}
+
+/* ─── Instructor Notes ─── */
+.flightprocedures-notes {
+  background: rgba(255, 193, 7, 0.06);
+  border: 1px solid rgba(255, 193, 7, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.flightprocedures-notes-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-warning);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flightprocedures-notes-title svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.flightprocedures-notes-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* ─── Completion Criteria ─── */
+.flightprocedures-criteria {
+  margin-bottom: 4px;
+}
+
+.flightprocedures-criteria-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flightprocedures-criteria-title svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.flightprocedures-criteria-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* ─── References ─── */
+.flightprocedures-refs {
+  margin-top: 4px;
+}
+
+.flightprocedures-refs-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.flightprocedures-refs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flightprocedures-ref {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  padding: 3px 0 3px 14px;
+  position: relative;
+}
+
+.flightprocedures-ref::before {
+  content: '\2014';
+  position: absolute;
+  left: 0;
+  color: var(--color-border);
+}
+
+/* ── PDF reference link ── */
+.flightprocedures-ref--link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--border-radius-sm);
+  background: rgba(23, 162, 184, 0.06);
+  border: 1px solid rgba(23, 162, 184, 0.12);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  margin-bottom: 4px;
+}
+
+.flightprocedures-ref--link::before {
+  display: none;
+}
+
+.flightprocedures-ref-icon {
+  flex-shrink: 0;
+  color: var(--color-info);
+  display: flex;
+  align-items: center;
+}
+
+.flightprocedures-ref-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.flightprocedures-ref-text {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-info);
+  font-family: var(--font-main);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flightprocedures-ref-page {
+  flex-shrink: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  background: rgba(23, 162, 184, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .flightprocedures-ref--link:hover {
+    background: rgba(23, 162, 184, 0.12);
+    border-color: rgba(23, 162, 184, 0.25);
+  }
+}
+
+/* ─── Image Gallery (PhotoSwipe by contract) ─── */
+.flightprocedures-image-gallery {
+  margin: 12px 0;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-card);
+}
+
+.flightprocedures-image-thumb {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: opacity var(--transition-speed) var(--transition-ease);
+}
+
+@media (hover: hover) {
+  .flightprocedures-image-thumb:hover {
+    opacity: 0.85;
+  }
+}
+
+/* ─── Content: Table (inline & file) ─── */
+.flightprocedures-table-wrap {
+  margin: 10px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border-subtle);
+}
+.flightprocedures-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+  line-height: 1.5;
+}
+.flightprocedures-table-wrap thead {
+  background: rgba(23, 162, 184, 0.08);
+}
+.flightprocedures-table-wrap th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-main);
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+.flightprocedures-table-wrap td {
+  padding: 10px 12px;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  vertical-align: top;
+}
+.flightprocedures-table-wrap tr:last-child td {
+  border-bottom: none;
+}
+.flightprocedures-table-wrap td strong {
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+.flightprocedures-table-wrap ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.flightprocedures-table-wrap li {
+  margin-bottom: 2px;
+}
+
+/* ─── Table file loading/error ─── */
+.flightprocedures-table-loading {
+  padding: 16px;
+  text-align: center;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+.flightprocedures-table-error {
+  padding: 16px;
+  text-align: center;
+  font-size: var(--font-sm);
+  color: var(--color-danger);
+}
+
+/* ─── Empty state ─── */
+.flightprocedures-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 16px;
+  text-align: center;
+}
+
+.flightprocedures-empty-icon {
+  color: var(--color-text-muted);
+  opacity: 0.3;
+  margin-bottom: 12px;
+}
+
+.flightprocedures-empty-icon svg {
+  width: 48px;
+  height: 48px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.flightprocedures-empty-text {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin: 0 0 4px;
+}
+
+.flightprocedures-empty-sub {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ─── Inline badges in content ─── */
+.flightprocedures-card-content .badge {
+  vertical-align: middle;
+  margin: 0 2px;
+  position: relative;
+  top: -1px;
+}
+
+.flightprocedures-description .badge {
+  margin: 0 3px;
+}
+
+.flightprocedures-memory-item .badge {
+  margin-left: 4px;
+  top: 0;
+}
+
+.flightprocedures-step .badge {
+  margin-left: 4px;
+  top: 0;
+}
+
+.flightprocedures-ref .badge {
+  margin-left: 4px;
+  top: 0;
+}
+
+.flightprocedures-notes-text .badge {
+  margin-left: 4px;
+  top: 0;
+}
+
+/* Card header without badge — adjust alignment */
+.flightprocedures-card-header--no-badge {
+  gap: 0;
+}
+
+/* ─── Nested accordion (depth 2+) ─── */
+.flightprocedures-nested {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Child count badge in header */
+.flightprocedures-card-child-count {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  background: var(--color-bg-card);
+  border-radius: 10px;
+  padding: 1px 7px;
+  min-width: 20px;
+  text-align: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Depth-based styling for nested cards */
+.flightprocedures-card[data-depth="2"] {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+.flightprocedures-card[data-depth="2"] .flightprocedures-card-header {
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
+}
+
+body.dark-theme .flightprocedures-card[data-depth="2"] .flightprocedures-card-header {
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+}
+
+.flightprocedures-card[data-depth="2"] .flightprocedures-card-title {
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.flightprocedures-card[data-depth="2"] .badge {
+  padding: 2px 7px;
+  font-size: 0.6rem;
+}
+
+.flightprocedures-card[data-depth="2"].open > .flightprocedures-card-body {
+  max-height: 5000px;
+}
+
+.flightprocedures-card[data-depth="3"] {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-xs);
+  background: transparent;
+}
+
+.flightprocedures-card[data-depth="3"] .flightprocedures-card-header {
+  padding: 8px 12px;
+  background: var(--color-bg-hover);
+}
+
+.flightprocedures-card[data-depth="3"] .flightprocedures-card-title {
+  font-size: var(--font-xs);
+  font-weight: 500;
+}
+
+.flightprocedures-card[data-depth="3"] .badge {
+  padding: 1px 6px;
+  font-size: 0.55rem;
+}
+
+.flightprocedures-card[data-depth="3"].open > .flightprocedures-card-body {
+  max-height: 5000px;
+}
+
+/* ─── Responsive ─── */
+@media (min-width: 768px) {
+  .flightprocedures-card-header {
+    padding: 16px 20px;
+  }
+
+  .flightprocedures-card-content {
+    padding: 0 20px 20px;
+  }
+
+  .flightprocedures-step {
+    padding-left: 36px;
+  }
+
+  .flightprocedures-step::before {
+    width: 24px;
+    height: 24px;
+    font-size: var(--font-xs);
+  }
+
+  .flightprocedures-memory {
+    padding: 14px 18px;
+  }
+
+  .flightprocedures-notes {
+    padding: 14px 18px;
+  }
 }

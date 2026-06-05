@@ -1,5 +1,2082 @@
 /* ═══════════════════════════════════════════
-   МОДУЛЬ: Метео брифинг (metbriefing)
+   МОДУЛЬ: Metbriefing — полётный метеобрифинг
    ═══════════════════════════════════════════ */
 
-/* Стили модуля будут добавлены при реализации */
+/* ── Aviabit Quick Link ── */
+.metbriefing-aviabit-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin: 8px 0;
+  background: var(--color-primary-ghost);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-primary);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s var(--transition-ease);
+}
+.metbriefing-aviabit-link svg {
+  width: 16px; height: 16px; flex-shrink: 0;
+}
+.metbriefing-aviabit-external {
+  opacity: 0.6;
+  width: 14px !important; height: 14px !important;
+  margin-left: auto;
+}
+@media (hover: hover) {
+  .metbriefing-aviabit-link:hover {
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border-color: rgba(var(--color-primary-rgb), 0.25);
+  }
+}
+
+/* ── Route Card ── */
+.metbriefing-route-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  margin: 8px 0;
+}
+
+/* ── Section Title ── */
+.metbriefing-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 12px;
+}
+.metbriefing-section-title svg {
+  width: 18px; height: 18px; color: var(--color-primary);
+}
+
+/* ── Input Groups ── */
+.metbriefing-route-inputs {
+  display: flex;
+  gap: 12px;
+}
+.metbriefing-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.metbriefing-input-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.metbriefing-icao-input {
+  height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-size: var(--font-md);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s var(--transition-ease);
+  width: 100%;
+}
+.metbriefing-icao-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+}
+.metbriefing-icao-input::placeholder {
+  color: var(--color-text-muted);
+  text-transform: none;
+}
+.metbriefing-input-hint {
+  font-size: var(--font-xs);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.metbriefing-text-input {
+  height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-size: var(--font-sm);
+  transition: border-color 0.2s var(--transition-ease);
+  width: 100%;
+}
+.metbriefing-text-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+}
+.metbriefing-text-input--uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+/* Native datetime picker for iOS/Android */
+.metbriefing-text-input[type="datetime-local"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 44px;
+}
+.metbriefing-text-input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.metbriefing-input-group--small {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Alternate Airport Tags ── */
+.metbriefing-alternate-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.metbriefing-alternate-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--color-primary-ghost);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 6px;
+  font-size: var(--font-xs);
+  color: var(--color-primary-dark);
+}
+.metbriefing-alternate-tag svg {
+  width: 12px; height: 12px;
+}
+.metbriefing-alternate-tag-icao {
+  font-weight: 700;
+}
+.metbriefing-alternate-tag-name {
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+.metbriefing-alternate-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; height: 20px;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--color-text-muted);
+  margin-left: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+.metbriefing-alternate-tag-remove svg {
+  width: 12px; height: 12px;
+}
+@media (hover: hover) {
+  .metbriefing-alternate-tag-remove:hover {
+    color: var(--color-danger);
+  }
+}
+
+/* ── Visual Route Display ── */
+.metbriefing-route-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0 12px;
+  padding: 12px 0;
+}
+.metbriefing-route-code {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
+}
+.metbriefing-route-line {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 120px;
+  min-width: 40px;
+  position: relative;
+}
+.metbriefing-route-dots {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+}
+.metbriefing-route-plane {
+  width: 18px !important; height: 18px !important;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+.metbriefing-route-alt-sep {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  margin: 0 4px;
+}
+.metbriefing-route-alt-codes {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* ── Route Extra (Flight Number & Date) ── */
+.metbriefing-route-extra {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ── Tab Switcher ── */
+.metbriefing-tab-switcher {
+  display: flex;
+  gap: 4px;
+  margin: 12px 0;
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-sm);
+  padding: 4px;
+  border: 1px solid var(--color-border-subtle);
+}
+.metbriefing-tab-pill {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-ease);
+  text-align: center;
+  min-height: 44px;
+}
+.metbriefing-tab-pill--active {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  box-shadow: 0 2px 8px var(--color-shadow-primary);
+}
+@media (hover: hover) {
+  .metbriefing-tab-pill:not(.metbriefing-tab-pill--active):hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-main);
+  }
+}
+
+/* ── Tab Content ── */
+.metbriefing-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Status Section ── */
+.metbriefing-status-section {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  margin: 4px 0;
+}
+
+/* ── Status Row ── */
+.metbriefing-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Status Badge ── */
+.metbriefing-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  min-width: 28px;
+  text-align: center;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.metbriefing-status-badge svg {
+  width: 14px; height: 14px;
+}
+.metbriefing-status-badge--ok {
+  background: var(--color-badge-ok-bg);
+  color: var(--color-badge-ok-text);
+}
+.metbriefing-status-badge--danger {
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+}
+.metbriefing-status-badge--warn {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+body.dark-theme .metbriefing-status-badge--warn {
+  background: rgba(245, 127, 23, 0.15);
+  color: #FFB74D;
+}
+
+.metbriefing-status-detail {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ── Link Button ── */
+.metbriefing-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-info);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  margin-left: auto;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.metbriefing-link-btn svg {
+  width: 14px; height: 14px;
+}
+@media (hover: hover) {
+  .metbriefing-link-btn:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ── Weather Maps (Briefing Tab) ── */
+.metbriefing-wx-maps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.metbriefing-wx-map-thumb {
+  position: relative;
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 4 / 3;
+  transition: border-color 0.2s var(--transition-ease);
+}
+.metbriefing-wx-map-thumb--full {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+}
+.metbriefing-wx-map-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.metbriefing-wx-map-thumb-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-main);
+  color: var(--color-text-muted);
+}
+.metbriefing-wx-map-thumb-loading svg {
+  width: 24px; height: 24px;
+}
+.metbriefing-wx-map-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 8px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+  color: #fff;
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+@media (hover: hover) {
+  .metbriefing-wx-map-thumb:hover {
+    border-color: var(--color-primary);
+  }
+}
+
+/* ── Inline Weather (Briefing Tab) ── */
+.metbriefing-inline-weather-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metbriefing-inline-weather {
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+}
+@media (hover: hover) {
+  .metbriefing-inline-weather:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-border);
+  }
+}
+.metbriefing-inline-weather--night {
+  border-left: 3px solid #5C6BC0;
+}
+.metbriefing-inline-weather--day {
+  border-left: 3px solid #FFA726;
+}
+/* Flight rules border colors */
+.metbriefing-inline-weather--vfr {
+  border-left: 3px solid #4CAF50;
+}
+.metbriefing-inline-weather--mvfr {
+  border-left: 3px solid #2196F3;
+}
+.metbriefing-inline-weather--ifr {
+  border-left: 3px solid #FF9800;
+}
+.metbriefing-inline-weather--lifr {
+  border-left: 3px solid #F44336;
+}
+/* Flight rules badge */
+.metbriefing-inline-weather-fr {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.metbriefing-fr--vfr {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4CAF50;
+}
+.metbriefing-fr--mvfr {
+  background: rgba(33, 150, 243, 0.15);
+  color: #2196F3;
+}
+.metbriefing-fr--ifr {
+  background: rgba(255, 152, 0, 0.15);
+  color: #FF9800;
+}
+.metbriefing-fr--lifr {
+  background: rgba(244, 67, 54, 0.15);
+  color: #F44336;
+}
+
+.metbriefing-inline-weather-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.metbriefing-inline-weather-airport {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.metbriefing-inline-weather-icao {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.metbriefing-inline-weather-name {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+.metbriefing-inline-weather-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metbriefing-inline-weather-daynight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.metbriefing-inline-weather-daynight svg {
+  width: 14px; height: 14px;
+}
+.metbriefing-inline-weather-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.metbriefing-inline-weather-refresh svg {
+  width: 14px; height: 14px;
+}
+@media (hover: hover) {
+  .metbriefing-inline-weather-refresh:hover {
+    color: var(--color-primary);
+  }
+}
+.metbriefing-inline-weather-chevron {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+/* ── Inline Loading / Error ── */
+.metbriefing-inline-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+}
+.metbriefing-inline-loading svg {
+  width: 18px; height: 18px;
+}
+.metbriefing-inline-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-sm);
+}
+.metbriefing-inline-error svg {
+  width: 14px; height: 14px; flex-shrink: 0;
+}
+.metbriefing-inline-retry {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--color-badge-danger-text);
+  border: 1px solid rgba(198, 40, 40, 0.2);
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 28px;
+}
+@media (hover: hover) {
+  .metbriefing-inline-retry:hover {
+    background: rgba(198, 40, 40, 0.2);
+  }
+}
+
+/* ── Inline METAR Section ── */
+.metbriefing-inline-metar-section {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.metbriefing-inline-metar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  color: var(--color-info);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.metbriefing-inline-metar-toggle svg {
+  width: 14px; height: 14px;
+}
+.metbriefing-inline-metar-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-info);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.metbriefing-inline-metar-code {
+  display: block;
+  padding: 8px;
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-sm);
+  font-family: 'Roboto Mono', monospace;
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: normal;
+  margin-top: 4px;
+}
+
+/* ── Inline Weather Fields ── */
+.metbriefing-inline-weather-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.metbriefing-inline-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.metbriefing-inline-field-icon {
+  width: 14px !important; height: 14px !important;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+.metbriefing-inline-field-value {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+/* ── Weather Severity Classes ── */
+.metbriefing-wx-vis--green { color: var(--color-success); }
+.metbriefing-wx-vis--yellow { color: var(--color-warning); }
+.metbriefing-wx-vis--red { color: var(--color-danger); font-weight: 700; }
+.metbriefing-wx-wind--red { color: var(--color-danger); font-weight: 700; }
+.metbriefing-wx-wind--orange { color: var(--color-warning); }
+/* Spinner animation */
+@keyframes metbriefing-spin {
+  to { transform: rotate(360deg); }
+}
+.metbriefing-spin {
+  animation: metbriefing-spin 0.8s linear infinite;
+}
+.metbriefing-vis--green { color: var(--color-success); }
+.metbriefing-vis--yellow { color: var(--color-warning); }
+.metbriefing-vis--red { color: var(--color-danger); font-weight: 700; }
+
+/* ── Inline Phenomena ── */
+.metbriefing-inline-phenomena {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.metbriefing-inline-phenomenon {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  background: var(--color-bg-card);
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.metbriefing-inline-phenomenon svg {
+  width: 12px; height: 12px;
+}
+
+/* ── Inline Clouds ── */
+.metbriefing-inline-clouds {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+.metbriefing-inline-clouds svg {
+  width: 12px; height: 12px;
+}
+
+/* ── Inline NOTAM (Briefing Tab) ── */
+.metbriefing-inline-notam-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metbriefing-inline-notam {
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  padding: 12px;
+}
+.metbriefing-inline-notam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  padding: 4px 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* hover removed — no highlight on NOTAM cards */
+.metbriefing-inline-notam--expanded .metbriefing-inline-notam-header {
+  margin-bottom: 8px;
+}
+.metbriefing-inline-notam-airport {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metbriefing-inline-notam-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.metbriefing-inline-notam--expanded .metbriefing-inline-notam-chevron {
+  transform: rotate(0deg);
+}
+.metbriefing-inline-notam-icao {
+  font-size: var(--font-md);
+  font-weight: 700;
+}
+.metbriefing-inline-notam-name {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+.metbriefing-inline-notam-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metbriefing-inline-notam-count {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.metbriefing-inline-notam-badge {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.metbriefing-inline-notam-badge--high {
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+}
+.metbriefing-inline-notam-badge--medium {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+body.dark-theme .metbriefing-inline-notam-badge--medium {
+  background: rgba(245, 127, 23, 0.15);
+  color: #FFB74D;
+}
+.metbriefing-inline-notam-badge--low {
+  background: var(--color-badge-ok-bg);
+  color: var(--color-badge-ok-text);
+}
+
+.metbriefing-inline-notam-details {
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 8px;
+}
+.metbriefing-inline-notam-message {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.metbriefing-inline-notam-empty {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 12px;
+}
+.metbriefing-inline-notam-item {
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 6px;
+  border-left: 3px solid var(--color-border);
+}
+.metbriefing-inline-notam-item--high {
+  border-left-color: var(--color-danger);
+  background: var(--color-badge-danger-bg);
+}
+.metbriefing-inline-notam-item--medium {
+  border-left-color: var(--color-warning);
+  background: #FFF8E1;
+}
+body.dark-theme .metbriefing-inline-notam-item--medium {
+  background: rgba(245, 127, 23, 0.08);
+}
+.metbriefing-inline-notam-item--low {
+  border-left-color: var(--color-success);
+  background: var(--color-badge-ok-bg);
+}
+.metbriefing-inline-notam-item-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.metbriefing-inline-notam-item-id {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.metbriefing-inline-notam-crit {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.metbriefing-inline-notam-crit--high {
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+}
+.metbriefing-inline-notam-crit--medium {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+body.dark-theme .metbriefing-inline-notam-crit--medium {
+  background: rgba(245, 127, 23, 0.15);
+  color: #FFB74D;
+}
+.metbriefing-inline-notam-crit--low {
+  background: var(--color-badge-ok-bg);
+  color: var(--color-badge-ok-text);
+}
+.metbriefing-inline-notam-item-subject {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+/* .metbriefing-inline-notam-item-desc and .metbriefing-inline-notam-item-dates removed — not used in briefing NOTAM */
+.metbriefing-inline-notam-qcode {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+  font-family: monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ── Summary / Readiness ── */
+.metbriefing-summary {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  margin: 8px 0;
+}
+.metbriefing-readiness-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-md);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.metbriefing-readiness-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.metbriefing-readiness-indicator--green .metbriefing-readiness-dot {
+  background: var(--color-success);
+}
+.metbriefing-readiness-indicator--green {
+  color: var(--color-success);
+}
+.metbriefing-readiness-indicator--yellow .metbriefing-readiness-dot {
+  background: var(--color-warning);
+}
+.metbriefing-readiness-indicator--yellow {
+  color: var(--color-warning);
+}
+.metbriefing-readiness-indicator--red .metbriefing-readiness-dot {
+  background: var(--color-danger);
+}
+.metbriefing-readiness-indicator--red {
+  color: var(--color-danger);
+}
+
+.metbriefing-readiness-issues {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 18px;
+}
+.metbriefing-readiness-issues li {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  padding: 2px 0;
+}
+.metbriefing-readiness-issues li::before {
+  content: '•';
+  margin-right: 8px;
+  color: var(--color-warning);
+}
+
+.metbriefing-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 20px;
+  background: var(--color-primary-dark);
+  color: var(--color-text-white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--color-shadow-primary);
+  transition: all 0.2s var(--transition-ease);
+}
+.metbriefing-share-btn svg {
+  width: 16px; height: 16px;
+}
+@media (hover: hover) {
+  .metbriefing-share-btn:hover {
+    background: var(--color-primary-deeper);
+    box-shadow: 0 4px 12px var(--color-shadow-primary);
+    transform: translateY(-1px);
+  }
+  .metbriefing-share-btn:active { transform: translateY(0); }
+}
+
+/* ────────────────────────────────────────────
+   WEATHER TAB
+   ──────────────────────────────────────────── */
+
+/* ── Search Bar ── */
+.metbriefing-wx-search-bar,
+.metbriefing-notam-search-bar {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+.metbriefing-wx-search-input-wrap,
+.metbriefing-notam-search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+.metbriefing-wx-search-icon,
+.metbriefing-notam-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px; height: 18px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.metbriefing-wx-search-input,
+.metbriefing-notam-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 36px 0 40px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-size: var(--font-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.metbriefing-wx-search-input:focus,
+.metbriefing-notam-search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
+}
+.metbriefing-wx-search-input::placeholder,
+.metbriefing-notam-search-input::placeholder {
+  color: var(--color-text-muted);
+  text-transform: none;
+}
+.metbriefing-wx-search-clear,
+.metbriefing-notam-search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+}
+.metbriefing-wx-search-clear svg,
+.metbriefing-notam-search-clear svg {
+  width: 16px; height: 16px;
+}
+.metbriefing-wx-search-btn,
+.metbriefing-notam-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background 0.2s var(--transition-ease);
+}
+.metbriefing-wx-search-btn:disabled,
+.metbriefing-notam-search-btn:disabled {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+.metbriefing-wx-search-btn svg,
+.metbriefing-notam-search-btn svg {
+  width: 18px; height: 18px;
+}
+@media (hover: hover) {
+  .metbriefing-wx-search-btn:not(:disabled):hover,
+  .metbriefing-notam-search-btn:not(:disabled):hover {
+    background: var(--color-primary-dark);
+  }
+}
+
+/* ── Recent Airports ── */
+.metbriefing-wx-recent {
+  margin-bottom: 8px;
+}
+.metbriefing-wx-recent-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  margin-bottom: 6px;
+}
+.metbriefing-wx-recent-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.metbriefing-wx-recent-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  min-height: 44px;
+  justify-content: center;
+  transition: all 0.2s var(--transition-ease);
+}
+.metbriefing-wx-recent-btn--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-ghost);
+}
+.metbriefing-wx-recent-code {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.metbriefing-wx-recent-name {
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+}
+@media (hover: hover) {
+  .metbriefing-wx-recent-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-ghost);
+  }
+}
+
+/* ── Weather Cards ── */
+.metbriefing-wx-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metbriefing-wx-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  position: relative;
+}
+.metbriefing-wx-card--night {
+  border-left: 4px solid #5C6BC0;
+}
+.metbriefing-wx-card--day {
+  border-left: 4px solid #FFA726;
+}
+/* Flight rules border colors for weather cards */
+.metbriefing-wx-card--vfr {
+  border-left: 4px solid #4CAF50;
+}
+.metbriefing-wx-card--mvfr {
+  border-left: 4px solid #2196F3;
+}
+.metbriefing-wx-card--ifr {
+  border-left: 4px solid #FF9800;
+}
+.metbriefing-wx-card--lifr {
+  border-left: 4px solid #F44336;
+}
+
+.metbriefing-wx-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.metbriefing-wx-card-airport {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.metbriefing-wx-card-icao {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.metbriefing-wx-card-name {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+.metbriefing-wx-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.metbriefing-wx-card-daynight svg {
+  width: 16px; height: 16px;
+}
+.metbriefing-wx-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--color-text-secondary);
+  transition: color 0.2s var(--transition-ease);
+  cursor: pointer;
+}
+.metbriefing-wx-card-action svg {
+  width: 16px; height: 16px;
+}
+.metbriefing-wx-card-action--danger {
+  color: var(--color-text-muted);
+}
+@media (hover: hover) {
+  .metbriefing-wx-card-action:hover {
+    color: var(--color-primary);
+  }
+  .metbriefing-wx-card-action--danger:hover {
+    color: var(--color-danger);
+  }
+}
+
+/* ── Weather Card Loading / Error ── */
+.metbriefing-wx-card-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+}
+.metbriefing-wx-card-loading svg {
+  width: 24px; height: 24px;
+}
+.metbriefing-wx-card-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-sm);
+}
+.metbriefing-wx-card-error svg {
+  width: 18px; height: 18px; flex-shrink: 0;
+}
+.metbriefing-wx-retry-btn {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--color-badge-danger-text);
+  border: 1px solid rgba(198, 40, 40, 0.2);
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 28px;
+}
+
+/* ── METAR Raw ── */
+.metbriefing-wx-metar-raw {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.metbriefing-wx-metar-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-info);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.metbriefing-wx-metar-code {
+  font-family: 'Roboto Mono', monospace;
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/* ── Parsed Fields Grid ── */
+.metbriefing-wx-parsed-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.metbriefing-wx-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-bg-main);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border-subtle);
+}
+.metbriefing-wx-field-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+}
+.metbriefing-wx-field-icon svg {
+  width: 18px; height: 18px;
+  color: var(--color-text-muted);
+}
+.metbriefing-wx-field-content {
+  flex: 1;
+  min-width: 0;
+}
+.metbriefing-wx-field-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+.metbriefing-wx-field-value {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.metbriefing-wx-warning-icon {
+  width: 14px !important; height: 14px !important;
+  color: var(--color-warning) !important;
+}
+
+/* ── Weather Phenomena ── */
+.metbriefing-wx-phenomena {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+.metbriefing-wx-phenomenon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.metbriefing-wx-phenomenon svg {
+  width: 14px; height: 14px;
+}
+
+/* ── Wind Rose ── */
+.metbriefing-wx-wind-rose {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 12px;
+}
+.metbriefing-wx-wind-arrow {
+  width: 28px !important; height: 28px !important;
+  color: var(--color-primary);
+  transition: transform 0.3s var(--transition-ease);
+}
+.metbriefing-wx-wind-dir-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ── TAF Section ── */
+.metbriefing-wx-taf-section {
+  margin-top: 12px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 8px;
+}
+.metbriefing-wx-taf-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 0;
+  color: var(--color-info);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.metbriefing-wx-taf-toggle svg {
+  width: 16px; height: 16px;
+}
+.metbriefing-wx-taf-content {
+  padding: 8px;
+  background: var(--color-bg-main);
+  border-radius: var(--border-radius-sm);
+  margin-top: 4px;
+}
+.metbriefing-wx-taf-code {
+  font-family: 'Roboto Mono', monospace;
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/* ── Weather Card Footer ── */
+.metbriefing-wx-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ── Stale Data Badge ── */
+.metbriefing-wx-stale-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: #FF9800;
+  background: rgba(255, 152, 0, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+.metbriefing-wx-stale-badge svg {
+  width: 12px; height: 12px;
+}
+.metbriefing-stale-badge {
+  display: inline-flex;
+  align-items: center;
+  color: #FF9800;
+  opacity: 0.9;
+}
+.metbriefing-stale-badge svg {
+  width: 10px; height: 10px;
+}
+.metbriefing-notam-airport-chip--stale {
+  opacity: 0.7;
+  border-color: #FF9800 !important;
+}
+
+/* ── Empty State ── */
+.metbriefing-wx-empty,
+.metbriefing-notam-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px;
+  gap: 8px;
+}
+.metbriefing-wx-empty-icon,
+.metbriefing-notam-empty-icon {
+  width: 56px !important; height: 56px !important;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+.metbriefing-wx-empty-text,
+.metbriefing-notam-empty-text {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.metbriefing-wx-empty-sub,
+.metbriefing-notam-empty-sub {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ────────────────────────────────────────────
+   NOTAM TAB
+   ──────────────────────────────────────────── */
+
+/* ── NOTAM Filter Tabs ── */
+.metbriefing-nt-filter-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0 8px;
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-sm);
+  padding: 4px;
+  border: 1px solid var(--color-border-subtle);
+}
+.metbriefing-nt-filter-pill {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-ease);
+  text-align: center;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.metbriefing-nt-filter-pill--active {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+}
+.metbriefing-nt-filter-count {
+  font-size: 0.625rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.metbriefing-nt-filter-pill:not(.metbriefing-nt-filter-pill--active) .metbriefing-nt-filter-count {
+  background: var(--color-border-subtle);
+  color: var(--color-text-secondary);
+}
+@media (hover: hover) {
+  .metbriefing-nt-filter-pill:not(.metbriefing-nt-filter-pill--active):hover {
+    background: var(--color-bg-hover);
+  }
+}
+
+/* ── NOTAM Airport Chips ── */
+.metbriefing-notam-airports-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.metbriefing-notam-airport-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--color-primary-ghost);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 6px;
+  font-size: var(--font-xs);
+}
+.metbriefing-notam-airport-chip-icao {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+.metbriefing-notam-airport-chip-count {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.625rem;
+}
+.metbriefing-notam-airport-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+.metbriefing-notam-airport-chip-remove svg {
+  width: 12px; height: 12px;
+}
+@media (hover: hover) {
+  .metbriefing-notam-airport-chip-remove:hover {
+    color: var(--color-danger);
+    background: var(--color-badge-danger-bg);
+  }
+}
+
+/* ── NOTAM Airport Chip FIR label ── */
+.metbriefing-notam-airport-chip-fir {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--color-warning-dark, #b45309);
+  background: var(--color-warning-bg, #fef3c7);
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── NOTAM Refresh-All Button ── */
+.metbriefing-notam-refresh-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+.metbriefing-notam-refresh-all svg {
+  width: 14px;
+  height: 14px;
+}
+.metbriefing-notam-refresh-all:hover:not(:disabled) {
+  background: rgba(var(--color-primary-rgb), 0.15);
+  color: var(--color-primary-dark);
+  transform: scale(1.05);
+}
+.metbriefing-notam-refresh-all:active:not(:disabled) {
+  transform: scale(0.95);
+}
+.metbriefing-notam-refresh-all:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── NOTAM Text Filter ── */
+.metbriefing-notam-filters {
+  margin-bottom: 8px;
+}
+.metbriefing-notam-text-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+}
+.metbriefing-notam-text-filter svg {
+  width: 14px; height: 14px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+.metbriefing-notam-text-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+  padding: 0;
+  height: 28px;
+}
+.metbriefing-notam-text-input:focus {
+  outline: none;
+}
+.metbriefing-notam-text-input::placeholder {
+  color: var(--color-text-muted);
+}
+.metbriefing-notam-text-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+}
+.metbriefing-notam-text-clear svg {
+  width: 14px; height: 14px;
+}
+
+/* ── NOTAM Tab: Airport Group Accordion ── */
+.metbriefing-notam-group {
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.metbriefing-notam-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background 0.15s;
+  gap: 8px;
+}
+.metbriefing-notam-group-header:hover {
+  background: var(--color-bg-hover);
+}
+.metbriefing-notam-group--expanded .metbriefing-notam-group-header {
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.metbriefing-notam-group-airport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.metbriefing-notam-group-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.metbriefing-notam-group--expanded .metbriefing-notam-group-chevron {
+  transform: rotate(0deg);
+}
+.metbriefing-notam-group-icao {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.metbriefing-notam-group-name {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+.metbriefing-notam-group-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.metbriefing-notam-group-count-zero {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--color-bg-card);
+}
+.metbriefing-notam-group-cards {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metbriefing-notam-no-results--inner {
+  padding: 16px;
+  text-align: center;
+}
+.metbriefing-notam-no-results--inner .metbriefing-notam-no-results-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── NOTAM Cards ── */
+.metbriefing-notam-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metbriefing-notam-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  padding: 16px;
+  border-left: 4px solid var(--color-border);
+}
+.metbriefing-notam-card--high {
+  border-left-color: var(--color-danger);
+}
+.metbriefing-notam-card--medium {
+  border-left-color: var(--color-warning);
+}
+.metbriefing-notam-card--low {
+  border-left-color: var(--color-success);
+}
+.metbriefing-notam-card--expired {
+  opacity: 0.6;
+}
+
+.metbriefing-notam-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.metbriefing-notam-card-id {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.metbriefing-notam-card-identifier {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.metbriefing-notam-type-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.metbriefing-notam-type-badge--N {
+  background: var(--color-badge-ok-bg);
+  color: var(--color-badge-ok-text);
+}
+.metbriefing-notam-type-badge--R {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+body.dark-theme .metbriefing-notam-type-badge--R {
+  background: rgba(245, 127, 23, 0.15);
+  color: #FFB74D;
+}
+.metbriefing-notam-type-badge--C {
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+}
+
+.metbriefing-notam-criticality-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.metbriefing-notam-criticality-badge--high {
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+}
+.metbriefing-notam-criticality-badge--medium {
+  background: #FFF8E1;
+  color: #F57F17;
+}
+body.dark-theme .metbriefing-notam-criticality-badge--medium {
+  background: rgba(245, 127, 23, 0.15);
+  color: #FFB74D;
+}
+.metbriefing-notam-criticality-badge--low {
+  background: var(--color-badge-ok-bg);
+  color: var(--color-badge-ok-text);
+}
+.metbriefing-notam-qcode-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+  font-family: monospace;
+  letter-spacing: 0.02em;
+}
+
+.metbriefing-notam-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metbriefing-notam-card-icao {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.metbriefing-notam-status-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.metbriefing-notam-status-badge--active {
+  background: var(--color-badge-ok-bg);
+  color: var(--color-badge-ok-text);
+}
+.metbriefing-notam-status-badge--expired {
+  background: var(--color-badge-danger-bg);
+  color: var(--color-badge-danger-text);
+}
+
+.metbriefing-notam-card-subject {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+.metbriefing-notam-card-description {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.metbriefing-notam-card-description p {
+  margin: 0;
+}
+
+.metbriefing-notam-card-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.metbriefing-notam-date-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+.metbriefing-notam-date-item svg {
+  width: 14px; height: 14px;
+}
+.metbriefing-notam-date-label {
+  font-weight: 600;
+}
+.metbriefing-notam-date-value {
+  color: var(--color-text-secondary);
+}
+
+/* ── NOTAM No Results ── */
+.metbriefing-notam-no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  gap: 8px;
+}
+.metbriefing-notam-no-results-icon {
+  width: 32px !important; height: 32px !important;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+.metbriefing-notam-no-results-text {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.metbriefing-notam-no-results-hint {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ── NOTAM Footer ── */
+.metbriefing-notam-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+.metbriefing-notam-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+.metbriefing-notam-footer-icao {
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+.metbriefing-notam-footer-time {
+  flex: 1;
+}
+.metbriefing-notam-footer-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-secondary);
+}
+.metbriefing-notam-footer-refresh svg {
+  width: 14px; height: 14px;
+}
+@media (hover: hover) {
+  .metbriefing-notam-footer-refresh:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-ghost);
+  }
+}
+.metbriefing-notam-footer-auto {
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive Tweaks ── */
+@media (max-width: 412px) {
+  .metbriefing-route-inputs {
+    flex-direction: column;
+  }
+  .metbriefing-route-extra {
+    flex-direction: column;
+  }
+  .metbriefing-wx-parsed-grid {
+    grid-template-columns: 1fr;
+  }
+  .metbriefing-inline-weather-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Station Info (now inline in header) */
+.metbriefing-wx-card-station, .metbriefing-inline-weather-station {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* TAF Raw (same style as METAR raw) */
+.metbriefing-wx-taf-raw {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.metbriefing-wx-taf-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: #2E7D32;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* METAR History */
+.metbriefing-wx-metar-history {
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 8px;
+}
+.metbriefing-wx-metar-history--loading {
+  opacity: 0.6;
+}
+.metbriefing-wx-metar-history-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+.metbriefing-wx-metar-history-title svg {
+  width: 14px; height: 14px;
+  color: var(--color-text-muted);
+}
+.metbriefing-wx-metar-history-item {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.metbriefing-wx-metar-history-item:last-child {
+  border-bottom: none;
+}
+.metbriefing-wx-metar-history-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.metbriefing-wx-metar-history-code {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-family: 'Roboto Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.5;
+}
+.metbriefing-wx-metar-history-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+.metbriefing-wx-hist-field {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.metbriefing-wx-metar-history-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}

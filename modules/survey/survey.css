@@ -1,0 +1,372 @@
+/* ═══════════════════════════════════════════
+   МОДУЛЬ: Контрольный опрос — проверка знаний
+   ═══════════════════════════════════════════ */
+
+/* ─── Overview Stats ─── */
+.survey-overview {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  flex-wrap: wrap;
+}
+
+.survey-stat-card {
+  flex: 1;
+  min-width: 100px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  padding: 12px;
+  text-align: center;
+}
+
+.survey-stat-value {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.survey-stat-value--success {
+  color: var(--color-success);
+}
+
+.survey-stat-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+/* ─── Search ─── */
+.survey-search-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.survey-search-wrap .survey-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.survey-search-wrap .survey-search-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.survey-search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-base);
+  font-family: var(--font-main);
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  box-sizing: border-box;
+  transition: border-color 0.15s var(--transition-ease);
+}
+
+.survey-search-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.survey-search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ─── Category Cards ─── */
+.survey-category {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.survey-category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.survey-category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.survey-category-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.survey-category-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.survey-category-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text-main);
+  line-height: 1.3;
+}
+
+.survey-category-meta {
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.survey-category-progress {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.survey-category-progress svg {
+  transform: rotate(-90deg);
+  width: 48px;
+  height: 48px;
+}
+
+.survey-category-progress-bg {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 3;
+}
+
+.survey-category-progress-fill {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s var(--transition-ease-out);
+}
+
+.survey-category-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.survey-category-chevron {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--transition-speed) var(--transition-ease);
+}
+
+.survey-category-chevron svg {
+  width: 20px;
+  height: 20px;
+}
+
+.survey-category.open .survey-category-chevron {
+  transform: rotate(180deg);
+}
+
+/* ─── Question Cards ─── */
+.survey-questions {
+  display: none;
+  padding: 0 12px 12px;
+}
+
+.survey-category.open .survey-questions {
+  display: block;
+}
+
+.survey-question {
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s var(--transition-ease);
+}
+
+.survey-question--mastered {
+  border-left: 3px solid var(--color-success);
+}
+
+.survey-question-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.survey-question-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: background 0.15s var(--transition-ease),
+              border-color 0.15s var(--transition-ease);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.survey-question--mastered .survey-question-checkbox {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.survey-question-checkbox svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--color-text-white);
+  color: var(--color-text-white);
+  opacity: 0;
+  transition: opacity 0.15s var(--transition-ease);
+}
+
+.survey-question--mastered .survey-question-checkbox svg {
+  opacity: 1;
+}
+
+.survey-question-text {
+  flex: 1;
+  font-size: var(--font-base);
+  color: var(--color-text-main);
+  line-height: 1.45;
+}
+
+.survey-question-toggle {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform var(--transition-speed) var(--transition-ease);
+  margin-top: 2px;
+}
+
+.survey-question-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.survey-question.open .survey-question-toggle {
+  transform: rotate(180deg);
+}
+
+/* ─── Answer ─── */
+.survey-answer {
+  display: none;
+  padding: 0 12px 12px 44px;
+}
+
+.survey-question.open .survey-answer {
+  display: block;
+}
+
+.survey-answer-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  padding: 10px 12px;
+  background: var(--color-primary-ghost);
+  border-radius: var(--border-radius-xs);
+  border-left: 3px solid var(--color-primary);
+}
+
+.survey-answer-ref {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  padding-left: 12px;
+}
+
+.survey-answer-ref::before {
+  content: '\2192'; /* → */
+  margin-right: 4px;
+}
+
+/* ─── Reset Button ─── */
+.survey-reset-wrap {
+  padding: 16px 0 32px;
+  text-align: center;
+}
+
+/* ─── No Results ─── */
+.survey-no-results {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-base);
+}
+
+.survey-no-results svg {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+
+/* ─── Hover states ─── */
+@media (hover: hover) {
+  .survey-category-header:hover {
+    background: var(--color-bg-hover);
+  }
+  .survey-question-header:hover {
+    background: var(--color-bg-hover);
+  }
+  .survey-question-checkbox:hover {
+    border-color: var(--color-primary);
+  }
+}
+
+/* ─── Dark theme corrections ─── */
+body.dark-theme .survey-question--mastered {
+  border-left-color: var(--color-success);
+}
+
+body.dark-theme .survey-answer-text {
+  background: rgba(230, 57, 70, 0.1);
+  border-left-color: var(--color-primary);
+}
+
+/* ─── Animations ─── */
+@keyframes survey-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.survey-category {
+  animation: survey-fade-in 0.25s var(--transition-ease-out) both;
+}
+
+.survey-category:nth-child(1) { animation-delay: 0.02s; }
+.survey-category:nth-child(2) { animation-delay: 0.06s; }
+.survey-category:nth-child(3) { animation-delay: 0.10s; }
+.survey-category:nth-child(4) { animation-delay: 0.14s; }
+.survey-category:nth-child(5) { animation-delay: 0.18s; }
+.survey-category:nth-child(6) { animation-delay: 0.22s; }
+.survey-category:nth-child(7) { animation-delay: 0.26s; }
+.survey-category:nth-child(8) { animation-delay: 0.30s; }

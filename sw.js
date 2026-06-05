@@ -1,13 +1,17 @@
 /* Pilot's Tool — Service Worker v24 */
 
-var CACHE_NAME = 'pilots-tool-v25';
+var CACHE_NAME = 'pilots-tool-v26';
 
 var JSON_MODULE_NAMES = {
   'modules/phonebook/data/phonebook.json':               'Телефонный справочник',
   'modules/checklists/data/checklists.json':              'Чеклисты',
   'modules/krs/data/krs.json':                            'Указания КРС',
   'modules/flightprocedures/data/flightprocedures.json':  'Лётные процедуры',
-  'modules/aviation_sayings.json':                   'Авиационные цитаты'
+  'modules/ffstraining/data/ffstraining.json':             'FFS Training',
+  'modules/aviation_sayings.json':                   'Авиационные цитаты',
+  'modules/survey/data/survey.json':                   'Контрольный опрос',
+  'modules/checkride/data/line.json':                    'Checkride LINE',
+  'modules/checkride/data/ffs.json':                     'Checkride FFS'
 };
 
 var STATIC_ASSETS = [
@@ -40,6 +44,7 @@ var STATIC_ASSETS = [
   './modules/metbriefing/index.js',
   './modules/checkride/index.js',
   './modules/ffstraining/index.js',
+  './modules/survey/index.js',
   // Модули CSS (подгружаются динамически через registry.ensureCss)
   './modules/worktime/worktime.css',
   './modules/checklists/checklists.css',
@@ -52,12 +57,22 @@ var STATIC_ASSETS = [
   './modules/metbriefing/metbriefing.css',
   './modules/checkride/checkride.css',
   './modules/ffstraining/ffstraining.css',
+  './modules/survey/survey.css',
   // JSON данных
   './modules/phonebook/data/phonebook.json',
   './modules/checklists/data/checklists.json',
   './modules/krs/data/krs.json',
   './modules/flightprocedures/data/flightprocedures.json',
+  './modules/ffstraining/data/ffstraining.json',
+  './modules/flightprocedures/data/maneuvers_stall.html',
+  './modules/flightprocedures/data/ext_walk1.png',
+  './modules/ffstraining/data/ext_walk1.png',
+  './modules/docs/AOMA.pdf',
+  './modules/docs/AOMB.pdf',
   './modules/aviation_sayings.json',
+  './modules/survey/data/survey.json',
+  './modules/checkride/data/line.json',
+  './modules/checkride/data/ffs.json',
   // Библиотеки
   './libs/photoswipe/photoswipe.min.js',
   './libs/photoswipe/photoswipe-ui-default.min.js',
