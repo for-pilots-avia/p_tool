@@ -2030,26 +2030,46 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   gap: 6px;
   font-size: var(--font-xs);
   font-weight: 600;
-  color: var(--color-text-secondary);
-  margin-bottom: 6px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .metbriefing-wx-metar-history-title svg {
   width: 14px; height: 14px;
-  color: var(--color-text-muted);
 }
 .metbriefing-wx-metar-history-item {
-  padding: 6px 0;
+  padding: 6px 8px;
   border-bottom: 1px solid var(--color-border-subtle);
+  border-left: 3px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 2px;
+  margin-bottom: 4px;
 }
 .metbriefing-wx-metar-history-item:last-child {
   border-bottom: none;
+  margin-bottom: 0;
 }
+.metbriefing-wx-metar-history-item.metbriefing-condition--vfr { border-left-color: #4CAF50; }
+.metbriefing-wx-metar-history-item.metbriefing-condition--mvfr { border-left-color: #2196F3; }
+.metbriefing-wx-metar-history-item.metbriefing-condition--ifr { border-left-color: #FF9800; }
+.metbriefing-wx-metar-history-item.metbriefing-condition--lifr { border-left-color: #F44336; }
 .metbriefing-wx-metar-history-label {
   font-size: 11px;
   font-weight: 600;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metbriefing-wx-hist-cat {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+  background: var(--color-primary-ghost);
   color: var(--color-primary);
 }
 .metbriefing-wx-metar-history-code {
@@ -2061,15 +2081,31 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   word-break: normal;
   line-height: 1.5;
 }
-.metbriefing-wx-metar-history-fields {
+.metbriefing-wx-metar-history-btn {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 2px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--color-primary-ghost);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-primary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--transition-ease);
+  width: 100%;
 }
-.metbriefing-wx-hist-field {
-  font-size: 11px;
-  color: var(--color-text-muted);
+.metbriefing-wx-metar-history-btn svg {
+  width: 14px; height: 14px;
+}
+@media (hover: hover) {
+  .metbriefing-wx-metar-history-btn:hover {
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border-color: rgba(var(--color-primary-rgb), 0.25);
+  }
 }
 .metbriefing-wx-metar-history-hint {
   display: flex;
