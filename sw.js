@@ -1,6 +1,6 @@
 /* Pilot's Tool — Service Worker v24 */
 
-var CACHE_NAME = 'pilots-tool-v26';
+var CACHE_NAME = 'pilots-tool-v27';
 
 var JSON_MODULE_NAMES = {
   'modules/phonebook/data/phonebook.json':               'Телефонный справочник',
