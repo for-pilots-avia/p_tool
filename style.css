@@ -144,10 +144,7 @@ html { font-size: 16px; }
 }
 
 /* Touch-action */
-button, .menu-item, .contact-item, .krs-block-header,
-.fp-phase-header, .fp-procedure-header, .contact-phone,
-.contact-email, .icon-btn, .commits-panel-close,
-.commits-action-item, .notes-fab, .notes-stroke-btn, .notes-tool-clear {
+button, .menu-item, .icon-btn {
   touch-action: manipulation;
 }
 
@@ -211,6 +208,7 @@ button:focus:not(:focus-visible) { outline: none; }
   height: var(--header-height);
   padding: 0 4px;
   box-sizing: border-box;
+  color: var(--color-text-white);
 }
 
 @media (min-width: 376px)  { .header-inner { padding: 0 8px; } }
@@ -287,21 +285,26 @@ button:focus:not(:focus-visible) { outline: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   background: none;
   border: none;
-  color: var(--color-text-white);
   cursor: pointer;
-  padding: 0;
   border-radius: var(--border-radius-sm);
-  font-family: var(--font-main);
+  color: inherit;
+  opacity: 1;
+  transition: opacity var(--transition-speed);
 }
 .icon-btn svg {
   width: 24px;
   height: 24px;
-  stroke: currentColor;
-  fill: none;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .header-inner.search-active #headerLeft button {
@@ -845,82 +848,8 @@ body.dark-theme #notesQuickBtn {
   }
 }
 
-/* ═══════════════════════════════════════════
-   SECTION 4.5: ACCORDION CHEVRON (GLOBAL)
-   ═══════════════════════════════════════════ */
-.collapsible-title {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-@keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.marquee-inner {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.krs-block.open       .marquee-inner.is-overflowing,
-.checklist-block.open .marquee-inner.is-overflowing,
-.fp-phase.open        .marquee-inner.is-overflowing,
-.fp-procedure.open    .marquee-inner.is-overflowing {
-  animation: marquee 10s linear infinite;
-  padding-right: 48px;
-}
-
-.collapsible-chevron {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  color: inherit;
-  transition: transform var(--transition-speed) var(--transition-ease);
-}
-.collapsible-chevron svg { width: 20px; height: 20px; }
-
-.krs-block.open       > .krs-block-header      > .collapsible-chevron,
-.checklist-block.open > .checklist-block-header > .collapsible-chevron,
-.fp-phase.open        > .fp-phase-header        > .collapsible-chevron,
-.fp-procedure.open    > .fp-procedure-header    > .collapsible-chevron {
-  transform: rotate(180deg);
-}
-
-/* ═══════════════════════════════════════════
-   SECTION 4 continued: DIVIDERS & MISC
-   ═══════════════════════════════════════════ */
-.list-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px var(--content-padding-x) 6px;
-  pointer-events: none;
-  user-select: none;
-}
-
-.list-divider::before,
-.list-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-
-.list-divider-label {
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.list-divider:not(:has(.list-divider-label))::before { flex: 1; }
-.list-divider:not(:has(.list-divider-label))::after  { display: none; }
+/* ─── Collapsible/accordion, marquee, dividers, cards ─── */
+/* Per SHELL_CONTRACT v3.19 §4: these are NOT global — each module declares its own. */
 
 /* ─── Module container ─── */
 .module-container {
@@ -940,48 +869,7 @@ body.dark-theme #notesQuickBtn {
 /* Модулям с широкой раскладкой — переопределить в своём CSS:
    #phonebookScreen .module-container { max-width: 1100px; } */
 
-/* ─── Generic App Card ─── */
-.app-card {
-  background: var(--color-bg-card);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--color-border-subtle);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.app-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-/* ─── Badges ─── */
-.badge-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-danger);
-  background: rgba(205, 32, 44, 0.1);
-  padding: 2px 8px;
-  border-radius: var(--border-radius-xs);
-}
-.badge-danger svg { width: 14px; height: 14px; }
-
-.badge-ok {
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-success);
-  background: rgba(40, 167, 69, 0.1);
-  padding: 2px 8px;
-  border-radius: var(--border-radius-xs);
-}
+/* ─── App Card, Badges — per SHELL_CONTRACT v3.19 §4 moved to module CSS ─── */
 
 /* ─── Buttons ─── */
 .btn-primary {
@@ -1027,56 +915,9 @@ body.dark-theme #notesQuickBtn {
   .btn-outline:hover { background: var(--color-bg-hover); }
 }
 
-.btn-danger-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: transparent;
-  color: var(--color-danger);
-  border: 1.5px solid var(--color-danger);
-  border-radius: var(--border-radius-sm);
-  padding: 10px 20px;
-  font-size: var(--font-base);
-  font-weight: 500;
-  font-family: var(--font-main);
-  cursor: pointer;
-  min-height: 44px;
-  transition: background 0.15s var(--transition-ease);
-}
-.btn-danger-outline svg { width: 18px; height: 18px; }
-@media (hover: hover) {
-  .btn-danger-outline:hover { background: rgba(205, 32, 44, 0.08); }
-}
+/* ─── btn-danger-outline — per SHELL_CONTRACT v3.19 §4 moved to module CSS ─── */
 
-/* ─── Placeholder screens ─── */
-.placeholder-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px var(--content-padding-x);
-  text-align: center;
-  min-height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0px) - 60px);
-}
-.placeholder-screen svg {
-  width: 64px;
-  height: 64px;
-  color: var(--color-text-muted);
-  margin-bottom: 16px;
-  opacity: 0.4;
-}
-.placeholder-screen h2 {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  color: var(--color-text-main);
-  margin: 0 0 8px;
-}
-.placeholder-screen p {
-  font-size: var(--font-sm);
-  color: var(--color-text-secondary);
-  margin: 0;
-}
+/* ─── placeholder-screen — per SHELL_CONTRACT v3.19 §4 moved to module CSS ─── */
 
 /* ─── Responsive tweaks ─── */
 @media (min-width: 376px) {
@@ -1084,13 +925,11 @@ body.dark-theme #notesQuickBtn {
 }
 
 @media (min-width: 768px) {
-  .contact-item, .krs-block-header { min-height: 56px; }
   .menu-item { font-size: var(--font-md); padding: 16px 20px; }
 }
 
 @media (hover: hover) {
-  .icon-btn:hover   { opacity: 0.85; }
-  .contact-item:hover { background: var(--color-bg-hover); }
+  .icon-btn:hover { background: var(--color-bg-hover); }
 }
 
 /* ═══════════════════════════════════════════
@@ -1339,13 +1178,6 @@ body.dark-theme #notesQuickBtn {
   border-radius: 6px;
   margin-bottom: 8px;
   animation: skeleton-pulse 1.5s ease-in-out infinite;
-}
-
-/* ─── Small button variant ─── */
-.btn-sm {
-  padding: 6px 12px;
-  font-size: var(--font-sm);
-  min-height: 36px;
 }
 
 

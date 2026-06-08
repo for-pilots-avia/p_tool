@@ -49,6 +49,9 @@ window.ModuleRegistry = {
 
     this._modules[id] = module;
     this._order.push(id);
+
+    // Подключить CSS модуля при регистрации (контракт MODULE_CONTRACT §1)
+    this.ensureCss(id);
   },
 
   /**
@@ -81,19 +84,17 @@ window.ModuleRegistry = {
   },
 
   /**
-   * Initialize a module (call its init() function).
-   * Also ensures the module's CSS is loaded.
+   * Initialize a module (call its init() function with params).
+   * CSS is already loaded at register() time (контракт MODULE_CONTRACT §1).
    * @param {string} id
+   * @param {object} [params] — параметры, передаваемые в init() (по умолчанию {})
    */
-  init: function(id) {
+  init: function(id, params) {
     var mod = this.get(id);
     if (!mod) return;
 
-    // Подгрузить CSS модуля, если ещё не загружен
-    this.ensureCss(id);
-
     if (typeof mod.init === 'function') {
-      mod.init();
+      mod.init(params || {});
     } else {
       // Fallback: show "in development" stub
       this._showStub(mod);

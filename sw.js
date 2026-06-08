@@ -1,15 +1,15 @@
 /* Pilot's Tool — Service Worker v24 */
 
-var CACHE_NAME = 'pilots-tool-v27';
+var CACHE_NAME = 'pilots-tool-v29';
 
 var JSON_MODULE_NAMES = {
-  'modules/phonebook/data/phonebook.json':               'Телефонный справочник',
+  'modules/aviation_sayings.json':                        'Авиационные цитаты',
+  'modules/phonebook/data/phonebook.json':                'Телефонный справочник',
   'modules/checklists/data/checklists.json':              'Чеклисты',
   'modules/krs/data/krs.json':                            'Указания КРС',
   'modules/flightprocedures/data/flightprocedures.json':  'Лётные процедуры',
-  'modules/ffstraining/data/ffstraining.json':             'FFS Training',
-  'modules/aviation_sayings.json':                   'Авиационные цитаты',
-  'modules/survey/data/survey.json':                   'Контрольный опрос',
+  'modules/ffstraining/data/ffstraining.json':            'FFS Training',
+  'modules/survey/data/survey.json':                     'Контрольный опрос',
   'modules/checkride/data/line.json':                    'Checkride LINE',
   'modules/checkride/data/ffs.json':                     'Checkride FFS'
 };
@@ -45,6 +45,7 @@ var STATIC_ASSETS = [
   './modules/checkride/index.js',
   './modules/ffstraining/index.js',
   './modules/survey/index.js',
+  './modules/rulesthumb/index.js',
   // Модули CSS (подгружаются динамически через registry.ensureCss)
   './modules/worktime/worktime.css',
   './modules/checklists/checklists.css',
@@ -58,6 +59,7 @@ var STATIC_ASSETS = [
   './modules/checkride/checkride.css',
   './modules/ffstraining/ffstraining.css',
   './modules/survey/survey.css',
+  './modules/rulesthumb/rulesthumb.css',
   // JSON данных
   './modules/phonebook/data/phonebook.json',
   './modules/checklists/data/checklists.json',

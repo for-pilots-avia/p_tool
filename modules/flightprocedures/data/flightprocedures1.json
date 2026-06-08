@@ -165,7 +165,7 @@
     "category": "Abnormal",
     "severity": "abnormal",
     "refCode": "ECAM-ENG-FAIL-AV1",
-    "description": "Действия экипажа при отказе двигателя на скорости V1 и выше. {{badge:abnormal}} Взлёт продолжается на одном двигателе. Критическая процедура — требует немедленных и точных действий. См. также: {{link:ffstraining:ffs-001a:Отработка EFATO в FFS}}.",
+    "description": "Действия экипажа при отказе двигателя на скорости V1 и выше. {{badge:abnormal}} Взлёт продолжается на одном двигателе. Критическая процедура — требует немедленных и точных действий.",
     "memoryItems": [
       "Throttle — IDLE (failed engine)",
       "Detect — Confirm engine failure",
@@ -295,7 +295,7 @@
     "category": "Emergency",
     "severity": "emergency",
     "refCode": "ECAM-ENG-DUAL-FAIL",
-    "description": "Аварийная ситуация — оба двигателя отказали. {{badge:emergency}} ВС переходит на EMER ELEC (RAT), давление гидравлики падает. Критическая по времени процедура. См. тренировку: {{link:ffstraining:ffs-008:EFATO в FFS Training}}.",
+    "description": "Аварийная ситуация — оба двигателя отказали. {{badge:emergency}} ВС переходит на EMER ELEC (RAT), давление гидравлики падает. Критическая по времени процедура.",
     "memoryItems": [
       "Speed — VMIN (green dot + 10) {{badge:emergency:КРИТ}}",
       "APU — START (if time permits)",
@@ -333,7 +333,7 @@
     "category": "Emergency",
     "severity": "emergency",
     "refCode": "ECAM-PRESS-RAPID",
-    "description": "Быстрая потеря давления в кабине. {{badge:emergency:КРИТ}} Кабинная высота растёт со скоростью >2000 ft/min. Время полезного сознания на FL350 составляет 30–60 секунд. См. тренировку: {{link:ffstraining:ffs-003:B777 Recurrent}}.",
+    "description": "Быстрая потеря давления в кабине. {{badge:emergency:КРИТ}} Кабинная высота растёт со скоростью >2000 ft/min. Время полезного сознания на FL350 составляет 30–60 секунд.",
     "memoryItems": [
       "Oxygen Masks — DON & 100% IMMEDIATELY {{badge:emergency:КРИТ}}",
       "EMER DESCENT — INITIATE NOW {{badge:emergency}}",

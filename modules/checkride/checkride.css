@@ -2,6 +2,14 @@
    МОДУЛЬ: Checkride Rating — инспекционная проверка
    ═══════════════════════════════════════════ */
 
+/* ── Модульные CSS-переменные (привязаны к контейнеру, не :root) ── */
+#checkrideContainer {
+  --cr-color-dark-surface: #1a1a1a;
+}
+body.dark-theme #checkrideContainer {
+  --cr-color-dark-surface: #2a2a2a;
+}
+
 /* ─── Start Screen ─── */
 .checkride-start {
   padding-bottom: 32px;
@@ -594,7 +602,7 @@
 
 /* ─── Dark theme corrections ─── */
 body.dark-theme .checkride-rating-summary {
-  background: #1a1a1a;
+  background: var(--cr-color-dark-surface);
 }
 
 body.dark-theme .checkride-report-comment {
@@ -602,7 +610,7 @@ body.dark-theme .checkride-report-comment {
 }
 
 body.dark-theme #checkride-signature {
-  background: #1a1a1a;
+  background: var(--cr-color-dark-surface);
 }
 
 /* ─── Print styles ─── */

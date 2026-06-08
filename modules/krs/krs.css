@@ -3,8 +3,8 @@
    ═══════════════════════════════════════════ */
 
 /* ─── Module-specific CSS Variables ─── */
-/* Контракт MODULE_CONTRACT §7: :root и body запрещены в модуле → скопируем на #krsScreen */
-#krsScreen {
+/* Контракт MODULE_CONTRACT §7: :root и body запрещены в модуле → переменные на #krsContainer */
+#krsContainer {
   --color-success-bg: rgba(40,167,69,0.12);
   --color-warning-bg: rgba(255,193,7,0.15);
   --color-danger-bg: rgba(220,53,69,0.12);
@@ -19,7 +19,7 @@
   --color-badge-old-text: #6c757d;
 }
 
-body.dark-theme #krsScreen {
+body.dark-theme #krsContainer {
   --color-success-bg: rgba(52,208,88,0.15);
   --color-warning-bg: rgba(227,169,24,0.18);
   --color-danger-bg: rgba(232,48,62,0.15);
@@ -34,9 +34,54 @@ body.dark-theme #krsScreen {
   --color-badge-old-text: #adb5bd;
 }
 
-/* ─── Chevron rotation on block open ─── */
-.krs-block--open .collapsible-chevron {
+/* ─── Accordion: collapsible-title, chevron, marquee ─── */
+/* MODULE_CONTRACT §7: стили аккордеона — в модуле, не в style.css */
+
+.collapsible-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@keyframes krs-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.krs-block--open .marquee-inner.is-overflowing {
+  animation: krs-marquee 10s linear infinite;
+  padding-right: 48px;
+}
+
+.collapsible-chevron {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  transition: transform var(--transition-speed) var(--transition-ease);
+}
+.collapsible-chevron svg { width: 20px; height: 20px; }
+
+.krs-block--open > .krs-block-header > .collapsible-chevron {
   transform: rotate(180deg);
+}
+
+/* ─── Touch-action (перенесено из style.css по MODULE_CONTRACT §7) ─── */
+.krs-block-header {
+  touch-action: manipulation;
+}
+
+/* ─── Responsive (перенесено из style.css по MODULE_CONTRACT §7) ─── */
+@media (min-width: 768px) {
+  .krs-block-header { min-height: 56px; }
 }
 
 /* ─── Search Bar ─── */
@@ -143,20 +188,26 @@ body.dark-theme #krsScreen {
   align-items: center;
   width: 100%;
   padding: 14px 16px;
-  background: none;
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
   border: none;
   cursor: pointer;
   gap: 10px;
   text-align: left;
   color: var(--color-text-main);
-  transition: background-color var(--transition-speed) var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease);
 }
 
 @media (hover: hover) {
-  .krs-block-header:hover { background-color: var(--color-bg-hover); }
+  .krs-block-header:hover {
+    background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+    box-shadow: inset 0 0 0 9999px var(--color-bg-hover);
+  }
 }
 
-.krs-block-header:active { background-color: var(--color-bg-hover); }
+.krs-block-header:active {
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+  box-shadow: inset 0 0 0 9999px var(--color-bg-hover);
+}
 
 /* ─── Age Badge ─── */
 .krs-age-badge {

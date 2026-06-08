@@ -3,8 +3,8 @@
    ═══════════════════════════════════════════ */
 
 /* ─── Module-specific CSS Variables ─── */
-/* Контракт MODULE_CONTRACT §7: :root и body запрещены в модуле → скопируем на #checklistsScreen */
-#checklistsScreen {
+/* Контракт MODULE_CONTRACT §7: :root и body запрещены в модуле → переменные на #checklistsContainer */
+#checklistsContainer {
   --color-success-bg: rgba(40,167,69,0.12);
   --color-warning-bg: rgba(255,193,7,0.15);
   --color-danger-bg: rgba(220,53,69,0.12);
@@ -12,7 +12,7 @@
   --color-camera-delete-text: #ffffff;
 }
 
-body.dark-theme #checklistsScreen {
+body.dark-theme #checklistsContainer {
   --color-success-bg: rgba(52,208,88,0.15);
   --color-warning-bg: rgba(227,169,24,0.18);
   --color-danger-bg: rgba(232,48,62,0.15);
@@ -53,8 +53,43 @@ body.dark-theme #checklistsScreen {
 
 .cl-tab-btn:active { color: var(--color-primary-dark); }
 
-/* ─── Chevron rotation on block open ─── */
-.cl-block--open .collapsible-chevron {
+/* ─── Accordion: collapsible-title, chevron, marquee ─── */
+/* MODULE_CONTRACT §7: стили аккордеона — в модуле, не в style.css */
+
+.collapsible-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@keyframes cl-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.cl-block--open .marquee-inner.is-overflowing {
+  animation: cl-marquee 10s linear infinite;
+  padding-right: 48px;
+}
+
+.collapsible-chevron {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  transition: transform var(--transition-speed) var(--transition-ease);
+}
+.collapsible-chevron svg { width: 20px; height: 20px; }
+
+.cl-block--open > .cl-block-header .collapsible-chevron {
   transform: rotate(180deg);
 }
 
@@ -87,20 +122,26 @@ body.dark-theme #checklistsScreen {
   justify-content: space-between;
   width: 100%;
   padding: 14px 16px;
-  background: none;
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
   border: none;
   cursor: pointer;
   gap: 12px;
   text-align: left;
   color: var(--color-text-main);
-  transition: background-color var(--transition-speed) var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease);
 }
 
 @media (hover: hover) {
-  .cl-block-header:hover { background-color: var(--color-bg-hover); }
+  .cl-block-header:hover {
+    background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+    box-shadow: inset 0 0 0 9999px var(--color-bg-hover);
+  }
 }
 
-.cl-block-header:active { background-color: var(--color-bg-hover); }
+.cl-block-header:active {
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+  box-shadow: inset 0 0 0 9999px var(--color-bg-hover);
+}
 
 .cl-block-header-left {
   display: flex;
@@ -340,7 +381,7 @@ body.dark-theme #checklistsScreen {
 }
 
 /* ─── Commits Panel (Top-right Dropdown) ─── */
-#commitsOverlay {
+#checklists-commitsOverlay {
   display: none;
   position: fixed;
   inset: 0;
@@ -349,7 +390,7 @@ body.dark-theme #checklistsScreen {
   animation: clPanelOverlayIn 0.15s var(--transition-ease-out);
 }
 
-#commitsOverlay.open {
+#checklists-commitsOverlay.open {
   display: block;
 }
 
@@ -358,7 +399,7 @@ body.dark-theme #checklistsScreen {
   to   { opacity: 1; }
 }
 
-#commitsPanel {
+#checklists-commitsPanel {
   display: none;
   position: fixed;
   top: calc(var(--header-height) + 4px);
@@ -371,7 +412,7 @@ body.dark-theme #checklistsScreen {
   animation: clPanelSlideIn 0.2s var(--transition-ease-out);
 }
 
-#commitsPanel.open {
+#checklists-commitsPanel.open {
   display: block;
 }
 

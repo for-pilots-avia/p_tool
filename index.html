@@ -75,8 +75,6 @@
     </div>
   </div>
 
-  <div id="app">
-
     <!-- ═══ HEADER ═══ -->
     <header class="header" id="appHeader">
       <div class="header-inner">
@@ -87,8 +85,6 @@
     </header>
 
     <!-- ═══ SIDE MENU ═══ -->
-    <div id="menuOverlay" class="menu-overlay"></div>
-
     <nav id="sideMenu" class="side-menu">
       <div class="menu-banner">
         <span class="menu-banner-icon" id="menuBannerIcon"></span>
@@ -125,8 +121,10 @@
         <button id="updateBadgeClose" class="update-badge-close" aria-label="Закрыть">✕</button>
       </div>
     </nav>
+    <div id="menuOverlay" class="menu-overlay"></div>
 
     <!-- ═══ SCREENS ═══ -->
+    <main>
 
     <!-- Main Screen -->
     <div id="mainScreen" class="screen">
@@ -201,6 +199,13 @@
       <div class="module-container" id="surveyContainer"></div>
     </div>
 
+    <!-- Rules of Thumb Screen -->
+    <div id="rulesthumbScreen" class="screen">
+      <div class="module-container" id="rulesthumbContainer"></div>
+    </div>
+
+    </main>
+
     <!-- ═══ GLOBAL TOAST ═══ -->
     <div id="globalToast" class="global-toast"></div>
 
@@ -215,8 +220,6 @@
       </div>
     </div>
 
-  </div>
-
   <!-- ═══ SCRIPTS (loaded in order) ═══ -->
   <script src="icons.js"></script>
   <script src="modules/registry.js"></script>
@@ -225,6 +228,7 @@
   <script src="modules/checklists/index.js"></script>
   <script src="modules/krs/index.js"></script>
   <script src="modules/flightprocedures/index.js"></script>
+  <script src="modules/rulesthumb/index.js"></script>
   <script src="modules/ffstraining/index.js"></script>
   <script src="modules/checkride/index.js"></script>
   <script src="modules/survey/index.js"></script>

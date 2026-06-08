@@ -12,7 +12,7 @@ var _currentModule = null;
    NAVIGATION
    ═══════════════════════════════════════════ */
 
-window.app.navigateTo = function(screenName) {
+window.app.navigateTo = function(screenName, params) {
   // Destroy previous module before switching (контракт SHELL_CONTRACT §2)
   if (_currentModule && _currentModule !== screenName) {
     ModuleRegistry.destroy(_currentModule);
@@ -49,7 +49,7 @@ window.app.navigateTo = function(screenName) {
     var mod = window.ModuleRegistry.get(screenName);
     if (mod) {
       ModuleRegistry.renderHeader(screenName);
-      ModuleRegistry.init(screenName);
+      ModuleRegistry.init(screenName, params);
     }
   }
 };
@@ -497,12 +497,18 @@ window.app.initServiceWorker = function() {
     var reloadBtn = document.getElementById('swUpdateReloadBtn');
     if (reloadBtn) {
       reloadBtn.addEventListener('click', function() {
-        if (reg.waiting) {
-          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-        }
+        // Сначала вешаем слушатель — чтобы не пропустить controllerchange
         navigator.serviceWorker.addEventListener('controllerchange', function() {
           window.location.reload();
         });
+        // Отправляем SKIP_WAITING ожидающему или устанавливаемому воркеру
+        var target = reg.waiting || reg.installing;
+        if (target) {
+          target.postMessage({ type: 'SKIP_WAITING' });
+        } else {
+          // Фоллбэк: если воркер не найден, просто перезагрузить
+          window.location.reload();
+        }
       });
     }
   }).catch(function(err) {
@@ -810,28 +816,20 @@ window.app.openPDFModal = function(url, startPage) {
   var fitScale = 1.5;
 
   function updateZoomLabel() {
-    var pct = (zoomLevel === 1)
-      ? Math.round(fitScale * 100)
-      : Math.round(zoomLevel * 100);
+    var pct = Math.round(fitScale * zoomLevel * 100);
     zoomLabel.textContent = pct + '%';
   }
 
   function zoomIn() {
-    var idx = ZOOM_STEPS.indexOf(zoomLevel);
-    if (idx < 0) idx = ZOOM_STEPS.findIndex(function(s) { return s > zoomLevel; });
-    if (idx < 0) idx = ZOOM_STEPS.length - 1;
-    else if (idx < ZOOM_STEPS.length - 1) idx++;
-    zoomLevel = ZOOM_STEPS[idx];
-    if (currentPdf) renderPage(currentPage);
+    var idx = 0;
+    for (var i = 0; i < ZOOM_STEPS.length; i++) { if (ZOOM_STEPS[i] <= zoomLevel + 0.01) idx = i; }
+    if (idx < ZOOM_STEPS.length - 1) { zoomLevel = ZOOM_STEPS[idx + 1]; if (currentPdf) renderPage(currentPage); }
   }
 
   function zoomOut() {
-    var idx = ZOOM_STEPS.indexOf(zoomLevel);
-    if (idx < 0) idx = ZOOM_STEPS.findIndex(function(s) { return s >= zoomLevel; }) - 1;
-    if (idx < 0) idx = 0;
-    else if (idx > 0) idx--;
-    zoomLevel = ZOOM_STEPS[idx];
-    if (currentPdf) renderPage(currentPage);
+    var idx = ZOOM_STEPS.length - 1;
+    for (var i = ZOOM_STEPS.length - 1; i >= 0; i--) { if (ZOOM_STEPS[i] >= zoomLevel - 0.01) idx = i; }
+    if (idx > 0) { zoomLevel = ZOOM_STEPS[idx - 1]; if (currentPdf) renderPage(currentPage); }
   }
 
   function zoomFit() {
@@ -846,11 +844,12 @@ window.app.openPDFModal = function(url, startPage) {
     currentPdf.getPage(num).then(function(page) {
       var baseViewport = page.getViewport({ scale: 1.5 });
       var wrapWidth = baseWrapWidth - 32;
-      if (wrapWidth > 0) {
-        fitScale = wrapWidth / baseViewport.width;
-      } else {
-        fitScale = 1.5;
+      if (wrapWidth <= 0) wrapWidth = canvasWrap.clientWidth - 32;
+      var computedFit = 1.5;
+      if (wrapWidth > 0 && baseViewport.width > wrapWidth) {
+        computedFit = wrapWidth / (baseViewport.width / 1.5);
       }
+      fitScale = computedFit;
       var scale = fitScale * zoomLevel;
       var viewport = page.getViewport({ scale: scale });
       canvas.width = viewport.width;

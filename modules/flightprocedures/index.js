@@ -56,6 +56,29 @@
     });
   }
 
+  /* ─── Inline link renderer ───
+     Заменяет {{link:MODULE:ID:LABEL}}
+     на кликабельный элемент навигации между модулями.
+     Вызывается ПОСЛЕ renderInlineBadges().
+  */
+  function renderInlineLinks(text) {
+    if (!text) return '';
+    return text.replace(/\{\{link:(\w+):([^:}]+):([^}]+)\}\}/g, function(match, mod, id, label) {
+      return '<span class="module-link" role="button" tabindex="0"'
+        + ' data-module="' + mod + '"'
+        + ' data-id="' + id + '">'
+        + label
+        + '</span>';
+    });
+  }
+
+  /* ─── Combined content renderer ───
+     Экранирование + бейджи + ссылки — один вызов.
+  */
+  function renderContent(text) {
+    return renderInlineLinks(renderInlineBadges(escapeHtml(text)));
+  }
+
   /* ═══════════════════════════════════════════
      HEADER
      ═══════════════════════════════════════════ */
@@ -133,7 +156,7 @@
         /* Section divider toggle */
         html += '<div class="list-divider flightprocedures-section-toggle' + (isOpen ? ' is-open' : '') + '" data-category="' + escapeAttr(catKey) + '">';
         html += '<span class="list-divider-label">' + escapeHtml(label) + '</span>';
-        html += '<span class="ffs-section-count">' + countLeaves(items) + '</span>';
+        html += '<span class="flightprocedures-section-count">' + items.length + '</span>';
         html += '</div>';
 
         /* Section cards container */
@@ -209,11 +232,12 @@
       html += '</div>';
     }
 
-    // child count
+    html += '</div>'; // card-info
+
+    // child count (right before chevron)
     if (hasChildren) {
       html += '<span class="flightprocedures-card-child-count">' + item.children.length + '</span>';
     }
-    html += '</div>'; // card-info
 
     // status (FFS-style)
     if (item.status) {
@@ -238,7 +262,7 @@
     if (hasOwnContent) {
       // 1. Description
       if (item.description) {
-        html += '<div class="flightprocedures-description">' + renderInlineBadges(escapeHtml(item.description)) + '</div>';
+        html += '<div class="flightprocedures-description">' + renderContent(item.description) + '</div>';
       }
 
       // 2. Image
@@ -260,7 +284,7 @@
           + ' Memory Items</div>';
         html += '<ul class="flightprocedures-memory-list">';
         for (var m = 0; m < item.memoryItems.length; m++) {
-          html += '<li class="flightprocedures-memory-item">' + renderInlineBadges(escapeHtml(item.memoryItems[m])) + '</li>';
+          html += '<li class="flightprocedures-memory-item">' + renderContent(item.memoryItems[m]) + '</li>';
         }
         html += '</ul>';
         html += '</div>';
@@ -272,7 +296,7 @@
         html += '<div class="flightprocedures-steps-title">Порядок действий</div>';
         html += '<ol class="flightprocedures-steps-list">';
         for (var s = 0; s < item.steps.length; s++) {
-          html += '<li class="flightprocedures-step">' + renderInlineBadges(escapeHtml(item.steps[s])) + '</li>';
+          html += '<li class="flightprocedures-step">' + renderContent(item.steps[s]) + '</li>';
         }
         html += '</ol>';
         html += '</div>';
@@ -300,7 +324,7 @@
       if (item.instructorNotes) {
         html += '<div class="flightprocedures-notes">';
         html += '<div class="flightprocedures-notes-title">' + window.ICONS['comments'] + ' Указания инструктора</div>';
-        html += '<div class="flightprocedures-notes-text">' + renderInlineBadges(escapeHtml(item.instructorNotes)) + '</div>';
+        html += '<div class="flightprocedures-notes-text">' + renderContent(item.instructorNotes) + '</div>';
         html += '</div>';
       }
 
@@ -341,7 +365,7 @@
           for (var r = 0; r < item.references.length; r++) {
             var ref = item.references[r];
             var refText = (typeof ref === 'string') ? ref : (ref.text || '');
-            html += '<li class="flightprocedures-ref">' + renderInlineBadges(escapeHtml(refText)) + '</li>';
+            html += '<li class="flightprocedures-ref">' + renderContent(refText) + '</li>';
           }
         }
 
@@ -492,16 +516,44 @@
     }
   }
 
+  /* ─── Cross-module navigation: open item by ID ─── */
+  function openAndScrollTo(id) {
+    var container = document.getElementById('flightproceduresContainer');
+    if (!container) return;
+    var target = container.querySelector('[data-id="' + id + '"]');
+    if (!target) return;
+
+    // Open all ancestor cards and section
+    var el = target.parentElement;
+    while (el && el !== container) {
+      if (el.classList.contains('flightprocedures-card')) el.classList.add('open');
+      if (el.classList.contains('flightprocedures-section-cards')) {
+        el.classList.add('open');
+        var cat = el.dataset.category;
+        var toggle = container.querySelector('.flightprocedures-section-toggle[data-category="' + cat + '"]');
+        if (toggle) toggle.classList.add('is-open');
+      }
+      el = el.parentElement;
+    }
+    target.classList.add('open');
+
+    setTimeout(function() {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+  }
+
   /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
     var container = document.getElementById('flightproceduresContainer');
     if (!container) {
       console.error('Контейнер flightproceduresContainer не найден!');
       return;
     }
+
+    // params — всегда объект (пустой {} если навигация без параметров)
 
     // Делегирование: вешать ровно ОДИН раз
     if (!container.dataset.delegated) {
@@ -514,6 +566,17 @@
           if (cards) {
             cards.classList.toggle('open');
             sectionToggle.classList.toggle('is-open');
+          }
+          return;
+        }
+
+        // Module link click → navigate to another module
+        var moduleLink = e.target.closest('.module-link');
+        if (moduleLink) {
+          var targetModule = moduleLink.dataset.module;
+          var targetId = moduleLink.dataset.id;
+          if (targetModule) {
+            app.navigateTo(targetModule, targetId ? { openId: targetId } : undefined);
           }
           return;
         }
@@ -554,6 +617,7 @@
 
     if (_data) {
       renderAll();
+      if (params && params.openId) openAndScrollTo(params.openId);
       return;
     }
 
@@ -571,6 +635,7 @@
           _data = data.procedures || [];
         }
         renderAll();
+        if (params && params.openId) openAndScrollTo(params.openId);
       })
       .catch(function(err) {
         app.showError(container, 'Не удалось загрузить процедуры');

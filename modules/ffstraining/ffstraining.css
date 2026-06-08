@@ -2,6 +2,88 @@
    МОДУЛЬ: FFS Training
    ═══════════════════════════════════════════ */
 
+/* ─── List Divider (разделитель секций) ─── */
+.list-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px var(--content-padding-x) 6px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ::before скрыт — линия только между заголовком и счётчиком */
+.list-divider::before {
+  display: none;
+}
+
+/* Линия между заголовком и счётчиком через order:1 */
+.list-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+  order: 1;
+}
+
+.list-divider-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Разделитель без заголовка — только линия */
+.list-divider:not(:has(.list-divider-label))::after {
+  display: block;
+}
+
+/* ─── Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.badge svg { width: 14px; height: 14px; }
+
+.badge--normal {
+  background: rgba(23, 162, 184, 0.12);
+  color: var(--color-info);
+  border: 1px solid rgba(23, 162, 184, 0.25);
+}
+.badge--abnormal {
+  background: rgba(255, 193, 7, 0.12);
+  color: var(--color-warning);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+.badge--emergency {
+  background: var(--color-primary-light);
+  color: var(--color-danger);
+  border: 1px solid var(--color-shadow-primary);
+}
+.badge--success {
+  background: rgba(40, 167, 69, 0.12);
+  color: var(--color-success);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+.badge--neutral {
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-subtle);
+}
+
 /* ─── Search bar ─── */
 .ffstraining-search-bar {
   display: flex;
@@ -81,14 +163,14 @@ body.dark-theme .ffstraining-search-input {
 }
 
 /* ─── Section Divider (list-divider + toggle) ─── */
-.ffs-section-toggle {
+#ffstrainingContainer .ffs-section-toggle {
   pointer-events: auto;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   margin-bottom: 4px;
 }
-.ffs-section-toggle .ffs-section-count {
+#ffstrainingContainer .ffs-section-toggle .ffs-section-count {
   font-size: var(--font-xs);
   color: var(--color-text-muted);
   background: var(--color-bg-card);
@@ -98,21 +180,22 @@ body.dark-theme .ffstraining-search-input {
   text-align: center;
   font-weight: 600;
   flex-shrink: 0;
+  order: 2;
 }
-.ffs-section-toggle.is-open + .ffs-section-cards {
+#ffstrainingContainer .ffs-section-toggle.is-open + .ffs-section-cards {
   max-height: none;
 }
-.ffs-section-toggle:not(.is-open) + .ffs-section-cards {
+#ffstrainingContainer .ffs-section-toggle:not(.is-open) + .ffs-section-cards {
   max-height: 0;
   overflow: hidden;
 }
 
 /* ─── Section Cards Container ─── */
-.ffs-section-cards {
+#ffstrainingContainer .ffs-section-cards {
   transition: max-height 0.35s var(--transition-ease-out);
   overflow: hidden;
 }
-.ffs-section-cards.open {
+#ffstrainingContainer .ffs-section-cards.open {
   max-height: none;
 }
 
@@ -186,6 +269,7 @@ body.dark-theme .ffstraining-search-input {
   font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
+  order: 15;
 }
 
 .ffstraining-status::before {
@@ -229,6 +313,7 @@ body.dark-theme .ffstraining-search-input {
   flex-shrink: 0;
   color: var(--color-text-muted);
   transition: transform var(--transition-speed) var(--transition-ease);
+  order: 20;
 }
 
 .ffstraining-card-chevron svg {
@@ -291,8 +376,8 @@ body.dark-theme .ffstraining-search-input {
 
 /* ─── Memory Items ─── */
 .ffstraining-memory {
-  background: rgba(205, 32, 44, 0.06);
-  border: 1px solid rgba(205, 32, 44, 0.15);
+  background: var(--color-primary-ghost);
+  border: 1px solid rgba(205, 32, 44, 0.15); /* TODO: no --color-primary-border var (15% opacity) */
   border-radius: var(--border-radius-sm);
   padding: 12px 14px;
   margin-bottom: 16px;
@@ -716,9 +801,31 @@ body.dark-theme .ffstraining-search-input {
   top: 0;
 }
 
-/* Card header without badge — adjust alignment */
+/* Card header without badge — no extra gap needed (flex gap applies between actual children) */
 .ffstraining-card-header--no-badge {
-  gap: 0;
+  /* gap remains 12px from parent — only badge element is absent */
+}
+
+/* ─── Module Link (cross-navigation) ─── */
+.module-link {
+  display: inline;
+  color: var(--color-info);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s var(--transition-ease);
+}
+
+.module-link:hover {
+  color: var(--color-primary);
+}
+
+.module-link::after {
+  content: ' →';
+  font-size: 0.9em;
 }
 
 /* ─── Nested accordion (depth 2+) ─── */
@@ -729,7 +836,7 @@ body.dark-theme .ffstraining-search-input {
   gap: 8px;
 }
 
-/* Child count badge in header */
+/* Child count badge in header — right before chevron */
 .ffstraining-card-child-count {
   font-size: var(--font-xs);
   color: var(--color-text-muted);
@@ -740,6 +847,7 @@ body.dark-theme .ffstraining-search-input {
   text-align: center;
   font-weight: 600;
   flex-shrink: 0;
+  order: 10;
 }
 
 /* Depth-based styling for nested cards */

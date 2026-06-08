@@ -467,7 +467,7 @@
      INIT
      ═══════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
     var container = document.getElementById('krsContainer');
     if (!container) {
       console.error('Контейнер krsContainer не найден!');

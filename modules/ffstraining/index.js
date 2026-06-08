@@ -52,6 +52,29 @@
     });
   }
 
+  /* ─── Inline link renderer ───
+     Заменяет {{link:MODULE:ID:LABEL}}
+     на кликабельный элемент навигации между модулями.
+     Вызывается ПОСЛЕ renderInlineBadges().
+  */
+  function renderInlineLinks(text) {
+    if (!text) return '';
+    return text.replace(/\{\{link:(\w+):([^:}]+):([^}]+)\}\}/g, function(match, mod, id, label) {
+      return '<span class="module-link" role="button" tabindex="0"'
+        + ' data-module="' + mod + '"'
+        + ' data-id="' + id + '">'
+        + label
+        + '</span>';
+    });
+  }
+
+  /* ─── Combined content renderer ───
+     Экранирование + бейджи + ссылки — один вызов.
+  */
+  function renderContent(text) {
+    return renderInlineLinks(renderInlineBadges(escapeHtml(text)));
+  }
+
   /* ═══════════════════════════════════════════
      HEADER
      ═══════════════════════════════════════════ */
@@ -126,7 +149,7 @@
         // Divider (label + линия)
         html += '<div class="list-divider ffs-section-toggle' + (isOpen ? ' is-open' : '') + '" data-category="' + escapeAttr(cat) + '">';
         html += '<span class="list-divider-label">' + escapeHtml(cat) + '</span>';
-        html += '<span class="ffs-section-count">' + countLeaves(items) + '</span>';
+        html += '<span class="ffs-section-count">' + items.length + '</span>';
         html += '</div>';
 
         html += '<div class="ffs-section-cards' + (isOpen ? ' open' : '') + '" data-category="' + escapeAttr(cat) + '">';
@@ -202,11 +225,12 @@
       html += '</div>';
     }
 
-    // child count
+    html += '</div>'; // card-info
+
+    // child count (right before chevron)
     if (hasChildren) {
       html += '<span class="ffstraining-card-child-count">' + item.children.length + '</span>';
     }
-    html += '</div>'; // card-info
 
     // status
     if (item.status) {
@@ -235,7 +259,7 @@
 
       // 1. Description
       if (item.description) {
-        html += '<div class="ffstraining-description">' + renderInlineBadges(escapeHtml(item.description)) + '</div>';
+        html += '<div class="ffstraining-description">' + renderContent(item.description) + '</div>';
       }
 
       // 2. Image (FP-style, PhotoSwipe by contract)
@@ -257,7 +281,7 @@
           + ' Memory Items</div>';
         html += '<ul class="ffstraining-memory-list">';
         for (var m = 0; m < item.memoryItems.length; m++) {
-          html += '<li class="ffstraining-memory-item">' + renderInlineBadges(escapeHtml(item.memoryItems[m])) + '</li>';
+          html += '<li class="ffstraining-memory-item">' + renderContent(item.memoryItems[m]) + '</li>';
         }
         html += '</ul></div>';
       }
@@ -268,7 +292,7 @@
         html += '<div class="ffstraining-steps-title">Порядок действий</div>';
         html += '<ol class="ffstraining-steps-list">';
         for (var s = 0; s < item.steps.length; s++) {
-          html += '<li class="ffstraining-step">' + renderInlineBadges(escapeHtml(item.steps[s])) + '</li>';
+          html += '<li class="ffstraining-step">' + renderContent(item.steps[s]) + '</li>';
         }
         html += '</ol></div>';
       }
@@ -296,7 +320,7 @@
       if (item.instructorNotes) {
         html += '<div class="ffstraining-notes">';
         html += '<div class="ffstraining-notes-title">' + window.ICONS['comments'] + ' Указания инструктора</div>';
-        html += '<div class="ffstraining-notes-text">' + renderInlineBadges(escapeHtml(item.instructorNotes)) + '</div>';
+        html += '<div class="ffstraining-notes-text">' + renderContent(item.instructorNotes) + '</div>';
         html += '</div>';
       }
 
@@ -337,7 +361,7 @@
           for (var r = 0; r < item.references.length; r++) {
             var ref = item.references[r];
             var refText = (typeof ref === 'string') ? ref : (ref.text || '');
-            html += '<li class="ffstraining-ref">' + renderInlineBadges(escapeHtml(refText)) + '</li>';
+            html += '<li class="ffstraining-ref">' + renderContent(refText) + '</li>';
           }
         }
 
@@ -399,9 +423,12 @@
     var titleMatch = (item.title || '').toLowerCase().indexOf(q) >= 0;
     var aircraftMatch = (item.aircraft || '').toLowerCase().indexOf(q) >= 0;
     var descMatch = (item.description || '').toLowerCase().indexOf(q) >= 0;
+    var catMatch = (item.category || '').toLowerCase().indexOf(q) >= 0;
     var typeLabel = TYPE_LABELS[item.type] || '';
     var typeMatch = typeLabel.toLowerCase().indexOf(q) >= 0 || (item.type || '').toLowerCase().indexOf(q) >= 0;
     var refCodeMatch = (item.refCode || '').toLowerCase().indexOf(q) >= 0;
+    var statusLabel = STATUS_LABELS[item.status] || '';
+    var statusMatch = statusLabel.toLowerCase().indexOf(q) >= 0 || (item.status || '').toLowerCase().indexOf(q) >= 0;
 
     var memoryMatch = false;
     if (item.memoryItems) {
@@ -424,7 +451,7 @@
       }
     }
 
-    return titleMatch || aircraftMatch || descMatch || typeMatch || refCodeMatch || memoryMatch || stepsMatch || docMatch;
+    return titleMatch || aircraftMatch || descMatch || catMatch || typeMatch || refCodeMatch || statusMatch || memoryMatch || stepsMatch || docMatch;
   }
 
   function shallowCopy(obj) {
@@ -468,16 +495,44 @@
     }
   }
 
+  /* ─── Cross-module navigation: open item by ID ─── */
+  function openAndScrollTo(id) {
+    var container = document.getElementById('ffstrainingContainer');
+    if (!container) return;
+    var target = container.querySelector('[data-id="' + id + '"]');
+    if (!target) return;
+
+    // Open all ancestor cards and section
+    var el = target.parentElement;
+    while (el && el !== container) {
+      if (el.classList.contains('ffstraining-card')) el.classList.add('open');
+      if (el.classList.contains('ffs-section-cards')) {
+        el.classList.add('open');
+        var cat = el.dataset.category;
+        var toggle = container.querySelector('.ffs-section-toggle[data-category="' + cat + '"]');
+        if (toggle) toggle.classList.add('is-open');
+      }
+      el = el.parentElement;
+    }
+    target.classList.add('open');
+
+    setTimeout(function() {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+  }
+
   /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
     var container = document.getElementById('ffstrainingContainer');
     if (!container) {
       console.error('Контейнер ffstrainingContainer не найден!');
       return;
     }
+
+    // params — всегда объект (пустой {} если навигация без параметров)
 
     // Делегирование: вешать ровно ОДИН раз
     if (!container.dataset.delegated) {
@@ -490,6 +545,17 @@
           if (cards) {
             cards.classList.toggle('open');
             sectionToggle.classList.toggle('is-open');
+          }
+          return;
+        }
+
+        // Module link click → navigate to another module
+        var moduleLink = e.target.closest('.module-link');
+        if (moduleLink) {
+          var targetModule = moduleLink.dataset.module;
+          var targetId = moduleLink.dataset.id;
+          if (targetModule) {
+            app.navigateTo(targetModule, targetId ? { openId: targetId } : undefined);
           }
           return;
         }
@@ -532,6 +598,7 @@
     // Если данные закэшированы — сразу рендер
     if (_data) {
       renderAll();
+      if (params && params.openId) openAndScrollTo(params.openId);
       return;
     }
 
@@ -547,6 +614,7 @@
       .then(function(data) {
         _data = data;
         renderAll();
+        if (params && params.openId) openAndScrollTo(params.openId);
       })
       .catch(function(err) {
         app.showError(container, 'Не удалось загрузить тренировки');

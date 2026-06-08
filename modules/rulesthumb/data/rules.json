@@ -1,0 +1,654 @@
+{
+  "warning": "⚠ NO OFFICIAL USE — ACCURACY CANNOT BE GUARANTEED — FOR INFO AND SIMULATION ONLY",
+  "categories": [
+    {
+      "id": "pressure-temp",
+      "title": "Pressure & Temperature",
+      "rules": [
+        {
+          "num": "1",
+          "title": "Altimeter correction for non-standard pressure",
+          "tip": "\"From high to low, look below\"",
+          "formula": "1 mb = 30 ft\nCorrection = ΔPressure (mb) × 30 ft",
+          "example": "FL 270, QNH 977 → ISA − 36 mb\n36 × 30 = 1 080 ft → True Alt = 25 920 ft",
+          "calcId": "altPressure"
+        },
+        {
+          "num": "2",
+          "title": "Altimeter correction for non-standard temperature",
+          "tip": "\"From high to low, look below\"",
+          "formula": "Corr (ft) = 4 × ΔISA × Altitude (ft) / 1 000",
+          "example": "FL 300, ISA − 6 °C\nCorr = 4 × 6 × 30 = 720 ft → True Alt = 29 280 ft",
+          "calcId": "altTemp"
+        },
+        {
+          "num": "3",
+          "title": "SAT out of TAT (standard Mach)",
+          "formula": "SAT (°C) = TAT (°C) − 3 × Mach",
+          "example": "TAT = −17 °C, Mach 0.64\nSAT = −17 − (3 × 6) = −35 °C",
+          "calcId": "satFromTat"
+        },
+        {
+          "num": "4",
+          "title": "SAT out of TAT (higher Mach, lower temp)",
+          "formula": "SAT (°C) = TAT (°C) − (100 × Mach) − 50",
+          "example": "TAT = −31 °C, Mach 0.74\n24 above M 0.50 → SAT = −31 − 24 = −55 °C",
+          "calcId": "satFromTatHigh"
+        }
+      ]
+    },
+    {
+      "id": "speeds",
+      "title": "Speeds & Mach",
+      "rules": [
+        {
+          "num": "9",
+          "title": "TAS from Mach number (high altitude cruise)",
+          "formula": "TAS (kt) = Mach digit × 60",
+          "example": "M 0.72 → TAS = 7 × 60 = 420 kt",
+          "calcId": "tasFromMach"
+        },
+        {
+          "num": "10",
+          "title": "TAS from IAS and Flight Level",
+          "formula": "TAS (kt) = IAS (kt) + FL / 2",
+          "example": "FL 300, IAS 240 kt → TAS = 240 + 150 = 390 kt",
+          "calcId": "tasFromIas"
+        },
+        {
+          "num": "11",
+          "title": "Ground Speed from Mach",
+          "formula": "GS (NM/min) = 10 × Mach",
+          "example": "M 0.72 → GS = 7.2 NM/min",
+          "calcId": "gsFromMach"
+        },
+        {
+          "num": "14",
+          "title": "Ground Speed with DME station",
+          "formula": "GS (kt) = 10 × distance (NM) in 36 s",
+          "example": "3.25 NM in 36 s → GS = 325 kt",
+          "calcId": "gsFromDme"
+        },
+        {
+          "num": "GEN",
+          "title": "TAS from IAS and Altitude (precise)",
+          "formula": "TAS = [(IAS × 2%) × (ALT / 1 000 ft)] + IAS",
+          "example": "IAS 300 kt, ALT 20 000 ft\n300 × 0.02 × 20 + 300 = 420 KTAS",
+          "calcId": "tasFromIasAlt"
+        },
+        {
+          "num": "GEN",
+          "title": "Kinetic Heating",
+          "formula": "TAT increases by ~1 °C per 10 kt IAS"
+        }
+      ],
+      "tables": [
+        {
+          "title": "Speed Number Reference (1/60 rule)",
+          "headers": ["Speed (kt)", "120", "150", "180", "210", "240", "270", "300", "330"],
+          "rows": [["Speed Number", "2", "2½", "3", "3½", "4", "4½", "5", "5½"]]
+        }
+      ]
+    },
+    {
+      "id": "climb-descent",
+      "title": "Climb, Descent & Vertical Speed",
+      "rules": [
+        {
+          "num": "5",
+          "title": "Level-off lead (R/C ≤ 1 000 ft/min)",
+          "formula": "Δ ft = R/C (ft/min) / 10",
+          "example": "Climbing to FL 210, R/C = 2 000 ft/min\nΔ = 200 ft → start level-off at 20 800 ft",
+          "calcId": "levelOffLow"
+        },
+        {
+          "num": "6",
+          "title": "Level-off lead (R/C > 1 000 ft/min)",
+          "formula": "Δ ft = 2 × R/C (ft/min) / 10",
+          "example": "Climbing to FL 300, R/C = 2 500 ft/min\nΔ = 500 ft → start level-off at 29 500 ft",
+          "calcId": "levelOffHigh"
+        },
+        {
+          "num": "7",
+          "title": "Cruise Flight Level computation",
+          "formula": "Cruise FL ≈ Trip Distance (NM)",
+          "example": "EBBR–EBOS = 60 NM → Optimum FL 60",
+          "calcId": "cruiseFL"
+        },
+        {
+          "num": "8",
+          "title": "Vertical Speed to rejoin assigned altitude",
+          "formula": "V/S (ft/min) = 2 × Δ feet",
+          "example": "At 6 250 ft instead of 6 000 ft\nV/S = 2 × 250 = 500 ft/min",
+          "calcId": "vsRejoin"
+        },
+        {
+          "num": "20",
+          "title": "Top of Descent (idle thrust, 3° path)",
+          "formula": "TOD (NM) = ΔFL / 3",
+          "example": "FL 280 down to 2 000 ft (ΔFL = 260)\nTOD = 260 / 3 = 87 NM",
+          "tip": "Also: Altitude × 3 = descent start distance in NM",
+          "calcId": "tod"
+        },
+        {
+          "num": "21",
+          "title": "R/D required to reach a point",
+          "formula": "R/D (ft/min) = Speed Number × Altitude (ft) / Distance (NM)",
+          "example": "Descend 17 000 ft in 28 NM, TAS 240 kt\nR/D = 4 × 17 000 / 28 = 2 400 ft/min",
+          "calcId": "rdRequired"
+        },
+        {
+          "num": "22",
+          "title": "Vertical Speed by Body Attitude (high speed)",
+          "formula": "R/D (ft/min) = Mach × 100 × ΔBA (°)",
+          "example": "Mach 0.74 → 1° BA = 740 ft/min",
+          "calcId": "vsByBaHigh"
+        },
+        {
+          "num": "23",
+          "title": "Vertical Speed by Body Attitude (lower speed)",
+          "formula": "R/D (ft/min) = Speed Number × ΔBA (°)",
+          "example": "TAS 420 kt (SN 7), BA 3° down\nR/D = 7 × 3 = 2 100 ft/min",
+          "calcId": "vsByBaLow"
+        },
+        {
+          "num": "24",
+          "title": "Distance required for a descent profile",
+          "formula": "Distance (NM) = Speed Number × Altitude (1 000 ft) / R/D (ft/min)",
+          "example": "23 000 ft at 1 000 ft/min, TAS 300 kt (SN 5)\nDistance = 5 × 23 = 115 NM",
+          "calcId": "distForDescent"
+        },
+        {
+          "num": "25",
+          "title": "Wind correction for descent distance",
+          "formula": "Wind Corr (NM) = 10% for each 40 kt wind component",
+          "example": "TOD = 87 NM with 20 kt tailwind\nAdd 5% → 92 NM",
+          "calcId": "windCorr"
+        },
+        {
+          "num": "26",
+          "title": "R/D to follow a glide %",
+          "formula": "R/D (ft/min) = Ground Speed (kt) × Glide %",
+          "example": "TAS 350 kt, 20 kt tailwind, 3° (5%) glide\nR/D = 370 × 5 = 1 850 ft/min",
+          "calcId": "rdForGlidePct"
+        },
+        {
+          "num": "27",
+          "title": "Convert glide degrees to percent",
+          "formula": "% = 10 × degrees / 6",
+          "example": "ILS 3° glide slope = 30 / 6 = 5%",
+          "calcId": "degToPercent"
+        },
+        {
+          "num": "GEN",
+          "title": "Rate of Descent (RoD) quick calculation",
+          "formula": "RoD = GS / 2 × 10 (= GS × 5)",
+          "example": "GS 150 kt → RoD = 750 fpm",
+          "calcId": "rodQuick"
+        },
+        {
+          "num": "GEN",
+          "title": "Idle descent planning",
+          "formula": "Allow 3 NM per 1 000 ft",
+          "example": "10 000 ft to lose → plan 30 NM before target",
+          "calcId": "idleDescent"
+        }
+      ]
+    },
+    {
+      "id": "navigation",
+      "title": "Navigation & Turns",
+      "rules": [
+        {
+          "num": "12",
+          "title": "Drift computation in cruise",
+          "formula": "Drift (°) = X-wind (kt) / Mach",
+          "example": "M 0.7, X-wind 35 kt\nDrift = 35 / 7 = 5°",
+          "calcId": "driftMach"
+        },
+        {
+          "num": "13",
+          "title": "Drift computation from TAS",
+          "formula": "Drift (°) = X-wind (kt) / Speed Number",
+          "example": "TAS 180 kt, X-wind 36 kt\nDrift = 36 / 3 = 12°",
+          "calcId": "driftTas"
+        },
+        {
+          "num": "15",
+          "title": "Off-Track distance",
+          "formula": "Off-Track (NM) = Δ° × Distance to station / 60",
+          "example": "9° off track, 11 NM from station\nOff-track = 9 × 11 / 60 = 1.6 NM",
+          "calcId": "offTrack"
+        },
+        {
+          "num": "16",
+          "title": "Slant distance overhead a DME station",
+          "formula": "Each 6 000 ft altitude → 1 NM DME reading",
+          "example": "Overhead station at FL 330\nDME reads: 33 000 / 6 000 = 5.5 NM",
+          "calcId": "slantDistance"
+        },
+        {
+          "num": "17",
+          "title": "Intercepting outbound leg near VOR-DME (Mach 0.7)",
+          "formula": "1 NM for each Δ30° of track change",
+          "example": "FL 330, ΔTrack = 120°\nStart turn at 2 NM before + 5.5 NM slant = 7.5 NM",
+          "calcId": "interceptOutbound"
+        },
+        {
+          "num": "18",
+          "title": "Intercept heading when passing station",
+          "formula": "Attack (°) = 1/3 × ΔTrack (°)",
+          "example": "Inbound on 180 to track 060 outbound\nAttack = 120 / 3 = 40° → Hdg 080",
+          "calcId": "interceptHeading"
+        },
+        {
+          "num": "19",
+          "title": "Intercept heading when slightly off-track",
+          "formula": "Attack (°) = 3 × Off-Track angle (°)",
+          "example": "On R-310 instead of R-315 (5° off)\nAttack = 3 × 5 = 15° to rejoin",
+          "calcId": "interceptOffTrack"
+        },
+        {
+          "num": "28",
+          "title": "Start roll-out from a turn",
+          "formula": "ΔHdg to go = Bank (°) / 3",
+          "example": "Bank 25°, right turn to Hdg 080\nStart roll-out 8° in advance → at Hdg 072",
+          "calcId": "rollout"
+        },
+        {
+          "num": "29",
+          "title": "Bank for small heading changes",
+          "formula": "Bank (°) = ΔHeading (°)",
+          "example": "Hdg North, right to Hdg 007 → take 7° bank",
+          "calcId": "bankSmall"
+        },
+        {
+          "num": "30",
+          "title": "Bank for rate-one turn",
+          "formula": "Bank (°) = (TAS / 10) + (TAS / 20)",
+          "example": "TAS 180 kt → Bank = 18 + 9 = 27°",
+          "calcId": "bankRateOne"
+        },
+        {
+          "num": "31",
+          "title": "Turn diameter of a rate-one turn",
+          "formula": "Diameter (NM) = TAS (kt) / 100",
+          "example": "TAS 150 kt → Turn Ø = 1.5 NM",
+          "calcId": "turnDiameter"
+        },
+        {
+          "num": "32",
+          "title": "Outbound timing for a base turn",
+          "formula": "Time (min) = 36 / ΔTrack (°)",
+          "example": "ILS Rwy 27, teardrop 066 outbound\nTime = 36 / (090 − 066) = 1.5 min",
+          "calcId": "baseTurnTime"
+        },
+        {
+          "num": "GEN",
+          "title": "Rollout angle (for turns)",
+          "formula": "Rollout Angle = Bank Angle / 2",
+          "example": "Hdg 090° to 270°, BA = 20°\nRA = 10° → start rollout at 260°",
+          "calcId": "rolloutAngle"
+        }
+      ]
+    },
+    {
+      "id": "approach",
+      "title": "Approach, ILS & Landing",
+      "rules": [
+        {
+          "num": "33",
+          "title": "R/D to follow ILS glideslope (3° = 5%)",
+          "formula": "R/D (ft/min) = 5 × Ground Speed (kt)",
+          "example": "TAS 140 kt, 10 kt tailwind (GS = 150 kt)\nR/D = 5 × 150 = 750 ft/min",
+          "calcId": "rdIls"
+        },
+        {
+          "num": "34",
+          "title": "Visibility to see threshold at VDP (NPA)",
+          "formula": "Vis (m) = 6 × MDA (ft)",
+          "example": "MDA 430 ft → Vis = 6 × 430 = 2 500 m",
+          "calcId": "visAtVdp"
+        },
+        {
+          "num": "GEN",
+          "title": "Descent rate for 3° glideslope",
+          "formula": "R/D = GS / 2, then × 10 (= GS × 5)",
+          "example": "GS 120 kt → R/D = 60 × 10 = 600 fpm",
+          "calcId": "rdGlideSlope"
+        },
+        {
+          "num": "GEN",
+          "title": "Distance from threshold for 3° glidepath",
+          "formula": "Distance (NM) = AGL Height (ft) / 300",
+          "example": "600 ft AGL → start glidepath at 2 NM",
+          "calcId": "distFromThreshold"
+        },
+        {
+          "num": "GEN",
+          "title": "Altitude check on descent",
+          "formula": "Desired Alt (ft) = GS Angle × 100 × Distance (NM)",
+          "example": "3.3° GS, 5 NM out\n3.3 × 100 × 5 = 1 650 ft MSL",
+          "calcId": "altCheck"
+        },
+        {
+          "num": "GEN",
+          "title": "Approach profile targets",
+          "tip": "🎯 Aim: 250 kt / 10 000 ft by 30 NM out\n🎯 Aim: 210 kt on ILS at 12 NM"
+        },
+        {
+          "num": "GEN",
+          "title": "Deceleration allowance",
+          "formula": "Level flight: 10 kt/NM and 1 kt/sec\nDescending: 5 kt/NM and 0.5 kt/sec"
+        }
+      ],
+      "tables": [
+        {
+          "title": "Standard 3° Glideslope — Distance vs Height AGL",
+          "headers": ["Distance (NM)", "Height AGL (ft)"],
+          "rows": [
+            ["15", "4 780"], ["14", "4 460"], ["13", "4 140"], ["12", "3 820"],
+            ["11", "3 500"], ["10", "3 180"], ["9", "2 870"], ["8", "2 550"],
+            ["7", "2 230"], ["6", "1 910"], ["5", "1 590"], ["4", "1 270"],
+            ["3", "960"], ["2", "640"], ["1", "320"], ["0.5", "160"], ["Threshold", "50"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "general",
+      "title": "General Rules",
+      "rules": [
+        {
+          "num": null,
+          "title": "Headings & IFR/VFR Altitudes",
+          "table": {
+            "headers": ["Magnetic Heading", "IFR", "VFR"],
+            "rows": [
+              ["0 – 179°", "Odd thousands ft", "Odd thousands + 500 ft"],
+              ["180 – 359°", "Even thousands ft", "Even thousands + 500 ft"]
+            ]
+          }
+        },
+        {
+          "num": null,
+          "title": "Minimum Separation",
+          "formula": "Horizontal (same altitude): 5 NM\nVertical: 1 000 ft"
+        },
+        {
+          "num": null,
+          "title": "Top of Descent (quick methods)",
+          "formula": "Method A: TOD (NM) = (Current FL − Target FL) × 3\nMethod B: TOD (NM) = FL × 3\nMethod C: Time out = altitude to lose ÷ 1 000 (min)",
+          "example": "A: FL350 to FL100 → (35−10) × 3 = 75 NM\nC: 10 000 ft to lose → 10 min out at 1 000 fpm",
+          "calcId": "todQuick"
+        },
+        {
+          "num": null,
+          "title": "Distance travelled from ground speed",
+          "formula": "GS ÷ 10 = distance flown in 6 minutes",
+          "example": "GS 150 kt → 15 NM in 6 min (= 2.5 NM/min)",
+          "calcId": "distFromGs"
+        },
+        {
+          "num": null,
+          "title": "Bank Angle for standard turns",
+          "formula": "Props (3°/sec): BA = (TAS / 10) + 7\nJets (1.5°/sec): BA = (TAS / 10) × 0.75\nAirliners: max 25° for passenger comfort"
+        }
+      ],
+      "alert": "\"A small correction early is better than a big correction late.\" — Don't debug anything on final. GO AROUND!"
+    },
+    {
+      "id": "b737",
+      "title": "Boeing 737 Tips",
+      "subtitle": "JF CLAES",
+      "tipCards": [
+        {
+          "title": "Take Off",
+          "rows": [
+            {"label": "Speed Margin", "value": "V2 gives stall margin for 15° + 15° overbank\nV2+15 gives stall margin for 30° + 15° overbank"},
+            {"label": "Engine Failure", "value": "Select LVL CHG and MAX CONT after flaps up"}
+          ]
+        },
+        {
+          "title": "Climb (without FMC)",
+          "rows": [
+            {"label": "Best Angle", "value": "Flaps-up manoeuvring speed"},
+            {"label": "Best Rate", "value": "Flaps-up manoeuvring speed + 50 kt / M0.74"},
+            {"label": "Economy", "value": "280 kt / M0.74"},
+            {"label": "1 Engine Inop", "value": "Flaps-up manoeuvring speed / Max Continuous"},
+            {"label": "If no ECON data", "value": "250 KIAS to 10 000 ft, then 280 KIAS / M0.74"},
+            {"label": "Best Angle (V2)", "value": "V2 + 80"},
+            {"label": "Best Rate (V2)", "value": "V2 + 120"}
+          ]
+        },
+        {
+          "title": "Cruise",
+          "rows": [
+            {"label": "Max Altitude", "value": "Min of: certified altitude, thrust capability, buffet margin (0.3g / 40° bank)"},
+            {"label": "Optimum Altitude", "value": "+/−1.5 g load factor (48° bank); 2 000 ft above = ±45° pre-buffet"},
+            {"label": "Altitude penalty", "value": "±2 000 ft → +1–2% fuel; −4 000 ft → +3–5%; −8 000 ft → +8–14%"},
+            {"label": "Long Range Cruise", "value": "1% less than max range; M0.74 gives LRC within 2 000 ft of optimum"},
+            {"label": "Cruise N1", "value": "N1 = (2 × FL/1 000) + 10 (e.g. FL350 → 80% N1)"},
+            {"label": "Fuel flow", "value": "FF = (IAS × 10) / 2 − 200 kg/hr/engine"},
+            {"label": "1 Eng Inop range", "value": "260 NM at cruise level & speed"}
+          ]
+        },
+        {
+          "title": "Descent",
+          "rows": [
+            {"label": "Planning", "value": "3 NM per 1 000 ft"},
+            {"label": "Speed (M0.74/280)", "value": "2 100 – 3 000 ft/min"},
+            {"label": "Speed (250 kt)", "value": "1 700 – 2 400 ft/min"},
+            {"label": "Speed (210 kt)", "value": "1 400 – 1 900 ft/min"},
+            {"label": "Target", "value": "10 000 ft, 250 kt at 30 NM"},
+            {"label": "Deceleration 280→250", "value": "~2 NM in level flight at 25\""},
+            {"label": "Deceleration 250→210", "value": "~3 NM in level flight (50% with speedbrake)"},
+            {"label": "Holding min speed", "value": "Flaps-up manoeuvring speed (above FL250: Vref40 + 100 kt)"}
+          ]
+        },
+        {
+          "title": "Approach",
+          "rows": [
+            {"label": "Engine Fail on Final", "value": "Retract flaps to 15°, increase Vref by 15 kt"},
+            {"label": "Flaps 15 landing", "value": "Use Flaps 1 for go-around"}
+          ]
+        },
+        {
+          "title": "Landing",
+          "rows": [
+            {"label": "Braking with A/S", "value": "Apply full braking"},
+            {"label": "Braking without A/S", "value": "Apply progressive constant braking"},
+            {"label": "Crosswind reverse", "value": "Avoid reverse if A/C in crab"},
+            {"label": "X-wind limit", "value": "Zero-crab not recommended if x-wind > 17 kt (23 kt with flaps 40°)"},
+            {"label": "Overweight", "value": "Use Flap 30° for speed margin; landing dist < TO dist except wet/contaminated RWY"},
+            {"label": "Flaps 30 vs 40", "value": "Flap 30 uses 25 kg less fuel than Flap 40 from 1 500 ft to touchdown"}
+          ]
+        },
+        {
+          "title": "Fuel Consumption",
+          "rows": [
+            {"label": "Engines", "value": "3 200 kg first hour, then 2 500 kg/hr (or check QRH)"},
+            {"label": "APU (ground)", "value": "115 kg/hr"},
+            {"label": "Eng Anti-ice", "value": "90 kg/hr"},
+            {"label": "Eng + Wing Anti-ice", "value": "250 kg/hr"},
+            {"label": "Burn rate", "value": "Approx 30 kg/min"},
+            {"label": "Trip fuel reduction", "value": "Weight reduction × flight time (hrs) × 3.5%"}
+          ]
+        },
+        {
+          "title": "Non-Normal Configurations (vs 2-engine LRC)",
+          "rows": [
+            {"label": "Engine Out LRC", "value": "+21% fuel burn, +13% time interval"},
+            {"label": "Depressurised LRC", "value": "+49% fuel burn, +20% time interval (at 10 000 ft)"},
+            {"label": "Gear Down", "value": "+89% fuel burn, +29% time interval"}
+          ]
+        },
+        {
+          "title": "Stall & Stick Shaker Speeds (kt)",
+          "rows": [],
+          "table": {
+            "headers": ["Config", "Stall", "Stick Shaker"],
+            "rows": [
+              ["Flaps Up", "160", "180"],
+              ["Flaps 5°", "135", "145"],
+              ["Flaps 15°", "118", "125"],
+              ["Flaps 30°", "108", "116"]
+            ]
+          },
+          "note": "Flaps Up and 5° values are for MTOW; others for MLW."
+        },
+        {
+          "title": "N1 & Pitch Attitudes (GW ~47 500 kg)",
+          "rows": [],
+          "table": {
+            "headers": ["Phase / Config", "%N1", "Attitude (°NU)"],
+            "rows": [
+              ["Level — 250 kt", "65", "4"],
+              ["Level — 210 kt", "60", "6"],
+              ["Level — Flap 1, 190 kt", "60", "6"],
+              ["Level — Flap 5, 180 kt", "62", "7"],
+              ["Level — Gear dn, Flap 15, 150 kt", "70", "8"],
+              ["Glideslope — Flap 15, 150 kt", "52", "4.5"],
+              ["Glideslope — Flap 25, 140 kt", "52", "4"],
+              ["Glideslope — Flap 30, Vref+5", "55", "2.5"],
+              ["Glideslope — Flap 40, Vref+5", "62", "1"]
+            ]
+          },
+          "note": "Add 2% N1 in turns. Single engine: add 15% N1 (+5% in turns)."
+        }
+      ],
+      "tables": [
+        {
+          "title": "Step Climb & Wind Trade (break-even wind)",
+          "headers": ["Step Climb", "737-300 M0.74", "737-700 M0.78"],
+          "rows": [
+            ["FL290 → FL330", "< 34 kt", "< 75 kt"],
+            ["FL310 → FL350", "< 25 kt", "< 69 kt"],
+            ["FL330 → FL370", "< 12 kt", "< 55 kt"],
+            ["FL370 → FL410", "N/A", "< 24 kt"]
+          ]
+        },
+        {
+          "title": "Driftdown — Altitude Penalty for Engine Bleed",
+          "headers": ["Bleed Requirements", "737-300 Terrain", "737-300 LRC", "737-700 Terrain", "737-700 LRC"],
+          "rows": [
+            ["Engine Anti-ice ON", "−1 500 ft", "−4 000 ft", "−5 600 ft", "−5 900 ft"],
+            ["Eng & Wing Anti-ice ON", "−4 800 ft", "−7 600 ft", "−12 500 ft", "−13 000 ft"]
+          ]
+        },
+        {
+          "title": "Optimum FL — Fuel Mileage Penalty",
+          "headers": ["Altitude vs Optimum", "737-300 M0.74", "737-700 M0.78"],
+          "rows": [
+            ["2 000 ft above", "+1%", "+2%"],
+            ["Optimum", "0%", "0%"],
+            ["2 000 ft below", "+2%", "+2%"],
+            ["4 000 ft below", "+4%", "+5%"],
+            ["8 000 ft below", "+11%", "+14%"],
+            ["12 000 ft below", "+20%", "+24%"]
+          ]
+        }
+      ],
+      "checklist": {
+        "title": "Rapid Descent Checklist Order",
+        "items": ["1° Lights", "2° Start Switches", "3° Altitude", "4° LVL CHG", "5° Thrust Levers", "6° Speed Brake", "→ Check MSA, ATC, QNH"]
+      }
+    },
+    {
+      "id": "reference",
+      "title": "Reference Tables",
+      "tables": [
+        {
+          "title": "°C / °F Conversion",
+          "headers": ["°C", "°F"],
+          "rows": [
+            ["−60", "−76"], ["−50", "−58"], ["−30", "−22"], ["−25", "−13"],
+            ["−20", "−4"], ["−15", "+5"], ["−10", "+14"], ["−5", "+23"],
+            ["0", "+32"], ["+5", "+41"], ["+10", "+50"], ["+15", "+59"],
+            ["+20", "+68"], ["+25", "+77"], ["+30", "+86"], ["+35", "+95"],
+            ["+40", "+104"], ["+50", "+122"]
+          ]
+        },
+        {
+          "title": "Unit Conversions",
+          "headers": ["From", "To"],
+          "rows": [
+            ["1 ft", "0.305 m"],
+            ["1 kt", "1 NM / hour"],
+            ["1 NM", "1.1516 SM = 1.853 km"],
+            ["1 SM", "0.8683 NM = 1.609 km"],
+            ["1 inHg", "33.86 hPa"]
+          ]
+        },
+        {
+          "title": "Air Pressure (hPa ↔ inHg)",
+          "formula": "hPa × (1/33.86) = inHg\ninHg × 33.86 = hPa"
+        },
+        {
+          "title": "Passenger & Baggage Weights (Charter EU)",
+          "headers": ["Category", "Weight"],
+          "rows": [
+            ["Male", "83 kg"], ["Female", "69 kg"], ["All Adult", "76 kg"],
+            ["Child (2–12)", "35 kg"], ["Infant (<2)", "0 kg"], ["Baggage (1 piece)", "13 kg"]
+          ]
+        },
+        {
+          "title": "ICAO Phonetic Alphabet & Morse Code",
+          "headers": ["Letter", "Phonetic", "Morse", "Letter", "Phonetic", "Morse"],
+          "rows": [
+            ["A", "ALPHA", "· —", "N", "NOVEMBER", "— ·"],
+            ["B", "BRAVO", "— · · ·", "O", "OSCAR", "— — —"],
+            ["C", "CHARLIE", "— · — ·", "P", "PAPA", "· — — ·"],
+            ["D", "DELTA", "— · ·", "Q", "QUEBEC", "— — · —"],
+            ["E", "ECHO", "·", "R", "ROMEO", "· — ·"],
+            ["F", "FOXTROT", "· · — ·", "S", "SIERRA", "· · ·"],
+            ["G", "GOLF", "— — ·", "T", "TANGO", "—"],
+            ["H", "HOTEL", "· · · ·", "U", "UNIFORM", "· · —"],
+            ["I", "INDIA", "· ·", "V", "VICTOR", "· · · —"],
+            ["J", "JULIET", "· — — —", "W", "WHISKEY", "· — —"],
+            ["K", "KILO", "— · —", "X", "XRAY", "— · · —"],
+            ["L", "LIMA", "· — · ·", "Y", "YANKEE", "— · — —"],
+            ["M", "MIKE", "— —", "Z", "ZULU", "— — · ·"]
+          ]
+        },
+        {
+          "title": "Main V-Speed Definitions",
+          "headers": ["Speed", "Definition"],
+          "rows": [
+            ["V1", "Takeoff Decision Speed"],
+            ["VR", "Rotate Speed"],
+            ["V2", "Takeoff Safety Speed"],
+            ["VS", "Stall Speed (clean)"],
+            ["VSO", "Stall Speed (landing configuration)"],
+            ["VREF", "Landing Reference Speed (= 1.3 × VSO)"],
+            ["VMC", "Minimum Control Speed"]
+          ]
+        },
+        {
+          "title": "Landing Approach Speeds by Aircraft Category",
+          "headers": ["Category", "Final Approach", "Short Final", "Threshold"],
+          "rows": [
+            ["A (VREF < 91 kt)", "1.4 × VSO", "1.4 × VSO", "VREF"],
+            ["B–D (VREF > 91 kt)", "VREF + 20 kt", "VREF + 10 kt", "VREF"]
+          ]
+        }
+      ],
+      "tipCards": [
+        {
+          "title": "Low Visibility Procedure",
+          "rows": [
+            {"label": "Low Vis Take-Off", "value": "Visibility < 400 m. Check Airport Minimas."},
+            {"label": "CAT II / III Approach", "value": "Visibility down to 200 m. Captain makes good briefing."}
+          ],
+          "list": [
+            "Verify A/C status",
+            "Verify airport status",
+            "Verify weather",
+            "Verify crew qualification"
+          ]
+        }
+      ]
+    }
+  ],
+  "attribution": "Captain Pat BOONE (www.b737mrg.net) · JF CLAES · Wagner B. Beskow (Handy Sheet 3.0)"
+}
