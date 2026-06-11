@@ -18,9 +18,9 @@
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    left.innerHTML = '<button class="icon-btn" aria-label="Меню">'
+      + window.ICONS['menu'] + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
 
     center.innerHTML = '<div class="hc-module">FAQ</div>';
 
@@ -32,21 +32,20 @@
      INIT
      ═══════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
+    // params — всегда объект (контракт MODULE_CONTRACT §5)
     var container = document.getElementById('faqContainer');
     if (!container) { console.error('Контейнер faqContainer не найден!'); return; }
 
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
-        var pill = e.target.closest('.faq-toc-pill');
-        if (pill) {
-          var sectionId = pill.dataset.section;
-          if (sectionId) scrollToSection(sectionId);
-          return;
-        }
-      });
-      container.dataset.delegated = 'true';
-    }
+    /* Делегирование: init() вызывается строго один раз (контракт MODULE_CONTRACT §5) */
+    container.addEventListener('click', function(e) {
+      var pill = e.target.closest('.faq-toc-pill');
+      if (pill) {
+        var sectionId = pill.dataset.section;
+        if (sectionId) scrollToSection(sectionId);
+        return;
+      }
+    });
 
     if (_data) {
       renderAll();
@@ -78,7 +77,7 @@
     var container = document.getElementById('faqContainer');
     if (!container || !_data) return;
 
-    var html = '<div>';
+    var html = '<div class="module-container">';
 
     // TOC pills
     html += '<div class="faq-toc"><div class="faq-toc-inner">';
@@ -133,6 +132,17 @@
      ═══════════════════════════════════════════ */
 
   function scrollToSection(id) {
+    /* Update active pill */
+    var ct = document.getElementById('faqContainer');
+    if (ct) {
+      var pills = ct.querySelectorAll('.faq-toc-pill');
+      for (var p = 0; p < pills.length; p++) {
+        pills[p].classList.remove('faq-toc-pill--active');
+        if (pills[p].dataset.section === id) {
+          pills[p].classList.add('faq-toc-pill--active');
+        }
+      }
+    }
     var el = document.getElementById(id);
     if (el) {
       var headerOffset = 56 + 52 + 16;

@@ -202,9 +202,9 @@
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню">'
+      + window.ICONS.menu + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
 
     center.innerHTML = '<div class="hc-module">Рабочее время</div>';
 
@@ -240,7 +240,7 @@
 
     var reportMin = wtParseTime(_wtSettings.reportTime);
 
-    var html = '<div>';
+    var html = '<div class="module-container">';
     html += wtRenderDutyCard(results, night, pilotMax, cabinMax, reportMin, landings);
     html += wtRenderSegmentsCard(results);
     if (_wtFinalized && results) {
@@ -644,8 +644,8 @@
       + '<input id="wtPostflight" type="number" inputmode="numeric" class="wt-field-input" style="max-width:140px;" value="' + s.postflight + '">'
       + '</div>'
 
-      + '<div class="wt-settings-group" style="background:var(--color-badge-ok-bg);border-color:rgba(0,176,80,0.15);">'
-      + '<div style="font-size:var(--font-sm);color:var(--color-badge-ok-text);display:flex;align-items:center;gap:8px;">'
+      + '<div class="wt-settings-group" style="background:var(--wt-badge-ok-bg);border-color:var(--wt-badge-ok-border);">'
+      + '<div style="font-size:var(--font-sm);color:var(--wt-badge-ok-text);display:flex;align-items:center;gap:8px;">'
       + '<span class="wt-info-inline-icon">' + window.ICONS['plane-landing'] + '</span>'
       + '<span><strong>Посадки</strong> определяются автоматически по количеству сегментов.</span></div></div>';
   }
@@ -965,10 +965,10 @@
     menu.innerHTML = '<button class="wt-header-menu-item" data-action="reset">'
       + window.ICONS['rotate-ccw'] + ' Очистить рейс</button>';
 
-    // Transparent overlay to catch outside clicks (no document.addEventListener)
+    // Full-screen overlay — click closes the menu
     var backdrop = document.createElement('div');
     backdrop.id = 'wtHeaderMenuBackdrop';
-    backdrop.style.cssText = 'position:fixed;inset:0;z-index:998;';
+    backdrop.className = 'wt-header-menu-backdrop';
     backdrop.addEventListener('click', function() { wtCloseHeaderMenu(); });
 
     document.body.appendChild(backdrop);
@@ -985,6 +985,7 @@
 
     // Animate in
     requestAnimationFrame(function() {
+      backdrop.classList.add('open');
       menu.classList.add('open');
     });
 
@@ -1005,14 +1006,17 @@
 
   function wtCloseHeaderMenu() {
     var menu = document.getElementById('wtHeaderMenu');
+    var backdrop = document.getElementById('wtHeaderMenuBackdrop');
     if (menu) {
       menu.classList.remove('open');
-      setTimeout(function() {
-        if (menu.parentNode) menu.parentNode.removeChild(menu);
-      }, 200);
     }
-    var backdrop = document.getElementById('wtHeaderMenuBackdrop');
-    if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    if (backdrop) {
+      backdrop.classList.remove('open');
+    }
+    setTimeout(function() {
+      if (menu && menu.parentNode) menu.parentNode.removeChild(menu);
+      if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    }, 200);
     _wtMenuOpen = false;
   }
 

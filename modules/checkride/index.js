@@ -14,6 +14,7 @@
   var _currentMode  = 'line'; // 'line' | 'ffs'
   var _sectionIndex = 0;      // текущий этап проверки
   var _screen       = 'start'; // start | test | report | history
+  var _saveStateTimer = null;   // debounce для автосохранения textarea
 
   /* ─── Данные регистрации пилота (сохраняются в памяти) ─── */
   var _pilotData = {
@@ -27,6 +28,15 @@
 
   var STORAGE_HISTORY = 'checkride_v8';
   var STORAGE_PILOT   = 'checkride_pilot';  // автосохранение полей регистрации
+  var STORAGE_STATE  = 'checkride_state';   // кэш хода проверки
+
+  /* ─── Маппинг кодов компетенций ─── */
+  var COMPETENCY_LABELS = {
+    '\u041F\u041F':  '\u041F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440',
+    '\u041D\u041A':  '\u041D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F \u0438 \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u044C',
+    '\u0420\u0421':  '\u0420\u0430\u0434\u0438\u043E\u0441\u0432\u044F\u0437\u044C',
+    'CRM': '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u043C\u0438 \u044D\u043A\u0438\u043F\u0430\u0436\u0430'
+  };
 
   /* ═══════════════════════════════════════════
      UTILITY: icon helper
@@ -68,6 +78,53 @@
     } catch(e) {}
   }
 
+  /* ═══════════════════════════════════════════
+     INSPECTION STATE: save / load / clear (localStorage)
+     ═══════════════════════════════════════════ */
+  function saveInspectionState() {
+    if (_screen !== 'test') return;
+    try {
+      var state = {
+        data: _data,
+        sectionIndex: _sectionIndex,
+        currentMode: _currentMode,
+        screen: _screen
+      };
+      localStorage.setItem(STORAGE_STATE, JSON.stringify(state));
+    } catch(e) {}  // quota exceeded — silently fail
+  }
+
+  function loadInspectionState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_STATE);
+      if (raw) {
+        var state = JSON.parse(raw);
+        if (state && state.screen === 'test' && state.data) {
+          _data = state.data;
+          _sectionIndex = state.sectionIndex || 0;
+          _currentMode = state.currentMode || 'line';
+          _screen = 'test';
+        }
+      }
+    } catch(e) {}  // corrupted data — ignore
+  }
+
+  function clearInspectionState() {
+    try {
+      localStorage.removeItem(STORAGE_STATE);
+    } catch(e) {}
+  }
+
+  /** Debounce-сохранение: сохранить DOM→_data→localStorage с задержкой 500мс */
+  function debouncedSaveInspectionState() {
+    if (_saveStateTimer) clearTimeout(_saveStateTimer);
+    _saveStateTimer = setTimeout(function() {
+      saveState();
+      saveInspectionState();
+      _saveStateTimer = null;
+    }, 500);
+  }
+
   /** Прочитать значения из DOM-полей формы в _pilotData */
   function readPilotFromDOM() {
     var fields = ['fio', 'license', 'instructor', 'route', 'ac_number', 'flight_time'];
@@ -87,51 +144,11 @@
   }
 
   /* ═══════════════════════════════════════════
-     HEADER
-     ═══════════════════════════════════════════ */
-  function renderHeader() {
-    var left   = document.getElementById('headerLeft');
-    var center = document.getElementById('headerCenter');
-    var right  = document.getElementById('headerRight');
-    if (!left || !center || !right) return;
-
-    left.innerHTML = '<button class="icon-btn" aria-label="\u041D\u0430\u0437\u0430\u0434">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() {
-      if (_screen === 'test') {
-        /* Вернуться к стартовому экрану с подтверждением */
-        app.showConfirm('\u041F\u0440\u0435\u0440\u0432\u0430\u0442\u044C \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0443?', function() {
-          _screen = 'start';
-          renderAll();
-        }, '\u041F\u0440\u0435\u0440\u0432\u0430\u0442\u044C');
-      } else if (_screen === 'report' || _screen === 'history') {
-        _screen = 'start';
-        renderAll();
-      } else {
-        app.navigateTo('main');
-      }
-    };
-
-    var titles = {
-      start: 'Checkride Rating',
-      test: '\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430',
-      report: '\u041E\u0442\u0447\u0451\u0442',
-      history: '\u0418\u0441\u0442\u043E\u0440\u0438\u044F'
-    };
-    center.innerHTML = '<div class="hc-module">' + (titles[_screen] || 'Checkride') + '</div>';
-
-    right.innerHTML = '';
-    right.onclick = null;
-  }
-
-  /* ═══════════════════════════════════════════
      RENDER: All content
      ═══════════════════════════════════════════ */
-  function renderAll() {
+  function renderContent() {
     var container = document.getElementById('checkrideContainer');
     if (!container) return;
-
-    renderHeader();
 
     switch (_screen) {
       case 'start':   renderStartScreen(container); break;
@@ -140,6 +157,10 @@
       case 'history': renderHistoryScreen(container); break;
       default:        renderStartScreen(container);
     }
+  }
+
+  function renderAll() {
+    renderContent();
   }
 
   /* ═══════════════════════════════════════════
@@ -159,14 +180,16 @@
     /* Input fields */
     html += '<div class="checkride-fields">';
     var fields = [
-      { id: 'cr_fio',         ph: '\u0424\u0418\u041E \u043F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u043E\u0433\u043E', val: _pilotData.fio },
-      { id: 'cr_license',     ph: '\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438', val: _pilotData.license },
-      { id: 'cr_instructor',  ph: '\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)', val: _pilotData.instructor },
-      { id: 'cr_route',       ph: '\u041C\u0430\u0440\u0448\u0440\u0443\u0442 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.route },
-      { id: 'cr_ac_number',   ph: '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.ac_number },
-      { id: 'cr_flight_time', ph: '\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.flight_time }
+      { id: 'cr_fio',         ph: '\u0424\u0418\u041E \u043F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u043E\u0433\u043E', val: _pilotData.fio, ffs: true },
+      { id: 'cr_license',     ph: '\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438', val: _pilotData.license, ffs: true },
+      { id: 'cr_instructor',  ph: '\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)', val: _pilotData.instructor, ffs: true },
+      { id: 'cr_route',       ph: '\u041C\u0430\u0440\u0448\u0440\u0443\u0442 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.route, ffs: false },
+      { id: 'cr_ac_number',   ph: '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.ac_number, ffs: false },
+      { id: 'cr_flight_time', ph: '\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.flight_time, ffs: false }
     ];
     for (var i = 0; i < fields.length; i++) {
+      /* Для FFS — скрыть поля route, ac_number, flight_time */
+      if (_currentMode === 'ffs' && !fields[i].ffs) continue;
       var escVal = (fields[i].val || '').replace(/"/g, '&quot;');
       html += '<input type="text" id="' + fields[i].id + '" class="checkride-input" placeholder="' + fields[i].ph + '" value="' + escVal + '">';
     }
@@ -206,41 +229,76 @@
       html += '<h3 class="checkride-subname">' + sec.subname + '</h3>';
 
       var groups = sec.groups || [{ items: sec.items || [] }];
-      groups.forEach(function(group) {
-        if (group.topitem) {
-          html += '<h4 class="checkride-topitem">' + group.topitem + '</h4>';
-        }
 
-        group.items.forEach(function(item) {
-          if (item.type === 'divider') {
-            html += '<div class="checkride-divider">' + item.label + '</div>';
-          } else if (item.type === 'checkbox') {
-            html += '<div class="checkride-check-item">'
-              + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
-              + '<label for="c_' + item.id + '">' + item.label + '</label>'
-            + '</div>';
-          } else if (item.type === 'radio') {
-            html += '<div class="checkride-radio-group">'
-              + '<p class="checkride-radio-label"><b>' + item.label + '</b></p>';
-            item.options.forEach(function(opt) {
-              html += '<label class="checkride-radio-option">'
-                + '<input type="radio" name="r_' + item.id + '" value="' + opt + '"' + (item.ok === opt ? ' checked' : '') + '>'
-                + '<span>' + opt + '</span>'
-              + '</label>';
-            });
-            html += '</div>';
+      /* Компетенции — аккордеон с list-divider (все закрыты по умолчанию) */
+      if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
+        groups.forEach(function(group) {
+          var compCode = group.topitem || '\u041E\u0431\u0449\u0438\u0435';
+          var compLabel = COMPETENCY_LABELS[compCode] || compCode;
+          var compCheckboxes = [];
+          for (var ci = 0; ci < group.items.length; ci++) {
+            if (group.items[ci].type === 'checkbox') compCheckboxes.push(group.items[ci]);
           }
+
+          /* Заголовок-аккордеон (ЗАКРЫТ — нет is-open) */
+          html += '<div class="list-divider checkride-competency-toggle" data-competency="' + compCode + '">';
+          html += '<span class="list-divider-label">' + compCode + ' \u2014 ' + compLabel + '</span>';
+          html += '<span class="checkride-competency-count">' + compCheckboxes.length + '</span>';
+          html += '<span class="checkride-competency-chevron">' + icon('chevron-down', 16) + '</span>';
+          html += '</div>';
+
+          /* Контейнер чекбоксов (ЗАКРЫТ — нет .open) */
+          html += '<div class="checkride-competency-items" data-competency="' + compCode + '">';
+          compCheckboxes.forEach(function(item) {
+            html += '<label class="checkride-competency-check">'
+              + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
+              + '<span>' + item.label + '</span>'
+            + '</label>';
+          });
+          html += '</div>';
         });
-      });
+      } else {
+        /* Обычные секции — без аккордеона */
+        groups.forEach(function(group) {
+          if (group.topitem) {
+            html += '<h4 class="checkride-topitem">' + group.topitem + '</h4>';
+          }
+
+          group.items.forEach(function(item) {
+            if (item.type === 'divider') {
+              html += '<div class="checkride-divider">' + item.label + '</div>';
+            } else if (item.type === 'checkbox') {
+              html += '<div class="checkride-check-item">'
+                + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
+                + '<label for="c_' + item.id + '">' + item.label + '</label>'
+              + '</div>';
+            } else if (item.type === 'radio') {
+              html += '<div class="checkride-radio-group">'
+                + '<p class="checkride-radio-label"><b>' + item.label + '</b></p>';
+              item.options.forEach(function(opt) {
+                html += '<label class="checkride-radio-option">'
+                  + '<input type="radio" name="r_' + item.id + '" value="' + opt + '"' + (item.ok === opt ? ' checked' : '') + '>'
+                  + '<span>' + opt + '</span>'
+                + '</label>';
+              });
+              html += '</div>';
+            }
+          });
+        });
+      }
 
       /* Comment/Photo block */
       if (sec.subname !== '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
         html += '<div class="checkride-detail-item">'
           + '<b class="checkride-comment-label">\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0438:</b>'
           + '<textarea id="sec_n_' + _sectionIndex + '_' + secIdx + '" class="checkride-textarea" placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u0435\u043A\u0441\u0442...">' + (sec.note || '') + '</textarea>'
-          + '<input type="file" accept="image/*" class="checkride-file-input" data-cr-file="' + _sectionIndex + '_' + secIdx + '">'
+          + '<div class="checkride-photo-row">'
+          + '<input type="file" accept="image/*" capture="environment" class="checkride-file-input-hidden" data-cr-file="' + _sectionIndex + '_' + secIdx + '">'
+          + '<button type="button" class="checkride-photo-btn" data-cr-photo="' + _sectionIndex + '_' + secIdx + '">'
+          + icon('camera', 18) + ' <span>\u0424\u043E\u0442\u043E!</span></button>'
+          + '</div>'
           + '<div id="sec_p_' + _sectionIndex + '_' + secIdx + '">'
-          + (sec.img ? '<img src="' + sec.img + '" class="checkride-attached-img">' : '')
+          + (sec.img ? '<img src="' + sec.img + '" class="checkride-attached-img" data-cr-img-view="' + _sectionIndex + '_' + secIdx + '">' : '')
           + '</div>'
         + '</div>';
       }
@@ -264,6 +322,10 @@
     html += '</div>';
     container.innerHTML = html;
     container.scrollTop = 0;
+    /* Скролл экрана и окна вверх при навигации */
+    var screen = document.getElementById('checkrideScreen');
+    if (screen) screen.scrollTop = 0;
+    window.scrollTo(0, 0);
   }
 
   /* ═══════════════════════════════════════════
@@ -395,6 +457,7 @@
     _sectionIndex = 0;
     _screen = 'test';
     renderAll();
+    saveInspectionState();
   }
 
   /* ═══════════════════════════════════════════
@@ -560,7 +623,7 @@
         if (sec.note || sec.img) {
           sHtml += '<div class="checkride-report-comment">'
             + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> ' + sec.note + '</p>' : '')
-            + (sec.img ? '<img src="' + sec.img + '" style="width:100%;max-width:200px;margin-top:10px;">' : '')
+            + (sec.img ? '<img src="' + sec.img + '" data-full-src="' + sec.img + '" class="checkride-report-img" data-cr-report-img="1" style="width:100%;max-width:200px;margin-top:10px;cursor:pointer;border-radius:var(--border-radius-xs);">' : '')
           + '</div>';
         }
         dataEl.innerHTML += sHtml + '</div>';
@@ -626,6 +689,7 @@
           _data.checklists[mainIdx].sections[secIdx].img = canvas.toDataURL('image/jpeg', 0.6);
           _screen = 'test';
           renderAll();
+          saveInspectionState();
         };
       };
       reader.readAsDataURL(input.files[0]);
@@ -640,6 +704,7 @@
     _screen = 'report';
     renderAll();
     saveToLocalStorage();
+    clearInspectionState();
   }
 
   /* ═══════════════════════════════════════════
@@ -769,7 +834,7 @@
   /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
-  function init() {
+  function init(params) {
     var container = document.getElementById('checkrideContainer');
     if (!container) { console.error('checkrideContainer not found'); return; }
 
@@ -780,9 +845,11 @@
     /* Загружаем сохранённые данные регистрации из localStorage */
     loadPilotFromCache();
 
-    /* Event delegation: attach ONCE */
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
+    /* Восстанавливаем ход проверки из localStorage (перезагрузка страницы) */
+    loadInspectionState();
+
+    /* Event delegation */
+    container.addEventListener('click', function(e) {
 
         /* Mode selector */
         var modeBtn = e.target.closest('[data-cr-mode]');
@@ -806,12 +873,14 @@
               _sectionIndex--;
               _screen = 'test';
               renderAll();
+              saveInspectionState();
               break;
             case 'next':
               saveState();
               _sectionIndex++;
               _screen = 'test';
               renderAll();
+              saveInspectionState();
               break;
             case 'finish':
               finishInspection();
@@ -829,6 +898,7 @@
             case 'go-start':
               _screen = 'start';
               renderAll();
+              clearInspectionState();
               break;
             case 'clear-history':
               app.showConfirm('\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0438\u0441\u0442\u043E\u0440\u0438\u044E \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A?', function() {
@@ -850,9 +920,45 @@
           return;
         }
 
+        /* Фото! button → trigger hidden file input */
+        var photoBtn = e.target.closest('[data-cr-photo]');
+        if (photoBtn) {
+          var photoKey = photoBtn.dataset.crPhoto;
+          var fileInput = document.querySelector('[data-cr-file="' + photoKey + '"]');
+          if (fileInput) fileInput.click();
+          return;
+        }
+
+        /* Click on attached image → open in PhotoSwipe */
+        var imgView = e.target.closest('[data-cr-img-view]');
+        if (imgView) {
+          app.openPhotoSwipe(imgView);
+          return;
+        }
+
+        /* Click on report image → open in PhotoSwipe */
+        var reportImg = e.target.closest('[data-cr-report-img]');
+        if (reportImg) {
+          var container = document.getElementById('checkrideContainer');
+          app.openPhotoSwipe(reportImg, container);
+          return;
+        }
+
+        /* Competency accordion toggle */
+        var compToggle = e.target.closest('.checkride-competency-toggle');
+        if (compToggle) {
+          var comp = compToggle.dataset.competency;
+          var items = document.querySelector('#checkrideContainer .checkride-competency-items[data-competency="' + comp + '"]');
+          if (items) {
+            items.classList.toggle('open');
+            compToggle.classList.toggle('is-open');
+          }
+          return;
+        }
+
       });
 
-      /* File input delegation */
+      /* File input / Checkbox / Radio delegation */
       container.addEventListener('change', function(e) {
         var fileInput = e.target.closest('[data-cr-file]');
         if (fileInput) {
@@ -860,11 +966,17 @@
           handleSectionFile(fileInput, parseInt(parts[0], 10), parseInt(parts[1], 10));
           return;
         }
+        /* Checkbox / Radio → немедленное сохранение в кеш */
+        if (_screen === 'test' && (e.target.type === 'checkbox' || e.target.type === 'radio')) {
+          saveState();
+          saveInspectionState();
+        }
       });
 
-      /* Автосохранение полей формы при вводе */
+      /* Автосохранение полей формы и комментариев при вводе */
       container.addEventListener('input', function(e) {
         var el = e.target;
+        /* Поля формы регистрации */
         if (el.id && el.id.indexOf('cr_') === 0) {
           var field = el.id.replace('cr_', '');
           if (_pilotData.hasOwnProperty(field)) {
@@ -872,15 +984,16 @@
             savePilotToCache();
           }
         }
+        /* Комментарии в тесте → debounce-сохранение в кеш */
+        if (_screen === 'test' && el.classList.contains('checkride-textarea')) {
+          debouncedSaveInspectionState();
+        }
       });
-
-      container.dataset.delegated = 'true';
-    }
 
     /* Load data if needed */
     var dataLoaded = (_dataLine && _dataFfs);
     if (dataLoaded) {
-      renderAll();
+      renderContent();
       return;
     }
 
@@ -897,7 +1010,7 @@
       .then(function(results) {
         _dataLine = results[0];
         _dataFfs = results[1];
-        renderAll();
+        renderContent();
       })
       .catch(function(err) {
         app.showError(container, '\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0434\u0430\u043D\u043D\u044B\u0435');
@@ -913,7 +1026,6 @@
     title:        'Checkride',
     icon:         'badge-check',
     init:          init,
-    renderHeader:  renderHeader
   });
 
 })();

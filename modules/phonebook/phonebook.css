@@ -4,14 +4,14 @@
 
 /* ─── Container — ID-селектор для override .module-container ─── */
 #phonebookContainer {
-  padding: 0 var(--content-padding-x);
+  --pb-info-light: rgba(23, 162, 184, 0.1);
+  --pb-success-light: rgba(40, 167, 69, 0.1);
 }
-@media (min-width: 900px) {
-  #phonebookContainer { max-width: 900px; }
+body.dark-theme #phonebookContainer {
+  --pb-info-light: rgba(90, 200, 250, 0.12);
+  --pb-success-light: rgba(52, 199, 89, 0.12);
 }
-@media (min-width: 1100px) {
-  #phonebookContainer { max-width: 1100px; }
-}
+/* max-width обеспечивается .module-container из style.css */
 
 /* ─── Search bar ─── */
 .pb-search-bar {
@@ -56,11 +56,6 @@
   border-color: var(--color-primary);
   outline: none;
   box-shadow: 0 0 0 3px var(--color-primary-ghost);
-}
-body.dark-theme .pb-search-input {
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
-  border-color: var(--color-border);
-  color: var(--color-text-main);
 }
 .pb-search-clear {
   display: inline-flex;
@@ -221,11 +216,11 @@ body.dark-theme .pb-search-input {
   flex-shrink: 0;
 }
 .pb-phone-badge--work {
-  background: rgba(23, 162, 184, 0.1);
+  background: var(--pb-info-light);
   color: var(--color-info);
 }
 .pb-phone-badge--personal {
-  background: rgba(40, 167, 69, 0.1);
+  background: var(--pb-success-light);
   color: var(--color-success);
 }
 

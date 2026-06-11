@@ -118,10 +118,10 @@
     var right = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    // Левая кнопка: Назад
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + (window.ICONS['arrow-left'] || '') + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    // Левая кнопка: Боковое меню
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню">'
+      + (window.ICONS.menu || '') + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
 
     // Центр: название модуля
     center.innerHTML = '<div class="hc-module">Указания КРС</div>';
@@ -148,17 +148,23 @@
     var container = document.getElementById('krsContainer');
     if (!container) return;
 
-    // Удалить предыдущее меню если есть
+    // Удалить предыдущее меню и оверлей если есть
     var existing = container.querySelector('.krs-sort-menu');
     if (existing) existing.remove();
-    var existingOverlay = container.querySelector('.krs-sort-overlay');
+    var existingOverlay = document.getElementById('krs-sort-overlay');
     if (existingOverlay) existingOverlay.remove();
+
+    // Оверлей на весь экран (включая хедер) — клик по нему закрывает меню
+    var overlay = document.createElement('div');
+    overlay.id = 'krs-sort-overlay';
+    overlay.className = 'krs-sort-overlay';
+    overlay.addEventListener('click', function() { hideSortMenu(); });
+    document.body.appendChild(overlay);
 
     var isDate = _sortBy === 'date';
     var isAlpha = _sortBy === 'alpha';
 
-    var menuHtml = '<div class="krs-sort-overlay"></div>'
-      + '<div class="krs-sort-menu">'
+    var menuHtml = '<div class="krs-sort-menu">'
       + '<button class="krs-sort-btn' + (isDate ? ' krs-sort-btn--active' : '') + '" data-sort="date">'
       + '<span>По дате</span>'
       + '</button>'
@@ -179,10 +185,12 @@
     var container = document.getElementById('krsContainer');
     if (!container) return;
 
-    var overlay = container.querySelector('.krs-sort-overlay');
     var menu = container.querySelector('.krs-sort-menu');
-    if (overlay) overlay.remove();
     if (menu) menu.remove();
+
+    // Удалить оверлей
+    var overlay = document.getElementById('krs-sort-overlay');
+    if (overlay) overlay.remove();
   }
 
   /* ═══════════════════════════════════════════
@@ -225,7 +233,7 @@
     var isOpen = !!_openBlocks[inst.id];
     var ageCat = getAgeCategory(inst.date);
     var ageLabel = getAgeLabel(ageCat);
-    var blockClass = 'krs-block' + (isOpen ? ' krs-block--open open' : '');
+    var blockClass = 'krs-block' + (isOpen ? ' open' : '');
 
     var html = '<div class="' + blockClass + '" data-block-id="' + inst.id + '">';
 
@@ -235,7 +243,7 @@
       html += '<span class="krs-age-badge krs-age-badge--' + ageCat + '">' + ageLabel + '</span>';
     }
     html += '<span class="collapsible-title"><span class="marquee-inner">' + escapeHtml(inst.title) + '</span></span>';
-    html += '<span class="collapsible-chevron' + (isOpen ? ' open' : '') + '">'
+    html += '<span class="collapsible-chevron">'
       + (window.ICONS['chevron-down'] || '') + '</span>';
     html += '</div>';
 
@@ -347,7 +355,7 @@
 
     var hasInstructions = false;
 
-    var html = '<div>';
+    var html = '<div class="module-container">';
 
     // Поиск
     html += renderSearchBar();
@@ -369,7 +377,7 @@
     html += '</div>';
 
     if (isSearching && !hasInstructions) {
-      html = '<div>'
+      html = '<div class="module-container">'
         + renderSearchBar()
         + '<div class="krs-empty">'
         + (window.ICONS['search'] || '')
@@ -478,9 +486,8 @@
     app.ensureLib('photoswipe', function() {});
     app.ensureLib('pdfjs', function() {});
 
-    // Делегирование: вешать ровно ОДИН раз
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
+    // Делегирование событий (контракт MODULE_CONTRACT §5: init() вызывается строго один раз)
+    container.addEventListener('click', function(e) {
         // Заголовок блока (аккордеон)
         var blockHeader = e.target.closest('.krs-block-header');
         if (blockHeader) {
@@ -494,13 +501,6 @@
         if (clearBtn) {
           _searchQuery = '';
           renderAll();
-          return;
-        }
-
-        // Оверлей меню сортировки
-        var sortOverlay = e.target.closest('.krs-sort-overlay');
-        if (sortOverlay) {
-          hideSortMenu();
           return;
         }
 
@@ -540,24 +540,21 @@
       });
 
       // Обработчик ввода в поиск
-      container.addEventListener('input', function(e) {
-        var input = e.target.closest('.krs-search-input');
-        if (input) {
-          _searchQuery = input.value;
-          renderAll();
-          // Вернуть фокус в input после перерендера
-          var newInput = document.getElementById('krsSearchInput');
-          if (newInput) {
-            newInput.focus();
-            newInput.setSelectionRange(_searchQuery.length, _searchQuery.length);
-          }
+    container.addEventListener('input', function(e) {
+      var input = e.target.closest('.krs-search-input');
+      if (input) {
+        _searchQuery = input.value;
+        renderAll();
+        // Вернуть фокус в input после перерендера
+        var newInput = document.getElementById('krsSearchInput');
+        if (newInput) {
+          newInput.focus();
+          newInput.setSelectionRange(_searchQuery.length, _searchQuery.length);
         }
-      });
+      }
+    });
 
-      container.dataset.delegated = 'true';
-    }
-
-    // Сбросить состояние при повторном входе
+    // Начальное состояние (контракт: init() вызывается строго ОДИН раз)
     _openBlocks = {};
     _searchQuery = '';
     _sortBy = 'date';
@@ -590,11 +587,19 @@
      REGISTER
      ═══════════════════════════════════════════ */
 
+  /* ─── DESTROY (контракт MODULE_CONTRACT §5: очистка при уходе) ─── */
+
+  function destroy() {
+    // Удалить динамический оверлей сортировки если был открыт
+    hideSortMenu();
+  }
+
   window.ModuleRegistry.register('krs', {
     title: 'Указания КРС',
     icon: 'file-text',
     init: init,
-    renderHeader: renderHeader
+    renderHeader: renderHeader,
+    destroy: destroy
   });
 
 })();

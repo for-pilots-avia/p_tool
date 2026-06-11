@@ -394,26 +394,6 @@
   };
 
   /* ═══════════════════════════════════════════
-     HEADER
-     ═══════════════════════════════════════════ */
-
-  function renderHeader() {
-    var left   = document.getElementById('headerLeft');
-    var center = document.getElementById('headerCenter');
-    var right  = document.getElementById('headerRight');
-    if (!left || !center || !right) return;
-
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
-
-    center.innerHTML = '<div class="hc-module">Rules of Thumb</div>';
-
-    right.innerHTML = '';
-    right.onclick = null;
-  }
-
-  /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
 
@@ -538,8 +518,7 @@
 
     /* Clear button */
     var clearBtn = container.querySelector('.rt-search-clear');
-    if (clearBtn && !clearBtn.dataset.bound) {
-      clearBtn.dataset.bound = 'true';
+    if (clearBtn) {
       clearBtn.addEventListener('click', function() {
         _filter = '';
         renderAll();
@@ -554,7 +533,7 @@
     var container = document.getElementById('rulesthumbContainer');
     if (!container) return;
     var input = container.querySelector('.rt-search-input');
-    if (input && !input.dataset.delegated) {
+    if (input) {
       input.addEventListener('input', function(e) {
         _filter = e.target.value;
         renderAll();
@@ -564,7 +543,6 @@
           inp.setSelectionRange(_filter.length, _filter.length);
         }
       });
-      input.dataset.delegated = 'true';
     }
   }
 
@@ -748,38 +726,32 @@
      ═══════════════════════════════════════════ */
 
   function initAccordionHandlers(container) {
-    if (!container.dataset.accDelegated) {
-      container.addEventListener('click', function(e) {
-        var header = e.target.closest('.rt-accordion-header');
-        if (header) {
-          var item = header.parentElement;
-          item.classList.toggle('rt-accordion-open');
-          return;
-        }
-      });
-      container.dataset.accDelegated = 'true';
-    }
+    container.addEventListener('click', function(e) {
+      var header = e.target.closest('.rt-accordion-header');
+      if (header) {
+        var item = header.parentElement;
+        item.classList.toggle('rt-accordion-open');
+        return;
+      }
+    });
   }
 
   function initCalcHandlers(container) {
-    if (!container.dataset.calcDelegated) {
-      container.addEventListener('click', function(e) {
-        var toggleBtn = e.target.closest('.rt-calc-toggle');
-        if (toggleBtn) {
-          var calcEl = toggleBtn.parentElement;
-          calcEl.classList.toggle('rt-calc-open');
-          return;
-        }
+    container.addEventListener('click', function(e) {
+      var toggleBtn = e.target.closest('.rt-calc-toggle');
+      if (toggleBtn) {
+        var calcEl = toggleBtn.parentElement;
+        calcEl.classList.toggle('rt-calc-open');
+        return;
+      }
 
-        var runBtn = e.target.closest('.rt-calc-btn');
-        if (runBtn) {
-          var calcId = runBtn.dataset.calcRun;
-          runCalc(calcId);
-          return;
-        }
-      });
-      container.dataset.calcDelegated = 'true';
-    }
+      var runBtn = e.target.closest('.rt-calc-btn');
+      if (runBtn) {
+        var calcId = runBtn.dataset.calcRun;
+        runCalc(calcId);
+        return;
+      }
+    });
   }
 
   function runCalc(calcId) {
@@ -840,8 +812,7 @@
   window.ModuleRegistry.register('rulesthumb', {
     title:        'Rules of Thumb',
     icon:         'drafting-compass',
-    init:          init,
-    renderHeader:  renderHeader
+    init:          init
   });
 
 })();

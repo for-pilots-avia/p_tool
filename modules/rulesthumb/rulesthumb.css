@@ -3,6 +3,24 @@
    Namespace: rt-
    ═══════════════════════════════════════════ */
 
+/* ─── Mobile width optimisation ─── */
+#rulesthumbContainer .module-container {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+@media (min-width: 600px) {
+  #rulesthumbContainer .module-container {
+    padding-left: var(--content-padding-x);
+    padding-right: var(--content-padding-x);
+  }
+
+  .rt-accordion-body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
 /* ─── Search bar (паттерн phonebook) ─── */
 .rt-search-bar {
   display: flex;
@@ -183,7 +201,7 @@
 
 .rt-accordion-body {
   display: none;
-  padding: 12px 16px 16px;
+  padding: 12px 4px 16px;
 }
 
 .rt-accordion-open .rt-accordion-body {

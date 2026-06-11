@@ -7,7 +7,8 @@
 window.ModuleRegistry = {
   _modules: {},
   _order: [],
-  _loadedCss: {},   // id → true, чтобы не вставлять <link> дважды
+  _loadedCss: {},      // id → true, чтобы не вставлять <link> дважды
+  _initialized: {},    // id → true, модуль уже был init(), больше не вызываем
 
   /**
    * Register a module.
@@ -49,9 +50,6 @@ window.ModuleRegistry = {
 
     this._modules[id] = module;
     this._order.push(id);
-
-    // Подключить CSS модуля при регистрации (контракт MODULE_CONTRACT §1)
-    this.ensureCss(id);
   },
 
   /**
@@ -84,21 +82,30 @@ window.ModuleRegistry = {
   },
 
   /**
-   * Initialize a module (call its init() function with params).
-   * CSS is already loaded at register() time (контракт MODULE_CONTRACT §1).
+   * Initialize a module (call its init() function).
+   * Also ensures the module's CSS is loaded.
+   * Если модуль уже был init() — пропускаем, сохраняя состояние.
    * @param {string} id
-   * @param {object} [params] — параметры, передаваемые в init() (по умолчанию {})
+   * @param {object} [params] — optional params passed from navigateTo()
    */
   init: function(id, params) {
     var mod = this.get(id);
     if (!mod) return;
 
+    // Модуль уже живой — не вызываем init() повторно, сохраняем состояние
+    if (this._initialized[id]) return;
+
+    // Подгрузить CSS модуля, если ещё не загружен
+    this.ensureCss(id);
+
     if (typeof mod.init === 'function') {
-      mod.init(params || {});
+      mod.init(params);
     } else {
       // Fallback: show "in development" stub
       this._showStub(mod);
     }
+
+    this._initialized[id] = true;
   },
 
   /**
@@ -157,9 +164,9 @@ window.ModuleRegistry = {
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню" onclick="app.toggleMenu()">'
+      + window.ICONS.menu + '</button>';
+    left.onclick = null;
 
     center.innerHTML = '<div class="hc-module">' + mod.title + '</div>';
 
@@ -168,8 +175,6 @@ window.ModuleRegistry = {
   },
 
   _showStub: function(mod) {
-    this._renderDefaultHeader(mod);
-
     var container = document.getElementById(mod.containerId);
     if (container) {
       container.innerHTML = '<div class="module-container" style="padding-top:16px;padding-bottom:32px;">'

@@ -12,7 +12,6 @@
   var _expanded  = {};     // id категории → true
   var _openQ     = {};     // id вопроса → true (ответ раскрыт)
   var _searchQ   = '';     // поисковый запрос
-  var _inited    = false;
 
   var STORAGE_KEY = 'survey-mastered';
 
@@ -104,25 +103,6 @@
   }
 
   /* ═══════════════════════════════════════════
-     HEADER
-     ═══════════════════════════════════════════ */
-  function renderHeader() {
-    var left   = document.getElementById('headerLeft');
-    var center = document.getElementById('headerCenter');
-    var right  = document.getElementById('headerRight');
-    if (!left || !center || !right) return;
-
-    left.innerHTML = '<button class="icon-btn" aria-label="\u041D\u0430\u0437\u0430\u0434">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
-
-    center.innerHTML = '<div class="hc-module">\u041A\u043E\u043D\u0442\u0440\u043E\u043B\u044C\u043D\u044B\u0439 \u043E\u043F\u0440\u043E\u0441</div>';
-
-    right.innerHTML = '';
-    right.onclick = null;
-  }
-
-  /* ═══════════════════════════════════════════
      RENDER: Full Content
      ═══════════════════════════════════════════ */
   function renderAll() {
@@ -132,7 +112,7 @@
     var totalProg = getTotalProgress();
     var totalCategories = _data.categories.length;
 
-    var html = '';
+    var html = '<div class="module-container">';
 
     /* ─── Overview Stats ─── */
     html += '<div class="survey-overview">' +
@@ -165,15 +145,7 @@
     html += renderCategories();
     html += '</div>';
 
-    /* ─── Reset Button ─── */
-    if (totalProg.done > 0) {
-      html += '<div class="survey-reset-wrap">' +
-        '<button class="btn-outline survey-reset-btn" data-action="reset-progress">' +
-          icon('eraser', 16) +
-          '<span>\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441</span>' +
-        '</button>' +
-      '</div>';
-    }
+    html += '</div>';  // close .module-container
 
     app.hideSkeleton(container, html);
 
@@ -278,15 +250,95 @@
   }
 
   /* ═══════════════════════════════════════════
+     HEADER: Вариант Б — гамбургер + заголовок + ⋮ (сброс)
+     ═══════════════════════════════════════════ */
+  function renderHeader() {
+    var left   = document.getElementById('headerLeft');
+    var center = document.getElementById('headerCenter');
+    var right  = document.getElementById('headerRight');
+    if (!left || !center || !right) return;
+
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню">'
+      + window.ICONS.menu + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
+
+    center.innerHTML = '<div class="hc-module">\u041A\u043E\u043D\u0442\u0440\u043E\u043B\u044C\u043D\u044B\u0439 \u043E\u043F\u0440\u043E\u0441</div>';
+
+    right.innerHTML = '<button class="icon-btn" aria-label="\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044F">'
+      + icon('ellipsis-vertical', 20) + '</button>';
+    right.onclick = function(e) {
+      e.stopPropagation();
+      toggleSurveyMenu();
+    };
+  }
+
+  function toggleSurveyMenu() {
+    var existing = document.getElementById('surveyDropdown');
+    if (existing) { closeSurveyMenu(); return; }
+
+    /* Full-screen overlay covering header too */
+    var overlay = document.createElement('div');
+    overlay.id = 'surveyOverlay';
+    overlay.className = 'survey-overlay';
+    document.body.appendChild(overlay);
+
+    /* Click overlay → close menu */
+    overlay.addEventListener('click', function() {
+      closeSurveyMenu();
+    });
+
+    var rightBtn = document.querySelector('#headerRight .icon-btn');
+    if (!rightBtn) return;
+
+    var rect = rightBtn.getBoundingClientRect();
+    var menu = document.createElement('div');
+    menu.id = 'surveyDropdown';
+    menu.className = 'survey-dropdown-menu';
+    menu.style.top = (rect.bottom + 4) + 'px';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
+    menu.innerHTML = '<button class="survey-dropdown-item" data-survey-action="reset-progress">'
+      + icon('trash', 16) + ' <span>\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441</span></button>';
+    document.body.appendChild(menu);
+
+    /* Click handler directly on dropdown — it's outside container so delegation doesn't work */
+    menu.addEventListener('click', function(ev) {
+      var dropItem = ev.target.closest('[data-survey-action]');
+      if (dropItem) {
+        var sAction = dropItem.dataset.surveyAction;
+        if (sAction === 'reset-progress') {
+          closeSurveyMenu();
+          app.showConfirm('\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u0432\u0435\u0441\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441?', function() {
+            _mastered = {};
+            _openQ = {};
+            saveMastered();
+            renderAll();
+            app.showToast('\u041F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u0441\u0431\u0440\u043E\u0448\u0435\u043D');
+          }, '\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C');
+        }
+      }
+    });
+  }
+
+  function closeSurveyMenu() {
+    var menu = document.getElementById('surveyDropdown');
+    if (menu) menu.remove();
+    var overlay = document.getElementById('surveyOverlay');
+    if (overlay) overlay.remove();
+  }
+
+  function destroy() {
+    closeSurveyMenu();
+  }
+
+  /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
-  function init() {
+  function init(params) {
     var container = document.getElementById('surveyContainer');
     if (!container) { console.error('\u041A\u043E\u043D\u0442\u0435\u0439\u043D\u0435\u0440 surveyContainer \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D!'); return; }
 
-    /* Делегирование: вешать ровно ОДИН раз */
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
+    /* Делегирование */
+    container.addEventListener('click', function(e) {
 
         /* Клик по чекбоксу вопроса → отметить/снять */
         var checkEl = e.target.closest('[data-q-check]');
@@ -342,22 +394,7 @@
           return;
         }
 
-        /* Клик по кнопке сброса прогресса */
-        var resetBtn = e.target.closest('[data-action="reset-progress"]');
-        if (resetBtn) {
-          app.showConfirm('\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u0432\u0435\u0441\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441?', function() {
-            _mastered = {};
-            _openQ = {};
-            saveMastered();
-            renderAll();
-            app.showToast('\u041F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u0441\u0431\u0440\u043E\u0448\u0435\u043D');
-          }, '\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C');
-          return;
-        }
-
-      });
-      container.dataset.delegated = 'true';
-    }
+    });
 
     /* Load mastered state */
     loadMastered();
@@ -393,7 +430,8 @@
     title:        '\u041A\u043E\u043D\u0442\u0440\u043E\u043B\u044C\u043D\u044B\u0439 \u043E\u043F\u0440\u043E\u0441',
     icon:         'clipboard-check',
     init:          init,
-    renderHeader:  renderHeader
+    renderHeader:  renderHeader,
+    destroy:       destroy,
   });
 
 })();

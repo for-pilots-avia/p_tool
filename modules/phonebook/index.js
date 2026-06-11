@@ -58,26 +58,6 @@
   }
 
   /* ═══════════════════════════════════════════
-     HEADER
-     ═══════════════════════════════════════════ */
-
-  function renderHeader() {
-    var left   = document.getElementById('headerLeft');
-    var center = document.getElementById('headerCenter');
-    var right  = document.getElementById('headerRight');
-    if (!left || !center || !right) return;
-
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
-
-    center.innerHTML = '<div class="hc-module">Телефонный справочник</div>';
-
-    right.innerHTML = '';
-    right.onclick = null;
-  }
-
-  /* ═══════════════════════════════════════════
      RENDER
      ═══════════════════════════════════════════ */
 
@@ -116,7 +96,7 @@
       if (!isDivider(filtered[h])) { hasContacts = true; break; }
     }
 
-    var html = '<div class="pb-container">';
+    var html = '<div class="module-container">';
 
     /* Search bar */
     html += '<div class="pb-search-bar">';
@@ -161,8 +141,7 @@
 
     // Bind clear button
     var clearBtn = container.querySelector('.pb-search-clear');
-    if (clearBtn && !clearBtn.dataset.bound) {
-      clearBtn.dataset.bound = 'true';
+    if (clearBtn) {
       clearBtn.addEventListener('click', function() {
         _filter = '';
         renderAll();
@@ -236,7 +215,7 @@
     var container = document.getElementById('phonebookContainer');
     if (!container) return;
     var input = container.querySelector('.pb-search-input');
-    if (input && !input.dataset.delegated) {
+    if (input) {
       input.addEventListener('input', function(e) {
         _filter = e.target.value;
         renderAll();
@@ -247,7 +226,6 @@
           inp.setSelectionRange(_filter.length, _filter.length);
         }
       });
-      input.dataset.delegated = 'true';
     }
   }
 
@@ -284,8 +262,8 @@
     if (!container) { console.error('Контейнер phonebookContainer не найден!'); return; }
 
     // Делегирование: вешать ровно ОДИН раз
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
+    // Делегирование: init() вызывается строго один раз (MODULE_CONTRACT §5)
+    container.addEventListener('click', function(e) {
         // Copy button
         var copyBtn = e.target.closest('.pb-copy-btn');
         if (copyBtn) {
@@ -297,8 +275,6 @@
         }
         // Let tel: and mailto: links work natively
       });
-      container.dataset.delegated = 'true';
-    }
 
     _filter = '';
 
@@ -334,8 +310,7 @@
     icon:        'phone',
     containerId: 'phonebookContainer',
     screenId:    'phonebookScreen',
-    init:        init,
-    renderHeader: renderHeader
+    init:        init
   });
 
 })();

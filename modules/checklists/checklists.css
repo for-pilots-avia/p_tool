@@ -53,8 +53,9 @@ body.dark-theme #checklistsContainer {
 
 .cl-tab-btn:active { color: var(--color-primary-dark); }
 
-/* ─── Accordion: collapsible-title, chevron, marquee ─── */
-/* MODULE_CONTRACT §7: стили аккордеона — в модуле, не в style.css */
+/* ─── Accordion base classes (контракт MODULE_CONTRACT v4.1 §7) ─── */
+/* Унифицированных базовых классов в style.css НЕТ — модуль объявляет всё сам. */
+/* @keyframes marquee — единственное исключение, остаётся в style.css. */
 
 .collapsible-title {
   flex: 1;
@@ -63,19 +64,9 @@ body.dark-theme #checklistsContainer {
   white-space: nowrap;
 }
 
-@keyframes cl-marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 .marquee-inner {
   display: inline-block;
   white-space: nowrap;
-}
-
-.cl-block--open .marquee-inner.is-overflowing {
-  animation: cl-marquee 10s linear infinite;
-  padding-right: 48px;
 }
 
 .collapsible-chevron {
@@ -87,9 +78,21 @@ body.dark-theme #checklistsContainer {
   color: var(--color-text-muted);
   transition: transform var(--transition-speed) var(--transition-ease);
 }
-.collapsible-chevron svg { width: 20px; height: 20px; }
+.collapsible-chevron svg {
+  width: 20px;
+  height: 20px;
+}
 
-.cl-block--open > .cl-block-header .collapsible-chevron {
+/* ─── Accordion: context-specific selectors ─── */
+
+/* Marquee при открытом блоке (базовый @keyframes marquee — в style.css) */
+.cl-block.open .marquee-inner.is-overflowing {
+  animation: marquee 10s linear infinite;
+  padding-right: 48px;
+}
+
+/* Поворот шеврона при открытом блоке (контракт MODULE_CONTRACT §7: прямой потомок) */
+.cl-block.open > .cl-block-header > .collapsible-chevron {
   transform: rotate(180deg);
 }
 
@@ -105,7 +108,7 @@ body.dark-theme #checklistsContainer {
               box-shadow var(--transition-speed) var(--transition-ease);
 }
 
-.cl-block--open {
+.cl-block.open {
   border-color: var(--color-danger);
   box-shadow: 0 1px 3px var(--color-danger-bg);
 }
@@ -115,17 +118,21 @@ body.dark-theme #checklistsContainer {
   box-shadow: 0 1px 3px var(--color-success-bg);
 }
 
+.cl-block.open.cl-block--ok {
+  border-color: var(--color-success);
+  box-shadow: 0 1px 3px var(--color-success-bg);
+}
+
 /* ─── Block Header ─── */
 .cl-block-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   padding: 14px 16px;
   background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
   border: none;
   cursor: pointer;
-  gap: 12px;
+  gap: 10px;
   text-align: left;
   color: var(--color-text-main);
   transition: background var(--transition-speed) var(--transition-ease);
@@ -143,21 +150,22 @@ body.dark-theme #checklistsContainer {
   box-shadow: inset 0 0 0 9999px var(--color-bg-hover);
 }
 
-.cl-block-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
+/* ─── Block Title (marquee on open) ─── */
+/* Контракт MODULE_CONTRACT §7: заголовок в .collapsible-title > .marquee-inner */
+.cl-block-header .collapsible-title {
   flex: 1;
-}
-
-.cl-block-title {
+  min-width: 0;
   font-size: var(--font-lg);
   font-weight: 600;
   color: var(--color-text-main);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.cl-block-header .marquee-inner {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--color-text-main);
 }
 
 /* ─── Block Note ─── */
@@ -385,7 +393,7 @@ body.dark-theme #checklistsContainer {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 800;
+  z-index: 1150;
   background: var(--color-overlay);
   animation: clPanelOverlayIn 0.15s var(--transition-ease-out);
 }
@@ -404,7 +412,7 @@ body.dark-theme #checklistsContainer {
   position: fixed;
   top: calc(var(--header-height) + 4px);
   right: 8px;
-  z-index: 801;
+  z-index: 1151;
   background: var(--color-bg-main);
   border-radius: var(--border-radius-md);
   box-shadow: 0 4px 16px var(--color-shadow-lg);
@@ -468,7 +476,7 @@ body.dark-theme #checklistsContainer {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 899;
+  z-index: 1150;
   background: var(--color-overlay);
   animation: clBackdropIn 0.15s var(--transition-ease-out);
 }
@@ -485,7 +493,7 @@ body.dark-theme #checklistsContainer {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 900;
+  z-index: 1151;
   max-height: 65vh;
   background: var(--color-bg-main);
   border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;

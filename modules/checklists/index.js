@@ -99,10 +99,10 @@
     var right = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    // Левая кнопка: Назад
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + (window.ICONS['arrow-left'] || '') + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    // Левая кнопка: Боковое меню
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню">'
+      + (window.ICONS.menu || '') + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
 
     // Центр: название модуля (не зависит от вкладки)
     center.innerHTML = '<div class="hc-module">Чеклисты</div>';
@@ -131,11 +131,11 @@
 
     // Commits Panel Overlay
     var overlay = document.createElement('div');
-    overlay.id = 'commitsOverlay';
+    overlay.id = 'checklists-commitsOverlay';
 
     // Commits Panel
     var panel = document.createElement('div');
-    panel.id = 'commitsPanel';
+    panel.id = 'checklists-commitsPanel';
     panel.innerHTML =
       '<div class="cl-panel-body">'
       + '<button class="cl-panel-btn" id="commitsCameraBtn">'
@@ -159,10 +159,10 @@
     // Camera Modal (bottom sheet)
     var cameraBackdrop = document.createElement('div');
     cameraBackdrop.className = 'cl-modal-backdrop';
-    cameraBackdrop.id = 'cameraBackdrop';
+    cameraBackdrop.id = 'checklists-cameraBackdrop';
 
     var cameraModal = document.createElement('div');
-    cameraModal.id = 'cameraModal';
+    cameraModal.id = 'checklists-cameraModal';
     cameraModal.className = 'cl-modal';
     cameraModal.innerHTML =
       '<div class="cl-modal-handle"></div>'
@@ -184,10 +184,10 @@
     // Notes Modal (bottom sheet)
     var notesBackdrop = document.createElement('div');
     notesBackdrop.className = 'cl-modal-backdrop';
-    notesBackdrop.id = 'notesBackdrop';
+    notesBackdrop.id = 'checklists-notesBackdrop';
 
     var notesModal = document.createElement('div');
-    notesModal.id = 'notesModal';
+    notesModal.id = 'checklists-notesModal';
     notesModal.className = 'cl-modal';
     notesModal.innerHTML =
       '<div class="cl-modal-handle"></div>'
@@ -209,10 +209,10 @@
     // Docs Modal (bottom sheet) — показывает фото + заметки
     var docsBackdrop = document.createElement('div');
     docsBackdrop.className = 'cl-modal-backdrop';
-    docsBackdrop.id = 'docsBackdrop';
+    docsBackdrop.id = 'checklists-docsBackdrop';
 
     var docsModal = document.createElement('div');
-    docsModal.id = 'docsModal';
+    docsModal.id = 'checklists-docsModal';
     docsModal.className = 'cl-modal';
     docsModal.innerHTML =
       '<div class="cl-modal-handle"></div>'
@@ -245,10 +245,10 @@
    */
   function removeDom() {
     var ids = [
-      'commitsOverlay', 'commitsPanel',
-      'cameraBackdrop', 'cameraModal',
-      'notesBackdrop', 'notesModal',
-      'docsBackdrop', 'docsModal'
+      'checklists-commitsOverlay', 'checklists-commitsPanel',
+      'checklists-cameraBackdrop', 'checklists-cameraModal',
+      'checklists-notesBackdrop', 'checklists-notesModal',
+      'checklists-docsBackdrop', 'checklists-docsModal'
     ];
     for (var i = 0; i < ids.length; i++) {
       var el = document.getElementById(ids[i]);
@@ -263,23 +263,28 @@
      ═══════════════════════════════════════════ */
 
   function openCommitsPanel() {
-    var panel = document.getElementById('commitsPanel');
-    var overlay = document.getElementById('commitsOverlay');
+    var panel = document.getElementById('checklists-commitsPanel');
+    var overlay = document.getElementById('checklists-commitsOverlay');
     if (panel) panel.classList.add('open');
     if (overlay) overlay.classList.add('open');
   }
 
   function closeCommitsPanel() {
-    var panel = document.getElementById('commitsPanel');
-    var overlay = document.getElementById('commitsOverlay');
+    var panel = document.getElementById('checklists-commitsPanel');
+    var overlay = document.getElementById('checklists-commitsOverlay');
     if (panel) panel.classList.remove('open');
     if (overlay) overlay.classList.remove('open');
   }
 
   function initCommitsPanelListeners() {
-    var panel = document.getElementById('commitsPanel');
-    var overlay = document.getElementById('commitsOverlay');
+    var panel = document.getElementById('checklists-commitsPanel');
     if (!panel) return;
+
+    // Клик по оверлею закрывает панель (как «Сбросить рейс»)
+    var overlay = document.getElementById('checklists-commitsOverlay');
+    if (overlay) {
+      overlay.addEventListener('click', function() { closeCommitsPanel(); });
+    }
 
     // Иконки
     var closeBtn = document.getElementById('commitsPanelClose');
@@ -294,9 +299,6 @@
       if (notesIcon) notesIcon.innerHTML = window.ICONS['message-square'];
       if (docsIcon) docsIcon.innerHTML = window.ICONS['file-text'];
     }
-
-    // Оверлей
-    overlay.addEventListener('click', closeCommitsPanel);
 
     // Панель
     panel.addEventListener('click', function(e) {
@@ -315,16 +317,16 @@
   var _cameraPhotos = []; // { id, dataUrl, name }
 
   function openCameraModal() {
-    var backdrop = document.getElementById('cameraBackdrop');
-    var modal = document.getElementById('cameraModal');
+    var backdrop = document.getElementById('checklists-cameraBackdrop');
+    var modal = document.getElementById('checklists-cameraModal');
     if (backdrop) backdrop.style.display = 'block';
     if (modal) modal.classList.add('open');
     renderCameraGallery();
   }
 
   function closeCameraModal() {
-    var backdrop = document.getElementById('cameraBackdrop');
-    var modal = document.getElementById('cameraModal');
+    var backdrop = document.getElementById('checklists-cameraBackdrop');
+    var modal = document.getElementById('checklists-cameraModal');
     if (backdrop) backdrop.style.display = 'none';
     if (modal) modal.classList.remove('open');
   }
@@ -353,7 +355,7 @@
   }
 
   function initCameraListeners() {
-    var modal = document.getElementById('cameraModal');
+    var modal = document.getElementById('checklists-cameraModal');
     if (!modal) return;
 
     var closeBtn = document.getElementById('cameraModalClose');
@@ -362,7 +364,7 @@
     if (addBtn) addBtn.innerHTML = window.ICONS['plus'] || '';
 
     // Закрытие по клику на backdrop
-    var cameraBackdrop = document.getElementById('cameraBackdrop');
+    var cameraBackdrop = document.getElementById('checklists-cameraBackdrop');
     if (cameraBackdrop) {
       cameraBackdrop.addEventListener('click', closeCameraModal);
     }
@@ -422,8 +424,8 @@
   var _notes = []; // { id, text, time }
 
   function openNotesModal() {
-    var backdrop = document.getElementById('notesBackdrop');
-    var modal = document.getElementById('notesModal');
+    var backdrop = document.getElementById('checklists-notesBackdrop');
+    var modal = document.getElementById('checklists-notesModal');
     if (backdrop) backdrop.style.display = 'block';
     if (modal) modal.classList.add('open');
     loadNotes();
@@ -431,8 +433,8 @@
   }
 
   function closeNotesModal() {
-    var backdrop = document.getElementById('notesBackdrop');
-    var modal = document.getElementById('notesModal');
+    var backdrop = document.getElementById('checklists-notesBackdrop');
+    var modal = document.getElementById('checklists-notesModal');
     if (backdrop) backdrop.style.display = 'none';
     if (modal) modal.classList.remove('open');
   }
@@ -495,7 +497,7 @@
   }
 
   function initNotesListeners() {
-    var modal = document.getElementById('notesModal');
+    var modal = document.getElementById('checklists-notesModal');
     if (!modal) return;
 
     var closeBtn = document.getElementById('notesModalClose');
@@ -504,7 +506,7 @@
     if (sendIcon) sendIcon.innerHTML = window.ICONS['send'] || '';
 
     // Закрытие по клику на backdrop
-    var notesBackdrop = document.getElementById('notesBackdrop');
+    var notesBackdrop = document.getElementById('checklists-notesBackdrop');
     if (notesBackdrop) {
       notesBackdrop.addEventListener('click', closeNotesModal);
     }
@@ -526,8 +528,8 @@
      ═══════════════════════════════════════════ */
 
   function openDocsModal() {
-    var backdrop = document.getElementById('docsBackdrop');
-    var modal = document.getElementById('docsModal');
+    var backdrop = document.getElementById('checklists-docsBackdrop');
+    var modal = document.getElementById('checklists-docsModal');
     if (backdrop) backdrop.style.display = 'block';
     if (modal) modal.classList.add('open');
     loadNotes(); // подгрузить актуальные заметки
@@ -535,8 +537,8 @@
   }
 
   function closeDocsModal() {
-    var backdrop = document.getElementById('docsBackdrop');
-    var modal = document.getElementById('docsModal');
+    var backdrop = document.getElementById('checklists-docsBackdrop');
+    var modal = document.getElementById('checklists-docsModal');
     if (backdrop) backdrop.style.display = 'none';
     if (modal) modal.classList.remove('open');
   }
@@ -600,14 +602,14 @@
   }
 
   function initDocsListeners() {
-    var modal = document.getElementById('docsModal');
+    var modal = document.getElementById('checklists-docsModal');
     if (!modal) return;
 
     var closeBtn = document.getElementById('docsModalClose');
     if (closeBtn) closeBtn.innerHTML = window.ICONS['arrow-left'] || '';
 
     // Закрытие по клику на backdrop
-    var docsBackdrop = document.getElementById('docsBackdrop');
+    var docsBackdrop = document.getElementById('checklists-docsBackdrop');
     if (docsBackdrop) {
       docsBackdrop.addEventListener('click', closeDocsModal);
     }
@@ -664,7 +666,7 @@
     var isOk = status === 'ok';
     var badgeClass = 'cl-badge ' + (isOk ? 'cl-badge--ok' : 'cl-badge--no');
     var badgeText = isOk ? 'OK' : 'NO';
-    var blockClass = 'cl-block' + (isOpen ? ' cl-block--open' : '') + (isOk ? ' cl-block--ok' : '');
+    var blockClass = 'cl-block' + (isOpen ? ' open' : '') + (isOk ? ' cl-block--ok' : '');
 
     var pct = progress.total > 0
       ? Math.round((progress.checked / progress.total) * 100)
@@ -672,13 +674,11 @@
 
     var html = '<div class="' + blockClass + '" data-block-id="' + block.id + '">';
 
-    // Заголовок аккордеона
+    // Заголовок аккордеона (контракт MODULE_CONTRACT §7: шеврон — прямой потомок .cl-block-header)
     html += '<div class="cl-block-header" data-block-id="' + block.id + '">';
-    html += '<div class="cl-block-header-left">';
-    html += '<span class="collapsible-chevron' + (isOpen ? ' open' : '') + '">'
+    html += '<span class="collapsible-chevron">'
       + (window.ICONS['chevron-down'] || '') + '</span>';
-    html += '<span class="cl-block-title">' + block.title + '</span>';
-    html += '</div>';
+    html += '<span class="collapsible-title"><span class="marquee-inner">' + escapeHtml(block.title) + '</span></span>';
     html += '<span class="' + badgeClass + '">' + badgeText + '</span>';
     html += '</div>';
 
@@ -750,7 +750,7 @@
       return;
     }
 
-    var html = '<div>';
+    var html = '<div class="module-container">';
 
     // Табы
     html += renderTabBar();
@@ -768,6 +768,11 @@
     html += '</div>';
 
     app.hideSkeleton(container, html);
+
+    // Инициализировать marquee для заголовков аккордеонов
+    if (window.app && window.app.initMarquee) {
+      window.app.initMarquee(container);
+    }
   }
 
   /* ═══════════════════════════════════════════
@@ -940,7 +945,7 @@
      INIT
      ═══════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
     var container = document.getElementById('checklistsContainer');
     if (!container) {
       console.error('Контейнер checklistsContainer не найден!');
@@ -953,41 +958,35 @@
     // Создать DOM модалок/панелей динамически (по контракту)
     ensureDom();
 
-    // Делегирование: вешать ровно ОДИН раз
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
-        // Табы
-        var tabBtn = e.target.closest('.cl-tab-btn');
-        if (tabBtn) {
-          var tab = tabBtn.getAttribute('data-tab');
-          if (tab) switchTab(tab);
-          return;
-        }
+    // Делегирование событий (контракт MODULE_CONTRACT §5: init() вызывается строго один раз)
+    container.addEventListener('click', function(e) {
+      // Табы
+      var tabBtn = e.target.closest('.cl-tab-btn');
+      if (tabBtn) {
+        var tab = tabBtn.getAttribute('data-tab');
+        if (tab) switchTab(tab);
+        return;
+      }
 
-        // Заголовок блока (аккордеон)
-        var blockHeader = e.target.closest('.cl-block-header');
-        if (blockHeader) {
-          var blockId = blockHeader.getAttribute('data-block-id');
-          if (blockId) toggleBlock(blockId);
-          return;
-        }
+      // Заголовок блока (аккордеон)
+      var blockHeader = e.target.closest('.cl-block-header');
+      if (blockHeader) {
+        var blockId = blockHeader.getAttribute('data-block-id');
+        if (blockId) toggleBlock(blockId);
+        return;
+      }
+    });
 
+    // Обработчик change для чекбоксов
+    container.addEventListener('change', function(e) {
+      var checkbox = e.target.closest('.cl-checkbox');
+      if (checkbox) {
+        var itemId = checkbox.getAttribute('data-item-id');
+        if (itemId) toggleItem(itemId);
+      }
+    });
 
-      });
-
-      // Обработчик change для чекбоксов
-      container.addEventListener('change', function(e) {
-        var checkbox = e.target.closest('.cl-checkbox');
-        if (checkbox) {
-          var itemId = checkbox.getAttribute('data-item-id');
-          if (itemId) toggleItem(itemId);
-        }
-      });
-
-      container.dataset.delegated = 'true';
-    }
-
-    // Сбросить состояние при повторном входе
+    // Начальное состояние (контракт: init() вызывается строго ОДИН раз)
     _activeTab = 'safa';
     _openBlocks = {};
     _checkedItems = loadCheckedState(_activeTab);

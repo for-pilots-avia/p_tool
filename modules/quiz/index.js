@@ -18,10 +18,13 @@
 
   /** Apply size to SVG template (handles both with and without explicit w/h) */
   function svgSize(tpl, size) {
-    if (/width="/.test(tpl)) {
+    /* Check the opening <svg …> tag for a standalone width attribute
+       (space-prefixed so we skip stroke-width="…") */
+    var svgOpen = tpl.match(/<svg[^>]*>/);
+    if (svgOpen && /\swidth="\d+"/.test(svgOpen[0])) {
       return tpl
-        .replace(/width="\d+"/, 'width="' + size + '"')
-        .replace(/height="\d+"/, 'height="' + size + '"');
+        .replace(/\swidth="\d+"/, ' width="' + size + '"')
+        .replace(/\sheight="\d+"/, ' height="' + size + '"');
     }
     return tpl.replace(/<svg/, '<svg width="' + size + '" height="' + size + '"');
   }
@@ -326,8 +329,7 @@
 
   function bindModalEvents() {
     var modalWrap = container.querySelector('#settingsOverlay');
-    if (!modalWrap || modalWrap.dataset.modalDelegated) return;
-    modalWrap.dataset.modalDelegated = 'true';
+    if (!modalWrap) return;
 
     modalWrap.addEventListener('click', function (e) {
       var target = e.target;
@@ -496,9 +498,7 @@
   }
 
   function updateTimerDisplay() {
-    var center = document.getElementById('headerCenter');
-    if (!center) return;
-    var timerEl = center.querySelector('.quiz-header-timer');
+    var timerEl = container ? container.querySelector('#quizScreenTimer') : null;
     if (timerEl) timerEl.textContent = fmtTime(Date.now() - S.quizStartTime);
   }
 
@@ -516,7 +516,7 @@
      TIMELINE — uses shared #timeline element from main layout
      ═══════════════════════════════════════════════════════════ */
   function buildTimeline() {
-    var timelineWrap = document.getElementById('timeline');
+    var timelineWrap = container.querySelector('#timeline');
     if (!timelineWrap) return;
     timelineWrap.innerHTML = '';
     var total = S.questions.length;
@@ -551,7 +551,7 @@
      PROGRESS — uses shared #progressFill element from main layout
      ═══════════════════════════════════════════════════════════ */
   function updateProgress() {
-    var progressFill = document.getElementById('progressFill');
+    var progressFill = container.querySelector('#progressFill');
     var total = S.questions.length;
     if (total === 0 || !progressFill) return;
     var pct = ((S.idx + (S.answered ? 1 : 0)) / total) * 100;
@@ -567,7 +567,7 @@
     var startScreen = container.querySelector('#quizStartScreen');
     var quizScreen = container.querySelector('#quizScreen');
     var resultScreen = container.querySelector('#resultScreen');
-    var progressSection = document.getElementById('progressSection');
+    var progressSection = container.querySelector('#progressSection');
 
     hide(startScreen); hide(quizScreen); hide(resultScreen);
     if (progressSection) hide(progressSection);
@@ -710,8 +710,8 @@
     buildTimeline();
     updateProgress();
 
-    /* Update header title */
-    renderHeader();
+    /* Update screen timer */
+    updateTimerDisplay();
 
     /* Animate in */
     var quizScreen = container.querySelector('#quizScreen');
@@ -839,18 +839,21 @@
     /* Work time bars */
     buildWorkTimeBars(total, totalTime);
 
-    /* Buttons */
-    var btnAction = container.querySelector('#btnAction');
+    /* Buttons: two in one row — Повторить ошибки + Завершить тест */
+    var btnRetryWrong = container.querySelector('#btnRetryWrong');
+    var btnFinish = container.querySelector('#btnFinish');
     if (S.wrongQs.length > 0) {
-      if (btnAction) {
-        btnAction.innerHTML = ico('refresh-ccw') + ' \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u043E\u0448\u0438\u0431\u043A\u0438'; /* Повторить ошибки */
-        btnAction.onclick = retryWrong;
+      if (btnRetryWrong) {
+        btnRetryWrong.innerHTML = ico('refresh-ccw') + ' \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u043E\u0448\u0438\u0431\u043A\u0438'; /* Повторить ошибки */
+        btnRetryWrong.onclick = retryWrong;
+        btnRetryWrong.style.display = '';
       }
     } else {
-      if (btnAction) {
-        btnAction.innerHTML = '\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044C'; /* Завершить */
-        btnAction.onclick = goStart;
-      }
+      if (btnRetryWrong) btnRetryWrong.style.display = 'none';
+    }
+    if (btnFinish) {
+      btnFinish.innerHTML = '\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044C \u0442\u0435\u0441\u0442'; /* Завершить тест */
+      btnFinish.onclick = goStart;
     }
 
     var resultScreen = container.querySelector('#resultScreen');
@@ -935,48 +938,35 @@
   /* ═══════════════════════════════════════════════════════════
      RENDER HEADER — direct DOM access per MODULE_CONTRACT
      ═══════════════════════════════════════════════════════════ */
+  function getCurrentTestName() {
+    if (S.selectedTest === 'default' && S.testData) return S.testData.name;
+    var custom = S.customTests.find(function (t) { return t.name === S.selectedTest; });
+    return custom ? custom.name : '';
+  }
+
   function renderHeader() {
     var left   = document.getElementById('headerLeft');
     var center = document.getElementById('headerCenter');
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    var titleText = '';
-    var showTimer = false;
-    var timerText = '';
-    var leftAction = null;
-    var rightAction = null;
+    var rightAction = openSettings;
 
-    if (S.screen === 'start') {
-      titleText = '\u0422\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435'; /* Тестирование */
-      leftAction = navigateHome;
-      rightAction = openSettings;
-    } else if (S.screen === 'quiz') {
-      var phase = S.isFirstRun ? '' : ' (\u043E\u0448\u0438\u0431\u043A\u0438)'; /* ошибки */
-      titleText = '\u0412\u043E\u043F\u0440\u043E\u0441 ' + (S.idx + 1) + '/' + S.questions.length + phase; /* Вопрос */
-      showTimer = true;
-      timerText = fmtTime(Date.now() - S.quizStartTime);
-      leftAction = goStart;
-      rightAction = openSettings;
-    } else if (S.screen === 'result') {
-      titleText = '\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B'; /* Результаты */
-      leftAction = goStart;
-      rightAction = openSettings;
+    /* Left: menu button (hamburger) */
+    left.innerHTML = '<button class="icon-btn" aria-label="Меню">' /* Меню */
+      + (getIcons()['menu'] || '') + '</button>';
+    left.onclick = function() { if (window.app && window.app.toggleMenu) window.app.toggleMenu(); };
+
+    /* Center: test name during quiz/result, module name on start */
+    var headerTitle = '\u0422\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435'; /* Тестирование */
+    if (S.screen === 'quiz' || S.screen === 'result') {
+      var tName = getCurrentTestName();
+      if (tName) headerTitle = tName;
     }
-
-    /* Left: back button */
-    left.innerHTML = '<button class="icon-btn" aria-label="\u041D\u0430\u0437\u0430\u0434">' /* Назад */
-      + (getIcons()['arrow-left'] || '') + '</button>';
-    left.onclick = leftAction;
-
-    /* Center: title + optional timer */
-    center.innerHTML = '<div class="hc-module">' + titleText + '</div>'
-      + (showTimer
-        ? '<div class="quiz-header-timer ct-mono-time" style="font-size:var(--font-xs);color:var(--color-on-primary-text-dim)">' + timerText + '</div>'
-        : '');
+    center.innerHTML = '<div class="hc-module">' + headerTitle + '</div>';
 
     /* Right: settings button */
-    right.innerHTML = '<button class="icon-btn" aria-label="\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438">' /* Настройки */
+    right.innerHTML = '<button class="icon-btn" aria-label="Настройки">' /* Настройки */
       + (getIcons()['ellipsis-vertical'] || '') + '</button>';
     right.onclick = rightAction;
   }
@@ -1006,6 +996,8 @@
      ─────────────────────────────────────────────────────────────── */
   function renderHTML() {
     container.innerHTML =
+      '<div class="module-container">' +
+
       '<!-- \u2550\u2550\u2550 START SCREEN \u2550\u2550\u2550 -->' +
       '<div id="quizStartScreen">' +
         '<div class="app-card animate-fade-in" style="text-align: center; margin-bottom: 16px">' +
@@ -1036,7 +1028,15 @@
         '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px">' +
           '<span id="quizProgressLabel" style="font-size: var(--font-xs); font-weight: 700; color: var(--color-text-secondary); letter-spacing: 0.01em; text-transform: uppercase"></span>' +
           '<span id="quizBadge" class="quiz-badge quiz-badge-danger" style="display:none">\u041E\u0428\u0418\u0411\u041A\u0418</span>' + /* ОШИБКИ */
+          '<span id="quizScreenTimer" class="quiz-screen-timer"></span>' +
         '</div>' +
+        '<!-- Progress section with timeline -->' +
+        '<div id="progressSection" class="quiz-progress-section" style="display:none">' +
+          '<div id="timeline" class="quiz-timeline"></div>' +
+          '<div class="quiz-progress-track">' +
+            '<div id="progressFill" class="quiz-progress-fill"></div>' +
+          '</div>' +
+        '</div>' + /* ОШИБКИ */
         '<div class="app-card" style="border-left: 4px solid var(--color-primary)">' +
           '<h2 id="questionText" style="font-size: var(--font-lg); font-weight: 700; line-height: 1.4; margin: 0; color: var(--color-text-main); letter-spacing: -0.01em"></h2>' +
           '<div id="questionImageWrap" class="question-image-wrap" style="display:none">' +
@@ -1078,8 +1078,9 @@
           '</div>' +
         '</div>' +
         '<div id="wtContainer" class="app-card"></div>' +
-        '<div style="display: flex; gap: 10px; margin-top: 16px">' +
-          '<button id="btnAction" class="btn-primary" style="flex: 1"></button>' +
+        '<div class="quiz-result-btns">' +
+          '<button id="btnRetryWrong" class="btn-outline" style="display: none"></button>' +
+          '<button id="btnFinish" class="btn-primary"></button>' +
         '</div>' +
       '</div>' +
 
@@ -1092,12 +1093,12 @@
             '<button id="modalClose" class="quiz-modal-close" aria-label="\u0417\u0430\u043A\u0440\u044B\u0442\u044C"></button>' + /* Закрыть */
           '</div>' +
           '<div class="quiz-modal-body">' +
-            '<div style="margin-bottom: 16px">' +
+            '<div class="quiz-modal-section">' +
               '<label for="modalTestSelector" style="font-size: var(--font-sm); font-weight: 600; color: var(--color-text-secondary); display: block; margin-bottom: 6px">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0435\u0441\u0442</label>' + /* Выберите тест */
               '<select id="modalTestSelector" class="quiz-select"></select>' +
             '</div>' +
-            '<div class="quiz-toggle-wrap">' +
-              '<span class="quiz-toggle-label" style="display: flex; align-items: center; gap: 8px">' +
+            '<div class="quiz-toggle-wrap quiz-modal-section">' +
+              '<span class="quiz-toggle-label">' +
                 '<span id="shuffleIcon" style="display: inline-flex"></span>' +
                 '\u041F\u0435\u0440\u0435\u043C\u0435\u0448\u0430\u0442\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B' + /* Перемешать вопросы */
               '</span>' +
@@ -1106,24 +1107,24 @@
                 '<span class="quiz-slider"></span>' +
               '</label>' +
             '</div>' +
-            '<button id="modalBtnStart" class="btn-primary" style="width: 100%; margin-top: 16px">' +
+            '<button id="modalBtnStart" class="btn-primary quiz-modal-btn quiz-modal-section">' +
               '<span id="modalPlayIcon" style="display: inline-flex; margin-right: 8px"></span>' +
               '\u041D\u0430\u0447\u0430\u0442\u044C \u0442\u0435\u0441\u0442' + /* Начать тест */
             '</button>' +
-            '<div class="quiz-bottom-row" style="display: flex; gap: 8px; margin-top: 12px">' +
-              '<label class="quiz-file-label" style="flex: 1; margin-top: 0">' +
-                '<span id="uploadIcon" style="display: inline-flex"></span>' +
-                'Загрузить свой тест (JSON)' + /* Загрузить свой тест (JSON) */
-                '<input id="modalFileInput" type="file" accept=".json" style="display: none">' +
-              '</label>' +
-              '<button id="modalBtnClearHistory" class="btn-outline" style="flex: 1; margin-top: 0; color: var(--color-danger); border-color: var(--color-danger)">' +
-                '<span id="trashIcon" style="display: inline-flex; margin-right: 6px"></span>' +
-                'Очистить результаты' + /* Очистить результаты */
-              '</button>' +
-            '</div>' +
+            '<label class="quiz-file-label quiz-modal-btn quiz-modal-section">' +
+              '<span id="uploadIcon" style="display: inline-flex"></span>' +
+              'Загрузить свой тест (JSON)' + /* Загрузить свой тест (JSON) */
+              '<input id="modalFileInput" type="file" accept=".json" style="display: none">' +
+            '</label>' +
+            '<button id="modalBtnClearHistory" class="btn-outline quiz-modal-btn quiz-modal-btn-danger quiz-modal-section">' +
+              '<span id="trashIcon" style="display: inline-flex; margin-right: 6px"></span>' +
+              'Очистить результаты' + /* Очистить результаты */
+            '</button>' +
           '</div>' +
         '</div>' +
-      '</div>';
+      '</div>' +
+
+      '</div>'; /* close .module-container */
   }
 
 
@@ -1149,20 +1150,17 @@
     /* Populate icons */
     populateIcons();
 
-    /* Event delegation — bind exactly once */
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function (e) {
-        var btnStart = e.target.closest('#btnStart');
-        if (btnStart) { startQuiz(); return; }
+    /* Event delegation — init() called strictly once (MODULE_CONTRACT §5) */
+    container.addEventListener('click', function (e) {
+      var btnStart = e.target.closest('#btnStart');
+      if (btnStart) { startQuiz(); return; }
 
-        var btnQuizSettings = e.target.closest('#btnQuizSettings');
-        if (btnQuizSettings) { openSettings(); return; }
+      var btnQuizSettings = e.target.closest('#btnQuizSettings');
+      if (btnQuizSettings) { openSettings(); return; }
 
-        var btnRetryLoad = e.target.closest('#btnRetryLoad');
-        if (btnRetryLoad) { loadData(); return; }
-      });
-      container.dataset.delegated = 'true';
-    }
+      var btnRetryLoad = e.target.closest('#btnRetryLoad');
+      if (btnRetryLoad) { loadData(); return; }
+    });
 
     /* Bind other modal events (id-based, not delegation) */
     bindModalEvents();

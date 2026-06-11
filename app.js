@@ -5,35 +5,38 @@
 
 window.app = {};
 
-/* ─── Current module tracker (for destroy on navigation) ─── */
+/* ─── Current module tracker ─── */
 var _currentModule = null;
 
 /* ═══════════════════════════════════════════
    NAVIGATION
+   Модули НЕ уничтожаются при уходе — сохраняют состояние.
+   При возврате в модуль вызывается только renderHeader(),
+   init() — только при первом посещении.
    ═══════════════════════════════════════════ */
 
 window.app.navigateTo = function(screenName, params) {
-  // Destroy previous module before switching (контракт SHELL_CONTRACT §2)
-  if (_currentModule && _currentModule !== screenName) {
-    ModuleRegistry.destroy(_currentModule);
-  }
   _currentModule = screenName;
 
+  // 1. Reset header (clear all zones)
   app.resetHeader();
 
-  // Hide all screens
+  // 2. Form header BEFORE showing screen
+  if (screenName === 'main') {
+    app.renderMainHeader();
+  } else {
+    ModuleRegistry.renderHeader(screenName);
+  }
+
+  // 3. Hide all screens, show target screen (AFTER header)
   document.querySelectorAll('.screen').forEach(function(s) {
     s.classList.remove('active');
   });
-
-  // Show target screen
   var screen = document.getElementById(screenName + 'Screen');
   if (screen) screen.classList.add('active');
 
-  // Close menu
+  // Close menu & update active state
   app.closeMenu();
-
-  // Update menu active state
   document.querySelectorAll('.menu-item[data-nav]').forEach(function(item) {
     item.classList.remove('menu-item--active');
     if (item.dataset.nav === screenName) {
@@ -41,16 +44,9 @@ window.app.navigateTo = function(screenName, params) {
     }
   });
 
-  // Handle navigation
-  if (screenName === 'main') {
-    app.renderMainHeader();
-  } else {
-    // Use module registry
-    var mod = window.ModuleRegistry.get(screenName);
-    if (mod) {
-      ModuleRegistry.renderHeader(screenName);
-      ModuleRegistry.init(screenName, params);
-    }
+  // 4. Init module (only on first visit, AFTER screen is visible)
+  if (screenName !== 'main') {
+    ModuleRegistry.init(screenName, params);
   }
 };
 
@@ -180,10 +176,22 @@ window.app.initMarquee = function(container) {
     (function(title) {
       var inner = title.querySelector('.marquee-inner');
       if (!inner) return;
+      // Если контент был дублирован ранее — восстановить оригинал для корректного замера
+      if (inner.dataset.mqOrig) {
+        inner.innerHTML = inner.dataset.mqOrig;
+        void inner.offsetWidth; // форсировать reflow
+      }
       if (inner.scrollWidth > title.clientWidth) {
         inner.classList.add('is-overflowing');
+        // Дублирование для бесшовного marquee:
+        // Структура: [контент][зазор][контент][зазор]
+        // translateX(-50%) прокручивает ровно одну половину — бесшовный цикл
+        var orig = inner.innerHTML;
+        inner.dataset.mqOrig = orig;
+        inner.innerHTML = orig + '<span class="mq-gap"></span>' + orig + '<span class="mq-gap"></span>';
       } else {
         inner.classList.remove('is-overflowing');
+        delete inner.dataset.mqOrig;
       }
     })(titles[i]);
   }
@@ -300,9 +308,6 @@ function initMenuIcons() {
   var offlineIcon = document.getElementById('offlineStatusIcon');
   if (offlineIcon) offlineIcon.innerHTML = window.ICONS.download || '';
 
-  var bannerIcon = document.getElementById('menuBannerIcon');
-  if (bannerIcon) bannerIcon.innerHTML = window.ICONS.plane;
-
   // updateBadgeIcon — заполняется ICONS.download (контракт SHELL_CONTRACT §1)
   var updateBadgeIconEl = document.getElementById('updateBadgeIcon');
   if (updateBadgeIconEl) updateBadgeIconEl.innerHTML = window.ICONS.download || '';
@@ -327,6 +332,12 @@ function buildMenuFromRegistry() {
   }
 
   menuList.innerHTML = html;
+
+  // Иконка кнопки «Главный экран» в шапке сайдменю
+  var homeIconEl = document.getElementById('menuHomeIcon');
+  if (homeIconEl && window.ICONS.home) {
+    homeIconEl.innerHTML = window.ICONS.home;
+  }
 }
 
 window.app.toggleMenu = function() {
@@ -429,12 +440,24 @@ window.app.initServiceWorker = function() {
       if (bar)  bar.style.width = pct + '%';
       if (oBar) oBar.style.width = pct + '%';
       if (oText) oText.textContent = pct + '%';
+
+      // Отобразить имя текущего файла
+      var fileName = data.url ? data.url.replace(/^\.\//, '') : '';
+      if (fileName === '.') fileName = 'index.html';
+      var oFile   = document.getElementById('cacheProgressFile');
+      var uFile   = document.getElementById('swUpdateFile');
+      if (oFile && fileName) oFile.textContent = fileName;
+      if (uFile && fileName) uFile.textContent = fileName;
     }
 
     if (data.type === 'CACHE_DONE') {
       if (bar)  bar.style.width = '100%';
       if (oBar) oBar.style.width = '100%';
       if (oText) oText.textContent = '100%';
+      var oFile = document.getElementById('cacheProgressFile');
+      var uFile = document.getElementById('swUpdateFile');
+      if (oFile) oFile.textContent = '';
+      if (uFile) uFile.textContent = '';
       localStorage.setItem('offlineReady', 'true');
       app.updateOfflineStatus(true);
       setTimeout(function() {
@@ -469,18 +492,20 @@ window.app.initServiceWorker = function() {
       if (swBar)   swBar.style.display   = 'block';
     }
 
-    // ── Обнаружение обновления SW → показать баннер ──
+    // ── Обнаружение обновления SW → показать баннер + затемнение ──
     reg.addEventListener('updatefound', function() {
       var newWorker = reg.installing;
       if (!newWorker) return;
 
-      var banner  = document.getElementById('swUpdateBanner');
-      var text    = document.getElementById('swUpdateBannerText');
-      var fill    = document.getElementById('swUpdateProgressFill');
+      var banner    = document.getElementById('swUpdateBanner');
+      var overlay   = document.getElementById('swUpdateOverlay');
+      var text      = document.getElementById('swUpdateBannerText');
+      var fill      = document.getElementById('swUpdateProgressFill');
       var reloadBtn = document.getElementById('swUpdateReloadBtn');
       if (!banner) return;
 
       banner.style.display = 'flex';
+      if (overlay) overlay.classList.add('visible');
       if (text) text.textContent = 'Загружается обновление...';
       if (reloadBtn) reloadBtn.style.display = 'none';
 
@@ -489,6 +514,8 @@ window.app.initServiceWorker = function() {
           if (fill) fill.style.width = '100%';
           if (text) text.textContent = 'Доступно обновление приложения';
           if (reloadBtn) reloadBtn.style.display = 'inline-block';
+          var uFile2 = document.getElementById('swUpdateFile');
+          if (uFile2) uFile2.textContent = '';
         }
       });
     });
@@ -509,6 +536,16 @@ window.app.initServiceWorker = function() {
           // Фоллбэк: если воркер не найден, просто перезагрузить
           window.location.reload();
         }
+      });
+    }
+
+    // Клик по затемнению → скрыть баннер и оверлей
+    var swOverlay = document.getElementById('swUpdateOverlay');
+    if (swOverlay) {
+      swOverlay.addEventListener('click', function() {
+        var swBanner = document.getElementById('swUpdateBanner');
+        if (swBanner) swBanner.style.display = 'none';
+        swOverlay.classList.remove('visible');
       });
     }
   }).catch(function(err) {
@@ -816,20 +853,28 @@ window.app.openPDFModal = function(url, startPage) {
   var fitScale = 1.5;
 
   function updateZoomLabel() {
-    var pct = Math.round(fitScale * zoomLevel * 100);
+    var pct = (zoomLevel === 1)
+      ? Math.round(fitScale * 100)
+      : Math.round(zoomLevel * 100);
     zoomLabel.textContent = pct + '%';
   }
 
   function zoomIn() {
-    var idx = 0;
-    for (var i = 0; i < ZOOM_STEPS.length; i++) { if (ZOOM_STEPS[i] <= zoomLevel + 0.01) idx = i; }
-    if (idx < ZOOM_STEPS.length - 1) { zoomLevel = ZOOM_STEPS[idx + 1]; if (currentPdf) renderPage(currentPage); }
+    var idx = ZOOM_STEPS.indexOf(zoomLevel);
+    if (idx < 0) idx = ZOOM_STEPS.findIndex(function(s) { return s > zoomLevel; });
+    if (idx < 0) idx = ZOOM_STEPS.length - 1;
+    else if (idx < ZOOM_STEPS.length - 1) idx++;
+    zoomLevel = ZOOM_STEPS[idx];
+    if (currentPdf) renderPage(currentPage);
   }
 
   function zoomOut() {
-    var idx = ZOOM_STEPS.length - 1;
-    for (var i = ZOOM_STEPS.length - 1; i >= 0; i--) { if (ZOOM_STEPS[i] >= zoomLevel - 0.01) idx = i; }
-    if (idx > 0) { zoomLevel = ZOOM_STEPS[idx - 1]; if (currentPdf) renderPage(currentPage); }
+    var idx = ZOOM_STEPS.indexOf(zoomLevel);
+    if (idx < 0) idx = ZOOM_STEPS.findIndex(function(s) { return s >= zoomLevel; }) - 1;
+    if (idx < 0) idx = 0;
+    else if (idx > 0) idx--;
+    zoomLevel = ZOOM_STEPS[idx];
+    if (currentPdf) renderPage(currentPage);
   }
 
   function zoomFit() {
@@ -844,12 +889,11 @@ window.app.openPDFModal = function(url, startPage) {
     currentPdf.getPage(num).then(function(page) {
       var baseViewport = page.getViewport({ scale: 1.5 });
       var wrapWidth = baseWrapWidth - 32;
-      if (wrapWidth <= 0) wrapWidth = canvasWrap.clientWidth - 32;
-      var computedFit = 1.5;
-      if (wrapWidth > 0 && baseViewport.width > wrapWidth) {
-        computedFit = wrapWidth / (baseViewport.width / 1.5);
+      if (wrapWidth > 0) {
+        fitScale = wrapWidth / baseViewport.width;
+      } else {
+        fitScale = 1.5;
       }
-      fitScale = computedFit;
       var scale = fitScale * zoomLevel;
       var viewport = page.getViewport({ scale: scale });
       canvas.width = viewport.width;
@@ -1083,16 +1127,6 @@ function _appInit() {
     app.updateOfflineStatus(true);
   }
 
-  // Network status
-  window.addEventListener('online', function() {
-    var el = document.getElementById('menuNetworkStatus');
-    if (el) { el.textContent = '● Онлайн'; el.style.color = ''; }
-  });
-  window.addEventListener('offline', function() {
-    var el = document.getElementById('menuNetworkStatus');
-    if (el) { el.textContent = '● Офлайн'; el.style.color = 'rgba(255,255,255,0.4)'; }
-  });
-
   // Notes quick button
   initNotesQuickBtn();
 
@@ -1100,9 +1134,5 @@ function _appInit() {
   window.app.navigateTo('main');
 }
 
-// Handle both cases: DOMContentLoaded not yet fired, or already fired
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', _appInit);
-} else {
-  _appInit();
-}
+// Handle DOMContentLoaded for initialization
+document.addEventListener('DOMContentLoaded', _appInit);

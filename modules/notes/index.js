@@ -173,33 +173,15 @@
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    left.innerHTML = '<button class="icon-btn" aria-label="Меню">'
+      + window.ICONS['menu'] + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
 
     center.innerHTML = '<div class="hc-module">Заметки</div>';
 
-    /* Right: ellipsis-vertical menu */
-    var hasAnyNotes = _cachedDrawNotes.length > 0 || _cachedTextNotes.length > 0;
-    var dropdownHtml = '';
-    dropdownHtml += '<div class="notes-header-dropdown">';
-    dropdownHtml += '<button class="notes-header-dropdown-item" data-action="new-draw">'
-      + (window.ICONS['pen-line'] || '') + '<span>Рисунок</span></button>';
-    dropdownHtml += '<button class="notes-header-dropdown-item" data-action="new-text">'
-      + (window.ICONS['type'] || '') + '<span>Текст</span></button>';
-    if (hasAnyNotes) {
-      dropdownHtml += '<div class="notes-header-dropdown-divider"></div>';
-      dropdownHtml += '<button class="notes-header-dropdown-item notes-header-dropdown-item--danger" data-action="delete-all">'
-        + (window.ICONS.trash || '') + '<span>Удалить все</span></button>';
-    }
-    dropdownHtml += '</div>';
-
-    right.innerHTML = '<div class="notes-header-menu" id="notesHeaderMenu">'
-      + '<button class="icon-btn" id="notesMenuBtn" aria-label="Меню">'
-      + (window.ICONS['ellipsis-vertical'] || '')
-      + '</button>'
-      + (_menuOpen ? dropdownHtml : '')
-      + '</div>';
+    /* Right: ellipsis-vertical button (dropdown rendered as floating overlay) */
+    right.innerHTML = '<button class="icon-btn" id="notesMenuBtn" aria-label="Меню">'
+      + (window.ICONS['ellipsis-vertical'] || '') + '</button>';
     right.onclick = null;
 
     /* Menu toggle */
@@ -208,45 +190,86 @@
       menuBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         _menuOpen = !_menuOpen;
-        renderListHeader();
-      });
-    }
-
-    /* Dropdown item handlers */
-    var menuContainer = document.getElementById('notesHeaderMenu');
-    if (menuContainer) {
-      menuContainer.addEventListener('click', function(e) {
-        var item = e.target.closest('.notes-header-dropdown-item');
-        if (!item) return;
-        var action = item.dataset.action;
-        _menuOpen = false;
-        if (action === 'new-draw') {
-          showDrawView();
-        } else if (action === 'new-text') {
-          showTextView();
-        } else if (action === 'delete-all') {
-          handleDeleteAll();
+        if (_menuOpen) {
+          _showMenuOverlay();
+        } else {
+          _hideMenuOverlay();
         }
       });
     }
+  }
 
-    /* Outside click to close menu */
-    setupMenuOutsideClick();
+  function _showMenuOverlay() {
+    _hideMenuOverlay();
+
+    var menuBtn = document.getElementById('notesMenuBtn');
+    if (!menuBtn) return;
+
+    var rect = menuBtn.getBoundingClientRect();
+
+    /* Full-screen overlay (covers header too) */
+    var overlay = document.createElement('div');
+    overlay.className = 'notes-menu-overlay';
+    overlay.id = 'notesMenuOverlay';
+    overlay.addEventListener('click', function() {
+      _menuOpen = false;
+      _hideMenuOverlay();
+    });
+    document.body.appendChild(overlay);
+
+    /* Floating dropdown (positioned near the ⋮ button) */
+    var dropdown = document.createElement('div');
+    dropdown.className = 'notes-header-dropdown notes-header-dropdown--floating';
+    dropdown.id = 'notesMenuDropdown';
+    dropdown.innerHTML = '<button class="notes-header-dropdown-item" data-action="new-draw">'
+      + (window.ICONS['pen-line'] || '') + '<span>Рисунок</span></button>'
+      + '<button class="notes-header-dropdown-item" data-action="new-text">'
+      + (window.ICONS['type'] || '') + '<span>Текст</span></button>'
+      + '<div class="notes-header-dropdown-divider"></div>'
+      + '<button class="notes-header-dropdown-item notes-header-dropdown-item--danger" data-action="delete-all">'
+      + (window.ICONS.trash || '') + '<span>Удалить все</span></button>';
+
+    /* Position below the ⋮ button */
+    dropdown.style.top = (rect.bottom + 4) + 'px';
+    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+
+    dropdown.addEventListener('click', function(e) {
+      var item = e.target.closest('.notes-header-dropdown-item');
+      if (!item) return;
+      var action = item.dataset.action;
+      _menuOpen = false;
+      _hideMenuOverlay();
+      if (action === 'new-draw') {
+        showDrawView();
+      } else if (action === 'new-text') {
+        showTextView();
+      } else if (action === 'delete-all') {
+        handleDeleteAll();
+      }
+    });
+
+    document.body.appendChild(dropdown);
+
+    /* Animate in */
+    requestAnimationFrame(function() {
+      overlay.classList.add('notes-menu-overlay--visible');
+      dropdown.classList.add('notes-header-dropdown--visible');
+    });
+  }
+
+  function _hideMenuOverlay() {
+    var overlay = document.getElementById('notesMenuOverlay');
+    var dropdown = document.getElementById('notesMenuDropdown');
+    if (overlay) overlay.remove();
+    if (dropdown) dropdown.remove();
   }
 
   function setupMenuOutsideClick() {
+    /* No longer needed — overlay click handles closing */
     if (_menuOutsideHandler) {
       document.removeEventListener('pointerdown', _menuOutsideHandler);
+      _menuOutsideHandler = null;
     }
-    if (!_menuOpen) return;
-    _menuOutsideHandler = function(e) {
-      var menu = document.getElementById('notesHeaderMenu');
-      if (menu && !menu.contains(e.target)) {
-        _menuOpen = false;
-        renderListHeader();
-      }
-    };
-    document.addEventListener('pointerdown', _menuOutsideHandler);
   }
 
   function renderDrawHeader() {
@@ -302,13 +325,13 @@
      INIT
      ═══════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
+    // params — всегда объект (контракт MODULE_CONTRACT §5)
     var container = document.getElementById('notesContainer');
     if (!container) { console.error('Контейнер notesContainer не найден!'); return; }
 
-    /* Делегирование: вешать ровно ОДИН раз */
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
+    /* Делегирование: init() вызывается строго один раз (контракт MODULE_CONTRACT §5) */
+    container.addEventListener('click', function(e) {
 
         /* Фото заметки — открыть просмотр PhotoSwipe */
         var imgEl = e.target.closest('.notes-thumb-img img');
@@ -362,8 +385,6 @@
         }
 
       });
-      container.dataset.delegated = 'true';
-    }
 
     /* Сброс состояния */
     _currentView = 'list';
@@ -413,7 +434,7 @@
       })
       .catch(function(err) {
         console.error('Notes load error:', err);
-        container.innerHTML = '<div class="notes-empty"><p class="notes-empty-text">Не удалось загрузить заметки</p></div>';
+        app.showError(container, 'Не удалось загрузить заметки');
       });
   }
 
@@ -436,7 +457,11 @@
     for (var t = 0; t < CATEGORY_TABS.length; t++) {
       var tabClass = 'notes-category-tab';
       if (CATEGORY_TABS[t].key === _activeCategory) tabClass += ' notes-category-tab--active';
-      html += '<button class="' + tabClass + '" data-cat-key="' + CATEGORY_TABS[t].key + '">' + CATEGORY_TABS[t].label + '</button>';
+      var tabStyle = '';
+      if (CAT_COLORS[CATEGORY_TABS[t].key]) {
+        tabStyle = ' style="--pill-border:' + CAT_COLORS[CATEGORY_TABS[t].key] + '"';
+      }
+      html += '<button class="' + tabClass + '" data-cat-key="' + CATEGORY_TABS[t].key + '"' + tabStyle + '>' + CATEGORY_TABS[t].label + '</button>';
     }
     html += '</div>';
 
@@ -485,10 +510,11 @@
       }
     }
 
-    app.hideSkeleton(container, html);
+    app.hideSkeleton(container, '<div class="module-container">' + html + '</div>');
 
-    /* Update header to reflect hasAnyNotes for dropdown menu */
-    renderListHeader();
+    /* Контракт MODULE_CONTRACT §6: init() не вызывает renderHeader().
+       renderListHeader() удалён — выпадающее меню всегда содержит
+       «Удалить все», а при отсутствии заметок показывает toast. */
   }
 
   /* ── Render text note as list item ── */
@@ -571,6 +597,10 @@
   }
 
   function handleDeleteAll() {
+    if (_cachedDrawNotes.length === 0 && _cachedTextNotes.length === 0) {
+      app.showToast('Нет заметок для удаления');
+      return;
+    }
     app.showConfirm('Удалить все заметки?', function() {
       Promise.all([
         openDB().then(function(db) {
@@ -650,7 +680,8 @@
     _currentView = 'list';
     _menuOpen = false;
     _editingTextId = null;
-    /* Clean up menu outside click */
+    /* Clean up menu overlay */
+    _hideMenuOverlay();
     if (_menuOutsideHandler) {
       document.removeEventListener('pointerdown', _menuOutsideHandler);
       _menuOutsideHandler = null;
@@ -810,9 +841,10 @@
     canvas.addEventListener('pointerup', onDrawEnd, { passive: false });
     canvas.addEventListener('pointercancel', onDrawEnd, { passive: false });
 
-    /* Toolbar delegation */
-    var drawScreen = document.querySelector('.notes-draw-screen');
-    if (drawScreen && !drawScreen.dataset.delegated) {
+    /* Toolbar delegation — drawScreen создаётся заново при каждом showDrawView() */
+    var container = document.getElementById('notesContainer');
+    var drawScreen = container ? container.querySelector('.notes-draw-screen') : null;
+    if (drawScreen) {
       drawScreen.addEventListener('click', function(e) {
         /* Stroke size */
         var strokeBtn = e.target.closest('.notes-stroke-btn');
@@ -887,7 +919,6 @@
           return;
         }
       });
-      drawScreen.dataset.delegated = 'true';
     }
   }
 
@@ -973,11 +1004,12 @@
   function initTextEditor(initialCat) {
     _textCategory = initialCat || '';
 
-    var editor = document.querySelector('.notes-text-editor');
+    var container = document.getElementById('notesContainer');
+    var editor = container ? container.querySelector('.notes-text-editor') : null;
     if (!editor) return;
 
-    if (!editor.dataset.delegated) {
-      editor.addEventListener('click', function(e) {
+    /* Делегирование — editor создаётся заново при каждом showTextView() */
+    editor.addEventListener('click', function(e) {
         /* Category pill toggle */
         var pill = e.target.closest('.notes-category-pill');
         if (pill) {
@@ -999,8 +1031,6 @@
           return;
         }
       });
-      editor.dataset.delegated = 'true';
-    }
   }
 
   function handleTextSave() {
@@ -1036,6 +1066,7 @@
     _editingTextId = null;
     _cachedDrawNotes = [];
     _cachedTextNotes = [];
+    _hideMenuOverlay();
     if (_menuOutsideHandler) {
       document.removeEventListener('pointerdown', _menuOutsideHandler);
       _menuOutsideHandler = null;

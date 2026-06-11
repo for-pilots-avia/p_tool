@@ -4,14 +4,29 @@
 
 /* ─── Container — ID-селектор для override .module-container ─── */
 #worktimeContainer {
+  --wt-info-light: rgba(23, 162, 184, 0.1);
+  --wt-success-light: rgba(40, 167, 69, 0.1);
+  --wt-success-ghost: rgba(40, 167, 69, 0.06);
+  --wt-danger-light: rgba(205, 32, 44, 0.1);
+  --wt-danger-ghost: rgba(205, 32, 44, 0.06);
+  --wt-badge-ok-bg: rgba(40, 167, 69, 0.1);
+  --wt-badge-ok-text: #1a7a36;
+  --wt-badge-ok-border: rgba(0, 176, 80, 0.15);
+}
+#worktimeContainer .module-container {
   padding: 20px var(--content-padding-x) 40px;
 }
-@media (min-width: 900px) {
-  #worktimeContainer { max-width: 900px; }
+body.dark-theme #worktimeContainer {
+  --wt-info-light: rgba(90, 200, 250, 0.12);
+  --wt-success-light: rgba(52, 199, 89, 0.12);
+  --wt-success-ghost: rgba(52, 199, 89, 0.08);
+  --wt-danger-light: rgba(230, 57, 70, 0.12);
+  --wt-danger-ghost: rgba(230, 57, 70, 0.08);
+  --wt-badge-ok-bg: rgba(52, 199, 89, 0.12);
+  --wt-badge-ok-text: #34c759;
+  --wt-badge-ok-border: rgba(52, 199, 89, 0.2);
 }
-@media (min-width: 1100px) {
-  #worktimeContainer { max-width: 1100px; }
-}
+/* max-width обеспечивается .module-container из style.css */
 
 /* ─── ct-heading classes ─── */
 .ct-heading-lg {
@@ -60,11 +75,11 @@
   color: var(--color-primary);
 }
 .wt-card-icon--segments {
-  background: rgba(23, 162, 184, 0.1);
+  background: var(--wt-info-light);
   color: var(--color-info);
 }
 .wt-card-icon--results {
-  background: rgba(40, 167, 69, 0.1);
+  background: var(--wt-success-light);
   color: var(--color-success);
 }
 
@@ -302,7 +317,7 @@
 
 /* ─── OK / Warning blocks ─── */
 .wt-ok-block {
-  background: rgba(40, 167, 69, 0.06);
+  background: var(--wt-success-ghost);
   border-radius: var(--border-radius-sm);
   padding: 12px 16px;
   font-size: var(--font-sm);
@@ -318,7 +333,7 @@
   flex-shrink: 0;
 }
 .wt-warning-block {
-  background: rgba(205, 32, 44, 0.06);
+  background: var(--wt-danger-ghost);
   border-radius: var(--border-radius-sm);
   padding: 12px 16px;
   font-size: var(--font-sm);
@@ -401,7 +416,7 @@
   position: fixed;
   inset: 0;
   background: var(--color-overlay);
-  z-index: 1055;
+  z-index: 1105;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s var(--transition-ease), visibility 0.25s var(--transition-ease);
@@ -416,7 +431,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1060;
+  z-index: 1110;
   background: var(--color-bg-card);
   border-radius: 16px 16px 0 0;
   padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
@@ -640,10 +655,23 @@
   transform: scale(0.97);
 }
 
+/* ─── Header dropdown menu overlay ─── */
+.wt-header-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1105;
+  background: var(--color-overlay);
+  opacity: 0;
+  transition: opacity 0.15s var(--transition-ease-out);
+}
+.wt-header-menu-backdrop.open {
+  opacity: 1;
+}
+
 /* ─── Header dropdown menu ─── */
 .wt-header-menu {
   position: fixed;
-  z-index: 1070;
+  z-index: 1110;
   background: var(--color-bg-card);
   border-radius: var(--border-radius-md);
   box-shadow: 0 4px 16px var(--color-shadow-lg), 0 0 0 1px var(--color-border-subtle);
@@ -684,16 +712,24 @@
 }
 @media (hover: hover) {
   .wt-header-menu-item:hover {
-    background: var(--color-badge-ok-bg);
+    background: var(--color-bg-hover);
   }
 }
 .wt-header-menu-item:active {
-  background: var(--color-badge-ok-bg);
+  background: var(--color-bg-hover);
+}
+
+/* ─── Badge overrides (style.css .badge-danger/.badge-ok have hardcoded rgba) ─── */
+#worktimeContainer .badge-danger {
+  background: var(--wt-danger-light);
+}
+#worktimeContainer .badge-ok {
+  background: var(--wt-badge-ok-bg);
 }
 
 /* ─── Close button in bottom-sheet ─── */
 .wt-settings-header .icon-btn {
-  color: var(--color-text-main) !important;
+  color: var(--color-text-main);
 }
 
 /* ─── Inline icon inside settings info blocks ─── */

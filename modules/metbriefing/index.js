@@ -3155,9 +3155,9 @@
     var right = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    left.innerHTML = '<button class="icon-btn" aria-label="\u041D\u0430\u0437\u0430\u0434">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="\u041C\u0435\u043D\u044E" onclick="app.toggleMenu()">'
+      + window.ICONS.menu + '</button>';
+    left.onclick = null;
 
     center.innerHTML = '<div class="hc-module">\u041C\u0435\u0442\u0435\u043E\u0431\u0440\u0438\u0444\u0438\u043D\u0433</div>';
 
@@ -3173,19 +3173,20 @@
   //  INIT
   // ═══════════════════════════════════════════
 
-  function init() {
+  function init(params) {
     var container = document.getElementById('metbriefingContainer');
     if (!container) { console.error('\u041A\u043E\u043D\u0442\u0435\u0439\u043D\u0435\u0440 metbriefingContainer \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D!'); return; }
 
-    // Build shell structure
+    // Build shell structure — wrap in .module-container per §7
     container.innerHTML =
+        '<div class="module-container">' +
         '<div id="metbriefing-route-card" class="metbriefing-route-card"></div>' +
         '<div id="metbriefing-tab-switcher" class="metbriefing-tab-switcher"></div>' +
-        '<div id="metbriefing-tab-content" class="metbriefing-tab-content"></div>';
+        '<div id="metbriefing-tab-content" class="metbriefing-tab-content"></div>' +
+        '</div>';
 
-    // Event delegation — exactly ONCE
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
+    // Event delegation
+    container.addEventListener('click', function(e) {
         // Tab pills
         var tabPill = e.target.closest('.metbriefing-tab-pill');
         if (tabPill && tabPill.getAttribute('data-tab')) {
@@ -3335,9 +3336,7 @@
           renderCurrentTab();
           return;
         }
-      });
-      container.dataset.delegated = 'true';
-    }
+    });
 
     // Load cached data
     loadStationCache();

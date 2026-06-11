@@ -38,7 +38,7 @@
     align-items: center; justify-content: center;
     color: #fff; font-family: sans-serif;
   ">
-    <div style="font-size: 2rem; margin-bottom: 16px;">✈️</div>
+    <div style="margin-bottom: 16px;"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
     <p style="margin-bottom: 16px; font-size: 1rem;">Подготовка к работе offline...</p>
     <div style="width: 240px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px;">
       <div id="cacheProgressBar" style="
@@ -47,7 +47,11 @@
       "></div>
     </div>
     <p id="cacheProgressText" style="margin-top: 12px; font-size: 0.875rem; opacity: 0.8;">0%</p>
+    <p id="cacheProgressFile" style="margin-top: 8px; font-size: 0.75rem; opacity: 0.6; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
   </div>
+
+  <!-- Затемнение при обновлении SW -->
+  <div id="swUpdateOverlay" class="sw-update-overlay"></div>
 
   <!-- Баннер обновления SW -->
   <div id="swUpdateBanner" style="
@@ -65,6 +69,7 @@
         display: none;
       ">Обновить</button>
     </div>
+    <span id="swUpdateFile" style="font-size: 0.75rem; opacity: 0.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
     <div id="swUpdateProgress" style="
       height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;
     ">
@@ -90,13 +95,10 @@
     <div id="menuOverlay" class="menu-overlay"></div>
 
     <nav id="sideMenu" class="side-menu">
-      <div class="menu-banner">
-        <span class="menu-banner-icon" id="menuBannerIcon"></span>
-        <div class="menu-banner-info">
-          <span class="menu-banner-title">Fly safe!</span>
-          <span class="menu-banner-network" id="menuNetworkStatus"></span>
-        </div>
-      </div>
+      <button class="menu-home-btn" onclick="app.navigateTo('main')" aria-label="Главный экран">
+        <span id="menuHomeIcon"></span>
+        <span>Главный экран</span>
+      </button>
 
       <ul class="menu-list" id="menuList">
         <!-- Menu items are generated dynamically by app.js from registry -->
@@ -141,64 +143,69 @@
       <button id="notesQuickBtn" class="notes-quick-btn" aria-label="Быстрое рисование"></button>
     </div>
 
-    <!-- Worktime Screen -->
+    <!-- 1. Worktime Screen -->
     <div id="worktimeScreen" class="screen">
-      <div class="module-container" id="worktimeContainer"></div>
+      <div id="worktimeContainer"></div>
     </div>
 
-    <!-- Phonebook Screen -->
-    <div id="phonebookScreen" class="screen">
-      <div class="module-container" id="phonebookContainer"></div>
-    </div>
-
-    <!-- Quiz Screen -->
-    <div id="quizScreen" class="screen">
-      <div class="module-container" id="quizContainer"></div>
-    </div>
-
-    <!-- Checklists Screen -->
-    <div id="checklistsScreen" class="screen">
-      <div class="module-container" id="checklistsContainer"></div>
-    </div>
-
-    <!-- KRS Screen -->
-    <div id="krsScreen" class="screen">
-      <div class="module-container" id="krsContainer"></div>
-    </div>
-
-    <!-- Flight Procedures Screen -->
-    <div id="flightproceduresScreen" class="screen">
-      <div class="module-container" id="flightproceduresContainer"></div>
-    </div>
-
-    <!-- Notes Screen -->
-    <div id="notesScreen" class="screen">
-      <div class="module-container" id="notesContainer"></div>
-    </div>
-
-    <!-- FAQ Screen -->
-    <div id="faqScreen" class="screen">
-      <div class="module-container" id="faqContainer"></div>
-    </div>
-
-    <!-- Metbriefing Screen -->
+    <!-- 2. Metbriefing Screen -->
     <div id="metbriefingScreen" class="screen">
-      <div class="module-container" id="metbriefingContainer"></div>
+      <div id="metbriefingContainer"></div>
     </div>
 
-    <!-- Checkride Screen -->
-    <div id="checkrideScreen" class="screen">
-      <div class="module-container" id="checkrideContainer"></div>
+    <!-- 3. Checklists Screen -->
+    <div id="checklistsScreen" class="screen">
+      <div id="checklistsContainer"></div>
     </div>
 
-    <!-- FFS Training Screen -->
-    <div id="ffstrainingScreen" class="screen">
-      <div class="module-container" id="ffstrainingContainer"></div>
+    <!-- 4. KRS Screen -->
+    <div id="krsScreen" class="screen">
+      <div id="krsContainer"></div>
     </div>
 
-    <!-- Survey Screen -->
+    <!-- 5. Flight Procedures Screen -->
+    <div id="flightproceduresScreen" class="screen">
+      <div id="flightproceduresContainer"></div>
+    </div>
+
+    <!-- 6. Rules of Thumb Screen -->
+    <div id="rulesthumbScreen" class="screen">
+      <div id="rulesthumbContainer"></div>
+    </div>
+
+    <!-- 7. Survey Screen -->
     <div id="surveyScreen" class="screen">
-      <div class="module-container" id="surveyContainer"></div>
+      <div id="surveyContainer"></div>
+    </div>
+
+    <!-- 8. FFS Training Screen -->
+    <div id="ffstrainingScreen" class="screen">
+      <div id="ffstrainingContainer"></div>
+    </div>
+
+    <!-- 9. Checkride Screen -->
+    <div id="checkrideScreen" class="screen">
+      <div id="checkrideContainer"></div>
+    </div>
+
+    <!-- 10. Quiz Screen -->
+    <div id="quizScreen" class="screen">
+      <div id="quizContainer"></div>
+    </div>
+
+    <!-- 11. Phonebook Screen -->
+    <div id="phonebookScreen" class="screen">
+      <div id="phonebookContainer"></div>
+    </div>
+
+    <!-- 12. Notes Screen -->
+    <div id="notesScreen" class="screen">
+      <div id="notesContainer"></div>
+    </div>
+
+    <!-- 13. FAQ Screen -->
+    <div id="faqScreen" class="screen">
+      <div id="faqContainer"></div>
     </div>
 
     <!-- ═══ GLOBAL TOAST ═══ -->
@@ -221,17 +228,18 @@
   <script src="icons.js"></script>
   <script src="modules/registry.js"></script>
   <script src="modules/worktime/index.js"></script>
+  <script src="modules/metbriefing/index.js"></script>
   <script src="modules/checklists/index.js"></script>
-  <script src="modules/flightprocedures/index.js"></script>
   <script src="modules/krs/index.js"></script>
-  <script src="modules/phonebook/index.js"></script>
+  <script src="modules/flightprocedures/index.js"></script>
+  <script src="modules/rulesthumb/index.js"></script>
+  <script src="modules/survey/index.js"></script>
+  <script src="modules/ffstraining/index.js"></script>
+  <script src="modules/checkride/index.js"></script>
   <script src="modules/quiz/index.js"></script>
+  <script src="modules/phonebook/index.js"></script>
   <script src="modules/notes/index.js"></script>
   <script src="modules/faq/index.js"></script>
-  <script src="modules/metbriefing/index.js"></script>
-  <script src="modules/checkride/index.js"></script>
-  <script src="modules/ffstraining/index.js"></script>
-  <script src="modules/survey/index.js"></script>
   <script src="app.js"></script>
   <script>app.initServiceWorker();</script>
 </body>

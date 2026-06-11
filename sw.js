@@ -1,17 +1,22 @@
 /* Pilot's Tool — Service Worker v24 */
 
-var CACHE_NAME = 'pilots-tool-v30';
+var CACHE_NAME = 'pilots-tool-v29';
 
 var JSON_MODULE_NAMES = {
-  'modules/aviation_sayings.json':                        'Авиационные цитаты',
-  'modules/phonebook/data/phonebook.json':                'Телефонный справочник',
+  'modules/metbriefing/data/metbriefing.json':            'Метео брифинг',
   'modules/checklists/data/checklists.json':              'Чеклисты',
   'modules/krs/data/krs.json':                            'Указания КРС',
   'modules/flightprocedures/data/flightprocedures.json':  'Лётные процедуры',
-  'modules/ffstraining/data/ffstraining.json':            'FFS Training',
+  'modules/rulesthumb/data/rulesthumb.json':              'Rules of Thumb',
   'modules/survey/data/survey.json':                     'Контрольный опрос',
+  'modules/ffstraining/data/ffstraining.json':            'FFS Training',
   'modules/checkride/data/line.json':                    'Checkride LINE',
-  'modules/checkride/data/ffs.json':                     'Checkride FFS'
+  'modules/checkride/data/ffs.json':                     'Checkride FFS',
+  'modules/quiz/data/test-TB.json':                      'Quiz test1',
+  'modules/quiz/data/test-visual.json':                  'Quiz test2',
+  'modules/phonebook/data/phonebook.json':               'Телефонный справочник',
+  'modules/faq/data/faq.json':                            'FAQ',
+  'modules/aviation_sayings.json':                        'Авиационные цитаты'
 };
 
 var STATIC_ASSETS = [
@@ -34,47 +39,54 @@ var STATIC_ASSETS = [
   // Модули JS
   './modules/registry.js',
   './modules/worktime/index.js',
+  './modules/metbriefing/index.js',
   './modules/checklists/index.js',
-  './modules/flightprocedures/index.js',
   './modules/krs/index.js',
-  './modules/phonebook/index.js',
+  './modules/flightprocedures/index.js',
+  './modules/rulesthumb/index.js',
+  './modules/survey/index.js',
+  './modules/ffstraining/index.js',
+  './modules/checkride/index.js',
   './modules/quiz/index.js',
+  './modules/phonebook/index.js',
   './modules/notes/index.js',
   './modules/faq/index.js',
-  './modules/metbriefing/index.js',
-  './modules/checkride/index.js',
-  './modules/ffstraining/index.js',
-  './modules/survey/index.js',
-  './modules/rulesthumb/index.js',
   // Модули CSS (подгружаются динамически через registry.ensureCss)
   './modules/worktime/worktime.css',
+  './modules/metbriefing/metbriefing.css',
   './modules/checklists/checklists.css',
-  './modules/flightprocedures/flightprocedures.css',
   './modules/krs/krs.css',
-  './modules/phonebook/phonebook.css',
+  './modules/flightprocedures/flightprocedures.css',
+  './modules/rulesthumb/rulesthumb.css',
+  './modules/survey/survey.css',
+  './modules/ffstraining/ffstraining.css',
+  './modules/checkride/checkride.css',
   './modules/quiz/quiz.css',
+  './modules/phonebook/phonebook.css',
   './modules/notes/notes.css',
   './modules/faq/faq.css',
-  './modules/metbriefing/metbriefing.css',
-  './modules/checkride/checkride.css',
-  './modules/ffstraining/ffstraining.css',
-  './modules/survey/survey.css',
-  './modules/rulesthumb/rulesthumb.css',
   // JSON данных
-  './modules/phonebook/data/phonebook.json',
+  './modules/metbriefing/data/metbriefing.json',
   './modules/checklists/data/checklists.json',
   './modules/krs/data/krs.json',
   './modules/flightprocedures/data/flightprocedures.json',
+  './modules/rulesthumb/data/rulesthumb.json',
+  './modules/survey/data/survey.json',
   './modules/ffstraining/data/ffstraining.json',
+  './modules/checkride/data/line.json',
+  './modules/checkride/data/ffs.json',
+  './modules/quiz/data/test-TB.json',
+  './modules/quiz/data/test-visual.json',
+  './modules/phonebook/data/phonebook.json',
+  './modules/faq/data/faq.json',
+  './modules/aviation_sayings.json',
+  // Документы
+  './modules/docs/AOMA.pdf',
+  './modules/docs/AOMB.pdf',
+  // Медиа
   './modules/flightprocedures/data/maneuvers_stall.html',
   './modules/flightprocedures/data/ext_walk1.png',
   './modules/ffstraining/data/ext_walk1.png',
-  './modules/docs/AOMA.pdf',
-  './modules/docs/AOMB.pdf',
-  './modules/aviation_sayings.json',
-  './modules/survey/data/survey.json',
-  './modules/checkride/data/line.json',
-  './modules/checkride/data/ffs.json',
   // Библиотеки
   './libs/photoswipe/photoswipe.min.js',
   './libs/photoswipe/photoswipe-ui-default.min.js',
@@ -113,7 +125,8 @@ self.addEventListener('install', function(event) {
                 type: 'CACHE_PROGRESS',
                 progress: cached / total,
                 cached: cached,
-                total: total
+                total: total,
+                url: url
               });
             });
         })

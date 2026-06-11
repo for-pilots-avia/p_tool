@@ -34,8 +34,9 @@ body.dark-theme #krsContainer {
   --color-badge-old-text: #adb5bd;
 }
 
-/* ─── Accordion: collapsible-title, chevron, marquee ─── */
-/* MODULE_CONTRACT §7: стили аккордеона — в модуле, не в style.css */
+/* ─── Accordion base classes (контракт MODULE_CONTRACT v4.1 §7) ─── */
+/* Унифицированных базовых классов в style.css НЕТ — модуль объявляет всё сам. */
+/* @keyframes marquee — единственное исключение, остаётся в style.css. */
 
 .collapsible-title {
   flex: 1;
@@ -44,19 +45,9 @@ body.dark-theme #krsContainer {
   white-space: nowrap;
 }
 
-@keyframes krs-marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 .marquee-inner {
   display: inline-block;
   white-space: nowrap;
-}
-
-.krs-block--open .marquee-inner.is-overflowing {
-  animation: krs-marquee 10s linear infinite;
-  padding-right: 48px;
 }
 
 .collapsible-chevron {
@@ -68,9 +59,21 @@ body.dark-theme #krsContainer {
   color: var(--color-text-muted);
   transition: transform var(--transition-speed) var(--transition-ease);
 }
-.collapsible-chevron svg { width: 20px; height: 20px; }
+.collapsible-chevron svg {
+  width: 20px;
+  height: 20px;
+}
 
-.krs-block--open > .krs-block-header > .collapsible-chevron {
+/* ─── Accordion: context-specific selectors ─── */
+
+/* Marquee при открытом блоке (базовый @keyframes marquee — в style.css) */
+.krs-block.open .marquee-inner.is-overflowing {
+  animation: marquee 10s linear infinite;
+  padding-right: 48px;
+}
+
+/* Поворот шеврона при открытом блоке */
+.krs-block.open > .krs-block-header > .collapsible-chevron {
   transform: rotate(180deg);
 }
 
@@ -177,7 +180,7 @@ body.dark-theme #krsContainer {
               box-shadow var(--transition-speed) var(--transition-ease);
 }
 
-.krs-block--open {
+.krs-block.open {
   border-left-color: var(--color-primary);
   box-shadow: 0 2px 8px var(--color-shadow-sm);
 }
@@ -243,9 +246,8 @@ body.dark-theme #krsContainer {
 }
 
 /* ─── Block Title (marquee on open) ─── */
-/* Заголовок обёрнут в .collapsible-title > .marquee-inner (глобальные классы).
-   Marquee активируется при раскрытии аккордеона через CSS в style.css:
-   .krs-block.open .marquee-inner.is-overflowing { animation: marquee ... } */
+/* Заголовок обёрнут в .collapsible-title > .marquee-inner (базовые классы из style.css).
+   Marquee активируется при раскрытии аккордеона через контекстный селектор выше. */
 .krs-block-header .collapsible-title {
   flex: 1;
   min-width: 0;
@@ -418,25 +420,26 @@ body.dark-theme #krsContainer {
   color: var(--color-text-secondary);
 }
 
-/* ─── Sort Menu ─── */
+/* ─── Sort Overlay ─── */
 .krs-sort-overlay {
   position: fixed;
   inset: 0;
-  z-index: 800;
+  z-index: 1150;
   background: var(--color-overlay);
-  animation: krsSortFadeIn 0.15s var(--transition-ease-out) forwards;
+  animation: krsSortOverlayIn 0.15s var(--transition-ease-out);
 }
 
-@keyframes krsSortFadeIn {
+@keyframes krsSortOverlayIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
+/* ─── Sort Menu ─── */
 .krs-sort-menu {
   position: fixed;
   top: calc(var(--header-height) + 4px);
   right: 8px;
-  z-index: 801;
+  z-index: 1151;
   background: var(--color-bg-main);
   border-radius: var(--border-radius-md);
   box-shadow: 0 4px 16px var(--color-shadow-lg);

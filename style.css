@@ -144,10 +144,8 @@ html { font-size: 16px; }
 }
 
 /* Touch-action */
-button, .menu-item, .contact-item, .krs-block-header,
-.fp-phase-header, .fp-procedure-header, .contact-phone,
-.contact-email, .icon-btn, .commits-panel-close,
-.commits-action-item, .notes-fab, .notes-stroke-btn, .notes-tool-clear {
+button, .menu-item, .contact-item, .contact-phone,
+.contact-email, .icon-btn {
   touch-action: manipulation;
 }
 
@@ -211,6 +209,7 @@ button:focus:not(:focus-visible) { outline: none; }
   height: var(--header-height);
   padding: 0 4px;
   box-sizing: border-box;
+  color: var(--color-text-white);
 }
 
 @media (min-width: 376px)  { .header-inner { padding: 0 8px; } }
@@ -287,21 +286,29 @@ button:focus:not(:focus-visible) { outline: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   background: none;
   border: none;
-  color: var(--color-text-white);
   cursor: pointer;
-  padding: 0;
   border-radius: var(--border-radius-sm);
-  font-family: var(--font-main);
+  color: inherit;
+  opacity: 1;
+  transition: opacity var(--transition-speed);
 }
 .icon-btn svg {
   width: 24px;
   height: 24px;
-  stroke: currentColor;
-  fill: none;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+@media (hover: hover) {
+  .icon-btn:hover { background: var(--color-bg-hover); }
 }
 
 .header-inner.search-active #headerLeft button {
@@ -323,6 +330,17 @@ button:focus:not(:focus-visible) { outline: none; }
 }
 .menu-overlay.open { opacity: 1; visibility: visible; }
 
+/* ── SW Update Overlay ── */
+.sw-update-overlay {
+  position: fixed; inset: 0;
+  background: var(--color-overlay);
+  z-index: 9997;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--transition-speed) var(--transition-ease),
+              visibility var(--transition-speed) var(--transition-ease);
+}
+.sw-update-overlay.visible { opacity: 1; visibility: visible; }
+
 .side-menu {
   position: fixed;
   top: 0;
@@ -343,50 +361,37 @@ button:focus:not(:focus-visible) { outline: none; }
   transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
-.menu-banner {
+.menu-home-btn {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: calc(20px + env(safe-area-inset-top, 0px)) 20px 20px;
-  min-height: 100px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  width: 100%;
+  padding: 0 20px;
+  height: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+  font-family: var(--font-main);
+  font-size: var(--font-md);
+  font-weight: 600;
+  cursor: pointer;
   flex-shrink: 0;
+  box-sizing: border-box;
+  text-align: left;
+  transition: background 0.15s ease;
 }
-.menu-banner-icon {
+.menu-home-btn:hover {
+  background: var(--color-primary-dark);
+}
+.menu-home-btn span:first-child {
   display: inline-flex;
   align-items: center;
-  color: var(--color-text-white);
-  opacity: 0.95;
   flex-shrink: 0;
 }
-.menu-banner-icon svg { width: 24px; height: 24px; }
-.menu-banner-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-.menu-banner-title {
-  font-family: var(--font-accent);
-  font-size: var(--font-xl);
-  font-weight: 700;
-  color: var(--color-text-white);
-  letter-spacing: 0.01em;
-}
-.menu-banner-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.menu-banner-version {
-  font-size: var(--font-xs);
-  color: var(--color-on-primary-text-dim);
-  font-family: var(--font-main);
-}
-.menu-banner-network {
-  font-size: var(--font-xs);
-  color: var(--color-on-primary-text-dim);
-  font-family: var(--font-main);
+.menu-home-btn span:first-child svg {
+  width: 22px;
+  height: 22px;
 }
 
 .menu-list {
@@ -396,6 +401,25 @@ button:focus:not(:focus-visible) { outline: none; }
   flex-shrink: 0;
 }
 .menu-list--controls { padding: 4px 0; }
+
+.menu-list--controls .menu-item {
+  padding: 10px 20px;
+  min-height: 40px;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  border-bottom: none;
+  gap: 10px;
+}
+.menu-list--controls .menu-item:hover {
+  background: var(--color-border-subtle);
+}
+.menu-list--controls .menu-icon {
+  color: var(--color-text-secondary);
+  width: 20px; height: 20px;
+}
+.menu-list--controls .menu-icon svg {
+  width: 16px; height: 16px;
+}
 
 .menu-item {
   display: flex;
@@ -487,6 +511,7 @@ button:focus:not(:focus-visible) { outline: none; }
 .menu-offline-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 
@@ -709,7 +734,7 @@ button:focus:not(:focus-visible) { outline: none; }
 
 #mainScreen .main-quote-mark {
   position: absolute;
-  font-size: 2.4em;
+  font-size: 1.8em;
   color: rgba(255,255,255,0.45);
   font-family: var(--font-accent);
   line-height: 1;
@@ -746,22 +771,22 @@ button:focus:not(:focus-visible) { outline: none; }
 /* ─── Responsive quote scaling ─── */
 @media (min-width: 375px) {
   #mainScreen .main-quote { font-size: 1.5rem; }
-  #mainScreen .main-quote-mark { font-size: 2.6em; }
+  #mainScreen .main-quote-mark { font-size: 2em; }
 }
 
 @media (min-width: 414px) {
   #mainScreen .main-quote { font-size: 1.625rem; }
-  #mainScreen .main-quote-mark { font-size: 2.8em; }
+  #mainScreen .main-quote-mark { font-size: 2.1em; }
 }
 
 @media (min-width: 768px) {
   #mainScreen .main-quote { font-size: 1.875rem; }
-  #mainScreen .main-quote-mark { font-size: 3.2em; }
+  #mainScreen .main-quote-mark { font-size: 2.4em; }
 }
 
 @media (min-width: 1024px) {
   #mainScreen .main-quote { font-size: 2rem; }
-  #mainScreen .main-quote-mark { font-size: 3.5em; }
+  #mainScreen .main-quote-mark { font-size: 2.6em; }
 }
 
 .main-quote-text {
@@ -794,8 +819,8 @@ button:focus:not(:focus-visible) { outline: none; }
 #notesQuickBtn {
   position: absolute;
   z-index: 10;
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   border: none;
   background: linear-gradient(135deg, rgba(160, 26, 36, 0.45), rgba(205, 32, 44, 0.65));
@@ -806,21 +831,36 @@ button:focus:not(:focus-visible) { outline: none; }
   align-items: center;
   justify-content: center;
   cursor: grab;
-  box-shadow: 0 4px 16px var(--color-shadow-primary),
-              0 1px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 3px 12px var(--color-shadow-primary),
+              0 1px 3px rgba(0,0,0,0.25);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   transition: box-shadow 0.2s var(--transition-ease),
               transform  0.2s var(--transition-ease);
-  bottom: calc(32px + env(safe-area-inset-bottom, 0px));
-  right: 20px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  right: 16px;
 }
 
 #notesQuickBtn svg {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  #notesQuickBtn {
+    width: 60px;
+    height: 60px;
+    bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    right: 20px;
+    box-shadow: 0 4px 16px var(--color-shadow-primary),
+                0 1px 4px rgba(0,0,0,0.3);
+  }
+  #notesQuickBtn svg {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 #notesQuickBtn.dragging {
@@ -844,83 +884,6 @@ body.dark-theme #notesQuickBtn {
                 0 2px 6px rgba(0,0,0,0.35);
   }
 }
-
-/* ═══════════════════════════════════════════
-   SECTION 4.5: ACCORDION CHEVRON (GLOBAL)
-   ═══════════════════════════════════════════ */
-.collapsible-title {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-@keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.marquee-inner {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.krs-block.open       .marquee-inner.is-overflowing,
-.checklist-block.open .marquee-inner.is-overflowing,
-.fp-phase.open        .marquee-inner.is-overflowing,
-.fp-procedure.open    .marquee-inner.is-overflowing {
-  animation: marquee 10s linear infinite;
-  padding-right: 48px;
-}
-
-.collapsible-chevron {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  color: inherit;
-  transition: transform var(--transition-speed) var(--transition-ease);
-}
-.collapsible-chevron svg { width: 20px; height: 20px; }
-
-.krs-block.open       > .krs-block-header      > .collapsible-chevron,
-.checklist-block.open > .checklist-block-header > .collapsible-chevron,
-.fp-phase.open        > .fp-phase-header        > .collapsible-chevron,
-.fp-procedure.open    > .fp-procedure-header    > .collapsible-chevron {
-  transform: rotate(180deg);
-}
-
-/* ═══════════════════════════════════════════
-   SECTION 4 continued: DIVIDERS & MISC
-   ═══════════════════════════════════════════ */
-.list-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px var(--content-padding-x) 6px;
-  pointer-events: none;
-  user-select: none;
-}
-
-.list-divider::before,
-.list-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-
-.list-divider-label {
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.list-divider:not(:has(.list-divider-label))::before { flex: 1; }
-.list-divider:not(:has(.list-divider-label))::after  { display: none; }
 
 /* ─── Module container ─── */
 .module-container {
@@ -956,31 +919,6 @@ body.dark-theme #notesQuickBtn {
   gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
-}
-
-/* ─── Badges ─── */
-.badge-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-danger);
-  background: rgba(205, 32, 44, 0.1);
-  padding: 2px 8px;
-  border-radius: var(--border-radius-xs);
-}
-.badge-danger svg { width: 14px; height: 14px; }
-
-.badge-ok {
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-success);
-  background: rgba(40, 167, 69, 0.1);
-  padding: 2px 8px;
-  border-radius: var(--border-radius-xs);
 }
 
 /* ─── Buttons ─── */
@@ -1049,48 +987,14 @@ body.dark-theme #notesQuickBtn {
   .btn-danger-outline:hover { background: rgba(205, 32, 44, 0.08); }
 }
 
-/* ─── Placeholder screens ─── */
-.placeholder-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px var(--content-padding-x);
-  text-align: center;
-  min-height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0px) - 60px);
-}
-.placeholder-screen svg {
-  width: 64px;
-  height: 64px;
-  color: var(--color-text-muted);
-  margin-bottom: 16px;
-  opacity: 0.4;
-}
-.placeholder-screen h2 {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  color: var(--color-text-main);
-  margin: 0 0 8px;
-}
-.placeholder-screen p {
-  font-size: var(--font-sm);
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-
 /* ─── Responsive tweaks ─── */
 @media (min-width: 376px) {
   .menu-item { font-size: var(--font-base); }
 }
 
 @media (min-width: 768px) {
-  .contact-item, .krs-block-header { min-height: 56px; }
+  .contact-item { min-height: 56px; }
   .menu-item { font-size: var(--font-md); padding: 16px 20px; }
-}
-
-@media (hover: hover) {
-  .icon-btn:hover   { opacity: 0.85; }
-  .contact-item:hover { background: var(--color-bg-hover); }
 }
 
 /* ═══════════════════════════════════════════
@@ -1214,10 +1118,33 @@ body.dark-theme #notesQuickBtn {
 }
 
 /* ═══════════════════════════════════════════
-   PHOTO VIEWER — PhotoSwipe v4 (контракт: SHELL_CONTRACT §6)
-   PhotoSwipe обрабатывает собственный UI через .pswp шаблон в index.html.
-   Дополнительные стили не требуются — всё включено в photoswipe.css + default-skin.css.
+   PHOTO VIEWER — PhotoSwipe v4 (контракт: SHELL_BUILD §5)
+   PhotoSwipe обрабатывает собственный UI через .pswp шаблон.
+   Preloader заменён на SVG-самолётик из icons.js (вместо preloader.gif).
    ═══════════════════════════════════════════ */
+
+/* Override PhotoSwipe preloader: spinning plane icon instead of preloader.gif */
+.pswp__preloader__icn {
+  background: none !important;
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+}
+.pswp__preloader__icn::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: pswp-plane-spin 1.2s linear infinite;
+}
+@keyframes pswp-plane-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 
 /* ═══════════════════════════════════════════
    PDF VIEWER — PDF.js v3 (контракт: SHELL_CONTRACT §6)
@@ -1348,4 +1275,22 @@ body.dark-theme #notesQuickBtn {
   min-height: 36px;
 }
 
+/* ═══════════════════════════════════════════
+   ACCORDION ANIMATION (контракт MODULE_CONTRACT v4.1 §7)
+   @keyframes marquee — единственный общий ресурс для аккордеонов.
+   Базовых классов НЕТ — каждый модуль объявляет всё сам в {name}.css.
+   ═══════════════════════════════════════════ */
+/* @keyframes marquee — единственное аккордеон-правило в style.css.
+   Контракт MODULE_CONTRACT v4.1 §7: унифицированных базовых классов нет —
+   каждый модуль объявляет .collapsible-title, .marquee-inner, .collapsible-chevron
+   самостоятельно в своём {name}.css. Дублировать @keyframes не нужно. */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
+/* ─── Marquee gap span (создаётся динамически в app.initMarquee) ─── */
+.mq-gap {
+  display: inline-block;
+  width: 48px;
+}
