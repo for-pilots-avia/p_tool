@@ -1,4 +1,4 @@
-/* Pilot's Tool — Service Worker v30 */
+/* Pilot's Tool — Service Worker v24 */
 
 var CACHE_NAME = 'pilots-tool-v30';
 
@@ -100,7 +100,10 @@ var STATIC_ASSETS = [
   './background-mobile.webp',
   './background-mobile.jpg',
   './background-desktop.webp',
-  './background-desktop.jpg'
+  './background-desktop.jpg',
+  // Скриншоты PWA (manifest.json screenshots)
+  './screenshots/screenshot-mobile.png',
+  './screenshots/screenshot-desktop.png'
 ];
 
 /* Единый канал для всех сообщений SW → страница */
@@ -113,25 +116,31 @@ self.addEventListener('install', function(event) {
       var cached = 0;
       var total = STATIC_ASSETS.length;
 
+      var failed = 0;
+
       return Promise.allSettled(
         STATIC_ASSETS.map(function(url) {
           return cache.add(url)
-            .catch(function(err) {
-              console.warn('SW: не удалось кэшировать:', url, err);
-            })
             .then(function() {
               cached++;
+            })
+            .catch(function(err) {
+              failed++;
+              console.warn('SW: не удалось кэшировать:', url, err);
+            })
+            .finally(function() {
               progressChannel.postMessage({
                 type: 'CACHE_PROGRESS',
-                progress: cached / total,
+                progress: (cached + failed) / total,
                 cached: cached,
                 total: total,
+                failed: failed,
                 url: url
               });
             });
         })
       ).then(function() {
-        progressChannel.postMessage({ type: 'CACHE_DONE' });
+        progressChannel.postMessage({ type: 'CACHE_DONE', failed: failed });
       });
     }).then(function() {
       return self.skipWaiting();

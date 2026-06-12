@@ -233,6 +233,59 @@ body.dark-theme #checkrideContainer {
   line-height: 1.4;
 }
 
+/* Grade dropdown for Стандартные процедуры */
+.checkride-grade-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: var(--font-base);
+  color: var(--color-text-main);
+}
+
+.checkride-grade-label {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.checkride-grade-select {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  padding-right: 30px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-size: var(--font-sm);
+  font-family: var(--font-main);
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-width: 64px;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  transition: border-color 0.15s var(--transition-ease);
+}
+
+.checkride-grade-select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* Grade result in report */
+.checkride-grade-na {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  font-style: italic;
+}
+
 .checkride-radio-group {
   padding: 8px 0;
 }
@@ -575,6 +628,12 @@ body.dark-theme #checkrideContainer {
   margin-bottom: 4px;
 }
 
+#checkrideContainer .checkride-competency-toggle .list-divider-label {
+  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 #checkrideContainer .checkride-competency-count {
   font-size: var(--font-xs);
   color: var(--color-text-muted);
@@ -692,14 +751,25 @@ body.dark-theme #checkrideContainer {
   color: var(--color-text-secondary);
 }
 
+/* Flight time input in report */
+.checkride-report-input {
+  display: inline-block;
+  width: auto;
+  min-width: 120px;
+  padding: 6px 10px;
+  margin: 0 0 0 4px;
+  font-size: var(--font-sm);
+  vertical-align: baseline;
+}
+
 #checkride-signature {
   border: 1px solid var(--color-border);
   background: var(--color-bg-main);
   width: 100%;
-  height: 150px;
   touch-action: none;
   margin-top: 8px;
   border-radius: var(--border-radius-xs);
+  display: block;
 }
 
 .checkride-report-actions {

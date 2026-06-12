@@ -397,6 +397,42 @@
   font-size: 0.78rem;
 }
 
+/* ─── Mobile font comfort (formulas & calculator) ─── */
+@media (max-width: 599px) {
+  .rt-formula {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+  .rt-example {
+    font-size: 0.84rem;
+  }
+  .rt-calc-toggle {
+    font-size: 0.84rem;
+    padding: 6px 14px;
+  }
+  .rt-calc-label {
+    font-size: 0.85rem;
+    min-width: 70px;
+  }
+  .rt-calc-unit {
+    font-size: 0.78rem;
+  }
+  .rt-calc-field {
+    font-size: 0.9rem;
+    padding: 7px 10px;
+  }
+  .rt-calc-btn {
+    font-size: 0.85rem;
+    padding: 8px 18px;
+  }
+  .rt-calc-result {
+    font-size: 0.9rem;
+  }
+  .rt-calc-error {
+    font-size: 0.84rem;
+  }
+}
+
 /* ═══════════════════════════════════════════
    TIP CARDS (B737)
    ═══════════════════════════════════════════ */

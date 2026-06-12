@@ -361,6 +361,24 @@ button:focus:not(:focus-visible) { outline: none; }
   transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
+body.menu-open {
+  overflow: hidden;
+  touch-action: none;
+}
+body.menu-open .side-menu {
+  touch-action: pan-y;
+}
+
+body.confirm-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+body.pdf-modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
 .menu-home-btn {
   display: flex;
   align-items: center;
@@ -452,8 +470,6 @@ button:focus:not(:focus-visible) { outline: none; }
   background: var(--color-primary-ghost);
   color: var(--color-primary);
   font-weight: 500;
-  border-left: 3px solid var(--color-primary);
-  padding-left: 17px;
   position: relative;
 }
 .menu-item--active .menu-icon { color: var(--color-primary); }
@@ -537,7 +553,6 @@ button:focus:not(:focus-visible) { outline: none; }
 @media (min-width: 768px) {
   .side-menu { width: 300px; }
   .menu-item { font-size: var(--font-md); padding: 16px 20px; }
-  .menu-item--active { padding-left: 17px; }
 }
 
 /* ═══════════════════════════════════════════
@@ -673,10 +688,16 @@ button:focus:not(:focus-visible) { outline: none; }
 
 #mainScreen .main-bg {
   position: absolute; inset: 0; z-index: 0;
+  background-image: url('background-mobile.jpg');
+  background-image:
+    -webkit-image-set(
+      url('background-mobile.webp') 1x,
+      url('background-mobile.jpg')  1x
+    );
   background-image:
     image-set(
-      url('background-mobile.webp') type('image/webp'),
-      url('background-mobile.jpg')  type('image/jpeg')
+      url('background-mobile.webp') 1x,
+      url('background-mobile.jpg')  1x
     );
   background-size: cover;
   background-position: center;
@@ -685,10 +706,16 @@ button:focus:not(:focus-visible) { outline: none; }
 
 @media (min-width: 768px) {
   #mainScreen .main-bg {
+    background-image: url('background-desktop.jpg');
+    background-image:
+      -webkit-image-set(
+        url('background-desktop.webp') 1x,
+        url('background-desktop.jpg')  1x
+      );
     background-image:
       image-set(
-        url('background-desktop.webp') type('image/webp'),
-        url('background-desktop.jpg')  type('image/jpeg')
+        url('background-desktop.webp') 1x,
+        url('background-desktop.jpg')  1x
       );
   }
 }
@@ -884,6 +911,39 @@ body.dark-theme #notesQuickBtn {
                 0 2px 6px rgba(0,0,0,0.35);
   }
 }
+
+/* ═══════════════════════════════════════════
+   SECTION 4 continued: DIVIDERS & MISC
+   ═══════════════════════════════════════════ */
+.list-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px var(--content-padding-x) 6px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.list-divider::before,
+.list-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.list-divider-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.list-divider:not(:has(.list-divider-label))::before { flex: 1; }
+.list-divider:not(:has(.list-divider-label))::after  { display: none; }
 
 /* ─── Module container ─── */
 .module-container {
@@ -1163,6 +1223,7 @@ body.dark-theme #notesQuickBtn {
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
   background: var(--color-bg-main);
   border-bottom: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
@@ -1275,22 +1336,4 @@ body.dark-theme #notesQuickBtn {
   min-height: 36px;
 }
 
-/* ═══════════════════════════════════════════
-   ACCORDION ANIMATION (контракт MODULE_CONTRACT v4.1 §7)
-   @keyframes marquee — единственный общий ресурс для аккордеонов.
-   Базовых классов НЕТ — каждый модуль объявляет всё сам в {name}.css.
-   ═══════════════════════════════════════════ */
-/* @keyframes marquee — единственное аккордеон-правило в style.css.
-   Контракт MODULE_CONTRACT v4.1 §7: унифицированных базовых классов нет —
-   каждый модуль объявляет .collapsible-title, .marquee-inner, .collapsible-chevron
-   самостоятельно в своём {name}.css. Дублировать @keyframes не нужно. */
-@keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
 
-/* ─── Marquee gap span (создаётся динамически в app.initMarquee) ─── */
-.mq-gap {
-  display: inline-block;
-  width: 48px;
-}

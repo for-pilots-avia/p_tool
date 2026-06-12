@@ -45,10 +45,10 @@
   var WX_MAPS = [
     { url: 'https://meteoinfo.ru/hmc-input/mapsynop/Analiz.png', label: '\u0410\u043D\u0430\u043B\u0438\u0437 \u043F\u043E\u0433\u043E\u0434\u044B', full: true },
     { url: 'https://meteoinfo.ru/hmc-input/egmb/egmb.png', label: '\u041F\u0440\u043E\u0433\u043D\u043E\u0437 \u0415\u041C\u0411', full: true },
-    { url: 'https://tgftp.nws.noaa.gov/fax/PGCE05.PNG', label: '\u0426\u0435\u043D\u0442\u0440\u0430\u043B\u044C\u043D\u0430\u044F \u0410\u043C\u0435\u0440\u0438\u043A\u0430', full: false },
+    { url: 'https://tgftp.nws.noaa.gov/fax/PGCE05.PNG', label: '\u0415\u0432\u0440\u043E\u043F\u0430/\u0410\u0437\u0438\u044F', full: false },
     { url: 'https://tgftp.nws.noaa.gov/fax/PGDE14.PNG', label: '\u0421\u0435\u0432\u0435\u0440\u043D\u0430\u044F \u0410\u0442\u043B\u0430\u043D\u0442\u0438\u043A\u0430', full: false },
-    { url: 'https://tgftp.nws.noaa.gov/fax/PGRE05.PNG', label: '\u042E\u0436\u043D\u0430\u044F \u0410\u043C\u0435\u0440\u0438\u043A\u0430', full: false },
-    { url: 'https://tgftp.nws.noaa.gov/fax/PGZE05.PNG', label: '\u0412\u043E\u0441\u0442\u043E\u0447\u043D\u0430\u044F \u0422\u0438\u0445\u043E\u043E\u043A\u0435\u0430\u043D\u0441\u043A\u0430\u044F \u043E\u0431\u043B\u0430\u0441\u0442\u044C', full: false }
+    { url: 'https://tgftp.nws.noaa.gov/fax/PGRE05.PNG', label: '\u0421\u0435\u0432\u0435\u0440\u043D\u0430\u044F \u0410\u0444\u0440\u0438\u043A\u0430/\u0411\u043B\u0438\u0436\u043D\u0438\u0439 \u0412\u043E\u0441\u0442\u043E\u043A', full: false },
+    { url: 'https://tgftp.nws.noaa.gov/fax/PGZE05.PNG', label: '\u0410\u0437\u0438\u044F/\u0422\u0438\u0445\u0438\u0439 \u043E\u043A\u0435\u0430\u043D', full: false }
   ];
 
   // FIR fallback mapping: airport ICAO prefix → FIR code(s)
@@ -506,7 +506,8 @@
     metarHistory: {},      // { ICAO: [{ raw, observedAt, flightCat }] } — fetched from AWC on demand
     metarHistoryLoading: {}, // { ICAO: true/false }
     wxMapCache: {},       // { url: { blobUrl: 'blob:...', fetchedAt: timestamp } }
-    wxMapLoading: false   // true while maps are being refreshed
+    wxMapLoading: false,  // true while maps are being refreshed
+    wxMapLoaded: {}       // { url: true } — tracks if <img> loaded successfully via onload
   };
 
   // ===== Utility: icon helper =====
@@ -794,11 +795,85 @@
     if (state.depIcao.length < 4) issues.push('\u0410\u044D\u0440\u043E\u043F\u043E\u0440\u0442 \u0432\u044B\u043B\u0435\u0442\u0430 \u043D\u0435 \u0443\u043A\u0430\u0437\u0430\u043D');
     if (state.arrIcao.length < 4) issues.push('\u0410\u044D\u0440\u043E\u043F\u043E\u0440\u0442 \u043F\u043E\u0441\u0430\u0434\u043A\u0438 \u043D\u0435 \u0443\u043A\u0430\u0437\u0430\u043D');
 
-    // Checklist issues removed — replaced by Weather Maps block
-
     if (issues.length === 0) return { level: 'green', label: '\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u0433\u043E\u0442\u043E\u0432', issues: [] };
     if (issues.length <= 2) return { level: 'yellow', label: '\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E \u0433\u043E\u0442\u043E\u0432', issues: issues };
     return { level: 'red', label: '\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u043D\u0435 \u0433\u043E\u0442\u043E\u0432', issues: issues };
+  }
+
+  // ===== Data Status Warnings (for "Брифинг готов" block) =====
+  function getDataStatusWarnings() {
+    var warnings = [];
+    var allAirports = getAllRouteAirports();
+
+    // Weather status per airport
+    allAirports.forEach(function(icao) {
+      var wxData = state.weatherCache[icao];
+      var wxLoading = state.wxLoading[icao];
+      var wxError = state.wxErrors[icao];
+
+      if (wxLoading) {
+        warnings.push({ type: 'loading', icon: 'rotate-ccw', label: '\u041F\u043E\u0433\u043E\u0434\u0430 ' + icao, detail: '\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430...', action: null });
+      } else if (wxError && !wxData) {
+        warnings.push({ type: 'error', icon: 'alert-triangle', label: '\u041F\u043E\u0433\u043E\u0434\u0430 ' + icao, detail: wxError, action: 'wx-retry-' + icao });
+      } else if (wxData && isStale(wxData.cachedAt)) {
+        warnings.push({ type: 'stale', icon: 'alert-triangle', label: '\u041F\u043E\u0433\u043E\u0434\u0430 ' + icao, detail: '\u0423\u0441\u0442\u0430\u0440\u0435\u043B\u0438 (' + formatRelativeTime(new Date(wxData.cachedAt).toISOString()) + ')', action: 'wx-refresh-' + icao });
+      } else if (!wxData) {
+        warnings.push({ type: 'missing', icon: 'cloud', label: '\u041F\u043E\u0433\u043E\u0434\u0430 ' + icao, detail: '\u041D\u0435\u0442 \u0434\u0430\u043D\u043D\u044B\u0445', action: 'wx-fetch-' + icao });
+      }
+    });
+
+    // NOTAM status per airport
+    allAirports.forEach(function(icao) {
+      var ntData = state.notamCache[icao];
+      var ntLoading = state.notamLoading[icao];
+      var ntError = state.notamErrors[icao];
+
+      if (ntLoading) {
+        warnings.push({ type: 'loading', icon: 'rotate-ccw', label: 'NOTAM ' + icao, detail: '\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430...', action: null });
+      } else if (ntError && !ntData) {
+        warnings.push({ type: 'error', icon: 'alert-triangle', label: 'NOTAM ' + icao, detail: ntError, action: 'nt-retry-' + icao });
+      } else if (ntData && isStale(ntData.fetchedAt, NOTAM_STALE_MS)) {
+        warnings.push({ type: 'stale', icon: 'alert-triangle', label: 'NOTAM ' + icao, detail: '\u0423\u0441\u0442\u0430\u0440\u0435\u043B\u0438 (' + formatRelativeTime(new Date(ntData.fetchedAt).toISOString()) + ')', action: 'nt-refresh-' + icao });
+      } else if (!ntData) {
+        warnings.push({ type: 'missing', icon: 'alert-triangle', label: 'NOTAM ' + icao, detail: '\u041D\u0435\u0442 \u0434\u0430\u043D\u043D\u044B\u0445', action: 'nt-fetch-' + icao });
+      }
+    });
+
+    // Weather maps status — check both cache (for offline) and visibility (img onload)
+    var mapsAllVisible = WX_MAPS.every(function(map) { return state.wxMapLoaded[map.url]; });
+    var mapsAnyCached = WX_MAPS.some(function(map) {
+      var cached = state.wxMapCache[map.url];
+      return cached && cached.blobUrl;
+    });
+    var mapsAllCachedFresh = WX_MAPS.every(function(map) {
+      var cached = state.wxMapCache[map.url];
+      return cached && cached.blobUrl && !isStale(cached.fetchedAt, WX_MAP_STALE_MS);
+    });
+    var mapsAnyStale = WX_MAPS.some(function(map) {
+      var cached = state.wxMapCache[map.url];
+      return cached && cached.blobUrl && isStale(cached.fetchedAt, WX_MAP_STALE_MS);
+    });
+    if (state.wxMapLoading) {
+      warnings.push({ type: 'loading', icon: 'rotate-ccw', label: '\u041A\u0430\u0440\u0442\u044B \u043F\u043E\u0433\u043E\u0434\u044B', detail: '\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430...', action: null });
+    } else if (!mapsAllVisible && !mapsAnyCached) {
+      // No maps visible and nothing in cache — truly not loaded
+      warnings.push({ type: 'missing', icon: 'alert-triangle', label: '\u041A\u0430\u0440\u0442\u044B \u043F\u043E\u0433\u043E\u0434\u044B', detail: '\u041D\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u044B', action: 'maps-refresh' });
+    } else if (mapsAllVisible && !mapsAnyCached) {
+      // Maps visible but not cached — offline will not work
+      warnings.push({ type: 'stale', icon: 'alert-triangle', label: '\u041A\u0430\u0440\u0442\u044B \u043F\u043E\u0433\u043E\u0434\u044B', detail: '\u041D\u0435 \u043A\u044D\u0448\u0438\u0440\u043E\u0432\u0430\u043D\u044B (\u043E\u0444\u043B\u0430\u0439\u043D \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u043D\u044B)', action: 'maps-refresh' });
+    } else if (mapsAnyStale && !mapsAllCachedFresh) {
+      // Some cached maps are stale
+      var newestMapFetch = 0;
+      WX_MAPS.forEach(function(map) {
+        var cached = state.wxMapCache[map.url];
+        if (cached && cached.fetchedAt && cached.fetchedAt > newestMapFetch) {
+          newestMapFetch = cached.fetchedAt;
+        }
+      });
+      warnings.push({ type: 'stale', icon: 'alert-triangle', label: '\u041A\u0430\u0440\u0442\u044B \u043F\u043E\u0433\u043E\u0434\u044B', detail: '\u0423\u0441\u0442\u0430\u0440\u0435\u043B\u0438 (' + formatRelativeTime(new Date(newestMapFetch).toISOString()) + ')', action: 'maps-refresh' });
+    }
+
+    return warnings;
   }
 
   // ===== All Route Airports =====
@@ -924,8 +999,10 @@
     if (!forceRefresh && cached && cached.blobUrl && !isStale(cached.fetchedAt, WX_MAP_STALE_MS)) {
       return Promise.resolve();
     }
-    var fetchUrl = forceRefresh ? url + '?_t=' + Date.now() : url;
-    return fetch(fetchUrl, { mode: 'cors' })
+    // Use CORS proxy Worker for caching (direct fetch fails — no CORS headers from meteoinfo/NOAA)
+    var proxyUrl = AWC_PROXY_URL + '/wxmap?url=' + encodeURIComponent(url);
+    var fetchUrl = forceRefresh ? proxyUrl + '&_t=' + Date.now() : proxyUrl;
+    return fetch(fetchUrl)
       .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.blob();
@@ -1910,8 +1987,10 @@
   }
 
   // Fetch NOTAMs from the API for a single ICAO location, parse and decrypt
+  // Uses CORS proxy Worker to avoid NetworkError on notams.online
   function fetchNotamRaw(location) {
-    return fetch(NOTAM_API_URL + '?location=' + encodeURIComponent(location))
+    var fetchUrl = AWC_PROXY_URL + '/notam?location=' + encodeURIComponent(location);
+    return fetch(fetchUrl)
       .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.text();
@@ -2364,7 +2443,7 @@
       var imgSrc = (cached && cached.blobUrl) ? cached.blobUrl : map.url;
       var isMapStale = !cached || !cached.blobUrl || isStale(cached.fetchedAt, WX_MAP_STALE_MS);
       html += '<div class="metbriefing-wx-map-thumb' + (map.full ? ' metbriefing-wx-map-thumb--full' : '') + '" data-wx-map-idx="' + idx + '">' +
-        '<img src="' + imgSrc + '" data-full-src="' + (cached && cached.blobUrl ? cached.blobUrl : map.url) + '" alt="' + map.label + '" loading="lazy" onerror="this.style.display=\'none\'">' +
+        '<img src="' + imgSrc + '" data-full-src="' + (cached && cached.blobUrl ? cached.blobUrl : map.url) + '" data-wx-map-url="' + map.url + '" alt="' + map.label + '" loading="lazy" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' +
         (state.wxMapLoading ? '<div class="metbriefing-wx-map-thumb-loading">' + icon('rotate-ccw', 24, 'metbriefing-spin') + '</div>' :
          isMapStale ? '<div class="metbriefing-wx-map-thumb-loading metbriefing-wx-map-thumb-loading--stale">' + icon('alert-triangle', 20) + '</div>' : '') +
         '<div class="metbriefing-wx-map-label">' + map.label + '</div>' +
@@ -2373,6 +2452,7 @@
     html += '</div></div>';
 
     // Summary
+    var dataWarnings = getDataStatusWarnings();
     html += '<div class="metbriefing-summary">' +
       '<div class="metbriefing-readiness-indicator metbriefing-readiness-indicator--' + readiness.level + '">' +
         '<span class="metbriefing-readiness-dot"></span>' +
@@ -2382,6 +2462,26 @@
       html += '<ul class="metbriefing-readiness-issues">';
       readiness.issues.forEach(function(issue) { html += '<li>' + issue + '</li>'; });
       html += '</ul>';
+    }
+    // Data status warnings
+    if (dataWarnings.length > 0) {
+      html += '<div class="metbriefing-readiness-warnings">';
+      html += '<div class="metbriefing-readiness-warnings-title">' + icon('info', 14) + '<span>\u0421\u0442\u0430\u0442\u0443\u0441 \u0434\u0430\u043D\u043D\u044B\u0445</span></div>';
+      dataWarnings.forEach(function(w) {
+        var wClass = 'metbriefing-readiness-warning--' + w.type;
+        var wIcon = w.type === 'loading' ? icon(w.icon, 14, 'metbriefing-spin') : icon(w.icon, 14);
+        var actionHtml = '';
+        if (w.action) {
+          actionHtml = '<button class="metbriefing-readiness-warning-action" data-mb-warn-action="' + w.action + '">' + icon('rotate-ccw', 12) + '\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C</button>';
+        }
+        html += '<div class="metbriefing-readiness-warning ' + wClass + '">' +
+          '<span class="metbriefing-readiness-warning-icon">' + wIcon + '</span>' +
+          '<span class="metbriefing-readiness-warning-label">' + w.label + '</span>' +
+          '<span class="metbriefing-readiness-warning-detail">' + w.detail + '</span>' +
+          actionHtml +
+        '</div>';
+      });
+      html += '</div>';
     }
     html += '<button class="metbriefing-share-btn" id="metbriefing-share-btn">' + icon('share', 16) + '\u041F\u043E\u0434\u0435\u043B\u0438\u0442\u044C\u0441\u044F \u0431\u0440\u0438\u0444\u0438\u043D\u0433\u043E\u043C</button></div>';
 
@@ -2442,6 +2542,24 @@
         delete state.notamErrors[icao];
         saveNotamCache();
         fetchNotam(icao);
+      });
+    });
+    // Data status warning actions
+    el.querySelectorAll('[data-mb-warn-action]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var action = btn.getAttribute('data-mb-warn-action');
+        if (action === 'maps-refresh') {
+          fetchAllWxMaps(true);
+        } else if (action.indexOf('wx-refresh-') === 0 || action.indexOf('wx-retry-') === 0 || action.indexOf('wx-fetch-') === 0) {
+          var wxIcao = action.replace('wx-refresh-', '').replace('wx-retry-', '').replace('wx-fetch-', '');
+          refreshAirportWeather(wxIcao);
+        } else if (action.indexOf('nt-retry-') === 0 || action.indexOf('nt-refresh-') === 0 || action.indexOf('nt-fetch-') === 0) {
+          var ntIcao = action.replace('nt-retry-', '').replace('nt-refresh-', '').replace('nt-fetch-', '');
+          delete state.notamCache[ntIcao];
+          delete state.notamErrors[ntIcao];
+          saveNotamCache();
+          fetchNotam(ntIcao);
+        }
       });
     });
     // Weather Maps — hide loading spinner when image loads, open PhotoSwipe on click
@@ -3186,6 +3304,20 @@
         '</div>';
 
     // Event delegation
+    // Track weather map image load/error via capture phase (load/error don't bubble)
+    container.addEventListener('load', function(e) {
+      var img = e.target;
+      if (img.tagName === 'IMG' && img.getAttribute('data-wx-map-url')) {
+        state.wxMapLoaded[img.getAttribute('data-wx-map-url')] = true;
+      }
+    }, true);
+    container.addEventListener('error', function(e) {
+      var img = e.target;
+      if (img.tagName === 'IMG' && img.getAttribute('data-wx-map-url')) {
+        state.wxMapLoaded[img.getAttribute('data-wx-map-url')] = false;
+      }
+    }, true);
+
     container.addEventListener('click', function(e) {
         // Tab pills
         var tabPill = e.target.closest('.metbriefing-tab-pill');
@@ -3394,15 +3526,9 @@
       clearInterval(state.tickInterval);
       state.tickInterval = null;
     }
-    // Revoke all map blob URLs to free memory
-    var urls = Object.keys(state.wxMapCache);
-    urls.forEach(function(url) {
-      var entry = state.wxMapCache[url];
-      if (entry && entry.blobUrl) {
-        try { URL.revokeObjectURL(entry.blobUrl); } catch(e) {}
-      }
-    });
-    state.wxMapCache = {};
+    // Do NOT revoke blob URLs or clear wxMapCache — IndexedDB still holds the blobs,
+    // and init() is not called again on re-entry (contract §5). Revoking kills
+    // offline map display. Blob URLs live until page unload — that's fine.
   }
 
   // ═══════════════════════════════════════════

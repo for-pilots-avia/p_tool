@@ -102,6 +102,27 @@
         for (var k = 0; k < paragraphs.length; k++) {
           html += '<p class="faq-paragraph">' + paragraphs[k] + '</p>';
         }
+        /* Install URL link */
+        if (sec.url) {
+          html += '<a href="' + sec.url + '" target="_blank" rel="noopener noreferrer" class="faq-install-url">';
+          html += '<span class="faq-install-url-label">Открыть сайт приложения</span>';
+          html += '<span class="faq-install-url-icon">' + (window.ICONS['external-link'] || '') + '</span>';
+          html += '</a>';
+        }
+        /* Contact links */
+        if (sec.contactLinks && sec.contactLinks.length > 0) {
+          html += '<div class="faq-contacts-grid">';
+          for (var c = 0; c < sec.contactLinks.length; c++) {
+            var cl = sec.contactLinks[c];
+            html += '<a href="' + cl.url + '" target="_blank" rel="noopener noreferrer" class="faq-contact-card">';
+            html += '<div class="faq-contact-icon">' + (window.ICONS[cl.icon] || '') + '</div>';
+            html += '<div class="faq-contact-content">';
+            html += '<span class="faq-contact-label">' + cl.label + '</span>';
+            html += '<span class="faq-contact-type">' + (cl.type === 'email' ? 'Электронная почта' : 'Telegram') + '</span>';
+            html += '</div></a>';
+          }
+          html += '</div>';
+        }
         html += '</section>';
       }
     }

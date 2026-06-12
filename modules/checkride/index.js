@@ -184,11 +184,10 @@
       { id: 'cr_license',     ph: '\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438', val: _pilotData.license, ffs: true },
       { id: 'cr_instructor',  ph: '\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)', val: _pilotData.instructor, ffs: true },
       { id: 'cr_route',       ph: '\u041C\u0430\u0440\u0448\u0440\u0443\u0442 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.route, ffs: false },
-      { id: 'cr_ac_number',   ph: '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.ac_number, ffs: false },
-      { id: 'cr_flight_time', ph: '\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.flight_time, ffs: false }
+      { id: 'cr_ac_number',   ph: '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.ac_number, ffs: false }
     ];
     for (var i = 0; i < fields.length; i++) {
-      /* Для FFS — скрыть поля route, ac_number, flight_time */
+      /* Для FFS — скрыть поля route, ac_number */
       if (_currentMode === 'ffs' && !fields[i].ffs) continue;
       var escVal = (fields[i].val || '').replace(/"/g, '&quot;');
       html += '<input type="text" id="' + fields[i].id + '" class="checkride-input" placeholder="' + fields[i].ph + '" value="' + escVal + '">';
@@ -234,7 +233,19 @@
       if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
         groups.forEach(function(group) {
           var compCode = group.topitem || '\u041E\u0431\u0449\u0438\u0435';
-          var compLabel = COMPETENCY_LABELS[compCode] || compCode;
+          var compLabel = COMPETENCY_LABELS[compCode];
+          /* FFS topitem: "Применение процедур (ПП):" → извлечь код из скобок */
+          if (!compLabel) {
+            var bracketMatch = compCode.match(/\(([^)]+)\)/);
+            if (bracketMatch) {
+              var shortCode = bracketMatch[1];
+              var fullName = compCode.replace(/\s*\([^)]+\)\s*:?\s*$/, '').trim();
+              compCode = shortCode;
+              compLabel = COMPETENCY_LABELS[shortCode] || fullName;
+            } else {
+              compLabel = compCode;
+            }
+          }
           var compCheckboxes = [];
           for (var ci = 0; ci < group.items.length; ci++) {
             if (group.items[ci].type === 'checkbox') compCheckboxes.push(group.items[ci]);
@@ -267,6 +278,20 @@
           group.items.forEach(function(item) {
             if (item.type === 'divider') {
               html += '<div class="checkride-divider">' + item.label + '</div>';
+            } else if (item.type === 'checkbox' && sec.subname === '\u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B.') {
+              /* \u041E\u0446\u0435\u043D\u043E\u0447\u043D\u044B\u0439 dropdown \u0434\u043B\u044F \u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B */
+              var gVal = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
+              html += '<div class="checkride-grade-item">'
+                + '<span class="checkride-grade-label">' + item.label + '</span>'
+                + '<select class="checkride-grade-select" data-cr-grade="' + item.id + '">'
+                + '<option value=""' + (gVal === '' ? ' selected' : '') + '>\u2014</option>'
+                + '<option value="2"' + (gVal === '2' ? ' selected' : '') + '>2</option>'
+                + '<option value="3"' + (gVal === '3' ? ' selected' : '') + '>3</option>'
+                + '<option value="4"' + (gVal === '4' ? ' selected' : '') + '>4</option>'
+                + '<option value="5"' + (gVal === '5' ? ' selected' : '') + '>5</option>'
+                + '<option value="na"' + (gVal === 'na' ? ' selected' : '') + '>\u2717 \u043D/\u043F</option>'
+                + '</select>'
+              + '</div>';
             } else if (item.type === 'checkbox') {
               html += '<div class="checkride-check-item">'
                 + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
@@ -344,7 +369,7 @@
       + '<p><b>\u0420\u0435\u0436\u0438\u043C:</b> <span id="r_mode"></span></p>'
       + '<p><b>\u041C\u0430\u0440\u0448\u0440\u0443\u0442:</b> <span id="r_route"></span></p>'
       + '<p><b>\u041D\u043E\u043C\u0435\u0440 \u0412\u0421:</b> <span id="r_ac_number"></span></p>'
-      + '<p><b>\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F:</b> <span id="r_flight_time"></span></p>'
+      + '<p><b>\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F:</b> <input type="text" id="r_flight_time" class="checkride-input checkride-report-input" placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F" value="' + ((_pilotData.flight_time || '').replace(/"/g, '&quot;')) + '"></p>'
     + '</div>';
 
     /* Ratings */
@@ -357,16 +382,16 @@
     html += '<div class="checkride-signature-section">'
       + '<p><b>\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439:</b> <span id="r_instructor"></span></p>'
       + '<p><b>\u041F\u043E\u0434\u043F\u0438\u0441\u044C:</b></p>'
-      + '<canvas id="checkride-signature" width="500" height="150"></canvas>'
+      + '<canvas id="checkride-signature"></canvas>'
     + '</div>';
 
     /* Action buttons */
     html += '<div class="checkride-report-actions">'
-      + '<button class="checkride-main-btn" data-cr-action="export-pdf">'
+      + '<button class="checkride-secondary-btn" data-cr-action="export-pdf">'
         + icon('download', 18) + ' <span>\u041F\u0435\u0447\u0430\u0442\u044C / PDF</span></button>'
       + '<button class="checkride-secondary-btn" data-cr-action="send-email">'
         + icon('mail', 18) + ' <span>\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u043F\u043E \u043F\u043E\u0447\u0442\u0435</span></button>'
-      + '<button class="checkride-secondary-btn" data-cr-action="go-start">'
+      + '<button class="checkride-main-btn" data-cr-action="go-start">'
         + icon('home', 18) + ' <span>\u041D\u0430 \u0433\u043B\u0430\u0432\u043D\u0443\u044E</span></button>'
     + '</div>';
 
@@ -448,7 +473,7 @@
         var groups = sec.groups || [{ items: sec.items || [] }];
         groups.forEach(function(group) {
           group.items.forEach(function(item) {
-            if (item.type !== 'divider') item.ok = (item.type === 'radio') ? null : false;
+            if (item.type !== 'divider') item.ok = (item.type === 'radio') ? null : (sec.subname === '\u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B.' ? '' : false);
           });
         });
       });
@@ -471,8 +496,13 @@
       groups.forEach(function(group) {
         group.items.forEach(function(item) {
           if (item.type === 'checkbox') {
-            var cb = document.getElementById('c_' + item.id);
-            if (cb) item.ok = cb.checked;
+            var gradeSel = document.querySelector('[data-cr-grade="' + item.id + '"]');
+            if (gradeSel) {
+              item.ok = gradeSel.value || '';
+            } else {
+              var cb = document.getElementById('c_' + item.id);
+              if (cb) item.ok = cb.checked;
+            }
           } else if (item.type === 'radio') {
             var selected = document.querySelector('input[name="r_' + item.id + '"]:checked');
             item.ok = selected ? selected.value : null;
@@ -497,6 +527,9 @@
         var groups = sec.groups || [{ items: sec.items || [] }];
         groups.forEach(function(group) {
           var compCode = group.topitem || '\u041E\u0431\u0449\u0438\u0435';
+          /* FFS topitem: извлечь код из скобок для консистентности */
+          var bracketMatch = compCode.match(/\(([^)]+)\)/);
+          if (bracketMatch) compCode = bracketMatch[1];
           if (!competencyMap[compCode]) {
             competencyMap[compCode] = { total: 0, checked: 0, items: [] };
           }
@@ -543,8 +576,8 @@
 
     _data.checklists.forEach(function(mainSec) {
       var piloting = [];
-      var violations = 0;
       var hasPilotingSection = false;
+      var gradeValues = [];
 
       mainSec.sections.forEach(function(sec) {
         var groups = sec.groups || [{ items: sec.items || [] }];
@@ -554,18 +587,27 @@
             var score = i.ok ? (5 - i.options.indexOf(i.ok)) : 2;
             piloting.push(score < 2 ? 2 : score);
           } else if (i.type === 'checkbox' && sec.subname !== '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
-            if (!i.ok) violations++;
+            if (sec.subname === '\u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B.') {
+              /* \u041E\u0446\u0435\u043D\u043A\u0438 2-5 \u0443\u0447\u0430\u0442\u0441\u044F \u0432 \u0441\u0440\u0435\u0434\u043D\u0435\u043C, na/\u043D\u0435 \u043E\u0446\u0435\u043D\u043E\u043A\u043E \u2014 \u043D\u0435 \u0443\u0447\u0438\u0442\u044B\u0432\u0430\u044E\u0442\u0441\u044F */
+              if (i.ok === '2' || i.ok === '3' || i.ok === '4' || i.ok === '5') {
+                gradeValues.push(parseInt(i.ok, 10));
+              }
+            }
           }
         }); });
       });
 
       var pRes = piloting.length ? (piloting.indexOf(2) !== -1 ? 2 : Math.round(piloting.reduce(function(a,b){return a+b;},0)/piloting.length)) : '-';
+      var gRes = gradeValues.length ? Math.round(gradeValues.reduce(function(a,b){return a+b;},0)/gradeValues.length) : '-';
 
       var ratingLine = '<div class="checkride-rating-block"><b>' + mainSec.name + '</b>';
       if (hasPilotingSection) {
         ratingLine += ' | \u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F: <span class="checkride-score-val">' + pRes + '</span>';
       }
-      ratingLine += ' | \u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0439: <span class="checkride-score-val">' + violations + '</span></div>';
+      if (gradeValues.length) {
+        ratingLine += ' | \u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B: <span class="checkride-score-val">' + gRes + '</span>';
+      }
+      ratingLine += '</div>';
       reportHtml += ratingLine;
     });
 
@@ -604,7 +646,19 @@
           if (group.topitem) sHtml += '<h4 class="checkride-report-topitem">' + group.topitem + '</h4>';
           group.items.forEach(function(item) {
             if (item.type === 'divider') return;
-            if (item.type === 'checkbox') {
+            if (item.type === 'checkbox' && sec.subname === '\u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B.') {
+              /* \u041E\u0442\u0447\u0451\u0442: \u043E\u0446\u0435\u043D\u043A\u0430 \u0432\u043C\u0435\u0441\u0442\u043E OK/\u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435 */
+              var gVal = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
+              var gradeRes = '';
+              if (gVal === '2' || gVal === '3' || gVal === '4' || gVal === '5') {
+                gradeRes = '<span class="checkride-score-val">\u041E\u0446\u0435\u043D\u043A\u0430: ' + gVal + '</span>';
+              } else if (gVal === 'na') {
+                gradeRes = '<span class="checkride-grade-na">\u2717 \u043D\u0435 \u043F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F</span>';
+              } else {
+                gradeRes = '<span class="checkride-grade-na">\u2014 \u043D\u0435 \u043E\u0446\u0435\u043D\u0435\u043D\u043E</span>';
+              }
+              sHtml += '<div class="checkride-report-item-row"><p>' + item.label + '</p><div class="checkride-flex-row">' + gradeRes + '</div></div>';
+            } else if (item.type === 'checkbox') {
               var res = item.ok
                 ? '<span class="checkride-icon-ok">\u2713 OK</span>'
                 : '<span class="checkride-icon-fail">\u2717 \u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435</span>';
@@ -658,8 +712,8 @@
     var compEl = document.getElementById('checkride-competencies');
     if (compEl) compEl.innerHTML = compHtml;
 
-    /* Meta fields — из _pilotData, НЕ из DOM */
-    var metaFields = ['fio', 'license', 'instructor', 'route', 'ac_number', 'flight_time'];
+    /* Meta fields — из _pilotData, НЕ из DOM (кроме flight_time — это input) */
+    var metaFields = ['fio', 'license', 'instructor', 'route', 'ac_number'];
     metaFields.forEach(function(f) {
       var target = document.getElementById('r_' + f);
       if (target) target.innerText = _pilotData[f] || '-';
@@ -773,19 +827,36 @@
   function initSignature() {
     var canvas = document.getElementById('checkride-signature');
     if (!canvas) return;
+
+    /* Динамический размер canvas — исправление для Samsung и мобильных */
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    var cssW = rect.width || canvas.offsetWidth || 300;
+    var cssH = 150;
+    canvas.width  = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    canvas.style.width  = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+
     var ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     canvas.style.display = 'block';
     var drawing = false;
 
     function getPos(e) {
-      var rect = canvas.getBoundingClientRect();
+      var r = canvas.getBoundingClientRect();
       var clientX = e.touches ? e.touches[0].clientX : e.clientX;
       var clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
+      return { x: clientX - r.left, y: clientY - r.top };
     }
 
     canvas.onmousedown = canvas.ontouchstart = function(e) {
+      e.preventDefault();
       drawing = true;
       ctx.beginPath();
       var p = getPos(e);
@@ -798,7 +869,7 @@
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
     };
-    canvas.onmouseup = canvas.ontouchend = function() { drawing = false; };
+    canvas.onmouseup = canvas.ontouchend = canvas.ontouchcancel = function() { drawing = false; };
   }
 
   /* ═══════════════════════════════════════════
@@ -967,7 +1038,7 @@
           return;
         }
         /* Checkbox / Radio → немедленное сохранение в кеш */
-        if (_screen === 'test' && (e.target.type === 'checkbox' || e.target.type === 'radio')) {
+        if (_screen === 'test' && (e.target.type === 'checkbox' || e.target.type === 'radio' || e.target.classList.contains('checkride-grade-select'))) {
           saveState();
           saveInspectionState();
         }
@@ -983,6 +1054,11 @@
             _pilotData[field] = el.value;
             savePilotToCache();
           }
+        }
+        /* Поле полётного времени в отчёте */
+        if (el.id === 'r_flight_time') {
+          _pilotData.flight_time = el.value;
+          savePilotToCache();
         }
         /* Комментарии в тесте → debounce-сохранение в кеш */
         if (_screen === 'test' && el.classList.contains('checkride-textarea')) {

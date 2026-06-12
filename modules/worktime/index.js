@@ -10,6 +10,8 @@
   var _wtSettings  = {};
   var _wtFinalized = false;
   var _wtSheetMode  = 'settings'; // 'settings' | 'segment'
+  var _wtEditSegmentIdx = -1;     // -1 = new, >=0 = edit index
+  var _wtSegmentJustSaved = false; // prevent double-save on auto-close
 
   var WT_DEFAULT_SETTINGS = {
     pilotExtra:  0,
@@ -320,17 +322,16 @@
     }
     html += '</div>';
 
-    // Settings button + report-time reminder — bottom of the card, one line
+    // Settings button + report-time reminder — bottom of the card
     var reportIsDefault = (_wtSettings.reportTime === WT_DEFAULT_SETTINGS.reportTime);
-    html += '<div style="display:flex;align-items:center;margin-top:8px;position:relative;">';
+    html += '<div style="margin-top:8px;">';
     if (reportIsDefault) {
-      html += '<span style="font-size:var(--font-sm);color:var(--color-text-secondary);line-height:1.45;flex:1;text-align:center;">'
-        + 'Нажмите ⚙ чтобы ввести время явки</span>';
+      html += '<button class="wt-report-btn" id="wtFlightSettingsBtn" aria-label="Ввести время явки">'
+        + window.ICONS.settings + ' Нажмите чтобы ввести время явки</button>';
     } else {
-      html += '<span style="flex:1;"></span>';
+      html += '<button class="wt-report-btn wt-report-btn--set" id="wtFlightSettingsBtn" aria-label="Изменить данные рейса">'
+        + window.ICONS.settings + ' Изменить данные рейса</button>';
     }
-    html += '<button class="icon-btn wt-card-action-btn" id="wtFlightSettingsBtn" aria-label="Настройки рейса" style="position:absolute;right:0;">'
-      + window.ICONS.settings + '</button>';
     html += '</div>';
 
     html += '</div>';
@@ -372,9 +373,11 @@
     html += '<div class="wt-card-icon wt-card-icon--segments">' + window.ICONS.plane + '</div>';
     html += '<h2 class="ct-heading-md">Сегменты полёта</h2>';
     html += '</div>';
-    // Plus icon — transparent, clickable in header
-    html += '<button class="wt-ghost-icon-btn" id="wtAddSegmentBtn" aria-label="Добавить сегмент">'
-      + window.ICONS.plus + '</button>';
+    // Plus icon — hidden after finalization
+    if (!_wtFinalized) {
+      html += '<button class="wt-ghost-icon-btn" id="wtAddSegmentBtn" aria-label="Добавить сегмент">'
+        + window.ICONS.plus + '</button>';
+    }
     html += '</div>';
 
     if (_wtSegments.length === 0) {
@@ -472,7 +475,8 @@
 
   function wtRenderSegmentCard(seg, idx) {
     var colorIdx = idx % 5;
-    return '<div class="wt-segment-card">'
+    var lockedClass = _wtFinalized ? ' wt-segment-card--locked' : '';
+    return '<div class="wt-segment-card' + lockedClass + '" data-idx="' + idx + '">'
       + '<div class="wt-segment-info">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
       + '<span class="wt-segment-color-' + colorIdx + '" style="width:12px;height:12px;border-radius:3px;display:inline-block;flex-shrink:0;"></span>'
@@ -562,6 +566,16 @@
      ═══════════════════════════════════════════════════════════════ */
 
   function wtCloseSheet() {
+    // Auto-save segment when closing in segment mode
+    if (_wtSheetMode === 'segment' && !_wtSegmentJustSaved) {
+      if (wtTryAutoSaveSegment()) {
+        app.showToast('Сегмент сохранён');
+        wtRenderAll();
+      }
+    }
+    _wtSegmentJustSaved = false;
+    _wtEditSegmentIdx = -1;
+
     var overlay = document.getElementById('wtSettingsOverlay');
     var sheet   = document.getElementById('wtSettingsSheet');
     if (overlay) overlay.classList.remove('open');
@@ -657,6 +671,7 @@
 
   function wtOpenSegmentSheet() {
     _wtSheetMode = 'segment';
+    _wtEditSegmentIdx = -1;
     var overlay  = document.getElementById('wtSettingsOverlay');
     var sheet    = document.getElementById('wtSettingsSheet');
     var closeBtn = document.getElementById('wtCloseSettingsBtn');
@@ -682,24 +697,64 @@
     wtCloseSheet();
   }
 
-  function wtRenderSegmentContent() {
+  /* ═══════════════════════════════════════════════════════════════
+     Bottom-sheet: режим «Редактирование сегмента»
+     Тот же sheet, с предзаполнением существующими временами
+     ═══════════════════════════════════════════════════════════════ */
+
+  function wtOpenEditSegmentSheet(idx) {
+    if (idx < 0 || idx >= _wtSegments.length) return;
+    _wtSheetMode = 'segment';
+    _wtEditSegmentIdx = idx;
+    var overlay  = document.getElementById('wtSettingsOverlay');
+    var sheet    = document.getElementById('wtSettingsSheet');
+    var closeBtn = document.getElementById('wtCloseSettingsBtn');
+    var titleEl  = document.getElementById('wtSettingsTitle');
+    var saveBtn  = document.getElementById('wtSaveSegmentBtn');
+    var summaryEl = document.getElementById('wtSettingsSummary');
+    var actionsEl = sheet ? sheet.querySelector('.wt-dialog-actions') : null;
+    if (!overlay || !sheet) return;
+
+    if (closeBtn) closeBtn.innerHTML = window.ICONS.x || window.ICONS.close;
+    if (titleEl) titleEl.textContent = 'Редактирование сегмента';
+    if (saveBtn) saveBtn.textContent = 'Сохранить';
+    if (summaryEl) summaryEl.innerHTML = '';
+    if (actionsEl) actionsEl.style.display = 'flex';
+
+    wtRenderSegmentContent(_wtSegments[idx]);
+
+    overlay.classList.add('open');
+    sheet.classList.add('open');
+  }
+
+  function wtRenderSegmentContent(prefill) {
     var el = document.getElementById('wtSettingsContent');
     if (!el) return;
 
-    // Smart defaults: if there are existing segments, start after the last one
-    var defaultStart = '10:00';
-    var defaultTakeoff = '10:30';
-    var defaultLanding = '13:45';
-    var defaultStop  = '14:00';
+    var defaultStart, defaultTakeoff, defaultLanding, defaultStop;
 
-    if (_wtSegments.length > 0) {
-      var lastSeg = _wtSegments[_wtSegments.length - 1];
-      // Start 30 min after last engine stop
-      var startMin = lastSeg.engineStop + 30;
-      defaultStart = wtFormatTime(startMin % 1440);
-      defaultTakeoff = wtFormatTime((startMin + 15) % 1440);
-      defaultLanding = wtFormatTime((startMin + 195) % 1440);
-      defaultStop  = wtFormatTime((startMin + 210) % 1440);
+    if (prefill) {
+      // Edit mode: pre-fill with existing segment data
+      defaultStart  = wtFormatTime(prefill.engineStart);
+      defaultTakeoff = wtFormatTime(prefill.takeoff);
+      defaultLanding = wtFormatTime(prefill.landing);
+      defaultStop   = wtFormatTime(prefill.engineStop);
+    } else {
+      // Smart defaults: if there are existing segments, start after the last one
+      defaultStart = '10:00';
+      defaultTakeoff = '10:30';
+      defaultLanding = '13:45';
+      defaultStop  = '14:00';
+
+      if (_wtSegments.length > 0) {
+        var lastSeg = _wtSegments[_wtSegments.length - 1];
+        // Start 30 min after last engine stop
+        var startMin = lastSeg.engineStop + 30;
+        defaultStart = wtFormatTime(startMin % 1440);
+        defaultTakeoff = wtFormatTime((startMin + 15) % 1440);
+        defaultLanding = wtFormatTime((startMin + 195) % 1440);
+        defaultStop  = wtFormatTime((startMin + 210) % 1440);
+      }
     }
 
     el.innerHTML = ''
@@ -786,6 +841,41 @@
     wtRenderAll();
   }
 
+  /* ─── Автосохранение сегмента при закрытии (тихое) ─── */
+
+  function wtTryAutoSaveSegment() {
+    var engineStart = wtParseTime(wtVal('wtEngineStart'));
+    var takeoff     = wtParseTime(wtVal('wtTakeoff'));
+    var landing     = wtParseTime(wtVal('wtLanding'));
+    var engineStop  = wtParseTime(wtVal('wtEngineStop'));
+
+    if (engineStart === null || takeoff === null || landing === null || engineStop === null) return false;
+
+    var flightTime = wtDiffTime(engineStart, engineStop);
+    var airTime    = wtDiffTime(takeoff, landing);
+
+    if (flightTime <= 0 || airTime <= 0) return false;
+    if (wtDiffTime(engineStart, takeoff) < 0) return false;
+    if (wtDiffTime(takeoff, landing) < 0) return false;
+    if (wtDiffTime(landing, engineStop) < 0) return false;
+    if (wtCheckOverlap(engineStart, engineStop, _wtSegments, _wtEditSegmentIdx)) return false;
+
+    var segData = { engineStart: engineStart, takeoff: takeoff,
+      landing: landing, engineStop: engineStop,
+      flightTime: flightTime, airTime: airTime };
+
+    if (_wtEditSegmentIdx >= 0) {
+      _wtSegments[_wtEditSegmentIdx] = segData;
+    } else {
+      _wtSegments.push(segData);
+    }
+    _wtEditSegmentIdx = -1;
+    _wtFinalized = false;
+    wtSaveSegments(_wtSegments);
+    wtSaveFinalized(false);
+    return true;
+  }
+
   /* ─── Сохранение сегмента ─── */
 
   function wtSaveSegment() {
@@ -819,19 +909,27 @@
       return;
     }
 
-    if (wtCheckOverlap(engineStart, engineStop, _wtSegments, -1)) {
+    if (wtCheckOverlap(engineStart, engineStop, _wtSegments, _wtEditSegmentIdx)) {
       app.showToast('Сегмент пересекается по времени с существующим');
       return;
     }
 
-    _wtSegments.push({ engineStart: engineStart, takeoff: takeoff,
+    var segData = { engineStart: engineStart, takeoff: takeoff,
       landing: landing, engineStop: engineStop,
-      flightTime: flightTime, airTime: airTime });
+      flightTime: flightTime, airTime: airTime };
+
+    if (_wtEditSegmentIdx >= 0) {
+      _wtSegments[_wtEditSegmentIdx] = segData;
+    } else {
+      _wtSegments.push(segData);
+    }
+    _wtEditSegmentIdx = -1;
     _wtFinalized = false;
     wtSaveSegments(_wtSegments);
     wtSaveFinalized(false);
 
-    wtCloseSegmentSheet();
+    _wtSegmentJustSaved = true;
+    wtCloseSheet();
     app.showToast('Сегмент сохранён');
     wtRenderAll();
   }
@@ -1053,7 +1151,6 @@
       + '<div id="wtSettingsContent" class="wt-settings-content"></div>'
       + '<div class="wt-dialog-actions" style="justify-content:center;">'
       + '<button class="btn-primary" id="wtSaveSegmentBtn">Сохранить</button>'
-      + '<button class="btn-outline" id="wtCloseSettingsBtn2">Закрыть</button>'
       + '</div>';
 
     document.body.appendChild(overlay);
@@ -1073,6 +1170,10 @@
       container.addEventListener('click', function(e) {
         var delBtn = e.target.closest('.wt-delete-segment');
         if (delBtn) {
+          if (_wtFinalized) {
+            app.showToast('Рейс завершён — удаление недоступно');
+            return;
+          }
           var idx = parseInt(delBtn.dataset.idx, 10);
           wtDeleteSegment(idx);
           return;
@@ -1088,7 +1189,22 @@
         }
         // Plus icon in Segments card → open Add Segment
         if (e.target.closest('#wtAddSegmentBtn')) {
+          if (_wtFinalized) {
+            app.showToast('Рейс завершён — добавление недоступно');
+            return;
+          }
           wtOpenSegmentSheet();
+          return;
+        }
+        // Segment card click → open Edit Segment
+        var segCard = e.target.closest('.wt-segment-card[data-idx]');
+        if (segCard && !e.target.closest('.wt-delete-segment')) {
+          if (_wtFinalized) {
+            app.showToast('Рейс завершён — редактирование недоступно');
+            return;
+          }
+          var segIdx = parseInt(segCard.dataset.idx, 10);
+          if (!isNaN(segIdx)) wtOpenEditSegmentSheet(segIdx);
           return;
         }
         if (e.target.closest('#wtShareBtn')) {
@@ -1118,8 +1234,8 @@
           else { wtAutoSaveSetting(); wtCloseSheet(); }
           return;
         }
-        // Close buttons
-        if (e.target.closest('#wtCloseSettingsBtn') || e.target.closest('#wtCloseSettingsBtn2')) {
+        // Close button (X)
+        if (e.target.closest('#wtCloseSettingsBtn')) {
           wtCloseSheet();
           return;
         }

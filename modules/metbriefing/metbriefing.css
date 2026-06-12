@@ -985,6 +985,91 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-warning);
 }
 
+/* ── Data Status Warnings ── */
+.metbriefing-readiness-warnings {
+  margin: 10px 0 12px 0;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 10px;
+}
+.metbriefing-readiness-warnings-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+.metbriefing-readiness-warnings-title svg {
+  width: 14px; height: 14px;
+  color: var(--color-info);
+}
+.metbriefing-readiness-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: var(--font-xs);
+  line-height: 1.4;
+}
+.metbriefing-readiness-warning-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.metbriefing-readiness-warning-icon svg {
+  width: 14px; height: 14px;
+}
+.metbriefing-readiness-warning--stale .metbriefing-readiness-warning-icon svg {
+  color: var(--color-warning);
+}
+.metbriefing-readiness-warning--error .metbriefing-readiness-warning-icon svg {
+  color: var(--color-danger);
+}
+.metbriefing-readiness-warning--missing .metbriefing-readiness-warning-icon svg {
+  color: var(--color-text-muted);
+}
+.metbriefing-readiness-warning--loading .metbriefing-readiness-warning-icon svg {
+  color: var(--color-info);
+}
+.metbriefing-readiness-warning-label {
+  font-weight: 600;
+  color: var(--color-text-main);
+  white-space: nowrap;
+}
+.metbriefing-readiness-warning-detail {
+  color: var(--color-text-muted);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.metbriefing-readiness-warning-action {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-xs);
+  color: var(--color-primary);
+  font-size: var(--font-xs);
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.15s var(--transition-ease);
+  white-space: nowrap;
+}
+.metbriefing-readiness-warning-action svg {
+  width: 12px; height: 12px;
+}
+@media (hover: hover) {
+  .metbriefing-readiness-warning-action:hover {
+    background: var(--color-primary-ghost);
+    border-color: var(--color-primary);
+  }
+}
+
 .metbriefing-share-btn {
   display: flex;
   align-items: center;

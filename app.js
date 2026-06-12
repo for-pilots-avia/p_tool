@@ -18,25 +18,21 @@ var _currentModule = null;
 window.app.navigateTo = function(screenName, params) {
   _currentModule = screenName;
 
-  // 1. Reset header (clear all zones)
   app.resetHeader();
 
-  // 2. Form header BEFORE showing screen
-  if (screenName === 'main') {
-    app.renderMainHeader();
-  } else {
-    ModuleRegistry.renderHeader(screenName);
-  }
-
-  // 3. Hide all screens, show target screen (AFTER header)
+  // Hide all screens
   document.querySelectorAll('.screen').forEach(function(s) {
     s.classList.remove('active');
   });
+
+  // Show target screen
   var screen = document.getElementById(screenName + 'Screen');
   if (screen) screen.classList.add('active');
 
-  // Close menu & update active state
+  // Close menu
   app.closeMenu();
+
+  // Update menu active state
   document.querySelectorAll('.menu-item[data-nav]').forEach(function(item) {
     item.classList.remove('menu-item--active');
     if (item.dataset.nav === screenName) {
@@ -44,9 +40,16 @@ window.app.navigateTo = function(screenName, params) {
     }
   });
 
-  // 4. Init module (only on first visit, AFTER screen is visible)
-  if (screenName !== 'main') {
-    ModuleRegistry.init(screenName, params);
+  // Handle navigation
+  if (screenName === 'main') {
+    app.renderMainHeader();
+  } else {
+    // Use module registry
+    var mod = window.ModuleRegistry.get(screenName);
+    if (mod) {
+      ModuleRegistry.renderHeader(screenName);
+      ModuleRegistry.init(screenName, params);
+    }
   }
 };
 
@@ -80,7 +83,7 @@ window.app.renderMainHeader = function() {
 };
 
 /* ── Typewriter Quote ── */
-window.app._twCancel = false;
+window.app._twId = 0;
 
 window.app.typewriterQuote = function(text, speed) {
   if (!speed) speed = 38;
@@ -89,7 +92,7 @@ window.app.typewriterQuote = function(text, speed) {
   var cursorEl = document.getElementById('mainQuoteCursor');
   if (!textEl) return;
 
-  window.app._twCancel = true;
+  var myId = ++window.app._twId;
 
   textEl.textContent = '';
   if (cursorEl) {
@@ -97,14 +100,14 @@ window.app.typewriterQuote = function(text, speed) {
   }
 
   setTimeout(function() {
-    window.app._twCancel = false;
+    if (window.app._twId !== myId) return;
 
     var i = 0;
 
     if (cursorEl) cursorEl.classList.add('visible');
 
     function typeNext() {
-      if (window.app._twCancel) {
+      if (window.app._twId !== myId) {
         if (cursorEl) cursorEl.classList.remove('visible');
         return;
       }
@@ -116,7 +119,7 @@ window.app.typewriterQuote = function(text, speed) {
         setTimeout(typeNext, speed);
       } else {
         setTimeout(function() {
-          if (!window.app._twCancel && cursorEl) {
+          if (window.app._twId === myId && cursorEl) {
             cursorEl.classList.remove('visible');
           }
         }, 1200);
@@ -176,22 +179,10 @@ window.app.initMarquee = function(container) {
     (function(title) {
       var inner = title.querySelector('.marquee-inner');
       if (!inner) return;
-      // Если контент был дублирован ранее — восстановить оригинал для корректного замера
-      if (inner.dataset.mqOrig) {
-        inner.innerHTML = inner.dataset.mqOrig;
-        void inner.offsetWidth; // форсировать reflow
-      }
       if (inner.scrollWidth > title.clientWidth) {
         inner.classList.add('is-overflowing');
-        // Дублирование для бесшовного marquee:
-        // Структура: [контент][зазор][контент][зазор]
-        // translateX(-50%) прокручивает ровно одну половину — бесшовный цикл
-        var orig = inner.innerHTML;
-        inner.dataset.mqOrig = orig;
-        inner.innerHTML = orig + '<span class="mq-gap"></span>' + orig + '<span class="mq-gap"></span>';
       } else {
         inner.classList.remove('is-overflowing');
-        delete inner.dataset.mqOrig;
       }
     })(titles[i]);
   }
@@ -349,6 +340,7 @@ window.app.toggleMenu = function() {
   var isOpen = menu.classList.contains('open');
   menu.classList.toggle('open');
   overlay.classList.toggle('open');
+  document.body.classList.toggle('menu-open', !isOpen);
 
   if (btn) {
     if (isOpen) {
@@ -367,6 +359,7 @@ window.app.closeMenu = function() {
   var btn     = document.getElementById('menuBtn');
   if (menu)    menu.classList.remove('open');
   if (overlay) overlay.classList.remove('open');
+  document.body.classList.remove('menu-open');
   if (btn) {
     btn.classList.remove('menu-btn-open');
     btn.innerHTML = window.ICONS.menu;
@@ -458,6 +451,9 @@ window.app.initServiceWorker = function() {
       var uFile = document.getElementById('swUpdateFile');
       if (oFile) oFile.textContent = '';
       if (uFile) uFile.textContent = '';
+      if (data.failed && data.failed > 0) {
+        app.showToast('Кэширование завершено с ошибками (' + data.failed + ' файлов)');
+      }
       localStorage.setItem('offlineReady', 'true');
       app.updateOfflineStatus(true);
       setTimeout(function() {
@@ -480,6 +476,11 @@ window.app.initServiceWorker = function() {
         setTimeout(function() { swBar.classList.remove('indeterminate'); }, 2000);
       }
       app.showUpdateBadge(data.module);
+
+      // Инвалидировать кэш цитат при обновлении aviation_sayings.json
+      if (data.module === 'Авиационные цитаты') {
+        localStorage.removeItem('mainQuoteData');
+      }
     }
   };
 
@@ -595,6 +596,7 @@ window.app.showConfirm = function(message, onConfirm, okLabel) {
 
   function close() {
     overlay.classList.remove('visible');
+    document.body.classList.remove('confirm-open');
     okBtn.removeEventListener('click', handleOk);
     cancelBtn.removeEventListener('click', handleCancel);
     overlay.removeEventListener('click', handleOverlay);
@@ -611,6 +613,7 @@ window.app.showConfirm = function(message, onConfirm, okLabel) {
 
   _confirmCleanup = close;
   overlay.classList.add('visible');
+  document.body.classList.add('confirm-open');
 };
 
 /* ═══════════════════════════════════════════
@@ -841,6 +844,7 @@ window.app.openPDFModal = function(url, startPage) {
   overlay.appendChild(canvasWrap);
   overlay.appendChild(navBar);
   document.body.appendChild(overlay);
+  document.body.classList.add('pdf-modal-open');
 
   var baseWrapWidth = canvasWrap.clientWidth;
 
@@ -997,6 +1001,7 @@ window.app.openPDFModal = function(url, startPage) {
 
   function closePDF() {
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    document.body.classList.remove('pdf-modal-open');
     document.removeEventListener('keydown', handleKey);
     window.removeEventListener('resize', handleResize);
   }
@@ -1134,5 +1139,9 @@ function _appInit() {
   window.app.navigateTo('main');
 }
 
-// Handle DOMContentLoaded for initialization
-document.addEventListener('DOMContentLoaded', _appInit);
+// Handle both cases: DOMContentLoaded not yet fired, or already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _appInit);
+} else {
+  _appInit();
+}
