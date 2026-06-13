@@ -60,13 +60,14 @@ body.dark-theme #checklistsContainer {
 .collapsible-title {
   flex: 1;
   min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  white-space: nowrap;
 }
 
 .marquee-inner {
-  display: inline-block;
-  white-space: nowrap;
+  display: inline;
 }
 
 .collapsible-chevron {
@@ -85,11 +86,7 @@ body.dark-theme #checklistsContainer {
 
 /* ─── Accordion: context-specific selectors ─── */
 
-/* Marquee при открытом блоке (базовый @keyframes marquee — в style.css) */
-.cl-block.open .marquee-inner.is-overflowing {
-  animation: marquee 10s linear infinite;
-  padding-right: 48px;
-}
+/* Marquee убран: при переполнении заголовок переносится в 2 строки */
 
 /* Поворот шеврона при открытом блоке (контракт MODULE_CONTRACT §7: прямой потомок) */
 .cl-block.open > .cl-block-header > .collapsible-chevron {
@@ -155,15 +152,18 @@ body.dark-theme #checklistsContainer {
 .cl-block-header .collapsible-title {
   flex: 1;
   min-width: 0;
-  font-size: var(--font-lg);
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--color-text-main);
-  white-space: nowrap;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .cl-block-header .marquee-inner {
-  font-size: var(--font-lg);
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--color-text-main);
 }
@@ -371,7 +371,38 @@ body.dark-theme #checklistsContainer {
   transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Divider ─── */
+/* ─── Divider (контракт MODULE_CONTRACT §7: осознанное дублирование, не в style.css) ─── */
+.list-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px var(--content-padding-x) 6px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.list-divider::before,
+.list-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.list-divider-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.list-divider:not(:has(.list-divider-label))::before { flex: 1; }
+.list-divider:not(:has(.list-divider-label))::after  { display: none; }
+
+/* ─── Checklists-specific divider overrides ─── */
 .cl-divider {
   padding: 16px 0 6px;
   font-size: var(--font-xs);

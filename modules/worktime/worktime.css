@@ -12,6 +12,13 @@
   --wt-badge-ok-bg: rgba(40, 167, 69, 0.1);
   --wt-badge-ok-text: #1a7a36;
   --wt-badge-ok-border: rgba(0, 176, 80, 0.15);
+
+  /* Segment palette (flight segments) */
+  --color-seg-0: #3b82f6;
+  --color-seg-1: #8b5cf6;
+  --color-seg-2: #ec4899;
+  --color-seg-3: #f59e0b;
+  --color-seg-4: #10b981;
 }
 #worktimeContainer .module-container {
   padding: 20px var(--content-padding-x) 40px;
@@ -25,6 +32,13 @@ body.dark-theme #worktimeContainer {
   --wt-badge-ok-bg: rgba(52, 199, 89, 0.12);
   --wt-badge-ok-text: #34c759;
   --wt-badge-ok-border: rgba(52, 199, 89, 0.2);
+
+  /* Segment palette (flight segments — dark theme) */
+  --color-seg-0: #3b82f6;
+  --color-seg-1: #8b5cf6;
+  --color-seg-2: #ec4899;
+  --color-seg-3: #f59e0b;
+  --color-seg-4: #10b981;
 }
 /* max-width обеспечивается .module-container из style.css */
 
@@ -75,8 +89,8 @@ body.dark-theme #worktimeContainer {
   color: var(--color-primary);
 }
 .wt-card-icon--segments {
-  background: var(--wt-info-light);
-  color: var(--color-info);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
 }
 .wt-card-icon--results {
   background: var(--wt-success-light);
@@ -297,7 +311,7 @@ body.dark-theme #worktimeContainer {
 
 /* ─── Empty state — используется глобальный .ct-empty-* из style.css ─── */
 
-/* ─── Timeline ─── */
+/* ─── Timeline (динамическая шкала от явки до конца смены) ─── */
 .wt-timeline-container {
   margin-bottom: 16px;
   padding: 12px;
@@ -306,12 +320,17 @@ body.dark-theme #worktimeContainer {
   border-radius: var(--border-radius-sm);
 }
 .wt-timeline-header {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
+  height: 16px;
+  margin-bottom: 6px;
   font-size: 10px;
   color: var(--color-text-muted);
-  margin-bottom: 6px;
   font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.wt-timeline-header span {
+  position: absolute;
+  transform: translateX(-50%);
 }
 .wt-timeline-track {
   position: relative;
@@ -319,6 +338,7 @@ body.dark-theme #worktimeContainer {
   background: var(--color-border-subtle);
   border-radius: 4px;
   overflow: visible;
+  margin-bottom: 14px;
 }
 .wt-timeline-gridline {
   position: absolute;
@@ -327,6 +347,17 @@ body.dark-theme #worktimeContainer {
   width: 1px;
   background: var(--color-border);
   opacity: 0.5;
+}
+.wt-timeline-gridline--midnight {
+  width: 1px;
+  background: var(--color-text-muted);
+  opacity: 0.6;
+  border-left: 1px dashed var(--color-text-muted);
+  background: none;
+}
+.wt-timeline-gridline--edge {
+  width: 2px;
+  opacity: 0.7;
 }
 .wt-timeline-segment {
   position: absolute;
@@ -351,6 +382,40 @@ body.dark-theme #worktimeContainer {
 }
 .wt-timeline-marker--landing {
   background: var(--color-warning);
+}
+.wt-timeline-marker--report {
+  background: var(--color-primary);
+  z-index: 2;
+}
+.wt-timeline-marker--report::after {
+  content: 'Явка';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-primary);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.wt-timeline-marker--shift-end {
+  background: var(--color-info);
+  z-index: 2;
+}
+.wt-timeline-marker--shift-end::after {
+  content: 'Конец';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-info);
+  white-space: nowrap;
+  margin-top: 2px;
 }
 
 /* ─── Results card special ─── */

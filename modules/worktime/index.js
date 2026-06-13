@@ -387,7 +387,7 @@
         + '<div class="ct-empty-text">Нажмите + чтобы добавить первый сегмент полёта — запуск двигателей, взлёт, посадка, выключение.</div>'
         + '</div>';
     } else {
-      html += wtRenderTimeline(_wtSegments);
+      html += wtRenderTimeline(_wtSegments, results);
       for (var i = 0; i < _wtSegments.length; i++) {
         html += wtRenderSegmentCard(_wtSegments[i], i);
       }
@@ -417,56 +417,132 @@
     return html;
   }
 
-  /* ─── Timeline ─── */
+  /* ─── Timeline (динамическая шкала от явки до конца смены) ─── */
 
-  function wtRenderTimeline(segments) {
-    var totalMin = 1440;
-    var hourLabels = [0, 3, 6, 9, 12, 15, 18, 21];
+  function wtRenderTimeline(segments, results) {
+    var reportMin = wtParseTime(_wtSettings.reportTime);
+    if (reportMin === null || segments.length === 0) return '';
+
+    /* ── Длительность шкалы ── */
+    var timelineDuration;
+    if (results && _wtFinalized) {
+      timelineDuration = results.duty;
+    } else {
+      var lastStop = segments[segments.length - 1].engineStop;
+      timelineDuration = wtDiffTime(reportMin, lastStop) + (_wtSettings.postflight || 0);
+    }
+    if (timelineDuration < 60) timelineDuration = 60; // минимум 1 ч
+    var timelineEnd = reportMin + timelineDuration;
+
+    /* ── Шаг сетки ── */
+    var step;
+    if (timelineDuration <= 180)       step = 30;
+    else if (timelineDuration <= 420)  step = 60;
+    else if (timelineDuration <= 900)  step = 120;
+    else                               step = 180;
+
+    /* ── Позиция относительно начала шкалы (поддержка перехода через полночь) ── */
+    function timelineOffset(absMin) {
+      var offset = absMin - reportMin;
+      if (offset < 0) offset += 1440;
+      return offset;
+    }
+    function timelinePct(absMin) {
+      return (timelineOffset(absMin) / timelineDuration * 100);
+    }
+
+    /* ── Метка времени (без суффикса +1) ── */
+    function fmtLabel(absMin) {
+      var h = Math.floor(((absMin % 1440) + 1440) % 1440 / 60);
+      var m = ((absMin % 1440) + 1440) % 1440 % 60;
+      return (h < 10 ? '0' + h : '' + h) + ':' + (m < 10 ? '0' + m : '' + m);
+    }
 
     var html = '<div class="wt-timeline-container">';
 
+    /* ── Заголовок: метки сетки ── */
     html += '<div class="wt-timeline-header">';
-    for (var i = 0; i < hourLabels.length; i++) {
-      html += '<span>' + (hourLabels[i] < 10 ? '0' + hourLabels[i] : hourLabels[i]) + ':00</span>';
+    var gridMin = reportMin;
+    var lastLabelPct = 0;
+    while (gridMin < timelineEnd + 1) {
+      var pct = timelinePct(gridMin);
+      if (pct > 100.05) break;
+      var clampedPct = Math.min(pct, 100);
+      html += '<span style="position:absolute;left:' + clampedPct.toFixed(2) + '%;transform:translateX(-50%);">'
+        + fmtLabel(gridMin) + '</span>';
+      lastLabelPct = clampedPct;
+      gridMin += step;
+    }
+    // Метка «Конец» справа — если последняя метка сетки не у правого края (≥98%)
+    if (lastLabelPct < 98) {
+      html += '<span style="position:absolute;right:0;transform:translateX(50%);">'
+        + fmtLabel(timelineEnd) + '</span>';
     }
     html += '</div>';
 
+    /* ── Трек ── */
     html += '<div class="wt-timeline-track">';
 
-    var allHours = [0, 3, 6, 9, 12, 15, 18, 21, 24];
-    for (var g = 0; g < allHours.length; g++) {
-      var leftPct = (allHours[g] * 60 / totalMin * 100).toFixed(2);
-      html += '<div class="wt-timeline-gridline" style="left:' + leftPct + '%;"></div>';
+    /* ── Линии сетки ── */
+    var _gridPcts = [];          // collect drawn gridline positions
+    gridMin = reportMin;
+    while (gridMin < timelineEnd + 1) {
+      var gPct = timelinePct(gridMin);
+      if (gPct > 100.05) break;
+      var gClamped = Math.min(gPct, 100);
+      var isEdge = (gridMin === reportMin || gridMin >= timelineEnd);
+      var isMidnight = (gridMin % 1440 === 0) && !isEdge;
+      var gClass = 'wt-timeline-gridline';
+      if (isMidnight) gClass += ' wt-timeline-gridline--midnight';
+      if (isEdge) gClass += ' wt-timeline-gridline--edge';
+      html += '<div class="' + gClass + '" style="left:' + gClamped.toFixed(2) + '%;"></div>';
+      _gridPcts.push(gClamped);
+      gridMin += step;
+    }
+    // Линия полуночи — может не совпасть с шагом сетки
+    if (reportMin > 0) {
+      var midnightOffset = (1440 - reportMin) % 1440;
+      if (midnightOffset > 0 && midnightOffset < timelineDuration) {
+        var midPct = (midnightOffset / timelineDuration * 100).toFixed(2);
+        // Проверяем что ещё не рисовали на этом месте (±1% допуск)
+        var _midNum = parseFloat(midPct);
+        var _alreadyDrawn = _gridPcts.some(function(p){ return Math.abs(p - _midNum) < 1; });
+        if (!_alreadyDrawn) {
+          html += '<div class="wt-timeline-gridline wt-timeline-gridline--midnight" style="left:' + midPct + '%;"></div>';
+        }
+      }
     }
 
+    /* ── Маркер «Время явки» (левый край шкалы) ── */
+    html += '<div class="wt-timeline-marker wt-timeline-marker--report" style="left:0%;"'
+      + ' title="Явка: ' + _wtSettings.reportTime + '"></div>';
+
+    /* ── Сегменты и маркеры взлёта/посадки ── */
     var COLORS = 5;
     for (var s = 0; s < segments.length; s++) {
       var seg = segments[s];
-      var startPct  = (seg.engineStart / totalMin * 100).toFixed(3);
-      var widthPct  = Math.max((seg.engineStop - seg.engineStart) / totalMin * 100, 0.3).toFixed(3);
-      var toPct     = (seg.takeoff  / totalMin * 100).toFixed(3);
-      var ldPct     = (seg.landing  / totalMin * 100).toFixed(3);
-      var colorIdx  = s % COLORS;
+      var sPct  = timelinePct(seg.engineStart);
+      var wPct  = Math.max(seg.flightTime / timelineDuration * 100, 0.3);
+      var toPct = timelinePct(seg.takeoff);
+      var ldPct = timelinePct(seg.landing);
+      var colorIdx = s % COLORS;
 
       html += '<div class="wt-timeline-segment wt-segment-color-' + colorIdx + '"'
-        + ' style="left:' + startPct + '%;width:' + widthPct + '%;"'
+        + ' style="left:' + sPct.toFixed(3) + '%;width:' + wPct.toFixed(3) + '%;"'
         + ' title="Сег. ' + (s + 1) + ': ' + wtFormatTime(seg.engineStart) + '–' + wtFormatTime(seg.engineStop) + '">'
         + '</div>';
-      html += '<div class="wt-timeline-marker wt-timeline-marker--takeoff" style="left:' + toPct + '%;"'
+      html += '<div class="wt-timeline-marker wt-timeline-marker--takeoff" style="left:' + toPct.toFixed(3) + '%;"'
         + ' title="Взлёт: ' + wtFormatTime(seg.takeoff) + '"></div>';
-      html += '<div class="wt-timeline-marker wt-timeline-marker--landing" style="left:' + ldPct + '%;"'
+      html += '<div class="wt-timeline-marker wt-timeline-marker--landing" style="left:' + ldPct.toFixed(3) + '%;"'
         + ' title="Посадка: ' + wtFormatTime(seg.landing) + '"></div>';
     }
 
+    /* ── Маркер «Конец смены» (правый край шкалы) ── */
+    var shiftEndMin = (reportMin + timelineDuration) % 1440;
+    html += '<div class="wt-timeline-marker wt-timeline-marker--shift-end" style="left:100%;"'
+      + ' title="Конец смены: ' + wtFormatTime(shiftEndMin) + '"></div>';
+
     html += '</div>';
-
-    html += '<div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;">'
-      + '<div style="display:flex;align-items:center;gap:4px;font-size:var(--font-xs);color:var(--color-text-muted);">'
-      + '<div style="width:8px;height:8px;border-radius:50%;background:var(--color-success);border:1.5px solid var(--color-text-white);"></div> Взлёт</div>'
-      + '<div style="display:flex;align-items:center;gap:4px;font-size:var(--font-xs);color:var(--color-text-muted);">'
-      + '<div style="width:8px;height:8px;border-radius:50%;background:var(--color-warning);border:1.5px solid var(--color-text-white);"></div> Посадка</div>'
-      + '</div>';
-
     html += '</div>';
     return html;
   }

@@ -769,10 +769,7 @@
 
     app.hideSkeleton(container, html);
 
-    // Инициализировать marquee для заголовков аккордеонов
-    if (window.app && window.app.initMarquee) {
-      window.app.initMarquee(container);
-    }
+    // Marquee убран: заголовки переносятся в 2 строки через CSS -webkit-line-clamp
   }
 
   /* ═══════════════════════════════════════════

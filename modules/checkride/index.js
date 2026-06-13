@@ -30,13 +30,28 @@
   var STORAGE_PILOT   = 'checkride_pilot';  // автосохранение полей регистрации
   var STORAGE_STATE  = 'checkride_state';   // кэш хода проверки
 
-  /* ─── Маппинг кодов компетенций ─── */
+  /* ─── Маппинг кодов компетенций (fallback — основные берутся из JSON competencyDefs) ─── */
   var COMPETENCY_LABELS = {
     '\u041F\u041F':  '\u041F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440',
     '\u041D\u041A':  '\u041D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F \u0438 \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u044C',
     '\u0420\u0421':  '\u0420\u0430\u0434\u0438\u043E\u0441\u0432\u044F\u0437\u044C',
-    'CRM': '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u043C\u0438 \u044D\u043A\u0438\u043F\u0430\u0436\u0430'
+    'CRM': '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0440\u0435\u0441\u0443\u0440\u0441\u0430\u043C\u0438 \u044D\u043A\u0438\u043F\u0430\u0436\u0430',
+    '\u041A\u041E\u041C': '\u041A\u043E\u043C\u043C\u0443\u043D\u0438\u043A\u0430\u0446\u0438\u044F',
+    '\u0410\u0423':  '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0442\u0440\u0430\u0435\u043A\u0442\u043E\u0440\u0438\u0435\u0439 \u043F\u043E\u043B\u0435\u0442\u0430 \u0412\u0421, \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0437\u0430\u0446\u0438\u044F',
+    '\u0420\u0423':  '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0442\u0440\u0430\u0435\u043A\u0442\u043E\u0440\u0438\u0435\u0439 \u043F\u043E\u043B\u0435\u0442\u0430 \u0412\u0421',
+    '\u041A\u0420':  '\u041B\u0438\u0434\u0435\u0440\u0441\u0442\u0432\u043E \u0438 \u043A\u043E\u043C\u0430\u043D\u0434\u043D\u0430\u044F \u0440\u0430\u0431\u043E\u0442\u0430',
+    '\u041F\u0420':  '\u0420\u0430\u0437\u0440\u0435\u0448\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0431\u043B\u0435\u043C \u0438 \u043F\u0440\u0438\u043D\u044F\u0442\u0438\u0435 \u0440\u0435\u0448\u0435\u043D\u0438\u0439',
+    '\u0421\u041E':  '\u0421\u0438\u0442\u0443\u0430\u0446\u0438\u043E\u043D\u043D\u0430\u044F \u043E\u0441\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u043D\u043E\u0441\u0442\u044C',
+    '\u0423\u0420\u041D': '\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435 \u0440\u0430\u0431\u043E\u0447\u0435\u0439 \u043D\u0430\u0433\u0440\u0443\u0437\u043A\u043E\u0439'
   };
+
+  /* Resolve competency label: prefer JSON competencyDefs, fallback to COMPETENCY_LABELS */
+  function getCompetencyLabel(code) {
+    if (_data && _data.competencyDefs && _data.competencyDefs[code]) {
+      return _data.competencyDefs[code];
+    }
+    return COMPETENCY_LABELS[code] || code;
+  }
 
   /* ═══════════════════════════════════════════
      UTILITY: icon helper
@@ -233,17 +248,14 @@
       if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
         groups.forEach(function(group) {
           var compCode = group.topitem || '\u041E\u0431\u0449\u0438\u0435';
-          var compLabel = COMPETENCY_LABELS[compCode];
-          /* FFS topitem: "Применение процедур (ПП):" → извлечь код из скобок */
-          if (!compLabel) {
+          var compLabel = getCompetencyLabel(compCode);
+          /* Legacy FFS topitem: "Применение процедур (ПП):" → извлечь код из скобок */
+          if (compLabel === compCode && compCode !== '\u041E\u0431\u0449\u0438\u0435') {
             var bracketMatch = compCode.match(/\(([^)]+)\)/);
             if (bracketMatch) {
               var shortCode = bracketMatch[1];
-              var fullName = compCode.replace(/\s*\([^)]+\)\s*:?\s*$/, '').trim();
               compCode = shortCode;
-              compLabel = COMPETENCY_LABELS[shortCode] || fullName;
-            } else {
-              compLabel = compCode;
+              compLabel = getCompetencyLabel(shortCode);
             }
           }
           var compCheckboxes = [];
@@ -617,7 +629,8 @@
       reportHtml += '<div class="checkride-competencies-rating-divider">';
       reportHtml += '<div class="checkride-competencies-rating-title">\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438:</div>';
       for (var code in competencies) {
-        reportHtml += '<div class="checkride-rating-block"><b>' + code + '</b>: <span class="checkride-score-val">' + competencies[code].score + '</span></div>';
+        var cLabel = getCompetencyLabel(code);
+        reportHtml += '<div class="checkride-rating-block"><b>' + code + '</b> — ' + cLabel + ': <span class="checkride-score-val">' + competencies[code].score + '</span></div>';
       }
       reportHtml += '</div>';
     }
@@ -690,7 +703,7 @@
     compHtml += '<h2 class="checkride-competencies-title">\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438:</h2>';
     for (var code in competencies) {
       var items = competencies[code].items;
-      compHtml += '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + code + '</h3>';
+      compHtml += '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + code + ' \u2014 ' + getCompetencyLabel(code) + '</h3>';
       items.forEach(function(item) {
         var percent = item.count > 0 ? (item.checked / item.count) * 100 : 0;
         var score = 2;
@@ -841,12 +854,15 @@
     var ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, cssW, cssH);
-    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     canvas.style.display = 'block';
     var drawing = false;
+
+    function getStrokeColor() {
+      return document.body.classList.contains('dark-theme') ? '#ffffff' : '#000000';
+    }
 
     function getPos(e) {
       var r = canvas.getBoundingClientRect();
@@ -858,6 +874,7 @@
     canvas.onmousedown = canvas.ontouchstart = function(e) {
       e.preventDefault();
       drawing = true;
+      ctx.strokeStyle = getStrokeColor();
       ctx.beginPath();
       var p = getPos(e);
       ctx.moveTo(p.x, p.y);
@@ -865,6 +882,7 @@
     canvas.onmousemove = canvas.ontouchmove = function(e) {
       if (!drawing) return;
       e.preventDefault();
+      ctx.strokeStyle = getStrokeColor();
       var p = getPos(e);
       ctx.lineTo(p.x, p.y);
       ctx.stroke();

@@ -562,13 +562,13 @@ body.dark-theme .rt-rule-card {
 body.dark-theme .rt-formula {
   background: rgba(0,0,0,0.3);
   border-color: rgba(255,255,255,0.1);
-  color: var(--color-text-secondary, #d1d5db);
+  color: var(--color-text-main, #e8e8e8);
 }
 
 body.dark-theme .rt-example {
   background: rgba(0,0,0,0.2);
   border-color: rgba(255,255,255,0.08);
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-secondary, #aaaaaa);
 }
 
 body.dark-theme .rt-tip {
@@ -616,12 +616,12 @@ body.dark-theme .rt-tip-row {
 
 body.dark-theme .rt-table th {
   background: rgba(255,255,255,0.06);
-  color: var(--color-text-secondary, #d1d5db);
+  color: var(--color-text-main, #e8e8e8);
 }
 
 body.dark-theme .rt-table td {
   border-color: rgba(255,255,255,0.06);
-  color: var(--color-text-secondary, #d1d5db);
+  color: var(--color-text-main, #e8e8e8);
 }
 
 body.dark-theme .rt-table tr:nth-child(even) td {
@@ -633,7 +633,7 @@ body.dark-theme .rt-attribution {
 }
 
 body.dark-theme .rt-checklist-list {
-  color: var(--color-text-secondary, #d1d5db);
+  color: var(--color-text-main, #e8e8e8);
 }
 
 body.dark-theme .rt-search-input {

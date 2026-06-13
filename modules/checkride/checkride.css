@@ -626,12 +626,18 @@ body.dark-theme #checkrideContainer {
   user-select: none;
   -webkit-user-select: none;
   margin-bottom: 4px;
+  flex-wrap: nowrap;
+  align-items: flex-start;
 }
 
 #checkrideContainer .checkride-competency-toggle .list-divider-label {
   color: var(--color-primary);
   font-weight: 700;
   letter-spacing: 0.04em;
+  white-space: normal;
+  flex: 1;
+  min-width: 0;
+  text-transform: none;
 }
 
 #checkrideContainer .checkride-competency-count {
@@ -644,6 +650,7 @@ body.dark-theme #checkrideContainer {
   text-align: center;
   font-weight: 600;
   flex-shrink: 0;
+  margin-top: 2px;
   order: 2;
 }
 
@@ -654,6 +661,12 @@ body.dark-theme #checkrideContainer {
   order: 3;
   display: flex;
   align-items: center;
+  margin-top: 2px;
+}
+
+/* Hide divider ::after line inside competency toggle */
+#checkrideContainer .checkride-competency-toggle::after {
+  display: none;
 }
 
 #checkrideContainer .checkride-competency-toggle .checkride-competency-chevron svg {
@@ -733,12 +746,12 @@ body.dark-theme #checkrideContainer {
 }
 
 .checkride-comp-yellow {
-  border-left: 4px solid var(--color-warning);
+  border-left: 2px solid var(--color-warning);
   padding-left: 16px;
 }
 
 .checkride-comp-red {
-  border-left: 4px solid var(--color-danger);
+  border-left: 2px solid var(--color-danger);
   padding-left: 16px;
 }
 
@@ -846,6 +859,14 @@ body.dark-theme #checkrideContainer {
 /* ─── Dark theme corrections ─── */
 body.dark-theme .checkride-rating-summary {
   background: var(--cr-color-dark-surface);
+}
+
+body.dark-theme .checkride-rating-block {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body.dark-theme .checkride-rating-block b {
+  color: var(--color-text-white);
 }
 
 body.dark-theme .checkride-report-comment {

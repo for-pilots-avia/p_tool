@@ -945,6 +945,30 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   font-weight: 700;
   margin-bottom: 8px;
 }
+.metbriefing-readiness-refresh-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.15s var(--transition-ease);
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+.metbriefing-readiness-refresh-btn:active {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .metbriefing-readiness-refresh-btn:hover {
+    opacity: 1;
+  }
+}
+.metbriefing-readiness-refresh-btn svg {
+  width: 18px;
+  height: 18px;
+}
 .metbriefing-readiness-dot {
   width: 10px; height: 10px;
   border-radius: 50%;

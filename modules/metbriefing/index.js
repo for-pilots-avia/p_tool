@@ -2457,6 +2457,7 @@
       '<div class="metbriefing-readiness-indicator metbriefing-readiness-indicator--' + readiness.level + '">' +
         '<span class="metbriefing-readiness-dot"></span>' +
         '<span class="metbriefing-readiness-label">' + readiness.label + '</span>' +
+        '<button class="metbriefing-readiness-refresh-btn" data-mb-refresh-all aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0432\u0441\u0435">' + icon('rotate-ccw', 18) + '</button>' +
       '</div>';
     if (readiness.issues.length > 0) {
       html += '<ul class="metbriefing-readiness-issues">';
@@ -3279,12 +3280,8 @@
 
     center.innerHTML = '<div class="hc-module">\u041C\u0435\u0442\u0435\u043E\u0431\u0440\u0438\u0444\u0438\u043D\u0433</div>';
 
-    right.innerHTML = '<button class="icon-btn" aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C">'
-      + window.ICONS['rotate-ccw'] + '</button>';
-    right.onclick = function() {
-      // Refresh ALL route airports' weather + NOTAM unconditionally
-      refreshAllWeather();
-    };
+    right.innerHTML = '';
+    right.onclick = null;
   }
 
   // ═══════════════════════════════════════════
@@ -3336,6 +3333,13 @@
 
           renderTabSwitcher();
           renderCurrentTab();
+          return;
+        }
+
+        // Refresh-all button (moved from header to "Брифинг готов" block)
+        var refreshAllBtn = e.target.closest('[data-mb-refresh-all]');
+        if (refreshAllBtn) {
+          refreshAllWeather();
           return;
         }
 

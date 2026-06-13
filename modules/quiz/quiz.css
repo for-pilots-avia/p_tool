@@ -198,6 +198,10 @@ body.dark-theme #quizContainer {
   gap: 12px;
   margin-top: 12px;
   width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--color-danger);
+  border-radius: var(--border-radius-sm);
+  box-sizing: border-box;
 }
 .quiz-toggle-label {
   display: flex;
