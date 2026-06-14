@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v24 */
+/* Pilot's Tool — Service Worker v34 */
 
-var CACHE_NAME = 'pilots-tool-v33';
+var CACHE_NAME = 'pilots-tool-v34';
 
 var JSON_MODULE_NAMES = {
   'modules/metbriefing/data/metbriefing.json':            'Метео брифинг',
