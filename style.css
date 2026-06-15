@@ -144,8 +144,7 @@ html { font-size: 16px; }
 }
 
 /* Touch-action */
-button, .menu-item, .contact-item, .contact-phone,
-.contact-email, .icon-btn {
+button, .menu-item, .icon-btn {
   touch-action: manipulation;
 }
 
@@ -912,38 +911,11 @@ body.dark-theme #notesQuickBtn {
   }
 }
 
-/* ═══════════════════════════════════════════
-   SECTION 4 continued: DIVIDERS & MISC
-   ═══════════════════════════════════════════ */
-.list-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px var(--content-padding-x) 6px;
-  pointer-events: none;
-  user-select: none;
+/* ─── Marquee keyframes (контракт MODULE_CONTRACT §7: единственное исключение в style.css) ─── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-
-.list-divider::before,
-.list-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-
-.list-divider-label {
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.list-divider:not(:has(.list-divider-label))::before { flex: 1; }
-.list-divider:not(:has(.list-divider-label))::after  { display: none; }
 
 /* ─── Module container ─── */
 .module-container {
@@ -1053,7 +1025,6 @@ body.dark-theme #notesQuickBtn {
 }
 
 @media (min-width: 768px) {
-  .contact-item { min-height: 56px; }
   .menu-item { font-size: var(--font-md); padding: 16px 20px; }
 }
 

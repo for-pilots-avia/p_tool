@@ -487,6 +487,8 @@ window.app.initServiceWorker = function() {
   navigator.serviceWorker.register('./sw.js').then(function(reg) {
     // Показать overlay и прогресс-бар только при первой установке SW
     if (reg.installing) {
+      localStorage.removeItem('offlineReady');
+      app.updateOfflineStatus(false);
       var overlay = document.getElementById('cacheProgressOverlay');
       var swBar   = document.getElementById('swProgressBar');
       if (overlay) overlay.style.display = 'flex';

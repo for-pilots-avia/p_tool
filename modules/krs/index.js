@@ -32,13 +32,11 @@
     return 'old';
   }
 
-  function getAgeLabel(category) {
-    switch (category) {
-      case 'new': return 'Новый';
-      case 'mid': return 'Устар.';
-      case 'old': return 'Старый';
-    }
-    return '';
+  function formatBadgeDate(dateStr) {
+    var d = new Date(dateStr);
+    var year = d.getFullYear();
+    var month = d.getMonth() + 1;
+    return year + '.' + (month < 10 ? '0' + month : month);
   }
 
   /* ═══════════════════════════════════════════
@@ -232,7 +230,7 @@
   function renderBlock(inst) {
     var isOpen = !!_openBlocks[inst.id];
     var ageCat = getAgeCategory(inst.date);
-    var ageLabel = getAgeLabel(ageCat);
+    var ageLabel = formatBadgeDate(inst.date);
     var blockClass = 'krs-block' + (isOpen ? ' open' : '');
 
     var html = '<div class="' + blockClass + '" data-block-id="' + inst.id + '">';
@@ -389,10 +387,7 @@
 
     app.hideSkeleton(container, html);
 
-    // Инициализировать marquee для заголовков аккордеонов
-    if (window.app && window.app.initMarquee) {
-      window.app.initMarquee(container);
-    }
+    // Marquee убран: заголовки переносятся в 2 строки через CSS -webkit-line-clamp
   }
 
   /* ═══════════════════════════════════════════
