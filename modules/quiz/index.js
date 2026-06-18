@@ -441,10 +441,10 @@
     var contentEl = container.querySelector('#startContent');
     show(loaderEl); hide(errorEl); hide(contentEl);
 
-    /* Load main test from questions.txt */
-    fetch('modules/quiz/data/questions.txt')
+    /* Load main test from test-line.json */
+    fetch('modules/quiz/data/test-line.json')
       .then(function (res) {
-        if (!res.ok) throw new Error('Failed to load questions.txt');
+        if (!res.ok) throw new Error('Failed to load test-line.json');
         return res.text();
       })
       .then(function (txt) {
@@ -453,10 +453,10 @@
 
         /* Load additional JSON tests */
         return Promise.all([
-          fetch('modules/quiz/data/test-visual.json')
+          fetch('modules/quiz/data/test-comm.json')
             .then(function (res) { if (!res.ok) return null; return res.json(); })
             .catch(function () { return null; }),
-          fetch('modules/quiz/data/test-TB.json')
+          fetch('modules/quiz/data/test-instructor.json')
             .then(function (res) { if (!res.ok) return null; return res.json(); })
             .catch(function () { return null; })
         ]);
