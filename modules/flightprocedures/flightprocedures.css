@@ -28,12 +28,15 @@
 
 .list-divider-label {
   font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
+  font-weight: 700;
+  color: var(--color-danger);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
   flex-shrink: 0;
+  max-width: calc(100% - 60px);
 }
 
 /* Разделитель без заголовка — только линия */
@@ -360,7 +363,7 @@ body.dark-theme .flightprocedures-card-header {
 /* ─── Memory Items ─── */
 .flightprocedures-memory {
   background: var(--color-primary-ghost);
-  border: 1px solid rgba(205, 32, 44, 0.15); /* TODO: no --color-primary-border var (15% opacity) */
+  border: 1px solid var(--color-primary-light);
   border-radius: var(--border-radius-sm);
   padding: 12px 14px;
   margin-bottom: 16px;
@@ -405,6 +408,113 @@ body.dark-theme .flightprocedures-card-header {
   left: 0;
   color: var(--color-danger);
   font-weight: 700;
+}
+
+/* ─── Radio Script (зелёный блок, по аналогии с Memory Items) ─── */
+.flightprocedures-radio {
+  background: rgba(40, 167, 69, 0.12);
+  border: 1px solid rgba(40, 167, 69, 0.30);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.flightprocedures-radio-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-success);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flightprocedures-radio-title svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.flightprocedures-radio-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flightprocedures-radio-item {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+}
+
+.flightprocedures-radio-item::before {
+  content: '\25B8';
+  position: absolute;
+  left: 0;
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* ─── Text Block (без аккордеона, layout: "text") ─── */
+.flightprocedures-text-block {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.flightprocedures-text-block:last-child {
+  border-bottom: none;
+}
+
+.flightprocedures-text-block-title {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.flightprocedures-text-block-desc {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+/* ─── Inline HTML Table (tableHtml) ─── */
+.flightprocedures-table-inline {
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.flightprocedures-table-inline table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+.flightprocedures-table-inline th,
+.flightprocedures-table-inline td {
+  border: 1px solid var(--color-border);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.flightprocedures-table-inline th {
+  background: var(--color-bg-card);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.flightprocedures-table-inline td ul,
+.flightprocedures-table-inline td ol {
+  margin: 4px 0;
+  padding-left: 18px;
 }
 
 /* ─── Steps ─── */
@@ -827,8 +937,10 @@ body.dark-theme .flightprocedures-card-header {
   transition: color 0.15s var(--transition-ease);
 }
 
-.module-link:hover {
-  color: var(--color-primary);
+@media (hover: hover) {
+  .module-link:hover {
+    color: var(--color-primary);
+  }
 }
 
 .module-link::after {
@@ -938,5 +1050,67 @@ body.dark-theme .flightprocedures-card[data-depth="2"] .flightprocedures-card-he
 
   .flightprocedures-notes {
     padding: 14px 18px;
+  }
+}
+
+/* Module container — нижний паддинг (MODULE_CONTRACT §7: переопределение через #nameContainer) */
+#flightproceduresContainer .module-container {
+  padding-bottom: 32px;
+}
+
+/* ─── Узкие экраны: компенсация матрёшки паддингов ───
+   На < 480px уменьшаем горизонтальные паддинги вложенных элементов, чтобы
+   глубокий контент (depth=3, steps) не сжимался до 228px из 360px.
+   MODULE_CONTRACT §7: контекстные правила на #nameContainer + свой module-container разрешены. */
+@media (max-width: 480px) {
+  #flightproceduresContainer .module-container { padding-left: 12px; padding-right: 12px; }
+  .flightprocedures-card-content { padding: 0 12px 16px; }
+  .flightprocedures-card[data-depth="2"] .flightprocedures-card-header { padding: 10px 10px; }
+  .flightprocedures-card[data-depth="3"] .flightprocedures-card-header { padding: 8px 8px; }
+  .flightprocedures-step { padding: 5px 0 5px 24px; }
+  .flightprocedures-memory { padding: 10px 10px; }
+  .flightprocedures-notes  { padding: 10px 10px; }
+}
+
+@media (max-width: 380px) {
+  #flightproceduresContainer .module-container { padding-left: 10px; padding-right: 10px; }
+  .flightprocedures-card-content { padding: 0 10px 14px; }
+  .flightprocedures-card[data-depth="2"] .flightprocedures-card-header { padding: 8px 8px; }
+  .flightprocedures-card[data-depth="3"] .flightprocedures-card-header { padding: 6px 6px; }
+  .flightprocedures-step { padding: 4px 0 4px 20px; }
+  .flightprocedures-step::before { width: 18px; height: 18px; font-size: 0.6rem; }
+  .flightprocedures-memory { padding: 8px 8px; }
+  .flightprocedures-notes  { padding: 8px 8px; }
+}
+
+/* ─── Узкие экраны: улучшенное выравнивание заголовков аккордеонов ───
+   Решает: длинные заголовки переносятся непредсказуемо, висячие предлоги,
+   «рваный» правый край на < 560px. lang="ru" на #flightproceduresContainer
+   включит слоговые переносы для hyphens: auto. */
+@media (max-width: 560px) {
+  .flightprocedures-card-header {
+    padding: 12px 12px;
+    gap: 8px;
+  }
+
+  .flightprocedures-card-title {
+    font-size: var(--font-sm);
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    text-align: left;
+  }
+}
+
+@media (max-width: 380px) {
+  .flightprocedures-card-header {
+    padding: 10px 10px;
+    gap: 6px;
+  }
+
+  .flightprocedures-card-title {
+    font-size: 13px;
+    line-height: 1.35;
   }
 }

@@ -477,6 +477,9 @@
       return;
     }
 
+    // lang="ru" для корректной расстановки переносов (hyphens: auto в CSS)
+    container.setAttribute('lang', 'ru');
+
     // Контракт MODULE_CONTRACT §7: запросить библиотеки лениво через ensureLib
     app.ensureLib('photoswipe', function() {});
     app.ensureLib('pdfjs', function() {});

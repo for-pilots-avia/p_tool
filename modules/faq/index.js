@@ -7,6 +7,10 @@
   'use strict';
 
   var _data = null;
+  var _sectionObserver = null;
+  var _visibleSections = {};
+  var _scrollProgrammatic = false;
+  var _scrollTimer = null;
 
   /* ═══════════════════════════════════════════
      HEADER
@@ -26,6 +30,11 @@
 
     right.innerHTML = '';
     right.onclick = null;
+
+    /* Re-init scroll sync if observer was disconnected (after destroy) */
+    if (!_sectionObserver && _data) {
+      _initScrollSync();
+    }
   }
 
   /* ═══════════════════════════════════════════
@@ -146,6 +155,7 @@
 
     html += '</div>';
     app.hideSkeleton(container, html);
+    _initScrollSync();
   }
 
   /* ═══════════════════════════════════════════
@@ -154,22 +164,113 @@
 
   function scrollToSection(id) {
     /* Update active pill */
-    var ct = document.getElementById('faqContainer');
-    if (ct) {
-      var pills = ct.querySelectorAll('.faq-toc-pill');
-      for (var p = 0; p < pills.length; p++) {
-        pills[p].classList.remove('faq-toc-pill--active');
-        if (pills[p].dataset.section === id) {
-          pills[p].classList.add('faq-toc-pill--active');
-        }
-      }
-    }
+    _setActivePill(id);
     var el = document.getElementById(id);
     if (el) {
       var headerOffset = 56 + 52 + 16;
       var y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      /* Suppress observer during programmatic scroll */
+      _scrollProgrammatic = true;
+      if (_scrollTimer) clearTimeout(_scrollTimer);
       window.scrollTo({ top: y, behavior: 'smooth' });
+      _scrollTimer = setTimeout(function() {
+        _scrollProgrammatic = false;
+        _scrollTimer = null;
+      }, 600);
     }
+  }
+
+  function _setActivePill(sectionId) {
+    var ct = document.getElementById('faqContainer');
+    if (!ct) return;
+    var pills = ct.querySelectorAll('.faq-toc-pill');
+    for (var p = 0; p < pills.length; p++) {
+      pills[p].classList.remove('faq-toc-pill--active');
+      if (pills[p].dataset.section === sectionId) {
+        pills[p].classList.add('faq-toc-pill--active');
+        /* Scroll pill into view if TOC is scrollable */
+        pills[p].scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+      }
+    }
+  }
+
+  function _initScrollSync() {
+    var container = document.getElementById('faqContainer');
+    if (!container) return;
+
+    var sections = container.querySelectorAll('.faq-section');
+    if (sections.length === 0) return;
+
+    /* Disconnect previous observer if re-initialized */
+    if (_sectionObserver) {
+      _sectionObserver.disconnect();
+      _sectionObserver = null;
+    }
+    _visibleSections = {};
+
+    _sectionObserver = new IntersectionObserver(function(entries) {
+      /* Skip updates during programmatic scroll */
+      if (_scrollProgrammatic) return;
+
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) {
+          _visibleSections[entries[i].target.id] = entries[i].target;
+        } else {
+          delete _visibleSections[entries[i].target.id];
+        }
+      }
+      var keys = Object.keys(_visibleSections);
+      if (keys.length === 0) return;
+
+      /* Near bottom — scan ALL sections in viewport to catch last ones outside observer zone */
+      var scrollEl = document.scrollingElement || document.documentElement;
+      var nearBottom = scrollEl && scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 50;
+
+      var activeId = null;
+      if (nearBottom) {
+        var allSections = container.querySelectorAll('.faq-section');
+        var bottomY = -Infinity;
+        for (var b = 0; b < allSections.length; b++) {
+          var bRect = allSections[b].getBoundingClientRect();
+          if (bRect.top < window.innerHeight && bRect.bottom > 0 && bRect.top > bottomY) {
+            bottomY = bRect.top;
+            activeId = allSections[b].id;
+          }
+        }
+      } else {
+        var topY = Infinity;
+        for (var t = 0; t < keys.length; t++) {
+          var tRect = _visibleSections[keys[t]].getBoundingClientRect();
+          if (tRect.top < topY) {
+            topY = tRect.top;
+            activeId = keys[t];
+          }
+        }
+      }
+      if (activeId) {
+        _setActivePill(activeId);
+      }
+    }, {
+      rootMargin: '-56px 0px -50% 0px',
+      threshold: 0
+    });
+
+    for (var s = 0; s < sections.length; s++) {
+      _sectionObserver.observe(sections[s]);
+    }
+  }
+
+  function destroy() {
+    if (_sectionObserver) {
+      _sectionObserver.disconnect();
+      _sectionObserver = null;
+    }
+    if (_scrollTimer) {
+      clearTimeout(_scrollTimer);
+      _scrollTimer = null;
+    }
+    _scrollProgrammatic = false;
+    _visibleSections = {};
   }
 
   /* ═══════════════════════════════════════════
@@ -180,7 +281,8 @@
     title:        'FAQ',
     icon:         'help-circle',
     init:          init,
-    renderHeader:  renderHeader
+    renderHeader:  renderHeader,
+    destroy:       destroy
   });
 
 })();

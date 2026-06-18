@@ -12,8 +12,25 @@
   var _expanded  = {};     // id категории → true
   var _openQ     = {};     // id вопроса → true (ответ раскрыт)
   var _searchQ   = '';     // поисковый запрос
+  var _activeSection = 'line'; // активная секция: 'line' | 'ffs'
 
   var STORAGE_KEY = 'survey-mastered';
+
+  /* ─── Совместимость JSON v1/v2 ─── */
+  function getAllCategories() {
+    if (!_data) return [];
+    if (_data.line && _data.ffs) {
+      return (_data.line.categories || []).concat(_data.ffs.categories || []);
+    }
+    return _data.categories || [];
+  }
+  function getActiveCategories() {
+    if (!_data) return [];
+    if (_data.line && _data.ffs) {
+      return (_data[_activeSection] && _data[_activeSection].categories) || [];
+    }
+    return _data.categories || [];
+  }
 
   /* ═══════════════════════════════════════════
      UTILITY: icon helper
@@ -74,9 +91,9 @@
   function getTotalProgress() {
     var total = 0;
     var done = 0;
-    if (!_data) return { total: 0, done: 0, pct: 0 };
-    for (var c = 0; c < _data.categories.length; c++) {
-      var cat = _data.categories[c];
+    var allCats = getAllCategories();
+    for (var c = 0; c < allCats.length; c++) {
+      var cat = allCats[c];
       total += cat.questions.length;
       for (var q = 0; q < cat.questions.length; q++) {
         if (_mastered[cat.questions[q].id]) done++;
@@ -110,14 +127,29 @@
     if (!container || !_data) return;
 
     var totalProg = getTotalProgress();
-    var totalCategories = _data.categories.length;
+    var activeCats = getActiveCategories();
+    var isV2 = !!(_data.line && _data.ffs);
 
-    var html = '<div class="module-container">';
+    var html = '<div class="module-container" lang="ru">';
+
+    /* ─── Section Tabs (LINE/FFS) — только для v2 ─── */
+    if (isV2) {
+      html += '<div class="survey-section-tabs">' +
+        '<button class="survey-section-tab' + (_activeSection === 'line' ? ' active' : '') + '" data-survey-section="line">LINE</button>' +
+        '<button class="survey-section-tab' + (_activeSection === 'ffs' ? ' active' : '') + '" data-survey-section="ffs">FFS</button>' +
+      '</div>';
+    }
+
+    /* ─── Search ─── */
+    html += '<div class="survey-search-wrap">' +
+      '<span class="survey-search-icon">' + icon('search', 18) + '</span>' +
+      '<input type="search" class="survey-search-input" id="surveySearchInput" placeholder="\u041F\u043E\u0438\u0441\u043A \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432..." autocomplete="off">' +
+    '</div>';
 
     /* ─── Overview Stats ─── */
     html += '<div class="survey-overview">' +
       '<div class="survey-stat-card">' +
-        '<div class="survey-stat-value">' + totalCategories + '</div>' +
+        '<div class="survey-stat-value">' + activeCats.length + '</div>' +
         '<div class="survey-stat-label">\u0420\u0430\u0437\u0434\u0435\u043B\u043E\u0432</div>' +
       '</div>' +
       '<div class="survey-stat-card">' +
@@ -132,12 +164,6 @@
         '<div class="survey-stat-value survey-stat-value--success">' + totalProg.pct + '%</div>' +
         '<div class="survey-stat-label">\u041F\u0440\u043E\u0433\u0440\u0435\u0441\u0441</div>' +
       '</div>' +
-    '</div>';
-
-    /* ─── Search ─── */
-    html += '<div class="survey-search-wrap">' +
-      '<span class="survey-search-icon">' + icon('search', 18) + '</span>' +
-      '<input type="search" class="survey-search-input" id="surveySearchInput" placeholder="\u041F\u043E\u0438\u0441\u043A \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432..." autocomplete="off">' +
     '</div>';
 
     /* ─── Categories ─── */
@@ -171,9 +197,10 @@
 
     var html = '';
     var hasAnyResult = false;
+    var cats = getActiveCategories();
 
-    for (var c = 0; c < _data.categories.length; c++) {
-      var cat = _data.categories[c];
+    for (var c = 0; c < cats.length; c++) {
+      var cat = cats[c];
       var prog = getCategoryProgress(cat);
       var isExpanded = !!_expanded[cat.id];
 
@@ -226,9 +253,15 @@
           '<span class="survey-question-toggle">' + icon('chevron-down', 18) + '</span>' +
         '</div>';
 
+        /* Question image — под header, не внутри flex-строки */
+        if (fqItem.qimg) {
+          html += '<img class="survey-question-img" src="modules/survey/data/' + fqItem.qimg + '" data-full-src="modules/survey/data/' + fqItem.qimg + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">';
+        }
+
         /* Answer */
         html += '<div class="survey-answer">' +
           '<div class="survey-answer-text">' + fqItem.a + '</div>' +
+          (fqItem.img ? '<img class="survey-answer-img" src="modules/survey/data/' + fqItem.img + '" data-full-src="modules/survey/data/' + fqItem.img + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">' : '') +
           (fqItem.ref ? '<div class="survey-answer-ref">' + fqItem.ref + '</div>' : '') +
         '</div>';
 
@@ -340,6 +373,18 @@
     /* Делегирование */
     container.addEventListener('click', function(e) {
 
+        /* Клик по табу секции LINE/FFS */
+        var sectionTab = e.target.closest('[data-survey-section]');
+        if (sectionTab) {
+          var section = sectionTab.getAttribute('data-survey-section');
+          if (section !== _activeSection) {
+            _activeSection = section;
+            _searchQ = '';
+            renderAll();
+          }
+          return;
+        }
+
         /* Клик по чекбоксу вопроса → отметить/снять */
         var checkEl = e.target.closest('[data-q-check]');
         if (checkEl) {
@@ -368,6 +413,14 @@
               qEl.classList.remove('open');
             }
           }
+          return;
+        }
+
+        /* Клик по картинке → PhotoSwipe */
+        var surveyImg = e.target.closest('[data-survey-img]');
+        if (surveyImg) {
+          var sContainer = document.getElementById('surveyContainer');
+          app.openPhotoSwipe(surveyImg, sContainer);
           return;
         }
 

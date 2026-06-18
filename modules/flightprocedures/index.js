@@ -10,6 +10,7 @@
   var _data      = null;   // кэш загруженных данных
   var _filter    = '';     // текущий поисковый запрос
   var _htmlCache = {};     // кэш загруженных HTML-файлов для tableFile
+  var _delegated = false;  // флаг делегирования событий (вместо dataset.delegated)
 
   /* ─── Маппинги для бейджей ─── */
   var SEVERITY_LABELS = {
@@ -45,7 +46,8 @@
   /* ─── Inline badge renderer ───
      Заменяет {{badge:TYPE}} и {{badge:TYPE:LABEL}}
      на HTML-элемент бейджа.
-     Вызывается ПОСЛЕ escapeHtml().
+     LABEL проходит через renderRichText (может содержать <b>, {{link:...}}).
+     Вызывается ПОСЛЕ экранирования, НО до renderInlineLinks.
   */
   function renderInlineBadges(text) {
     if (!text) return '';
@@ -54,6 +56,69 @@
       var badgeLabel = label || SEVERITY_LABELS[type] || type;
       return '<span class="badge badge--' + type + '">' + escapeHtml(badgeLabel) + '</span>';
     });
+  }
+
+  /* ─── Rich text renderer ───
+     Безопасно обрабатывает текст из JSON:
+       - литеральный "\\n" → реальный перенос → <br>
+       - реальный "\n" → <br>
+       - whitelist тегов: b, i, em, strong, u, br, ul, ol, li, sup, sub,
+         table, thead, tbody, tr, th, td (атрибуты запрещены)
+       - остальные теги экранируются
+       - затем применяются бейджи и ссылки
+  */
+  var ALLOWED_TAGS = {
+    'b': true, 'i': true, 'em': true, 'strong': true, 'u': true,
+    'br': true, 'ul': true, 'ol': true, 'li': true,
+    'sup': true, 'sub': true,
+    'table': true, 'thead': true, 'tbody': true, 'tr': true, 'th': true, 'td': true
+  };
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(String(str)));
+    return div.innerHTML;
+  }
+
+  function renderRichText(text) {
+    if (text === null || text === undefined || text === '') return '';
+    var s = String(text);
+    // литеральный \n → реальный перенос
+    s = s.replace(/\\\\n/g, '\n');
+    var out = '';
+    var i = 0;
+    while (i < s.length) {
+      var ch = s.charAt(i);
+      if (ch === '<') {
+        var close = s.indexOf('>', i);
+        if (close < 0) { out += '&lt;'; i++; continue; }
+        var tag = s.substring(i + 1, close).trim();
+        var isClosing = tag.charAt(0) === '/';
+        var name = isClosing ? tag.substring(1).toLowerCase() : tag.toLowerCase().split(/\s+/)[0];
+        // самозакрывающийся: <b/> → <b></b> условно разрешаем только как <br/>
+        if (name.charAt(name.length - 1) === '/') name = name.substring(0, name.length - 1);
+        if (ALLOWED_TAGS[name]) {
+          out += '<' + (isClosing ? '/' : '') + name + '>';
+        } else {
+          out += '&lt;' + tag + '&gt;';
+        }
+        i = close + 1;
+      } else if (ch === '\n') {
+        out += '<br>';
+        i++;
+      } else if (ch === '&' && s.substring(i, i + 5).toLowerCase() === '&amp;') {
+        out += '&amp;'; i += 5;
+      } else if (ch === '&' && s.substring(i, i + 4).toLowerCase() === '&lt;') {
+        out += '&lt;'; i += 4;
+      } else if (ch === '&' && s.substring(i, i + 4).toLowerCase() === '&gt;') {
+        out += '&gt;'; i += 4;
+      } else {
+        out += escapeHtml(ch);
+        i++;
+      }
+    }
+    return renderInlineLinks(renderInlineBadges(out));
   }
 
   /* ─── Inline link renderer ───
@@ -72,31 +137,11 @@
     });
   }
 
-  /* ─── Combined content renderer ───
-     Экранирование + бейджи + ссылки — один вызов.
+  /* ─── Combined content renderer (legacy alias) ───
+     Теперь = renderRichText (экранирование + whitelist тегов + \n + бейджи + ссылки).
   */
   function renderContent(text) {
-    return renderInlineLinks(renderInlineBadges(escapeHtml(text)));
-  }
-
-  /* ═══════════════════════════════════════════
-     HEADER
-     ═══════════════════════════════════════════ */
-
-  function renderHeader() {
-    var left   = document.getElementById('headerLeft');
-    var center = document.getElementById('headerCenter');
-    var right  = document.getElementById('headerRight');
-    if (!left || !center || !right) return;
-
-    left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
-      + window.ICONS['arrow-left'] + '</button>';
-    left.onclick = function() { app.navigateTo('main'); };
-
-    center.innerHTML = '<div class="hc-module">Лётные процедуры</div>';
-
-    right.innerHTML = '';
-    right.onclick = null;
+    return renderRichText(text);
   }
 
   /* ═══════════════════════════════════════════
@@ -106,6 +151,9 @@
   function renderAll() {
     var container = document.getElementById('flightproceduresContainer');
     if (!container || !_data) return;
+
+    // lang="ru" включает слоговые переносы (hyphens: auto) в заголовках аккордеонов
+    container.setAttribute('lang', 'ru');
 
     // Filter data recursively
     var q = _filter.trim().toLowerCase();
@@ -124,7 +172,7 @@
       grouped[cat].push(item);
     }
 
-    var html = '';
+    var html = '<div class="module-container">';
 
     /* Search bar */
     html += '<div class="flightprocedures-search-bar">';
@@ -155,7 +203,7 @@
 
         /* Section divider toggle */
         html += '<div class="list-divider flightprocedures-section-toggle' + (isOpen ? ' is-open' : '') + '" data-category="' + escapeAttr(catKey) + '">';
-        html += '<span class="list-divider-label">' + escapeHtml(label) + '</span>';
+        html += '<span class="list-divider-label">' + renderRichText(label) + '</span>';
         html += '<span class="flightprocedures-section-count">' + items.length + '</span>';
         html += '</div>';
 
@@ -167,6 +215,8 @@
         html += '</div>';
       }
     }
+
+    html += '</div>';
 
     app.hideSkeleton(container, html);
 
@@ -187,6 +237,10 @@
 
   /* ─── Рекурсивный рендер элемента (аккордеон любой глубины) ─── */
   function renderItem(item, depth) {
+    // Простой текстовый блок (без аккордеона) — для любого уровня
+    if (item.layout === 'text') {
+      return renderTextBlock(item, depth);
+    }
     var sev = item.severity || 'normal';
     var showHeaderBadge = item.headerBadge !== false;
     var hasChildren = item.children && item.children.length > 0;
@@ -207,27 +261,27 @@
     if (!showHeaderBadge) headerCls += ' flightprocedures-card-header--no-badge';
     html += '<div class="' + headerCls + '">';
     if (showHeaderBadge) {
-      html += '<span class="' + badgeClass + '">' + escapeHtml(badgeLabel) + '</span>';
+      html += '<span class="' + badgeClass + '">' + renderRichText(badgeLabel) + '</span>';
     }
     html += '<div class="flightprocedures-card-info">';
-    html += '<div class="flightprocedures-card-title">' + escapeHtml(item.title) + '</div>';
+    html += '<div class="flightprocedures-card-title">' + renderRichText(item.title) + '</div>';
 
     // refCode (FP-style)
     if (item.refCode) {
-      html += '<div class="flightprocedures-card-ref">' + escapeHtml(item.refCode) + '</div>';
+      html += '<div class="flightprocedures-card-ref">' + renderRichText(item.refCode) + '</div>';
     }
 
     // aircraft / duration (FFS-style)
     if (item.aircraft || item.duration) {
       html += '<div class="flightprocedures-card-meta">';
       if (item.aircraft) {
-        html += '<span class="flightprocedures-card-aircraft">' + escapeHtml(item.aircraft) + '</span>';
+        html += '<span class="flightprocedures-card-aircraft">' + renderRichText(item.aircraft) + '</span>';
       }
       if (item.aircraft && item.duration) {
         html += '<span class="flightprocedures-card-sep"> \u00B7 </span>';
       }
       if (item.duration) {
-        html += '<span class="flightprocedures-card-duration">' + escapeHtml(item.duration) + '</span>';
+        html += '<span class="flightprocedures-card-duration">' + renderRichText(item.duration) + '</span>';
       }
       html += '</div>';
     }
@@ -242,7 +296,7 @@
     // status (FFS-style)
     if (item.status) {
       var statusLabel = STATUS_LABELS[item.status] || item.status;
-      html += '<span class="flightprocedures-status flightprocedures-status--' + item.status + '">' + escapeHtml(statusLabel) + '</span>';
+      html += '<span class="flightprocedures-status flightprocedures-status--' + item.status + '">' + renderRichText(statusLabel) + '</span>';
     }
 
     html += '<span class="flightprocedures-card-chevron">' + window.ICONS['chevron-down'] + '</span>';
@@ -254,7 +308,8 @@
 
     // Content fields (only for leaf or items with their own content)
     var hasOwnContent = item.description || item.image || (item.memoryItems && item.memoryItems.length > 0)
-      || (item.steps && item.steps.length > 0) || item.tableFile
+      || (item.radioItems && item.radioItems.length > 0)
+      || (item.steps && item.steps.length > 0) || item.tableFile || item.tableHtml
       || (item.equipment && item.equipment.length > 0)
       || item.instructorNotes || item.criteria
       || (item.documents && item.documents.length > 0) || (item.references && item.references.length > 0);
@@ -290,6 +345,20 @@
         html += '</div>';
       }
 
+      // 3b. Radio script (зелёный блок, по аналогии с Memory Items)
+      if (item.radioItems && item.radioItems.length > 0) {
+        html += '<div class="flightprocedures-radio">';
+        html += '<div class="flightprocedures-radio-title">'
+          + (window.ICONS['radio'] || '')
+          + ' Radio Script</div>';
+        html += '<ul class="flightprocedures-radio-list">';
+        for (var rs = 0; rs < item.radioItems.length; rs++) {
+          html += '<li class="flightprocedures-radio-item">' + renderContent(item.radioItems[rs]) + '</li>';
+        }
+        html += '</ul>';
+        html += '</div>';
+      }
+
       // 4. Steps
       if (item.steps && item.steps.length > 0) {
         html += '<div class="flightprocedures-steps">';
@@ -309,13 +378,18 @@
         html += '</div>';
       }
 
+      // 5b. Inline HTML table (from JSON field tableHtml)
+      if (item.tableHtml) {
+        html += '<div class="flightprocedures-table-wrap flightprocedures-table-inline">' + renderRichText(item.tableHtml) + '</div>';
+      }
+
       // 6. Equipment (FFS-style)
       if (item.equipment && item.equipment.length > 0) {
         html += '<div class="flightprocedures-equipment">';
         html += '<div class="flightprocedures-equipment-title">Оборудование</div>';
         html += '<ul class="flightprocedures-equipment-list">';
         for (var eq = 0; eq < item.equipment.length; eq++) {
-          html += '<li>' + escapeHtml(item.equipment[eq]) + '</li>';
+          html += '<li>' + renderRichText(item.equipment[eq]) + '</li>';
         }
         html += '</ul></div>';
       }
@@ -332,7 +406,7 @@
       if (item.criteria) {
         html += '<div class="flightprocedures-criteria">';
         html += '<div class="flightprocedures-criteria-title">' + window.ICONS['check-circle'] + ' Критерии завершения</div>';
-        html += '<div class="flightprocedures-criteria-text">' + escapeHtml(item.criteria) + '</div>';
+        html += '<div class="flightprocedures-criteria-text">' + renderRichText(item.criteria) + '</div>';
         html += '</div>';
       }
 
@@ -355,7 +429,7 @@
               + ' role="button" tabindex="0"'
               + ' aria-label="Открыть PDF, стр. ' + docPage + '">';
             html += '<span class="flightprocedures-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>';
-            html += '<span class="flightprocedures-ref-text">' + escapeHtml(doc.title) + '</span>';
+            html += '<span class="flightprocedures-ref-text">' + renderRichText(doc.title) + '</span>';
             html += '<span class="flightprocedures-ref-page">стр.&nbsp;' + docPage + '</span>';
             html += '</li>';
           }
@@ -387,6 +461,77 @@
     html += '</div>'; // card-body
     html += '</div>'; // card
 
+    return html;
+  }
+
+  /* ─── Текстовый блок (без аккордеона) — для layout: "text" ─── */
+  function renderTextBlock(item, depth) {
+    var html = '<div class="flightprocedures-text-block" data-depth="' + depth + '" data-id="' + escapeAttr(item.id || '') + '">';
+
+    if (item.title) {
+      html += '<div class="flightprocedures-text-block-title">' + renderRichText(item.title) + '</div>';
+    }
+    if (item.description) {
+      html += '<div class="flightprocedures-text-block-desc">' + renderRichText(item.description) + '</div>';
+    }
+    if (item.image) {
+      html += '<div class="flightprocedures-image-gallery">';
+      html += '<img class="flightprocedures-image-thumb"'
+        + ' src="' + escapeAttr(item.image) + '"'
+        + ' data-full-src="' + escapeAttr(item.image) + '"'
+        + ' alt="' + escapeAttr(item.title || '') + '"'
+        + ' loading="lazy">';
+      html += '</div>';
+    }
+    if (item.memoryItems && item.memoryItems.length > 0) {
+      html += '<div class="flightprocedures-memory">';
+      html += '<div class="flightprocedures-memory-title">' + window.ICONS['alert-triangle'] + ' Memory Items</div>';
+      html += '<ul class="flightprocedures-memory-list">';
+      for (var m = 0; m < item.memoryItems.length; m++) {
+        html += '<li class="flightprocedures-memory-item">' + renderRichText(item.memoryItems[m]) + '</li>';
+      }
+      html += '</ul></div>';
+    }
+    if (item.radioItems && item.radioItems.length > 0) {
+      html += '<div class="flightprocedures-radio">';
+      html += '<div class="flightprocedures-radio-title">' + (window.ICONS['radio'] || '') + ' Radio Script</div>';
+      html += '<ul class="flightprocedures-radio-list">';
+      for (var rs = 0; rs < item.radioItems.length; rs++) {
+        html += '<li class="flightprocedures-radio-item">' + renderRichText(item.radioItems[rs]) + '</li>';
+      }
+      html += '</ul></div>';
+    }
+    if (item.steps && item.steps.length > 0) {
+      html += '<div class="flightprocedures-steps">';
+      html += '<ol class="flightprocedures-steps-list">';
+      for (var s = 0; s < item.steps.length; s++) {
+        html += '<li class="flightprocedures-step">' + renderRichText(item.steps[s]) + '</li>';
+      }
+      html += '</ol></div>';
+    }
+    if (item.tableHtml) {
+      html += '<div class="flightprocedures-table-wrap flightprocedures-table-inline">' + renderRichText(item.tableHtml) + '</div>';
+    }
+    if (item.references && item.references.length > 0) {
+      html += '<ul class="flightprocedures-refs-list">';
+      for (var r = 0; r < item.references.length; r++) {
+        var ref = item.references[r];
+        var refText = (typeof ref === 'string') ? ref : (ref.text || '');
+        html += '<li class="flightprocedures-ref">' + renderRichText(refText) + '</li>';
+      }
+      html += '</ul>';
+    }
+
+    // Вложенные дети (рекурсия — могут быть как аккордеонами, так и text-блоками)
+    if (item.children && item.children.length > 0) {
+      html += '<div class="flightprocedures-nested">';
+      for (var ch = 0; ch < item.children.length; ch++) {
+        html += renderItem(item.children[ch], depth + 1);
+      }
+      html += '</div>';
+    }
+
+    html += '</div>';
     return html;
   }
 
@@ -456,24 +601,11 @@
     return copy;
   }
 
-  /* ─── Подсчёт листьев (для счётчика в секции) ─── */
-  function countLeaves(items) {
-    var count = 0;
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].children && items[i].children.length > 0) {
-        count += countLeaves(items[i].children);
-      } else {
-        count++;
-      }
-    }
-    return count;
-  }
-
   /* ─── Event binding ─── */
 
   function bindSearchInput(container) {
     var input = container.querySelector('.flightprocedures-search-input');
-    if (input && !input.dataset.delegated) {
+    if (input) {
       input.addEventListener('input', function(e) {
         _filter = e.target.value;
         renderAll();
@@ -483,7 +615,6 @@
           inp.setSelectionRange(_filter.length, _filter.length);
         }
       });
-      input.dataset.delegated = 'true';
     }
   }
 
@@ -556,7 +687,7 @@
     // params — всегда объект (пустой {} если навигация без параметров)
 
     // Делегирование: вешать ровно ОДИН раз
-    if (!container.dataset.delegated) {
+    if (!_delegated) {
       container.addEventListener('click', function(e) {
         // Section divider toggle
         var sectionToggle = e.target.closest('.flightprocedures-section-toggle');
@@ -610,7 +741,7 @@
           return;
         }
       });
-      container.dataset.delegated = 'true';
+      _delegated = true;
     }
 
     _filter = '';
@@ -647,13 +778,6 @@
      HELPERS
      ═══════════════════════════════════════════ */
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
-  }
-
   function escapeAttr(str) {
     if (!str) return '';
     return str
@@ -671,8 +795,7 @@
   window.ModuleRegistry.register('flightprocedures', {
     title:        'Лётные процедуры',
     icon:         'message-square',
-    init:          init,
-    renderHeader:  renderHeader
+    init:          init
   });
 
 })();

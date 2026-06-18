@@ -22,7 +22,6 @@
             "headerBadge": false,
             "refCode": "SOP-TO-SHORT",
             "description": "Взлёт с короткой ВПП или при ограничениях по длине. {{badge:normal}} Требует точного расчёта V-скоростей и конфигурации.",
-            "text": "Взлёт и заход",
             "steps": [
               "Рассчитать V1/VR/V2 для фактической длины ВПП",
               "Подтвердить takeoff data: TOW, CG, flex temp",

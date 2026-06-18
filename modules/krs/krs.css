@@ -550,3 +550,50 @@ body.dark-theme #krsContainer {
 }
 
 .krs-sort-btn:active { background-color: var(--color-bg-hover); }
+
+/* ─── Mobile: улучшение форматирования заголовков на узких экранах ─── */
+/* ВАЖНО: медиа-запросы расположены ПОСЛЕ базовых правил,
+   иначе каскад CSS отдаст приоритет более позднему базовому правилу. */
+
+@media (max-width: 560px) {
+  .krs-block-header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .krs-block-header .collapsible-title {
+    font-size: var(--font-sm);
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .krs-block-header .marquee-inner {
+    font-size: var(--font-sm);
+  }
+
+  .krs-age-badge {
+    padding: 2px 6px;
+    font-size: var(--font-xs);
+    border-left-width: 2px;
+  }
+}
+
+@media (max-width: 380px) {
+  .krs-block-header {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .krs-block-header .collapsible-title {
+    font-size: 0.75rem;
+  }
+
+  .krs-block-header .marquee-inner {
+    font-size: 0.75rem;
+  }
+
+  .krs-age-badge {
+    padding: 2px 5px;
+    min-width: auto;
+  }
+}

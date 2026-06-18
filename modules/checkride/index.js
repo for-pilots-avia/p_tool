@@ -16,6 +16,12 @@
   var _screen       = 'start'; // start | test | report | history
   var _saveStateTimer = null;   // debounce для автосохранения textarea
 
+  /* ─── Swipe-навигация (touch) ─── */
+  var _swipeStartX    = 0;
+  var _swipeStartY    = 0;
+  var _swipeTracking  = false;
+  var SWIPE_THRESHOLD = 50;   // минимальная дистанция свайпа (px)
+
   /* ─── Данные регистрации пилота (сохраняются в памяти) ─── */
   var _pilotData = {
     fio: '',
@@ -51,6 +57,33 @@
       return _data.competencyDefs[code];
     }
     return COMPETENCY_LABELS[code] || code;
+  }
+
+  /* DRY: expand top-level `competencies` шапка into each stage's "Компетенции." groups.
+     For each GRP with topitem but no items, find matching comp in `competencies` block,
+     clone items with stage-prefixed IDs: {stageIdx}_{origId} — preserves per-stage state,
+     calculation formula unchanged (aggregates across stages as before). */
+  function expandCompetencies(data) {
+    if (!data || !data.competencies || !data.checklists) return data;
+    data.checklists.forEach(function(cl, stageIdx) {
+      cl.sections.forEach(function(sec) {
+        if (sec.subname !== '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+        var groups = sec.groups || [];
+        groups.forEach(function(gr) {
+          if (gr.topitem && (!gr.items || gr.items.length === 0)) {
+            for (var i = 0; i < data.competencies.length; i++) {
+              if (data.competencies[i].code === gr.topitem) {
+                gr.items = data.competencies[i].items.map(function(it) {
+                  return { id: stageIdx + '_' + it.id, type: it.type, label: it.label };
+                });
+                break;
+              }
+            }
+          }
+        });
+      });
+    });
+    return data;
   }
 
   /* ═══════════════════════════════════════════
@@ -130,6 +163,69 @@
     } catch(e) {}
   }
 
+  /* One-time cleanup of orphaned localStorage keys.
+     Task 12 (FFS DRY refactor): FFS IDs changed from c_Preflight_pf_4_1, c_Takeoff_and_Climb_pf_4_1
+       → c_{stageIdx}_{origId} (e.g. c_0_pf_4_1). Old keys remained as orphans.
+     Task 16 (LINE DRY refactor): LINE IDs changed from hardcoded c1..c12 (in stages "Компетенции.")
+       → c_{stageIdx}_{compCode}_{N} (e.g. c_4_ПП_1, c_4_НК_1, c_4_РС_1, c_4_CRM_1) via expandCompetencies.
+       Old c1..c12 keys remained as orphans.
+     Both old key sets are cleaned up once per browser via flag in localStorage. */
+  var STORAGE_LEGACY_CLEANED = 'checkride_legacy_v13_cleaned';
+
+  function cleanupLegacyStateOnce() {
+    try {
+      if (localStorage.getItem(STORAGE_LEGACY_CLEANED)) return;
+      var raw = localStorage.getItem(STORAGE_STATE);
+      if (!raw) {
+        localStorage.setItem(STORAGE_LEGACY_CLEANED, '1');
+        return;
+      }
+      var state = JSON.parse(raw);
+      if (!state || !state.data || !state.data.checklists) {
+        localStorage.setItem(STORAGE_LEGACY_CLEANED, '1');
+        return;
+      }
+      /* Walk all items across all stages, drop keys with old ID pattern
+         (containing '_' followed by a letter, e.g. c_Preflight_*, c_Takeoff_and_Climb_*) */
+      var allItems = [];
+      state.data.checklists.forEach(function(cl) {
+        cl.sections.forEach(function(sec) {
+          (sec.groups || []).forEach(function(gr) {
+            (gr.items || []).forEach(function(it) {
+              if (it && it.id) allItems.push(it);
+            });
+          });
+        });
+      });
+      allItems.forEach(function(it) {
+        if (it.ok !== undefined && typeof it.id === 'string') {
+          /* Legacy v16 LINE ID: c1, c2, ..., c12 (hardcoded, no underscore) */
+          if (/^c\d+$/.test(it.id)) {
+            it.ok = false;
+            if (it.comment) delete it.comment;
+          } else if (it.id.indexOf('_') !== -1) {
+            /* Check rest after first underscore: */
+            var rest = it.id.split('_').slice(1).join('_');
+            /* New IDs: numeric stage prefix → rest starts with digit (0_pf_4_1, 4_ПП_1, etc.) */
+            /* Old v11 IDs: rest starts with a letter (Preflight, Takeoff_and_Climb, Cruise, Approach, Landing, Postflight) */
+            if (rest.length > 0 && /^[A-Za-z]/.test(rest)) {
+              it.ok = false;
+              if (it.comment) delete it.comment;
+            }
+          }
+        }
+      });
+      /* If state still has 'test' screen but items are cleaned — keep state but resave */
+      try {
+        localStorage.setItem(STORAGE_STATE, JSON.stringify(state));
+      } catch(e) {}
+      localStorage.setItem(STORAGE_LEGACY_CLEANED, '1');
+    } catch(e) {
+      /* On any parse error — just mark cleaned to avoid retry storms */
+      try { localStorage.setItem(STORAGE_LEGACY_CLEANED, '1'); } catch(e2) {}
+    }
+  }
+
   /** Debounce-сохранение: сохранить DOM→_data→localStorage с задержкой 500мс */
   function debouncedSaveInspectionState() {
     if (_saveStateTimer) clearTimeout(_saveStateTimer);
@@ -205,15 +301,18 @@
       /* Для FFS — скрыть поля route, ac_number */
       if (_currentMode === 'ffs' && !fields[i].ffs) continue;
       var escVal = (fields[i].val || '').replace(/"/g, '&quot;');
+      html += '<label class="checkride-label" for="' + fields[i].id + '">' + fields[i].ph + '</label>';
       html += '<input type="text" id="' + fields[i].id + '" class="checkride-input" placeholder="' + fields[i].ph + '" value="' + escVal + '">';
     }
     html += '</div>';
 
-    /* Buttons */
-    html += '<button class="checkride-main-btn" data-cr-action="start">'
-      + icon('checklist', 18) + ' <span>\u041D\u0430\u0447\u0430\u0442\u044C \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0443</span></button>';
-    html += '<button class="checkride-secondary-btn" data-cr-action="history">'
-      + icon('clock', 18) + ' <span>\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A</span></button>';
+    /* Buttons — в одну строку: слева История, справа Начать */
+    html += '<div class="checkride-start-actions">'
+      + '<button class="checkride-secondary-btn" data-cr-action="history">'
+        + icon('clock', 18) + ' <span>\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A</span></button>'
+      + '<button class="checkride-main-btn" data-cr-action="start">'
+        + icon('checklist', 18) + ' <span>\u041D\u0430\u0447\u0430\u0442\u044C \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0443</span></button>'
+      + '</div>';
 
     html += '</div>';
     container.innerHTML = html;
@@ -284,7 +383,7 @@
         /* Обычные секции — без аккордеона */
         groups.forEach(function(group) {
           if (group.topitem) {
-            html += '<h4 class="checkride-topitem">' + group.topitem + '</h4>';
+            html += '<h4 class="checkride-topitem">' + getCompetencyLabel(group.topitem) + '</h4>';
           }
 
           group.items.forEach(function(item) {
@@ -397,12 +496,14 @@
       + '<canvas id="checkride-signature"></canvas>'
     + '</div>';
 
-    /* Action buttons */
+    /* Action buttons — Печать+Отправить в одну строку, На главную ниже */
     html += '<div class="checkride-report-actions">'
-      + '<button class="checkride-secondary-btn" data-cr-action="export-pdf">'
-        + icon('download', 18) + ' <span>\u041F\u0435\u0447\u0430\u0442\u044C / PDF</span></button>'
-      + '<button class="checkride-secondary-btn" data-cr-action="send-email">'
-        + icon('mail', 18) + ' <span>\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u043F\u043E \u043F\u043E\u0447\u0442\u0435</span></button>'
+      + '<div class="checkride-report-row">'
+        + '<button class="checkride-secondary-btn" data-cr-action="export-pdf">'
+          + icon('download', 18) + ' <span>\u041F\u0435\u0447\u0430\u0442\u044C / PDF</span></button>'
+        + '<button class="checkride-secondary-btn" data-cr-action="send-email">'
+          + icon('mail', 18) + ' <span>\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u043F\u043E \u043F\u043E\u0447\u0442\u0435</span></button>'
+      + '</div>'
       + '<button class="checkride-main-btn" data-cr-action="go-start">'
         + icon('home', 18) + ' <span>\u041D\u0430 \u0433\u043B\u0430\u0432\u043D\u0443\u044E</span></button>'
     + '</div>';
@@ -413,6 +514,12 @@
     /* Build report data */
     buildReport();
     initSignature();
+
+    /* Scroll to top — как в renderTestScreen */
+    container.scrollTop = 0;
+    var screen = document.getElementById('checkrideScreen');
+    if (screen) screen.scrollTop = 0;
+    window.scrollTo(0, 0);
   }
 
   /* ═══════════════════════════════════════════
@@ -439,7 +546,8 @@
       for (var i = 0; i < history.length; i++) {
         var h = history[i];
         html += '<div class="checkride-history-card" data-cr-view="' + i + '">'
-          + '<b>' + h.fio + '</b> <small>(' + h.mode + ')</small><br>' + h.date
+          + '<div class="checkride-history-info"><b>' + h.fio + '</b> <small>(' + h.mode + ')</small><br>' + h.date + '</div>'
+          + '<button class="checkride-history-delete" data-cr-delete="' + i + '" aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C">' + icon('trash', 16) + '</button>'
         + '</div>';
       }
       html += '</div>';
@@ -656,7 +764,7 @@
         var sHtml = '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + sec.subname + '</h3>';
         var groups = sec.groups || [{ items: sec.items || [] }];
         groups.forEach(function(group) {
-          if (group.topitem) sHtml += '<h4 class="checkride-report-topitem">' + group.topitem + '</h4>';
+          if (group.topitem) sHtml += '<h4 class="checkride-report-topitem">' + getCompetencyLabel(group.topitem) + '</h4>';
           group.items.forEach(function(item) {
             if (item.type === 'divider') return;
             if (item.type === 'checkbox' && sec.subname === '\u0421\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440\u044B.') {
@@ -937,6 +1045,9 @@
     /* Восстанавливаем ход проверки из localStorage (перезагрузка страницы) */
     loadInspectionState();
 
+    /* One-time cleanup of orphaned localStorage keys (Task 12 legacy FFS DRY refactor) */
+    cleanupLegacyStateOnce();
+
     /* Event delegation */
     container.addEventListener('click', function(e) {
 
@@ -992,12 +1103,31 @@
             case 'clear-history':
               app.showConfirm('\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0438\u0441\u0442\u043E\u0440\u0438\u044E \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A?', function() {
                 localStorage.removeItem(STORAGE_HISTORY);
-                _screen = 'history';
+                /* Также очистить кэш хода проверки (state) — модуль возвращается к стартовому экрану */
+                clearInspectionState();
+                _data = null;
+                _sectionIndex = 0;
+                _screen = 'start';
                 renderAll();
                 app.showToast('\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043E\u0447\u0438\u0449\u0435\u043D\u0430');
               }, '\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C');
               break;
           }
+          return;
+        }
+
+        /* Delete single history item */
+        var deleteBtn = e.target.closest('[data-cr-delete]');
+        if (deleteBtn) {
+          var delIdx = parseInt(deleteBtn.dataset.crDelete, 10);
+          app.showConfirm('\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u044D\u0442\u0443 \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0443?', function() {
+            var hist = [];
+            try { var rawH = localStorage.getItem(STORAGE_HISTORY); if (rawH) hist = JSON.parse(rawH); } catch(e) {}
+            hist.splice(delIdx, 1);
+            try { localStorage.setItem(STORAGE_HISTORY, JSON.stringify(hist)); } catch(e) {}
+            renderAll();
+            app.showToast('\u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0430');
+          }, '\u0423\u0434\u0430\u043B\u0438\u0442\u044C');
           return;
         }
 
@@ -1084,6 +1214,51 @@
         }
       });
 
+      /* ─── Swipe-навигация на экране теста ─── */
+      container.addEventListener('touchstart', function(e) {
+        if (_screen !== 'test' || !_data) return;
+        var t = e.touches[0];
+        _swipeStartX = t.clientX;
+        _swipeStartY = t.clientY;
+        _swipeTracking = true;
+      }, { passive: true });
+
+      container.addEventListener('touchmove', function(e) {
+        if (!_swipeTracking) return;
+        /* Отмена если вертикальный скролл преобладает */
+        var t = e.touches[0];
+        var dx = Math.abs(t.clientX - _swipeStartX);
+        var dy = Math.abs(t.clientY - _swipeStartY);
+        if (dy > dx) {
+          _swipeTracking = false;
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', function(e) {
+        if (!_swipeTracking || _screen !== 'test' || !_data) {
+          _swipeTracking = false;
+          return;
+        }
+        _swipeTracking = false;
+        var t = e.changedTouches[0];
+        var dx = t.clientX - _swipeStartX;
+        var adx = Math.abs(dx);
+        if (adx < SWIPE_THRESHOLD) return;
+
+        saveState();
+        if (dx < 0 && _sectionIndex < _data.checklists.length - 1) {
+          /* Свайп влево → Далее */
+          _sectionIndex++;
+          renderAll();
+          saveInspectionState();
+        } else if (dx > 0 && _sectionIndex > 0) {
+          /* Свайп вправо → Назад */
+          _sectionIndex--;
+          renderAll();
+          saveInspectionState();
+        }
+      }, { passive: true });
+
     /* Load data if needed */
     var dataLoaded = (_dataLine && _dataFfs);
     if (dataLoaded) {
@@ -1102,8 +1277,8 @@
 
     Promise.all([linePromise, ffsPromise])
       .then(function(results) {
-        _dataLine = results[0];
-        _dataFfs = results[1];
+        _dataLine = expandCompetencies(results[0]);
+        _dataFfs = expandCompetencies(results[1]);
         renderContent();
       })
       .catch(function(err) {
