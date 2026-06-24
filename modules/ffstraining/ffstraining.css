@@ -2,7 +2,99 @@
    МОДУЛЬ: FFS Training
    ═══════════════════════════════════════════ */
 
-/* ─── List Divider (разделитель секций) ─── */
+/* ─── Divider-List (data-driven сворачиваемая группа любой глубины) ───
+   layout: "divider" → кликабельный заголовок + сворачиваемый контейнер.
+   Стили метки: uppercase, var(--font-xs), чёрный (var(--color-text-main)).
+   Weight: depth=1 (верхний) — жирный (700); depth≥2 — обычный (600).
+   Справа: счётчик + шеврон. */
+.divider-list {
+  margin-bottom: 4px;
+}
+
+.divider-list-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px var(--content-padding-x) 6px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.divider-list-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ВЕРХНИЙ УРОВЕНЬ (depth=1) — ЖИРНЫЙ */
+.divider-list[data-depth="1"] > .divider-list-toggle > .divider-list-label {
+  font-weight: 700;
+}
+
+.divider-list-count {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  background: var(--color-bg-card);
+  border-radius: 10px;
+  padding: 2px 8px;
+  min-width: 24px;
+  text-align: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.divider-list-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform var(--transition-speed) var(--transition-ease);
+  display: flex;
+  align-items: center;
+}
+
+.divider-list-chevron svg {
+  width: 16px;
+  height: 16px;
+}
+
+.divider-list-toggle.is-open .divider-list-chevron {
+  transform: rotate(180deg);
+}
+
+.divider-list-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-xs);
+}
+
+/* Adjacent sibling — сворачивание */
+.divider-list-toggle.is-open + .divider-list-items {
+  max-height: none;
+}
+
+.divider-list-toggle:not(.is-open) + .divider-list-items {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.divider-list-items {
+  padding: 0 var(--content-padding-x);
+  transition: max-height 0.35s var(--transition-ease-out);
+  overflow: hidden;
+}
+
+/* ─── List Divider (разделитель-лейбел с линией справа) ───
+   layout: "divider" без children → неинтерактивный разделитель.
+   Класс с осознанным дублированием (MODULE_CONTRACT §7 L437,
+   SHELL_CONTRACT §5 L419). Вариант A: линия только справа от лейбла. */
 .list-divider {
   display: flex;
   align-items: center;
@@ -12,12 +104,10 @@
   user-select: none;
 }
 
-/* ::before скрыт — линия только между заголовком и счётчиком */
 .list-divider::before {
-  display: none;
+  display: none; /* Вариант A: левая линия скрыта */
 }
 
-/* Линия между заголовком и счётчиком через order:1 */
 .list-divider::after {
   content: '';
   flex: 1;
@@ -28,23 +118,21 @@
 
 .list-divider-label {
   font-size: var(--font-xs);
-  font-weight: 700;
-  color: var(--color-danger);
+  font-weight: 600;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  white-space: nowrap;
   flex-shrink: 0;
-  max-width: calc(100% - 60px);
+  order: 0;
 }
 
-/* Разделитель без заголовка — только линия */
-.list-divider:not(:has(.list-divider-label))::after {
-  display: block;
-}
-
-/* ─── Badges ─── */
+/* ─── Badges (унифицированная палитра 5 цветов) ───
+   success   → синий     #17a2b8
+   normal    → зелёный   #28a745
+   abnormal  → оранжевый #ffc107
+   emergency → красный   #dc3545
+   info      → наследует родителя (прозрачный) */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -61,10 +149,15 @@
 }
 .badge svg { width: 14px; height: 14px; }
 
-.badge--normal {
+.badge--success {
   background: rgba(23, 162, 184, 0.12);
   color: var(--color-info);
-  border: 1px solid rgba(23, 162, 184, 0.25);
+  border: 1px solid rgba(23, 162, 184, 0.3);
+}
+.badge--normal {
+  background: rgba(40, 167, 69, 0.12);
+  color: var(--color-success);
+  border: 1px solid rgba(40, 167, 69, 0.3);
 }
 .badge--abnormal {
   background: rgba(255, 193, 7, 0.12);
@@ -72,19 +165,76 @@
   border: 1px solid rgba(255, 193, 7, 0.3);
 }
 .badge--emergency {
-  background: var(--color-primary-light);
+  background: rgba(220, 53, 69, 0.12);
   color: var(--color-danger);
-  border: 1px solid var(--color-shadow-primary);
+  border: 1px solid rgba(220, 53, 69, 0.3);
 }
-.badge--success {
-  background: rgba(40, 167, 69, 0.12);
-  color: var(--color-success);
-  border: 1px solid rgba(40, 167, 69, 0.3);
+.badge--info {
+  background: transparent;
+  color: inherit;
+  border: 1px solid transparent;
 }
-.badge--neutral {
-  background: var(--color-bg-card);
+
+/* ─── Items blocks (палитра фон + левая граница) ───
+   Используется для {{items:PALETTE[:TITLE]}} в JSON.
+   Текстовый блок с форматированием (\n, <b>, <i>, {{badge:}}, {{link:}}). */
+.items-block {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid transparent;
+  font-size: var(--font-sm);
+  line-height: 1.6;
+}
+.items-block--success {
+  background: rgba(23, 162, 184, 0.08);
+  border-left-color: var(--color-info);
+}
+.items-block--normal {
+  background: rgba(40, 167, 69, 0.08);
+  border-left-color: var(--color-success);
+}
+.items-block--abnormal {
+  background: rgba(255, 193, 7, 0.08);
+  border-left-color: var(--color-warning);
+}
+.items-block--emergency {
+  background: rgba(220, 53, 69, 0.08);
+  border-left-color: var(--color-danger);
+}
+.items-block--info {
+  background: transparent;
+  border-left-color: transparent;
+}
+
+.items-block-title {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.items-block--success   .items-block-title { color: var(--color-info); }
+.items-block--normal    .items-block-title { color: var(--color-success); }
+.items-block--abnormal  .items-block-title { color: var(--color-warning); }
+.items-block--emergency .items-block-title { color: var(--color-danger); }
+.items-block--info      .items-block-title { color: var(--color-text-main); }
+
+body.dark-theme .items-block-title {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.items-block-content {
   color: var(--color-text-secondary);
-  border: 1px solid var(--color-border-subtle);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.items-block-content b,
+.items-block-content strong {
+  color: var(--color-text-main);
+  font-weight: 600;
 }
 
 /* ─── Search bar ─── */
@@ -163,43 +313,6 @@ body.dark-theme .ffstraining-search-input {
     color: var(--color-danger);
     background: var(--color-bg-hover);
   }
-}
-
-/* ─── Section Divider (list-divider + toggle) ─── */
-#ffstrainingContainer .ffs-section-toggle {
-  pointer-events: auto;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  margin-bottom: 4px;
-}
-#ffstrainingContainer .ffs-section-toggle .ffs-section-count {
-  font-size: var(--font-xs);
-  color: var(--color-text-muted);
-  background: var(--color-bg-card);
-  border-radius: 10px;
-  padding: 2px 8px;
-  min-width: 24px;
-  text-align: center;
-  font-weight: 600;
-  flex-shrink: 0;
-  order: 2;
-}
-#ffstrainingContainer .ffs-section-toggle.is-open + .ffs-section-cards {
-  max-height: none;
-}
-#ffstrainingContainer .ffs-section-toggle:not(.is-open) + .ffs-section-cards {
-  max-height: 0;
-  overflow: hidden;
-}
-
-/* ─── Section Cards Container ─── */
-#ffstrainingContainer .ffs-section-cards {
-  transition: max-height 0.35s var(--transition-ease-out);
-  overflow: hidden;
-}
-#ffstrainingContainer .ffs-section-cards.open {
-  max-height: none;
 }
 
 /* ─── Session Card ─── */
@@ -362,6 +475,7 @@ body.dark-theme .ffstraining-search-input {
   background: var(--color-bg-card);
 }
 
+/* Single image: full-width, contain (legacy behaviour) */
 .ffstraining-image-thumb {
   display: block;
   width: 100%;
@@ -377,105 +491,39 @@ body.dark-theme .ffstraining-search-input {
   }
 }
 
-/* ─── Memory Items ─── */
-.ffstraining-memory {
-  background: var(--color-primary-ghost);
-  border: 1px solid var(--color-primary-light);
+/* Multi-image grid (Variant 1): fixed square thumbnails */
+.ffstraining-image-gallery[data-count]:not([data-count="1"]) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  padding: 8px;
+}
+
+.ffstraining-image-gallery[data-count]:not([data-count="1"]) .ffstraining-image-thumb {
+  width: 100%;
+  max-height: none;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius: var(--border-radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 16px;
 }
 
-.ffstraining-memory-title {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-danger);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+@media (max-width: 480px) {
+  .ffstraining-image-gallery[data-count]:not([data-count="1"]) {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 6px;
+    padding: 6px;
+  }
 }
 
-.ffstraining-memory-title svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
+@media (max-width: 380px) {
+  .ffstraining-image-gallery[data-count]:not([data-count="1"]) {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 4px;
+    padding: 4px;
+  }
 }
 
-.ffstraining-memory-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ffstraining-memory-item {
-  font-size: var(--font-sm);
-  font-weight: 600;
-  color: var(--color-text-main);
-  padding: 4px 0;
-  padding-left: 16px;
-  position: relative;
-}
-
-.ffstraining-memory-item::before {
-  content: '\25B8';
-  position: absolute;
-  left: 0;
-  color: var(--color-danger);
-  font-weight: 700;
-}
-
-/* ─── Radio Script (зелёный блок, по аналогии с Memory Items) ─── */
-.ffstraining-radio {
-  background: rgba(40, 167, 69, 0.12);
-  border: 1px solid rgba(40, 167, 69, 0.30);
-  border-radius: var(--border-radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 16px;
-}
-
-.ffstraining-radio-title {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-success);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.ffstraining-radio-title svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.ffstraining-radio-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ffstraining-radio-item {
-  font-size: var(--font-sm);
-  font-weight: 600;
-  color: var(--color-text-main);
-  padding: 4px 0;
-  padding-left: 16px;
-  position: relative;
-}
-
-.ffstraining-radio-item::before {
-  content: '\25B8';
-  position: absolute;
-  left: 0;
-  color: var(--color-success);
-  font-weight: 700;
-}
+/* ─── Memory Items / Radio Script → заменены на .items-block--* (см. выше) ─── */
 
 /* ─── Text Block (без аккордеона, layout: "text") ─── */
 .ffstraining-text-block {
@@ -534,59 +582,7 @@ body.dark-theme .ffstraining-search-input {
   padding-left: 18px;
 }
 
-/* ─── Steps ─── */
-.ffstraining-steps {
-  margin-bottom: 16px;
-}
-
-.ffstraining-steps-title {
-  font-size: var(--font-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
-  margin-bottom: 10px;
-}
-
-.ffstraining-steps-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  counter-reset: ffstraining-step;
-}
-
-.ffstraining-step {
-  font-size: var(--font-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  padding: 5px 0 5px 32px;
-  position: relative;
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-.ffstraining-step:last-child {
-  border-bottom: none;
-}
-
-.ffstraining-step::before {
-  counter-increment: ffstraining-step;
-  content: counter(ffstraining-step);
-  position: absolute;
-  left: 0;
-  top: 5px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--color-bg-card);
-  border: 1.5px solid var(--color-border);
-  font-size: var(--font-xs);
-  font-weight: 700;
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
+/* ─── Steps → заменены на .items-block--* (см. выше) ─── */
 
 /* ─── Content: Table (inline & file) ─── */
 .ffstraining-table-wrap {
@@ -747,6 +743,386 @@ body.dark-theme .ffstraining-search-input {
   line-height: 1.6;
 }
 
+/* ═══════════════════════════════════════════
+   УНИВЕРСАЛЬНАЯ ПАЛИТРА БЛОКОВ (v3)
+   Структура задаётся JSON через [data-block],
+   цвета — через [data-style].
+   ═══════════════════════════════════════════ */
+
+/* ─── Палитра data-style ─── */
+[data-block][data-style="neutral"] {
+  background: transparent;
+  border-left: 3px solid var(--color-border-subtle);
+  padding-left: 10px;
+}
+
+[data-block][data-style="info"] {
+  background: rgba(33, 150, 243, 0.10);
+  border-left: 3px solid rgba(33, 150, 243, 0.45);
+  padding: 10px 12px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+}
+
+[data-block][data-style="success"] {
+  background: rgba(40, 167, 69, 0.12);
+  border-left: 3px solid rgba(40, 167, 69, 0.40);
+  padding: 10px 12px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+}
+
+[data-block][data-style="warning"] {
+  background: rgba(255, 193, 7, 0.14);
+  border-left: 3px solid rgba(255, 193, 7, 0.55);
+  padding: 10px 12px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+}
+
+[data-block][data-style="danger"] {
+  background: rgba(220, 53, 69, 0.10);
+  border-left: 3px solid rgba(220, 53, 69, 0.50);
+  padding: 10px 12px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+}
+
+/* ─── data-block: text ─── */
+[data-block="text"] {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  padding-left: 0;
+  border-left: none;
+}
+
+[data-block="text"][data-style]:not([data-style="neutral"]) {
+  padding-left: 12px;
+}
+
+/* ─── data-block: heading ─── */
+[data-block="heading"] {
+  margin: 14px 0 8px;
+  padding-left: 0;
+  border-left: none;
+}
+
+[data-block="heading"] h2,
+[data-block="heading"] h3,
+[data-block="heading"] h4,
+[data-block="heading"] h5,
+[data-block="heading"] h6 {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin: 0;
+  line-height: 1.35;
+}
+
+[data-block="heading"][data-level="2"] h2 { font-size: 18px; }
+[data-block="heading"][data-level="3"] h3 { font-size: 16px; }
+[data-block="heading"][data-level="4"] h4 { font-size: 15px; color: var(--color-danger); }
+[data-block="heading"][data-level="5"] h5 { font-size: 14px; }
+[data-block="heading"][data-level="6"] h6 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ─── data-block: procedure / checklist ─── */
+[data-block="procedure"],
+[data-block="checklist"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  padding: 4px 0;
+  margin-bottom: 4px;
+  border-left: none;
+  background: transparent;
+}
+
+[data-block="procedure"] .block-action,
+[data-block="checklist"] .block-action {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+[data-block="checklist"] .block-action {
+  color: var(--color-success);
+}
+
+[data-block="procedure"] .block-dots,
+[data-block="checklist"] .block-dots {
+  color: var(--color-text-muted);
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+[data-block="procedure"] .block-result,
+[data-block="checklist"] .block-result {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+/* ─── data-block: callout (Note/CAUTION/WARNING) ─── */
+[data-block="callout"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 12px;
+  font-size: var(--font-sm);
+  line-height: 1.6;
+}
+
+[data-block="callout"] .block-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+[data-block="callout"][data-style="info"] .block-label     { color: var(--color-info); }
+[data-block="callout"][data-style="warning"] .block-label  { color: var(--color-warning); }
+[data-block="callout"][data-style="danger"] .block-label   { color: var(--color-danger); }
+[data-block="callout"][data-style="success"] .block-label  { color: var(--color-success); }
+
+[data-block="callout"] .block-content {
+  color: var(--color-text-main);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ─── data-block: verify / conditional / tail-marker / sub-note ─── */
+[data-block="verify"] {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  padding: 3px 0 3px 12px;
+  margin-bottom: 4px;
+  border-left: 2px solid var(--color-border-subtle);
+}
+
+[data-block="conditional"] {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  padding: 6px 0;
+  margin-bottom: 4px;
+  border-left: none;
+  background: transparent;
+}
+
+[data-block="conditional"] + .block-nested {
+  margin-left: 16px;
+  padding-left: 8px;
+  border-left: 2px solid var(--color-border-subtle);
+}
+
+[data-block="tail-marker"] {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: 2px 0;
+  margin-bottom: 4px;
+  border-left: none;
+  background: transparent;
+}
+
+[data-block="sub-note"] {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  padding: 2px 0 2px 16px;
+  margin-bottom: 4px;
+  border-left: none;
+  background: transparent;
+}
+
+/* ─── data-block: bullet-list / numbered-list ─── */
+[data-block="bullet-list"],
+[data-block="numbered-list"] {
+  margin: 8px 0 12px;
+  padding-left: 4px;
+  border-left: none;
+  background: transparent;
+}
+
+[data-block="bullet-list"] ul,
+[data-block="numbered-list"] ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+[data-block="bullet-list"] li,
+[data-block="numbered-list"] li {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  padding: 2px 0;
+}
+
+/* ─── data-block: separator ─── */
+[data-block="separator"] {
+  margin: 12px 0;
+  border-left: none;
+  background: transparent;
+  padding: 0;
+}
+
+[data-block="separator"] hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0;
+}
+
+/* ─── data-block: image (расширение legacy) ─── */
+[data-block="image"] {
+  margin: 10px 0;
+  border-left: none;
+  background: transparent;
+  padding: 0;
+}
+
+[data-block="image"][data-float="left"]  { float: left;  margin-right: 14px; max-width: 50%; }
+[data-block="image"][data-float="right"] { float: right; margin-left: 14px;  max-width: 50%; }
+
+[data-block="image"] .block-image-caption {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ─── data-block: pdf-link (расширение legacy) ─── */
+[data-block="pdf-link"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+/* ─── data-block: table / table-file (расширение legacy) ─── */
+[data-block="table"],
+[data-block="table-file"] {
+  margin-bottom: 16px;
+  overflow-x: auto;
+  border-left: none;
+  background: transparent;
+  padding: 0;
+}
+
+[data-block="table"] table,
+[data-block="table-file"] table,
+.ffstraining-table-inline table,
+.ffstraining-table-file table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+[data-block="table"] th,
+[data-block="table"] td,
+[data-block="table-file"] th,
+[data-block="table-file"] td,
+.ffstraining-table-inline th,
+.ffstraining-table-inline td,
+.ffstraining-table-file th,
+.ffstraining-table-file td {
+  border: 1px solid var(--color-border);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+[data-block="table"] th,
+[data-block="table-file"] th,
+.ffstraining-table-inline th,
+.ffstraining-table-file th {
+  background: var(--color-bg-card);
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+[data-block="table"] td ul,
+[data-block="table"] td ol,
+[data-block="table-file"] td ul,
+[data-block="table-file"] td ol,
+.ffstraining-table-inline td ul,
+.ffstraining-table-inline td ol,
+.ffstraining-table-file td ul,
+.ffstraining-table-file td ol {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+/* ─── data-block: accordion (вложенный) ─── */
+.ffstraining-block-accordion {
+  margin: 8px 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-subtle);
+  overflow: hidden;
+  border-left: none;
+  padding: 0;
+}
+
+.ffstraining-block-accordion > summary {
+  padding: 8px 12px;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-danger);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.ffstraining-block-accordion > summary::before {
+  content: '\25B8';
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.ffstraining-block-accordion[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.ffstraining-block-accordion > .block-accordion-body {
+  padding: 8px 12px 12px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* ─── data-block: card / sub-section ─── */
+.ffstraining-block-card,
+[data-block="sub-section"] {
+  margin: 10px 0;
+  padding: 10px 0;
+  border-left: none;
+  background: transparent;
+}
+
+.ffstraining-block-card > .block-card-title,
+[data-block="sub-section"] > .block-subsection-title {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.ffstraining-block-card > .block-card-body {
+  padding-left: 4px;
+}
+
 /* ─── References ─── */
 .ffstraining-refs {
   margin-top: 4px;
@@ -891,16 +1267,6 @@ body.dark-theme .ffstraining-search-input {
   margin: 0 3px;
 }
 
-.ffstraining-memory-item .badge {
-  margin-left: 4px;
-  top: 0;
-}
-
-.ffstraining-step .badge {
-  margin-left: 4px;
-  top: 0;
-}
-
 .ffstraining-ref .badge {
   margin-left: 4px;
   top: 0;
@@ -962,14 +1328,22 @@ body.dark-theme .ffstraining-search-input {
   order: 10;
 }
 
-/* Depth-based styling for nested cards */
+/* Depth-based styling for nested cards
+   ─── ANTI-MATRYOSHKA ───
+   Вложенные карты (depth>=2) получают negative horizontal margin,
+   равный padding родительского .card-content (16px), чтобы «съесть»
+   родительский отступ. Свой .card-content получает padding:0 по
+   горизонтали. Результат: ширина контента одинакова на любой глубине.
+   Визуальная вложенность — через left border (solid/dashed). */
 .ffstraining-card[data-depth="2"] {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
+  margin-left: -16px;
+  margin-right: -16px;
 }
 
 .ffstraining-card[data-depth="2"] .ffstraining-card-header {
-  padding: 10px 14px;
+  padding: 10px 16px;
   background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
 }
 
@@ -995,10 +1369,11 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
   border: 1px dashed var(--color-border);
   border-radius: var(--border-radius-xs);
   background: transparent;
+  /* negative margin НЕ нужен: родитель (depth-2 content) уже имеет padding:0 */
 }
 
 .ffstraining-card[data-depth="3"] .ffstraining-card-header {
-  padding: 8px 12px;
+  padding: 8px 16px;
   background: var(--color-bg-hover);
 }
 
@@ -1016,63 +1391,67 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
   max-height: 5000px;
 }
 
-/* ─── Responsive ─── */
-@media (min-width: 768px) {
-  .ffstraining-card-header {
-    padding: 16px 20px;
-  }
-
-  .ffstraining-card-content {
-    padding: 0 20px 20px;
-  }
-
-  .ffstraining-step {
-    padding-left: 36px;
-  }
-
-  .ffstraining-step::before {
-    width: 24px;
-    height: 24px;
-    font-size: var(--font-xs);
-  }
-
-  .ffstraining-memory {
-    padding: 14px 18px;
-  }
-
-  .ffstraining-notes {
-    padding: 14px 18px;
-  }
+/* ─── ANTI-MATRYOSHKA: zero horizontal padding для вложенных card-content ───
+   Родительский .card-content уже дал отступ (16px), вложенная карта
+   «съела» его через negative margin. Свой padding — 0 по горизонтали,
+   иначе суммирование (матрёшка) вернётся. */
+.ffstraining-card[data-depth="2"] > .ffstraining-card-body > .ffstraining-card-content,
+.ffstraining-card[data-depth="3"] > .ffstraining-card-body > .ffstraining-card-content {
+  padding-left: 0;
+  padding-right: 0;
 }
+
+/* ─── Responsive ─── */
+/* @media (min-width: 768px) удалён — MODULE_CONTRACT §7 v4.7 определяет только @560/@380. */
 
 /* Module container — нижний паддинг (MODULE_CONTRACT §7: переопределение через #nameContainer) */
 #ffstrainingContainer .module-container {
   padding-bottom: 32px;
 }
 
-/* ─── Узкие экраны: компенсация матрёшки паддингов ───
-   На < 480px уменьшаем горизонтальные паддинги вложенных элементов, чтобы
-   глубокий контент (depth=3, steps) не сжимался до 228px из 360px.
-   MODULE_CONTRACT §7: контекстные правила на #nameContainer + свой module-container разрешены. */
+/* ─── Узкие экраны: anti-matryoshka ───
+   На < 480px уменьшаем базовые горизонтальные паддинги (module-container,
+   depth-1 content), а negative margin вложенных карт пропорционально
+   уменьшаем (-12px) чтобы они продолжали «съедать» родительский отступ.
+   MODULE_CONTRACT §7: контекстные правила на #nameContainer разрешены. */
 @media (max-width: 480px) {
   #ffstrainingContainer .module-container { padding-left: 12px; padding-right: 12px; }
-  .ffstraining-card-content { padding: 0 12px 16px; }
-  .ffstraining-card[data-depth="2"] .ffstraining-card-header { padding: 10px 10px; }
-  .ffstraining-card[data-depth="3"] .ffstraining-card-header { padding: 8px 8px; }
-  .ffstraining-step { padding: 5px 0 5px 24px; }
+  /* depth-1 content: базовый отступ 12px */
+  .ffstraining-card[data-depth="1"] > .ffstraining-card-body > .ffstraining-card-content {
+    padding-left: 12px; padding-right: 12px;
+  }
+  /* depth-2: negative margin = -12px (компенсирует depth-1 content padding) */
+  .ffstraining-card[data-depth="2"] {
+    margin-left: -12px; margin-right: -12px;
+  }
+  .ffstraining-card[data-depth="2"] .ffstraining-card-header { padding: 10px 12px; }
+  .ffstraining-card[data-depth="3"] .ffstraining-card-header { padding: 8px 12px; }
+  .items-block { padding: 8px 10px; }
   .ffstraining-memory { padding: 10px 10px; }
   .ffstraining-notes  { padding: 10px 10px; }
+  /* Smart Divider + divider-list: синхронно с module-container */
+  .divider-list-toggle { padding: 14px 12px 6px; }
+  .divider-list-items  { padding: 0 12px; }
+  .list-divider        { padding: 18px 12px 6px; }
 }
 
 @media (max-width: 380px) {
   #ffstrainingContainer .module-container { padding-left: 10px; padding-right: 10px; }
-  .ffstraining-card-content { padding: 0 10px 14px; }
-  .ffstraining-card[data-depth="2"] .ffstraining-card-header { padding: 8px 8px; }
-  .ffstraining-card[data-depth="3"] .ffstraining-card-header { padding: 6px 6px; }
-  .ffstraining-step { padding: 4px 0 4px 20px; }
-  .ffstraining-step::before { width: 18px; height: 18px; font-size: 0.6rem; }
+  .ffstraining-card[data-depth="1"] > .ffstraining-card-body > .ffstraining-card-content {
+    padding-left: 10px; padding-right: 10px;
+  }
+  .ffstraining-card[data-depth="2"] {
+    margin-left: -10px; margin-right: -10px;
+  }
+  .ffstraining-card[data-depth="2"] .ffstraining-card-header { padding: 8px 10px; }
+  .ffstraining-card[data-depth="3"] .ffstraining-card-header { padding: 6px 10px; }
+  .items-block { padding: 6px 8px; }
   .ffstraining-memory { padding: 8px 8px; }
   .ffstraining-notes  { padding: 8px 8px; }
+  /* Smart Divider + divider-list: синхронно с module-container */
+  .divider-list-toggle { padding: 14px 10px 6px; }
+  .divider-list-items  { padding: 0 10px; }
+  .list-divider        { padding: 18px 10px 6px; }
 }
 
 /* ─── Узкие экраны: улучшенное выравнивание заголовков аккордеонов ───
@@ -1088,9 +1467,6 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
   .ffstraining-card-title {
     font-size: var(--font-sm);
     line-height: 1.4;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
     text-align: left;
   }
 }
@@ -1102,7 +1478,7 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
   }
 
   .ffstraining-card-title {
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.35;
   }
 }

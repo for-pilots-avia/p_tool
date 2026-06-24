@@ -52,8 +52,10 @@
     screen: 'start',
     testData: null,
     customTests: [],
-    selectedTest: 'default',
+    selectedTest: '',
     shuffle: true,
+    mode: 'train',
+    examCount: 10,
     questions: [],
     idx: 0,
     score: 0,
@@ -61,6 +63,8 @@
     isFirstRun: true,
     answered: false,
     shuffledAnswers: [],
+    isMulti: false,
+    multiSelected: [],
     quizStartTime: 0,
     questionStartTime: 0,
     questionTimes: [],
@@ -114,48 +118,11 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-     PARSE QUESTIONS FILE — supports both formats:
-     1. questions.txt (plain text, * marks correct)
-     2. JSON ({ name, questions: [...] })
-     ═══════════════════════════════════════════════════════════ */
-  function parseQuestionsFile(text) {
-    var name = '\u041E\u0441\u043D\u043E\u0432\u043D\u043E\u0439 \u0442\u0435\u0441\u0442'; /* Основной тест */
-    var questions = [];
-    var blocks = text.split(/\n\s*\n/).filter(function (b) { return b.trim(); });
-
-    for (var bi = 0; bi < blocks.length; bi++) {
-      var lines = blocks[bi].split('\n').map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 0; });
-      if (lines.length < 2) continue;
-
-      var question = lines[0];
-      var answers = [];
-      var correct = 0;
-
-      for (var li = 1; li < lines.length; li++) {
-        var line = lines[li];
-        var isCorrect = false;
-        if (line.charAt(0) === '*') {
-          isCorrect = true;
-          line = line.substring(1);
-        }
-        if (isCorrect) correct = answers.length;
-        answers.push(line);
-      }
-
-      if (answers.length > 0) {
-        questions.push({ question: question, answers: answers, correct: correct });
-      }
-    }
-
-    return { name: name, questions: questions };
-  }
-
-
-  /* ═══════════════════════════════════════════════════════════
      RESULTS HISTORY — localStorage
      ═══════════════════════════════════════════════════════════ */
   var HISTORY_KEY = 'nw_quiz_history';
   var CUSTOM_TESTS_KEY = 'nw_quiz_custom_tests';
+  var LAST_SELECTED_KEY = 'nw_quiz_last_selected';
   var MAX_HISTORY = 20;
 
   function loadHistory() {
@@ -292,37 +259,53 @@
     rebuildSelector(sel);
     var toggle = container.querySelector('#modalShuffleToggle');
     if (toggle) toggle.checked = S.shuffle;
+    /* Mode toggle sync */
+    var modeTrain = container.querySelector('#modalModeTrain');
+    var modeExam = container.querySelector('#modalModeExam');
+    if (modeTrain) modeTrain.classList.toggle('quiz-mode-btn--active', S.mode === 'train');
+    if (modeExam) modeExam.classList.toggle('quiz-mode-btn--active', S.mode === 'exam');
+    /* Stop button visible only during quiz/result */
+    var stopBtn = container.querySelector('#modalBtnStop');
+    if (stopBtn) stopBtn.style.display = (S.screen === 'quiz' || S.screen === 'result') ? '' : 'none';
   }
 
   function rebuildSelector(sel) {
     if (!sel) return;
     sel.innerHTML = '';
-    if (S.testData) {
-      var o = document.createElement('option');
-      o.value = 'default';
-      o.textContent = S.testData.name + ' (' + S.testData.questions.length + ' \u0432\u043E\u043F\u0440.)'; /* вопр. */
-      sel.appendChild(o);
-    }
-    var hasCustom = S.customTests.length > 0;
-    if (hasCustom && S.testData) {
-      var sep = document.createElement('option');
-      sep.disabled = true;
-      sep.textContent = '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500'; /* separator */
-      sel.appendChild(sep);
-    }
+    /* Все тесты (встроенные + пользовательские) — единый список. */
+    /* Разделитель только если есть оба типа. */
+    var hasBuiltin = S.customTests.some(function (t) { return t._builtin; });
+    var hasUser = S.customTests.some(function (t) { return !t._builtin; });
+    var needSeparator = hasBuiltin && hasUser;
+
     S.customTests.forEach(function (t) {
+      if (needSeparator && !t._builtin) return; /* пользовательские — после разделителя */
       var o = document.createElement('option');
       o.value = t.name;
       o.textContent = t.name + ' (' + t.questions.length + ' \u0432\u043E\u043F\u0440.)';
       sel.appendChild(o);
     });
+
+    if (needSeparator) {
+      var sep = document.createElement('option');
+      sep.disabled = true;
+      sep.textContent = '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500';
+      sel.appendChild(sep);
+      S.customTests.forEach(function (t) {
+        if (t._builtin) return;
+        var o = document.createElement('option');
+        o.value = t.name;
+        o.textContent = t.name + ' (' + t.questions.length + ' \u0432\u043E\u043F\u0440.)';
+        sel.appendChild(o);
+      });
+    }
+
     sel.value = S.selectedTest;
   }
 
   function syncMainFromState() {
-    var name = S.selectedTest === 'default' && S.testData
-      ? S.testData.name
-      : (S.customTests.find(function (t) { return t.name === S.selectedTest; }) || {}).name || '';
+    var custom = S.customTests.find(function (t) { return t.name === S.selectedTest; });
+    var name = custom ? custom.name : '';
     var el = container.querySelector('#startTestName');
     if (el) el.textContent = name ? name : '';
   }
@@ -340,20 +323,39 @@
       /* Overlay click (close) */
       if (target === modalWrap) { closeSettings(); return; }
 
-      /* Clear history button */
-      if (target.closest('#modalBtnClearHistory')) { clearHistory(); return; }
-
-      /* Start button */
-      if (target.closest('#modalBtnStart')) {
-        var sel = container.querySelector('#modalTestSelector');
-        var toggle = container.querySelector('#modalShuffleToggle');
-        S.selectedTest = sel ? sel.value : 'default';
-        S.shuffle = toggle ? toggle.checked : true;
-        syncMainFromState();
-        closeSettings();
-        startQuiz();
+      /* Mode toggle — Training (all questions) */
+      if (target.closest('#modalModeTrain')) {
+        S.mode = 'train';
+        syncModalFromState();
         return;
       }
+
+      /* Mode toggle — Testing (10 questions) */
+      if (target.closest('#modalModeExam')) {
+        S.mode = 'exam';
+        syncModalFromState();
+        return;
+      }
+
+      /* Stop test button — confirm before aborting.
+         Сначала закрываем модалку настроек (z-index 9999/10000 перекрывает
+         globalConfirmOverlay z-index 2100), затем показываем confirm. */
+      if (target.closest('#modalBtnStop')) {
+        closeSettings();
+        if (window.app && typeof window.app.showConfirm === 'function') {
+          window.app.showConfirm(
+            '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C \u0442\u0435\u0441\u0442? \u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u0431\u0443\u0434\u0435\u0442 \u043F\u043E\u0442\u0435\u0440\u044F\u043D.',
+            function () { goStart(); },
+            '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C'
+          );
+        } else {
+          goStart();
+        }
+        return;
+      }
+
+      /* Clear history button */
+      if (target.closest('#modalBtnClearHistory')) { clearHistory(); return; }
 
       /* File input */
       var fileInput = target.closest('#modalFileInput');
@@ -385,10 +387,6 @@
         return;
       }
 
-      /* Select change */
-      var selEl = target.closest('#modalTestSelector');
-      if (selEl) { S.selectedTest = selEl.value; return; }
-
       /* Shuffle toggle */
       var toggleEl = target.closest('#modalShuffleToggle');
       if (toggleEl) { S.shuffle = toggleEl.checked; return; }
@@ -396,7 +394,14 @@
 
     /* Separate listener for select/toggle change events (not click) */
     var sel = container.querySelector('#modalTestSelector');
-    if (sel) sel.addEventListener('change', function () { S.selectedTest = sel.value; });
+    if (sel) sel.addEventListener('change', function () {
+      S.selectedTest = sel.value;
+      var toggle = container.querySelector('#modalShuffleToggle');
+      S.shuffle = toggle ? toggle.checked : true;
+      try { localStorage.setItem(LAST_SELECTED_KEY, S.selectedTest); } catch (e) {}
+      syncMainFromState();
+      closeSettings();
+    });
 
     var toggle = container.querySelector('#modalShuffleToggle');
     if (toggle) toggle.addEventListener('change', function () { S.shuffle = toggle.checked; });
@@ -433,7 +438,10 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-     LOAD DATA — client-side, supports both .txt and .json formats
+     LOAD DATA — fetch quiz-tests.json (manifest) → all listed JSON tests.
+     Все тесты из manifest.tests → S.customTests с _builtin=true.
+     S.selectedTest восстанавливается из localStorage (last used) или берётся
+     первый из списка (тест по умолчанию при первом входе).
      ═══════════════════════════════════════════════════════════ */
   function loadData() {
     var loaderEl = container.querySelector('#loader');
@@ -441,37 +449,41 @@
     var contentEl = container.querySelector('#startContent');
     show(loaderEl); hide(errorEl); hide(contentEl);
 
-    /* Load main test from test-line.json */
-    fetch('modules/quiz/data/test-line.json')
+    fetch('modules/quiz/data/quiz-tests.json')
       .then(function (res) {
-        if (!res.ok) throw new Error('Failed to load test-line.json');
-        return res.text();
+        if (!res.ok) throw new Error('Failed to load quiz-tests.json');
+        return res.json();
       })
-      .then(function (txt) {
-        var mainTest = parseQuestionsFile(txt);
-        S.testData = mainTest;
-
-        /* Load additional JSON tests */
-        return Promise.all([
-          fetch('modules/quiz/data/test-comm.json')
+      .catch(function () { return { tests: [] }; })
+      .then(function (manifest) {
+        var list = (manifest && Array.isArray(manifest.tests)) ? manifest.tests : [];
+        return Promise.all(list.map(function (fname) {
+          return fetch('modules/quiz/data/' + fname)
             .then(function (res) { if (!res.ok) return null; return res.json(); })
-            .catch(function () { return null; }),
-          fetch('modules/quiz/data/test-instructor.json')
-            .then(function (res) { if (!res.ok) return null; return res.json(); })
-            .catch(function () { return null; })
-        ]);
+            .then(function (data) { return { file: fname, data: data }; })
+            .catch(function () { return null; });
+        }));
       })
-      .then(function (jsonResults) {
-        jsonResults.forEach(function (jsonData) {
-          if (jsonData && jsonData.name && jsonData.questions && jsonData.questions.length > 0) {
-            addCustomTest(jsonData.name, jsonData.questions, true);
-          }
+      .then(function (results) {
+        results.forEach(function (entry) {
+          if (!entry || !entry.data) return;
+          var data = entry.data;
+          if (!data.name || !Array.isArray(data.questions) || data.questions.length === 0) return;
+          addCustomTest(data.name, data.questions, true);
         });
         /* Load persisted custom tests from localStorage */
         var persisted = loadCustomTests();
         persisted.forEach(function (t) {
           addCustomTest(t.name, t.questions, false);
         });
+
+        /* Восстановить последний выбранный тест ИЛИ взять первый из списка */
+        var lastSel = null;
+        try { lastSel = localStorage.getItem(LAST_SELECTED_KEY); } catch (e) {}
+        var exists = lastSel && S.customTests.find(function (t) { return t.name === lastSel; });
+        S.selectedTest = exists ? lastSel : (S.customTests[0] && S.customTests[0].name) || '';
+        try { localStorage.setItem(LAST_SELECTED_KEY, S.selectedTest); } catch (e) {}
+
         hide(loaderEl); show(contentEl);
         syncModalFromState();
         syncMainFromState();
@@ -594,13 +606,14 @@
      ═══════════════════════════════════════════════════════════ */
   function startQuiz() {
     var qs = [];
-    if (S.selectedTest === 'default' && S.testData) {
-      qs = JSON.parse(JSON.stringify(S.testData.questions));
-    } else {
-      var custom = S.customTests.find(function (t) { return t.name === S.selectedTest; });
-      if (custom) qs = JSON.parse(JSON.stringify(custom.questions));
-    }
+    var custom = S.customTests.find(function (t) { return t.name === S.selectedTest; });
+    if (custom) qs = JSON.parse(JSON.stringify(custom.questions));
     if (qs.length === 0) return;
+
+    /* Exam mode: limit to examCount random questions */
+    if (S.mode === 'exam' && qs.length > S.examCount) {
+      qs = shuffleArr(qs).slice(0, S.examCount);
+    }
 
     S.questions = S.shuffle ? shuffleArr(qs) : qs;
     S.idx = 0;
@@ -664,9 +677,10 @@
       }
     }
 
-    /* Question text */
+    /* Question text — MODULE_CONTRACT §13: рендерим как HTML
+       (\n → <br>, разрешённые теги <b>/<i> рендерятся как HTML) */
     var questionText = container.querySelector('#questionText');
-    if (questionText) questionText.textContent = q.question;
+    if (questionText) questionText.innerHTML = (q.question || '').replace(/\n/g, '<br>');
 
     /* Image */
     var questionImageWrap = container.querySelector('#questionImageWrap');
@@ -683,20 +697,41 @@
       hide(questionImageWrap);
     }
 
-    /* Answers (shuffle) */
-    var mapped = q.answers.map(function (text, idx) { return { text: text, isCorrect: idx === q.correct }; });
+    /* Answers (shuffle) — multi-mode если correct — массив */
+    var isMulti = Array.isArray(q.correct);
+    S.isMulti = isMulti;
+    S.multiSelected = [];
+    var correctArr = isMulti ? q.correct : [q.correct];
+    var mapped = q.answers.map(function (text, idx) {
+      return { text: text, isCorrect: correctArr.indexOf(idx) >= 0 };
+    });
     S.shuffledAnswers = shuffleArr(mapped);
+
+    /* Multi-hint — показываем только в multi-режиме */
+    var multiHint = container.querySelector('#multiHint');
+    if (multiHint) multiHint.style.display = isMulti ? '' : 'none';
 
     var answersContainer = container.querySelector('#answersContainer');
     if (answersContainer) {
       answersContainer.innerHTML = '';
       S.shuffledAnswers.forEach(function (ans, idx) {
         var btn = document.createElement('button');
-        btn.className = 'answer-btn';
+        btn.className = isMulti ? 'answer-btn answer-multi' : 'answer-btn';
         btn.innerHTML = '<span class="answer-letter">' + LETTERS[idx] + '</span><span>' + ans.text + '</span>';
-        btn.addEventListener('click', function () { handleAnswer(ans, idx, btn); });
+        if (isMulti) {
+          btn.addEventListener('click', function () { toggleMultiAnswer(idx, btn); });
+        } else {
+          btn.addEventListener('click', function () { handleAnswer(ans, idx, btn); });
+        }
         answersContainer.appendChild(btn);
       });
+    }
+
+    /* Confirm button (multi-mode only) */
+    var btnConfirmMulti = container.querySelector('#btnConfirmMulti');
+    if (btnConfirmMulti) {
+      btnConfirmMulti.style.display = isMulti ? '' : 'none';
+      btnConfirmMulti.disabled = true;
     }
 
     /* Clear feedback */
@@ -784,6 +819,98 @@
 
 
   /* ═══════════════════════════════════════════════════════════
+     TOGGLE MULTI ANSWER (multi-mode only)
+     ═══════════════════════════════════════════════════════════ */
+  function toggleMultiAnswer(idx, btn) {
+    if (S.answered) return;
+    var pos = S.multiSelected.indexOf(idx);
+    if (pos >= 0) {
+      S.multiSelected.splice(pos, 1);
+      btn.classList.remove('answer-selected');
+    } else {
+      S.multiSelected.push(idx);
+      btn.classList.add('answer-selected');
+    }
+    var btnConfirmMulti = container.querySelector('#btnConfirmMulti');
+    if (btnConfirmMulti) btnConfirmMulti.disabled = S.multiSelected.length === 0;
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     HANDLE MULTI CONFIRM (multi-mode only)
+     ═══════════════════════════════════════════════════════════ */
+  function handleMultiConfirm() {
+    if (S.answered) return;
+    S.answered = true;
+    markQuestionTime();
+
+    var answersContainer = container.querySelector('#answersContainer');
+    var feedbackLine = container.querySelector('#feedbackLine');
+    var btnConfirmMulti = container.querySelector('#btnConfirmMulti');
+    if (btnConfirmMulti) btnConfirmMulti.disabled = true;
+
+    var btns = answersContainer.querySelectorAll('.answer-btn');
+    var selectedSet = S.multiSelected.slice();
+    var allCorrectSelected = true;
+    var noneWrongSelected = true;
+
+    btns.forEach(function (b, i) {
+      b.disabled = true;
+      var a = S.shuffledAnswers[i];
+      var isSelected = selectedSet.indexOf(i) >= 0;
+      var letterEl = b.querySelector('.answer-letter');
+      if (a.isCorrect && isSelected) {
+        /* Верно выбран — зелёный */
+        b.classList.add('answer-correct');
+        b.classList.remove('answer-selected');
+        if (letterEl) letterEl.innerHTML = icoCustom('check', 16, 2.5);
+      } else if (!a.isCorrect && isSelected) {
+        /* Неверно выбран — красный */
+        b.classList.add('answer-wrong');
+        b.classList.remove('answer-selected');
+        if (letterEl) letterEl.innerHTML = icoCustom('x', 16, 2.5);
+        noneWrongSelected = false;
+      } else if (a.isCorrect && !isSelected) {
+        /* Пропущен правильный — оранжевый */
+        b.classList.add('answer-missed');
+        if (letterEl) letterEl.innerHTML = icoCustom('check', 16, 2.5);
+        allCorrectSelected = false;
+      }
+    });
+
+    var fullyCorrect = allCorrectSelected && noneWrongSelected;
+
+    if (fullyCorrect) {
+      S.score++;
+      if (feedbackLine) {
+        feedbackLine.className = 'feedback-line feedback-correct';
+        feedbackLine.innerHTML = icoCustom('check', 16, 2.5) + ' \u041F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E \u0432\u0435\u0440\u043D\u043E!'; /* Полностью верно! */
+      }
+    } else {
+      var q = S.questions[S.idx];
+      if (!S.wrongQs.find(function (x) { return x.question === q.question; })) S.wrongQs.push(q);
+      if (feedbackLine) {
+        feedbackLine.className = 'feedback-line feedback-wrong';
+        feedbackLine.innerHTML = icoCustom('x', 16, 2.5) + ' \u041D\u0435\u0432\u0435\u0440\u043D\u043E'; /* Неверно */
+      }
+    }
+
+    buildTimeline();
+    updateProgress();
+
+    /* Next after delay — 1.5с для multi (чуть больше времени на анализ) */
+    setTimeout(function () {
+      S.idx++;
+      if (S.idx < S.questions.length) {
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }, 1500);
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
      SHOW RESULTS
      ═══════════════════════════════════════════════════════════ */
   function showResults() {
@@ -865,9 +992,7 @@
 
     /* Save result to history (first run only) */
     if (S.isFirstRun) {
-      var testName = S.selectedTest === 'default' && S.testData
-        ? S.testData.name
-        : (S.customTests.find(function (t) { return t.name === S.selectedTest; }) || {}).name || '\u0422\u0435\u0441\u0442'; /* Тест */
+      var testName = (S.customTests.find(function (t) { return t.name === S.selectedTest; }) || {}).name || '\u0422\u0435\u0441\u0442'; /* Тест */
       pushResult({
         testName: testName,
         date: Date.now(),
@@ -939,7 +1064,6 @@
      RENDER HEADER — direct DOM access per MODULE_CONTRACT
      ═══════════════════════════════════════════════════════════ */
   function getCurrentTestName() {
-    if (S.selectedTest === 'default' && S.testData) return S.testData.name;
     var custom = S.customTests.find(function (t) { return t.name === S.selectedTest; });
     return custom ? custom.name : '';
   }
@@ -984,10 +1108,10 @@
     if (uploadIcon) uploadIcon.innerHTML = ico('upload');
     var shuffleIcon = container.querySelector('#shuffleIcon');
     if (shuffleIcon) shuffleIcon.innerHTML = ico('shuffle');
-    var modalPlayIcon = container.querySelector('#modalPlayIcon');
-    if (modalPlayIcon) modalPlayIcon.innerHTML = ico('play');
     var trashIcon = container.querySelector('#trashIcon');
     if (trashIcon) trashIcon.innerHTML = ico('trash-2');
+    var stopIcon = container.querySelector('#stopIcon');
+    if (stopIcon) stopIcon.innerHTML = ico('x');
   }
 
 
@@ -1043,7 +1167,9 @@
             '<img id="questionImage" alt="\u0438\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">' + /* иллюстрация */
           '</div>' +
         '</div>' +
+        '<div id="multiHint" class="multi-hint" style="display:none">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u0432\u0435\u0440\u043D\u044B\u0435 \u043E\u0442\u0432\u0435\u0442\u044B</div>' + /* Выберите все верные ответы */
         '<div id="answersContainer" style="margin-top: 8px"></div>' +
+        '<button id="btnConfirmMulti" class="btn-primary" style="display:none; width: 100%; margin-top: 12px">\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C</button>' + /* Подтвердить */
         '<div id="feedbackLine" class="feedback-line"></div>' +
       '</div>' +
 
@@ -1097,19 +1223,33 @@
               '<label for="modalTestSelector" style="font-size: var(--font-sm); font-weight: 600; color: var(--color-text-secondary); display: block; margin-bottom: 6px">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0435\u0441\u0442</label>' + /* Выберите тест */
               '<select id="modalTestSelector" class="quiz-select"></select>' +
             '</div>' +
-            '<div class="quiz-toggle-wrap quiz-modal-section">' +
-              '<span class="quiz-toggle-label">' +
-                '<span id="shuffleIcon" style="display: inline-flex"></span>' +
-                '\u041F\u0435\u0440\u0435\u043C\u0435\u0448\u0430\u0442\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B' + /* Перемешать вопросы */
-              '</span>' +
-              '<label class="quiz-switch">' +
-                '<input id="modalShuffleToggle" type="checkbox" checked>' +
-                '<span class="quiz-slider"></span>' +
-              '</label>' +
+            '<div class="quiz-mode-toggle-wrap quiz-modal-section">' +
+              '<div class="quiz-mode-label">\u0420\u0415\u0416\u0418\u041C</div>' + /* РЕЖИМ */
+              '<div class="quiz-mode-toggle">' +
+                '<button id="modalModeTrain" type="button" class="quiz-mode-btn quiz-mode-btn--active">' +
+                  '<span class="quiz-mode-name">\u0422\u0440\u0435\u043D\u0438\u0440\u043E\u0432\u043A\u0430</span>' + /* Тренировка */
+                  '<span class="quiz-mode-sub">\u0432\u0441\u0435 \u0432\u043E\u043F\u0440\u043E\u0441\u044B</span>' + /* все вопросы */
+                '</button>' +
+                '<button id="modalModeExam" type="button" class="quiz-mode-btn">' +
+                  '<span class="quiz-mode-name">\u0422\u0435\u0441\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435</span>' + /* Тестирование */
+                  '<span class="quiz-mode-sub">10 \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432</span>' + /* 10 вопросов */
+                '</button>' +
+              '</div>' +
+              '<div class="quiz-mode-divider"></div>' +
+              '<div class="quiz-toggle-wrap quiz-toggle-wrap--inline">' +
+                '<span class="quiz-toggle-label">' +
+                  '<span id="shuffleIcon" style="display: inline-flex"></span>' +
+                  '\u041F\u0435\u0440\u0435\u043C\u0435\u0448\u0430\u0442\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B' + /* Перемешать вопросы */
+                '</span>' +
+                '<label class="quiz-switch">' +
+                  '<input id="modalShuffleToggle" type="checkbox" checked>' +
+                  '<span class="quiz-slider"></span>' +
+                '</label>' +
+              '</div>' +
             '</div>' +
-            '<button id="modalBtnStart" class="btn-primary quiz-modal-btn quiz-modal-section">' +
-              '<span id="modalPlayIcon" style="display: inline-flex; margin-right: 8px"></span>' +
-              '\u041D\u0430\u0447\u0430\u0442\u044C \u0442\u0435\u0441\u0442' + /* Начать тест */
+            '<button id="modalBtnStop" class="btn-danger-outline quiz-modal-btn quiz-modal-section" style="display:none">' +
+              '<span id="stopIcon" style="display: inline-flex; margin-right: 6px"></span>' +
+              '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C \u0442\u0435\u0441\u0442' + /* Прекратить тест */
             '</button>' +
             '<label class="quiz-file-label quiz-modal-btn quiz-modal-section">' +
               '<span id="uploadIcon" style="display: inline-flex"></span>' +
@@ -1160,6 +1300,9 @@
 
       var btnRetryLoad = e.target.closest('#btnRetryLoad');
       if (btnRetryLoad) { loadData(); return; }
+
+      var btnConfirmMulti = e.target.closest('#btnConfirmMulti');
+      if (btnConfirmMulti) { handleMultiConfirm(); return; }
     });
 
     /* Bind other modal events (id-based, not delegation) */

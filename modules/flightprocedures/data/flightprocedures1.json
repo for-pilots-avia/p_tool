@@ -2,31 +2,42 @@
   {
     "id": "fp-group-normal",
     "title": "Взлёт и заход",
-    "category": "Normal",
-    "severity": "normal",
-    "headerBadge": false,
-    "refCode": "",
     "children": [
       {
         "id": "fp-001",
         "title": "Стандартный взлёт",
-        "severity": "normal",
-        "headerBadge": false,
         "refCode": "SOP-TO-STD",
-        "description": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+        "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+        "images": [
+          { "src": "modules/flightprocedures/data/ext_walk1.png", "alt": "Внешний осмотр — вид слева" },
+          { "src": "modules/flightprocedures/data/ext_walk1.png", "alt": "Внешний осмотр — вид справа" },
+          { "src": "modules/flightprocedures/data/ext_walk1.png", "alt": "Внешний осмотр — вид спереди" }
+        ],
+        "{{items:abnormal}}": "Выполнить Before Takeoff Checklist\nУбедиться в установке взлётной конфигурации (flaps, trim, stabilizer)\nПолучить clearance на выруливание и взлёт\nНа ВПП: установить тормоза, вывести двигатели на 50% N1, проверить параметры\nОтпустить тормоза, установить TAKEOFF THRUST (FLX или TOGA)\nМониторинг параметров двигателей до V1\nПри V1: PF — руки на штурвале, решение «Взлёт продолжаем»\nПри VR: PF — плавный тангаж +15°, отрыв\nПри V2: установить начальный набор высоты, подтвердить POSITIVE RATE\nPM — «Gear Up», подтвердить уборку шасси\nНа высоте 400 ft AGL: выбрать режим CLB, установить скорость S-speed / F-speed\nНа высоте ускорения: уборка закрылков по графику, выход на чистое крыло\nВыполнить After Takeoff Checklist",
+        "documents": [
+          {
+            "title": "SOP — AOMB стр. 1",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 1
+          },
+          {
+            "title": "FCOM Vol. 1 — Takeoff стр. 12",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 12
+          }
+        ],
+        "references": [
+          "FCOM Vol. 1 — Normal Procedures: Takeoff",
+          "SOP — Standard Takeoff Profile",
+          "QRH — Configuration Checklist"
+        ],
         "children": [
           {
             "id": "fp-001a",
             "title": "Взлёт с ограниченной ВПП",
-            "severity": "normal",
-            "headerBadge": false,
             "refCode": "SOP-TO-SHORT",
-            "description": "Взлёт с короткой ВПП или при ограничениях по длине. {{badge:normal}} Требует точного расчёта V-скоростей и конфигурации.",
-            "steps": [
-              "Рассчитать V1/VR/V2 для фактической длины ВПП",
-              "Подтвердить takeoff data: TOW, CG, flex temp",
-              "Выполнить взлёт по стандартной процедуре с контролем скорости"
-            ],
+            "{{items:normal}}": "Взлёт с короткой ВПП или при ограничениях по длине. {{badge:normal}} Требует точного расчёта V-скоростей и конфигурации.",
+            "{{items:abnormal}}": "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp\nВыполнить взлёт по стандартной процедуре с контролем скорости",
             "references": [
               "FCOM Vol. 1 — Takeoff Performance",
               "SOP — Short Runway Operations"
@@ -35,73 +46,29 @@
           {
             "id": "fp-001b",
             "title": "Взлёт в условиях сдвига ветра",
-            "severity": "abnormal",
-            "headerBadge": false,
             "refCode": "SOP-TO-WS",
-            "description": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal}} Требует повышенной бдительности и готовности к уходу на второй круг.",
-            "memoryItems": [
-              "Windshear — DETECT (GPWS or visual)",
-              "Pitch — 15° minimum",
-              "Thrust — TOGA"
-            ],
-            "steps": [
-              "Получить информацию о windshear от ATC / EDR",
-              "Рассчитать V-скорости с поправкой на windshear",
-              "При обнаружении windshear на разбеге: TOGA, продолжить взлёт"
-            ],
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal}} Требует повышенной бдительности и готовности к уходу на второй круг.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nРассчитать V-скорости с поправкой на windshear\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
             "references": [
               "FCOM Vol. 1 — Windshear",
               "SOP — Windshear Escape Maneuver"
             ]
           }
-        ],
-        "image": "modules/flightprocedures/data/ext_walk1.png",
-        "steps": [
-          "Выполнить Before Takeoff Checklist",
-          "Убедиться в установке взлётной конфигурации (flaps, trim, stabilizer)",
-          "Получить clearance на выруливание и взлёт",
-          "На ВПП: установить тормоза, вывести двигатели на 50% N1, проверить параметры",
-          "Отпустить тормоза, установить TAKEOFF THRUST (FLX или TOGA)",
-          "Мониторинг параметров двигателей до V1",
-          "При V1: PF — руки на штурвале, решение «Взлёт продолжаем»",
-          "При VR: PF — плавный тангаж +15°, отрыв",
-          "При V2: установить начальный набор высоты, подтвердить POSITIVE RATE",
-          "PM — «Gear Up», подтвердить уборку шасси",
-          "На высоте 400 ft AGL: выбрать режим CLB, установить скорость S-speed / F-speed",
-          "На высоте ускорения: уборка закрылков по графику, выход на чистое крыло",
-          "Выполнить After Takeoff Checklist"
-        ],
-        "documents": [
-          {"title": "SOP — AOMB стр. 1", "src": "modules/docs/AOMB.pdf", "page": 1},
-          {"title": "FCOM Vol. 1 — Takeoff стр. 12", "src": "modules/docs/AOMB.pdf", "page": 12}
-        ],
-        "references": [
-          "FCOM Vol. 1 — Normal Procedures: Takeoff",
-          "SOP — Standard Takeoff Profile",
-          "QRH — Configuration Checklist"
         ]
       },
       {
         "id": "fp-002",
         "title": "Заход на посадку по ILS",
-        "severity": "normal",
-        "headerBadge": false,
         "refCode": "SOP-APP-ILS",
-        "description": "Стандартная процедура точного захода на посадку по ILS Category I. {{badge:normal}} Выполняется при наличии ILS на аэродроме и метеоминимумах не ниже CAT I.",
-        "steps": [
-          "Получить ATIS и подтвердить тип захода (ILS)",
-          "Установить частоту ILS и курс на MCP, подтвердить идентификатор морзянкой",
-          "Выполнить Approach Briefing: runway, DH, missed approach procedure",
-          "На снижении: установить барометр QNH при переходе TL",
-          "Установить VAPP (VREF + поправка на ветер), выставить на MCP",
-          "На рубеже захвата: подтвердить LOC и G/S захват (LOC* / G/S*)",
-          "Установить landing configuration: Gear Down, Flaps FULL",
-          "Выполнить Landing Checklist",
-          "На DH: визуальный контакт — продолжить посадку; нет контакта — уход на второй",
-          "Приземление, реверс, тормоза, уборка закрылков по SOP"
-        ],
+        "{{items:normal}}": "Стандартная процедура точного захода на посадку по ILS Category I. {{badge:normal}} Выполняется при наличии ILS на аэродроме и метеоминимумах не ниже CAT I.",
+        "{{items:abnormal}}": "Получить ATIS и подтвердить тип захода (ILS)\nУстановить частоту ILS и курс на MCP, подтвердить идентификатор морзянкой\nВыполнить Approach Briefing: runway, DH, missed approach procedure\nНа снижении: установить барометр QNH при переходе TL\nУстановить VAPP (VREF + поправка на ветер), выставить на MCP\nНа рубеже захвата: подтвердить LOC и G/S захват (LOC* / G/S*)\nУстановить landing configuration: Gear Down, Flaps FULL\nВыполнить Landing Checklist\nНа DH: визуальный контакт — продолжить посадку; нет контакта — уход на второй\nПриземление, реверс, тормоза, уборка закрылков по SOP",
         "documents": [
-          {"title": "SOP — ILS Approach стр. 5", "src": "modules/docs/AOMB.pdf", "page": 5}
+          {
+            "title": "SOP — ILS Approach стр. 5",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 5
+          }
         ],
         "references": [
           "FCOM Vol. 1 — Approach Procedures",
@@ -112,31 +79,16 @@
       {
         "id": "fp-003",
         "title": "Уход на второй круг",
-        "severity": "normal",
-        "headerBadge": false,
         "refCode": "SOP-GA-STD",
-        "description": "Стандартная процедура ухода на второй круг (Go-Around). {{badge:normal}} Инициируется командой PF «Go-Around / Flaps» на любом этапе захода.",
-        "memoryItems": [
-          "Thrust — TOGA",
-          "Pitch — 15° nose up",
-          "Flaps — Reduce by one stage",
-          "Gear — UP (at positive rate)",
-          "FD — Go-Around mode"
-        ],
-        "steps": [
-          "PF: нажать TOGA, объявить «Go-Around, Flaps»",
-          "PM: уменьшить закрылки на одну ступень",
-          "PF: установить тангаж +15°, следовать FD в режиме GA",
-          "PM: подтвердить POSITIVE RATE, объявить «Gear Up»",
-          "Установить SRS/GA TRK на FMA, подтвердить режим",
-          "На высоте ускорения: установить скорость 250 kt",
-          "Уборка закрылков по графику скоростей",
-          "Выполнить After Takeoff / Go-Around Checklist",
-          "Связаться с ATC, доложить о GA, получить инструкции",
-          "Подготовиться к повторному заходу или уходу на запасной"
-        ],
+        "{{items:normal}}": "Стандартная процедура ухода на второй круг (Go-Around). {{badge:normal}} Инициируется командой PF «Go-Around / Flaps» на любом этапе захода.",
+        "{{items:emergency:Memory items}}": "Thrust — TOGA\nPitch — 15° nose up\nFlaps — Reduce by one stage\nGear — UP (at positive rate)\nFD — Go-Around mode",
+        "{{items:abnormal}}": "PF: нажать TOGA, объявить «Go-Around, Flaps»\nPM: уменьшить закрылки на одну ступень\nPF: установить тангаж +15°, следовать FD в режиме GA\nPM: подтвердить POSITIVE RATE, объявить «Gear Up»\nУстановить SRS/GA TRK на FMA, подтвердить режим\nНа высоте ускорения: установить скорость 250 kt\nУборка закрылков по графику скоростей\nВыполнить After Takeoff / Go-Around Checklist\nСвязаться с ATC, доложить о GA, получить инструкции\nПодготовиться к повторному заходу или уходу на запасной",
         "documents": [
-          {"title": "SOP — Missed Approach стр. 7", "src": "modules/docs/AOMB.pdf", "page": 7}
+          {
+            "title": "SOP — Missed Approach стр. 7",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 7
+          }
         ],
         "references": [
           "FCOM Vol. 1 — Go-Around Procedure",
@@ -148,11 +100,8 @@
   {
     "id": "fp-maneuvers",
     "title": "Маневры",
-    "category": "Normal",
-    "severity": "normal",
-    "headerBadge": false,
     "refCode": "MANEUVERS",
-    "description": "Процедуры выполнения маневров — Stall Recovery. {{badge:abnormal:Внимание}} Срыв может произойти при любом угле атаки и любой скорости.",
+    "{{items:normal}}": "Процедуры выполнения маневров — Stall Recovery. {{badge:abnormal:Внимание}} Срыв может произойти при любом угле атаки и любой скорости.",
     "tableFile": "modules/flightprocedures/data/maneuvers_stall.html",
     "references": [
       "FCOM Vol. 1 — Stall Recovery",
@@ -160,35 +109,34 @@
     ]
   },
   {
-    "id": "fp-004",
-    "title": "Отказ двигателя после V1",
-    "category": "Abnormal",
-    "severity": "abnormal",
-    "refCode": "ECAM-ENG-FAIL-AV1",
-    "description": "Действия экипажа при отказе двигателя на скорости V1 и выше. {{badge:abnormal}} Взлёт продолжается на одном двигателе. Критическая процедура — требует немедленных и точных действий. См. также: {{link:ffstraining:ffs-001a:Отработка EFATO в FFS}}.",
-    "memoryItems": [
-      "Throttle — IDLE (failed engine)",
-      "Detect — Confirm engine failure",
-      "Continue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}"
-    ],
+    "id": "fp-sep-non-normal",
+    "title": "Ненормальные процедуры",
+    "layout": "divider"
+  },
+  {
+    "id": "fp-failures",
+    "title": "Отказы",
+    "layout": "divider",
+    "children": [
+      {
+        "id": "fp-004",
+        "title": "Отказ двигателя после V1",
+        "refCode": "ECAM-ENG-FAIL-AV1",
+    "{{items:normal}}": "Действия экипажа при отказе двигателя на скорости V1 и выше. {{badge:abnormal}} Взлёт продолжается на одном двигателе. Критическая процедура — требует немедленных и точных действий. См. также: {{link:ffstraining:ffs-001a:Отработка EFATO в FFS}}.",
+    "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nDetect — Confirm engine failure\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
     "documents": [
-      {"title": "QRH — Eng Failure Takeoff стр. 22", "src": "modules/docs/AOMB.pdf", "page": 22},
-      {"title": "FCOM Vol. 3 — ENG FAIL стр. 45", "src": "modules/docs/AOMB.pdf", "page": 45}
+      {
+        "title": "QRH — Eng Failure Takeoff стр. 22",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 22
+      },
+      {
+        "title": "FCOM Vol. 3 — ENG FAIL стр. 45",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 45
+      }
     ],
-    "steps": [
-      "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1 {{badge:abnormal}}",
-      "PF: удерживать направление по оси ВПП (rudder)",
-      "При VR: оторвать, установить тангаж +15° (V2 + 10 kt)",
-      "PM: подтвердить отказ по ECAM (ENG FAIL), доложить «Engine Fire/Fail» {{badge:abnormal:ECAM}}",
-      "На безопасной высоте (≥400 ft AGL): PF объявить «ECAM Actions»",
-      "PM: выполнить ECAM — Idle/Off (если пожар — ENG FIRE handle PULL)",
-      "PM: выполнить STATUS procedure, доложить PF",
-      "PF: установить LVL/CH на MCP, координировать с ATC",
-      "На высоте ускорения: уборка закрылков по графику, подтверждение чистого крыла",
-      "Выполнить After Takeoff Checklist (Single Engine)",
-      "Принять решение: возврат / уход на запасной аэродром",
-      "Подготовиться к посадке на одном двигателе"
-    ],
+    "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1 {{badge:abnormal}}\nPF: удерживать направление по оси ВПП (rudder)\nПри VR: оторвать, установить тангаж +15° (V2 + 10 kt)\nPM: подтвердить отказ по ECAM (ENG FAIL), доложить «Engine Fire/Fail» {{badge:abnormal:ECAM}}\nНа безопасной высоте (≥400 ft AGL): PF объявить «ECAM Actions»\nPM: выполнить ECAM — Idle/Off (если пожар — ENG FIRE handle PULL)\nPM: выполнить STATUS procedure, доложить PF\nPF: установить LVL/CH на MCP, координировать с ATC\nНа высоте ускорения: уборка закрылков по графику, подтверждение чистого крыла\nВыполнить After Takeoff Checklist (Single Engine)\nПринять решение: возврат / уход на запасной аэродром\nПодготовиться к посадке на одном двигателе",
     "references": [
       "FCOM Vol. 3 — ENG FAIL After V1",
       "QRH — Engine Failure During Takeoff",
@@ -198,30 +146,16 @@
   {
     "id": "fp-005",
     "title": "Проблема герметизации кабины",
-    "category": "Abnormal",
-    "severity": "abnormal",
     "refCode": "ECAM-PRESS-FAULT",
-    "description": "Аномальная ситуация, связанная с разгерметизацией или неисправностью системы наддува кабины. {{badge:abnormal}} Признаки: предупреждение CABIN PRESS, неконтролируемая скорость набора высоты кабины, запахи.",
-    "memoryItems": [
-      "Oxygen Masks — DON (if cabin alt > 10000 ft)",
-      "EMER DESCENT — INITIATE (if rapid depressurization) {{badge:abnormal:СРОЧНО}}"
-    ],
-    "steps": [
-      "Оценить ситуацию: CABIN ALT, CABIN RATE, PACK параметры",
-      "При CABIN ALT > 10000 ft: немедленно надеть кислородные маски (100%) {{badge:abnormal}}",
-      "PF: инициировать экстренное снижение (если разгерметизация)",
-      "Установить EMER DESCENT: SPD 340 kt / Mach 0.82, V/S -5000 ft/min",
-      "PM: доложить ATC «Mayday, Emergency Descent»",
-      "Включить сигнальную табло SEAT BELTS",
-      "Проверить PACK 1 + PACK 2 — включить оба, если один OFF",
-      "Проверить OUTFLOW VALVE — AUTO, при необходимости MANUAL",
-      "Выполнить ECAM CABIN PRESS procedure",
-      "На безопасной высоте (≤10000 ft или MEA): выровнять, оценить обстановку",
-      "Принять решение: продолжить на безопасной высоте / уход на запасной",
-      "Выполнить STATUS и After Checklist"
-    ],
+    "{{items:normal}}": "Аномальная ситуация, связанная с разгерметизацией или неисправностью системы наддува кабины. {{badge:abnormal}} Признаки: предупреждение CABIN PRESS, неконтролируемая скорость набора высоты кабины, запахи.",
+    "{{items:emergency:Memory items}}": "Oxygen Masks — DON (if cabin alt > 10000 ft)\nEMER DESCENT — INITIATE (if rapid depressurization) {{badge:abnormal:СРОЧНО}}",
+    "{{items:abnormal}}": "Оценить ситуацию: CABIN ALT, CABIN RATE, PACK параметры\nПри CABIN ALT > 10000 ft: немедленно надеть кислородные маски (100%) {{badge:abnormal}}\nPF: инициировать экстренное снижение (если разгерметизация)\nУстановить EMER DESCENT: SPD 340 kt / Mach 0.82, V/S -5000 ft/min\nPM: доложить ATC «Mayday, Emergency Descent»\nВключить сигнальную табло SEAT BELTS\nПроверить PACK 1 + PACK 2 — включить оба, если один OFF\nПроверить OUTFLOW VALVE — AUTO, при необходимости MANUAL\nВыполнить ECAM CABIN PRESS procedure\nНа безопасной высоте (≤10000 ft или MEA): выровнять, оценить обстановку\nПринять решение: продолжить на безопасной высоте / уход на запасной\nВыполнить STATUS и After Checklist",
     "documents": [
-      {"title": "QRH — Press Fault стр. 31", "src": "modules/docs/AOMB.pdf", "page": 31}
+      {
+        "title": "QRH — Press Fault стр. 31",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 31
+      }
     ],
     "references": [
       "FCOM Vol. 3 — CABIN PRESS Fault",
@@ -232,31 +166,17 @@
   {
     "id": "fp-006",
     "title": "Отказ гидравлической системы (G+B)",
-    "category": "Abnormal",
-    "severity": "abnormal",
     "refCode": "ECAM-HYD-G+B-LO",
-    "description": "Потеря зелёной и синей гидравлических систем. {{badge:abnormal}} Резервное управление: только жёлтая система. Ограничения: ручное управление рулём направления, отсутствие автоторможения, ограниченные тормоза.",
-    "memoryItems": [
-      "Yellow Hyd — CONFIRM available",
-      "Manual Flying — REQUIRED",
-      "Autobrake — NOT AVAILABLE {{badge:abnormal:NO AUTO}}"
-    ],
+    "{{items:normal}}": "Потеря зелёной и синей гидравлических систем. {{badge:abnormal}} Резервное управление: только жёлтая система. Ограничения: ручное управление рулём направления, отсутствие автоторможения, ограниченные тормоза.",
+    "{{items:emergency:Memory items}}": "Yellow Hyd — CONFIRM available\nManual Flying — REQUIRED\nAutobrake — NOT AVAILABLE {{badge:abnormal:NO AUTO}}",
     "documents": [
-      {"title": "QRH — Hyd System Loss стр. 38", "src": "modules/docs/AOMB.pdf", "page": 38}
+      {
+        "title": "QRH — Hyd System Loss стр. 38",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 38
+      }
     ],
-    "steps": [
-      "Подтвердить отказ по ECAM: HYD G+B LO PR",
-      "PF: отключить AP, перейти на ручное управление",
-      "PM: выполнить ECAM HYD G+B procedure",
-      "Подтвердить работоспособность жёлтой системы (HYD Y RSVR)",
-      "Учесть ограничения: NO autoflight, NO autobrake, NO nosewheel steering",
-      "Установить подходящую скорость (VREF + поправка за конфигурацию)",
-      "При заходе: использовать ALTN braking, ручное торможение",
-      "Выполнить Approach Briefing с учётом ограничений",
-      "На ВПП: торможение MANUAL, MAX BRAKE PRESSURE",
-      "При необходимости: запросить полный останов на ВПП, буксировку",
-      "Выполнить After Landing Checklist"
-    ],
+    "{{items:abnormal}}": "Подтвердить отказ по ECAM: HYD G+B LO PR\nPF: отключить AP, перейти на ручное управление\nPM: выполнить ECAM HYD G+B procedure\nПодтвердить работоспособность жёлтой системы (HYD Y RSVR)\nУчесть ограничения: NO autoflight, NO autobrake, NO nosewheel steering\nУстановить подходящую скорость (VREF + поправка за конфигурацию)\nПри заходе: использовать ALTN braking, ручное торможение\nВыполнить Approach Briefing с учётом ограничений\nНа ВПП: торможение MANUAL, MAX BRAKE PRESSURE\nПри необходимости: запросить полный останов на ВПП, буксировку\nВыполнить After Landing Checklist",
     "references": [
       "FCOM Vol. 3 — HYD Dual Failure",
       "QRH — Hydraulic System Loss",
@@ -266,23 +186,9 @@
   {
     "id": "fp-007",
     "title": "Отказ генератора (IDG)",
-    "category": "Abnormal",
-    "severity": "abnormal",
-    "headerBadge": false,
     "refCode": "ECAM-ELEC-IDG-FAULT",
-    "description": "Отказ Integrated Drive Generator на одном двигателе. {{badge:abnormal}} Переход на EMER GEN (если оба) или нормальную работу от оставшегося генератора.",
-    "steps": [
-      "Подтвердить отказ: ELEC IDG 1(2) FAULT на ECAM",
-      "PM: выполнить ECAM — IDG OFF",
-      "Проверить APU GEN — включить APU, подключить APU GEN",
-      "Подтвердить: ELEC CONFIG NORMAL (оба BUS powered) {{badge:success:ОК}}",
-      "При отказе обоих IDG: EMER GEN от RAT — ELEC EMER CONFIG {{badge:emergency:КРИТ}}",
-      "В ELEC EMER: ограничены PFD, NAV, COM — ручной полёт",
-      "Снизиться до FL250 (или ниже), подготовиться к быстрому заходу",
-      "Выполнить STATUS procedure",
-      "Выполнить Approach Briefing с учётом ограничений электрики",
-      "Посадка при наличии минимальных систем"
-    ],
+    "{{items:normal}}": "Отказ Integrated Drive Generator на одном двигателе. {{badge:abnormal}} Переход на EMER GEN (если оба) или нормальную работу от оставшегося генератора.",
+    "{{items:abnormal}}": "Подтвердить отказ: ELEC IDG 1(2) FAULT на ECAM\nPM: выполнить ECAM — IDG OFF\nПроверить APU GEN — включить APU, подключить APU GEN\nПодтвердить: ELEC CONFIG NORMAL (оба BUS powered) {{badge:success:ОК}}\nПри отказе обоих IDG: EMER GEN от RAT — ELEC EMER CONFIG {{badge:emergency:КРИТ}}\nВ ELEC EMER: ограничены PFD, NAV, COM — ручной полёт\nСнизиться до FL250 (или ниже), подготовиться к быстрому заходу\nВыполнить STATUS procedure\nВыполнить Approach Briefing с учётом ограничений электрики\nПосадка при наличии минимальных систем",
     "references": [
       "FCOM Vol. 3 — ELEC IDG Fault",
       "QRH — Electrical Emergency Configuration",
@@ -292,34 +198,22 @@
   {
     "id": "fp-008",
     "title": "Двойной отказ двигателей",
-    "category": "Emergency",
-    "severity": "emergency",
     "refCode": "ECAM-ENG-DUAL-FAIL",
-    "description": "Аварийная ситуация — оба двигателя отказали. {{badge:emergency}} ВС переходит на EMER ELEC (RAT), давление гидравлики падает. Критическая по времени процедура. См. тренировку: {{link:ffstraining:ffs-008:EFATO в FFS Training}}.",
-    "memoryItems": [
-      "Speed — VMIN (green dot + 10) {{badge:emergency:КРИТ}}",
-      "APU — START (if time permits)",
-      "ENG RELIGHT — IGN A+B {{badge:emergency}}",
-      "MAYDAY — DECLARE {{badge:emergency:MAYDAY}}"
-    ],
+    "{{items:normal}}": "Аварийная ситуация — оба двигателя отказали. {{badge:emergency}} ВС переходит на EMER ELEC (RAT), давление гидравлики падает. Критическая по времени процедура. См. тренировку: {{link:ffstraining:ffs-008:EFATO в FFS Training}}.",
+    "{{items:emergency:Memory items}}": "Speed — VMIN (green dot + 10) {{badge:emergency:КРИТ}}\nAPU — START (if time permits)\nENG RELIGHT — IGN A+B {{badge:emergency}}\nMAYDAY — DECLARE {{badge:emergency:MAYDAY}}",
     "documents": [
-      {"title": "QRH — Dual Eng Failure стр. 55", "src": "modules/docs/AOMB.pdf", "page": 55},
-      {"title": "SOP — Eng Relight стр. 8", "src": "modules/docs/AOMB.pdf", "page": 8}
+      {
+        "title": "QRH — Dual Eng Failure стр. 55",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 55
+      },
+      {
+        "title": "SOP — Eng Relight стр. 8",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 8
+      }
     ],
-    "steps": [
-      "PF: установить скорость планирования (green dot / VMIN)",
-      "PM: объявить MAYDAY, доложить ATC «Dual Engine Failure»",
-      "Попытаться запустить APU (если позволяет высота)",
-      "Включить IGN A+B на обоих двигателях",
-      "Попробовать RELIGHT: Windmill Start при V > 250 kt и FL < 300",
-      "При неудаче: выполнить ASSISTED START через APU BLEED",
-      "PM: выполнить ECAM ENG DUAL FAILURE procedure",
-      "Проверить RAT deployment, ELEC EMER CONFIG",
-      "Оценить дальность планирования (≈ 2 nm per 1000 ft)",
-      "Выбрать аэродром для экстренной посадки в пределах глиссады",
-      "Подготовиться к посадке без тяги (deadstick landing)",
-      "При невозможности запуска: посадка на выбранной ВПП без реверса"
-    ],
+    "{{items:abnormal}}": "PF: установить скорость планирования (green dot / VMIN)\nPM: объявить MAYDAY, доложить ATC «Dual Engine Failure»\nПопытаться запустить APU (если позволяет высота)\nВключить IGN A+B на обоих двигателях\nПопробовать RELIGHT: Windmill Start при V > 250 kt и FL < 300\nПри неудаче: выполнить ASSISTED START через APU BLEED\nPM: выполнить ECAM ENG DUAL FAILURE procedure\nПроверить RAT deployment, ELEC EMER CONFIG\nОценить дальность планирования (≈ 2 nm per 1000 ft)\nВыбрать аэродром для экстренной посадки в пределах глиссады\nПодготовиться к посадке без тяги (deadstick landing)\nПри невозможности запуска: посадка на выбранной ВПП без реверса",
     "references": [
       "FCOM Vol. 3 — ENG DUAL FAILURE / FLAME OUT",
       "QRH — Dual Engine Failure",
@@ -330,32 +224,16 @@
   {
     "id": "fp-009",
     "title": "Стремительная разгерметизация",
-    "category": "Emergency",
-    "severity": "emergency",
     "refCode": "ECAM-PRESS-RAPID",
-    "description": "Быстрая потеря давления в кабине. {{badge:emergency:КРИТ}} Кабинная высота растёт со скоростью >2000 ft/min. Время полезного сознания на FL350 составляет 30–60 секунд. См. тренировку: {{link:ffstraining:ffs-003:B777 Recurrent}}.",
-    "memoryItems": [
-      "Oxygen Masks — DON & 100% IMMEDIATELY {{badge:emergency:КРИТ}}",
-      "EMER DESCENT — INITIATE NOW {{badge:emergency}}",
-      "SEAT BELTS — ON",
-      "MAYDAY — DECLARE {{badge:emergency:MAYDAY}}"
-    ],
-    "steps": [
-      "PF+PM: немедленно надеть кислородные маски, 100% O2",
-      "PF: инициировать экстренное снижение — «Emergency Descent»",
-      "Установить: AP OFF (или AP ON с V/S -5000), SPD 340/M.82",
-      "Закрылки 0, шасси убраны, spoilers RETRACTED",
-      "PM: доложить ATC «Mayday, Mayday, Mayday — Rapid Depressurization, Emergency Descent»",
-      "Включить SEAT BELTS, NO SMOKING (автоматически)",
-      "Проверить PACK — оба ON, OUTFLOW VALVE — проверить",
-      "Проверить O2 pressure в кабине (пассажирские маски выпадают автоматически >14000 ft cabin)",
-      "На высоте ≤10000 ft (или MEA): выровнять, снять маски при stable cabin",
-      "Оценить состояние пассажиров и экипажа",
-      "Принять решение: продолжить на низкой высоте / посадка на ближайшем аэродроме",
-      "Выполнить After Emergency Checklist"
-    ],
+    "{{items:normal}}": "Быстрая потеря давления в кабине. {{badge:emergency:КРИТ}} Кабинная высота растёт со скоростью >2000 ft/min. Время полезного сознания на FL350 составляет 30–60 секунд. См. тренировку: {{link:ffstraining:ffs-003:B777 Recurrent}}.",
+    "{{items:emergency:Memory items}}": "Oxygen Masks — DON & 100% IMMEDIATELY {{badge:emergency:КРИТ}}\nEMER DESCENT — INITIATE NOW {{badge:emergency}}\nSEAT BELTS — ON\nMAYDAY — DECLARE {{badge:emergency:MAYDAY}}",
+    "{{items:abnormal}}": "PF+PM: немедленно надеть кислородные маски, 100% O2\nPF: инициировать экстренное снижение — «Emergency Descent»\nУстановить: AP OFF (или AP ON с V/S -5000), SPD 340/M.82\nЗакрылки 0, шасси убраны, spoilers RETRACTED\nPM: доложить ATC «Mayday, Mayday, Mayday — Rapid Depressurization, Emergency Descent»\nВключить SEAT BELTS, NO SMOKING (автоматически)\nПроверить PACK — оба ON, OUTFLOW VALVE — проверить\nПроверить O2 pressure в кабине (пассажирские маски выпадают автоматически >14000 ft cabin)\nНа высоте ≤10000 ft (или MEA): выровнять, снять маски при stable cabin\nОценить состояние пассажиров и экипажа\nПринять решение: продолжить на низкой высоте / посадка на ближайшем аэродроме\nВыполнить After Emergency Checklist",
     "documents": [
-      {"title": "QRH — Emerg Descent стр. 62", "src": "modules/docs/AOMB.pdf", "page": 62}
+      {
+        "title": "QRH — Emerg Descent стр. 62",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 62
+      }
     ],
     "references": [
       "FCOM Vol. 3 — CABIN PRESS Rapid Depressurization",
@@ -367,40 +245,29 @@
   {
     "id": "fp-010",
     "title": "Пожар на борту",
-    "category": "Emergency",
-    "severity": "emergency",
     "refCode": "ECAM-FIRE-ENG+CAB",
-    "description": "Пожар двигателя и/или в кабине. {{badge:emergency:КРИТ}} Наиболее критическая аварийная ситуация. Требует немедленных, решительных действий и координации экипажа.",
-    "memoryItems": [
-      "FIRE Handle — PULL {{badge:emergency:КРИТ}}",
-      "AGENT — DISCHARGE (1 then 2 if needed) {{badge:emergency}}",
-      "Oxygen Masks — DON (cabin smoke)",
-      "SPEED — MINIMUM for descent"
-    ],
-    "steps": [
-      "Подтвердить пожар: FIRE warning, визуальное подтверждение",
-      "PF: «Engine Fire Number 1/2» — объявить тип и сторону",
-      "PM: THRUST LEVER — IDLE (affected engine)",
-      "PM: FIRE HANDLE — PULL (отключает топливо, гидравлику, воздух)",
-      "PM: AGENT 1 — DISCHARGE (подождать 10 сек, оценить)",
-      "При сохранении: AGENT 2 — DISCHARGE",
-      "PF: инициировать снижение и возврат на аэродром",
-      "PM: MAYDAY, доложить ATC «Engine Fire»",
-      "При задымлении кабины: OXY MASKS — DON, 100%",
-      "SMOKE EVACUATION procedure: CABIN FANS OFF, O2 MASKS DROP",
-      "На ВПП: максимальное торможение, запросить пожарные расчёты",
-      "EVACUATION — если пожар не потушен после посадки",
-      "Выполнить Evacuation Checklist (если необходимо)"
-    ],
+    "{{items:normal}}": "Пожар двигателя и/или в кабине. {{badge:emergency:КРИТ}} Наиболее критическая аварийная ситуация. Требует немедленных, решительных действий и координации экипажа.",
+    "{{items:emergency:Memory items}}": "FIRE Handle — PULL {{badge:emergency:КРИТ}}\nAGENT — DISCHARGE (1 then 2 if needed) {{badge:emergency}}\nOxygen Masks — DON (cabin smoke)\nSPEED — MINIMUM for descent",
+    "{{items:abnormal}}": "Подтвердить пожар: FIRE warning, визуальное подтверждение\nPF: «Engine Fire Number 1/2» — объявить тип и сторону\nPM: THRUST LEVER — IDLE (affected engine)\nPM: FIRE HANDLE — PULL (отключает топливо, гидравлику, воздух)\nPM: AGENT 1 — DISCHARGE (подождать 10 сек, оценить)\nПри сохранении: AGENT 2 — DISCHARGE\nPF: инициировать снижение и возврат на аэродром\nPM: MAYDAY, доложить ATC «Engine Fire»\nПри задымлении кабины: OXY MASKS — DON, 100%\nSMOKE EVACUATION procedure: CABIN FANS OFF, O2 MASKS DROP\nНа ВПП: максимальное торможение, запросить пожарные расчёты\nEVACUATION — если пожар не потушен после посадки\nВыполнить Evacuation Checklist (если необходимо)",
     "documents": [
-      {"title": "QRH — Eng Fire стр. 70", "src": "modules/docs/AOMB.pdf", "page": 70},
-      {"title": "SOP — Smoke/Fumes стр. 15", "src": "modules/docs/AOMB.pdf", "page": 15}
+      {
+        "title": "QRH — Eng Fire стр. 70",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 70
+      },
+      {
+        "title": "SOP — Smoke/Fumes стр. 15",
+        "src": "modules/docs/AOMB.pdf",
+        "page": 15
+      }
     ],
     "references": [
       "FCOM Vol. 3 — ENG FIRE",
       "QRH — Engine Fire / Severe Damage",
       "SOP — Smoke / Fumes Procedure",
       "SOP — Evacuation Command"
+    ]
+      }
     ]
   }
 ]

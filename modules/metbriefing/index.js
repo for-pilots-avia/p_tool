@@ -40,24 +40,38 @@
   function getIcaoTz(icao) { return (_metData && _metData.icaoTimezones && _metData.icaoTimezones[icao]) || ''; }
   function getIcaoToFir(key) { return (_metData && _metData.icaoToFir && _metData.icaoToFir[key]) || null; }
   function getWxMaps() { return (_metData && _metData.wxMaps) || []; }
+  function getWindMaps() { return (_metData && _metData.windMaps) || null; }
   function getNotamSubject(key) { return (_metData && _metData.notamSubjects && _metData.notamSubjects[key]) || key; }
   function getNotamCondition(key) { return (_metData && _metData.notamConditions && _metData.notamConditions[key]) || ''; }
   function getNotamSpecific(key) { return (_metData && _metData.notamSpecificMap && _metData.notamSpecificMap[key]) || ''; }
 
+  // Task 24: HTML-escape helper — для защиты от HTML-инъекций через METAR/TAF/NOTAM/airport info.
+  // Экранирует & < > " ' — этого достаточно дляtextContent-эквивалента внутри HTML.
+  // Применяется ко всем внешним данным (METAR/TAF raw, NOTAM id/subject/description, stationInfo).
+  function escapeHtml(s) {
+    if (s === null || s === undefined) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   var CACHE_TTL_MS = 30 * 60 * 1000;
   var STATION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours for station cache
   var WX_MAP_STALE_MS = 2 * 60 * 60 * 1000; // 2 hours — weather maps stale threshold
-  var SIGMET_STALE_MS = 10 * 60 * 1000; // 10 minutes
+  var SIGMET_STALE_MS = 60 * 60 * 1000; // 1 hour — Task 21: было 10 мин, стало 1 час (по запросу пользователя)
 
-  // ===== Direct API Constants (no proxy needed) =====
-  var AVWX_BASE = 'https://avwx.rest/api';
-  var AVWX_TOKEN = 'fHRfXLb0Y7wd5okRIEUrM88Iy9zRwvIK-7oWh2PJ26U';
-  var CHECKWX_BASE = 'https://api.checkwx.com/v2';
-  var CHECKWX_KEY = '730ac83e902c466cae2626a7f134cbdc';
+  // ===== API Constants (secrets moved to Worker env — Task 28) =====
+  // AVWX_TOKEN, CHECKWX_KEY — теперь живут в Cloudflare Worker env (wrangler secret put),
+  // НЕ в клиентском коде. CheckWX/AVWX запросы идут через Worker /wx-station, /wx-metar, /wx-taf.
+  // avia-meteo.ru — PRIMARY source для METAR/TAF (Task 28): bulk text через /am-metar, /am-taf.
+  // Worker /wxmap whitelist: meteoinfo.ru, tgftp.nws.noaa.gov, avia-meteo.ru, meteocenter.net.
   var NOTAM_API_URL = 'https://notams.online/api/notams.php';
   var NOTAM_XOR_KEY = 'NotamViewer@1.0.0-OZ_2026!#';
   var AWC_PROXY_URL = 'https://aviation-proxy.777b737.workers.dev';
-  // Priority: CheckWX (primary) → AVWX (fallback) → AWC proxy (last resort) for all weather
+  // Priority: avia-meteo (primary) → Worker /wx-metar,/wx-taf (CheckWX→AVWX) → AWC proxy (last resort)
 
   // ===== Weather Maps & FIR — loaded from metbriefing.json =====
   // WX_MAPS and ICAO_TO_FIR are now in _metData.wxMaps / _metData.icaoToFir
@@ -255,6 +269,7 @@
     manualNotamAirports: {},
     // checklistProgress removed — replaced by Weather Maps block
     tickInterval: null,
+    sigmetRefreshInterval: null,   // автообновление SIGMET (как карты погоды)
     weatherLoaded: false,
     // AVWX data
     avwxStation: {},    // { ICAO: stationInfo }
@@ -264,6 +279,15 @@
     wxMapCache: {},       // { url: { blobUrl: 'blob:...', fetchedAt: timestamp } }
     wxMapLoading: false,  // true while maps are being refreshed
     wxMapLoaded: {},       // { url: true } — tracks if <img> loaded successfully via onload
+    // Task 28: avia-meteo.ru bulk text cache (METAR+TAF primary source)
+    amMetarBulk: null,    // { text: '...', fetchedAt: timestamp }
+    amTafBulk: null,      // { text: '...', fetchedAt: timestamp }
+    amLoading: false,     // true while fetching avia-meteo bulk
+    // Task 28: Wind-by-flight-level maps (FL100-FL390, +6h, area C)
+    windLevel: 340,       // selected flight level (default from windMaps.defaultLevel)
+    windMapCache: {},     // { level: { blobUrl: 'blob:...', fetchedAt: timestamp } }
+    windMapLoading: false, // true while preloading wind maps
+    windMapLoaded: {},     // { level: true } — tracks if <img> loaded successfully
     // SIGMET
     sigmetCache: null,     // { intl: [...], us: [...], fetchedAt: timestamp }
     sigmetLoading: false,
@@ -271,6 +295,33 @@
     sigmetFirFilter: 'route',  // 'route' | FIR ID | country name | 'all'
     firsData: null         // seeded from metbriefing.json .firs
   };
+
+  // Task 24: §8 — module-scope ссылки на document listeners для header menu overlay.
+  // Хранятся как module-private (НЕ window.*) — позволяет removeEventListener в closeHeaderMenu/destroy.
+  var _onHeaderMenuDocClick = null;
+  var _onHeaderMenuKeydown = null;
+
+  // Task 24: единая функция закрытия dropdown + overlay + снятия listeners (§8 условие 1, 2).
+  function closeHeaderMenu() {
+    var dropdown = document.getElementById('mbHeaderMenuDropdown');
+    var overlay = document.getElementById('mbHeaderMenuOverlay');
+    var btn = document.getElementById('mbHeaderMenuBtn');
+    if (dropdown) dropdown.classList.remove('metbriefing-header-menu--open');
+    if (overlay) {
+      overlay.classList.remove('metbriefing-header-menu-overlay--visible');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    // §8 условие 1: listener добавляется при открытии, удаляется при закрытии
+    if (_onHeaderMenuDocClick) {
+      document.removeEventListener('click', _onHeaderMenuDocClick);
+      _onHeaderMenuDocClick = null;
+    }
+    if (_onHeaderMenuKeydown) {
+      document.removeEventListener('keydown', _onHeaderMenuKeydown);
+      _onHeaderMenuKeydown = null;
+    }
+  }
 
   // ===== Utility: icon helper =====
   function icon(name, size, extraClass) {
@@ -900,9 +951,10 @@
       return Promise.resolve();
     }
     // Use CORS proxy Worker for caching (direct fetch fails — no CORS headers from meteoinfo/NOAA)
+    // Task 24: §5 — cache-busting (?_t=Date.now()) ЗАПРЕЩЁН в fetch. Инвалидация кэша —
+    // ответственность SW (смена CACHE_NAME). forceRefresh обрабатывается через state.wxMapCache.
     var proxyUrl = AWC_PROXY_URL + '/wxmap?url=' + encodeURIComponent(url);
-    var fetchUrl = forceRefresh ? proxyUrl + '&_t=' + Date.now() : proxyUrl;
-    return fetch(fetchUrl)
+    return fetch(proxyUrl)
       .then(function(res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.blob();
@@ -936,6 +988,74 @@
       })
       .catch(function() {
         state.wxMapLoading = false;
+        renderCurrentTab();
+      });
+  }
+
+  // ===== Task 29: Wind-by-flight-level maps (FL100-FL390, +6h, area C) — metavia.ru =====
+  // Source: metavia.ru (Авиаметтелеком) — https://www.metavia.ru/?pag=metaviaMaps&wafc=ruat&ind=C
+  // 11 доступных уровней: FL100,140,180,210,240,270,300,320,340,360,390. Default FL340.
+  // Worker /mv-windmap?level=FL — поддерживает PHPSESSID-сессию metavia.ru + кэш PNG (1h).
+  // Клиент предзагружает все 11 уровней (батчами по 5), кэш в state.windMapCache.
+  function getWindMapUrl(level) {
+    var cfg = getWindMaps();
+    if (!cfg || !AWC_PROXY_URL) return '';
+    var ep = cfg.endpoint || '/mv-windmap';
+    return AWC_PROXY_URL + ep + '?level=' + level;
+  }
+
+  function fetchAndCacheWindMap(level, forceRefresh) {
+    var url = getWindMapUrl(level);
+    if (!url) return Promise.resolve();
+    var cached = state.windMapCache[level];
+    if (!forceRefresh && cached && cached.blobUrl && !isStale(cached.fetchedAt, WX_MAP_STALE_MS)) {
+      return Promise.resolve();
+    }
+    // Worker /mv-windmap возвращает PNG напрямую (с CORS + 1h кэш), без /wxmap обёртки.
+    return fetch(url)
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.blob();
+      })
+      .then(function(blob) {
+        if (cached && cached.blobUrl) {
+          try { URL.revokeObjectURL(cached.blobUrl); } catch(e) {}
+        }
+        var blobUrl = URL.createObjectURL(blob);
+        state.windMapCache[level] = { blobUrl: blobUrl, fetchedAt: Date.now() };
+      })
+      .catch(function(err) {
+        console.warn('[WindMap] Failed to fetch FL' + level + ':', err.message);
+      });
+  }
+
+  function preloadAllWindMaps(forceRefresh) {
+    var cfg = getWindMaps();
+    if (!cfg || !cfg.levels || cfg.levels.length === 0) return Promise.resolve();
+    state.windMapLoading = true;
+    renderCurrentTab();
+    // Fetch in small concurrent batches (5 at a time) to avoid hammering the Worker
+    var levels = cfg.levels.slice();
+    var batches = [];
+    for (var i = 0; i < levels.length; i += 5) {
+      batches.push(levels.slice(i, i + 5));
+    }
+    var chain = Promise.resolve();
+    batches.forEach(function(batch) {
+      chain = chain.then(function() {
+        return Promise.all(batch.map(function(lvl) {
+          return fetchAndCacheWindMap(lvl, forceRefresh);
+        }));
+      });
+    });
+    return chain
+      .then(function() {
+        state.windMapLoading = false;
+        renderCurrentTab();
+        console.info('[WindMap] Preloaded', Object.keys(state.windMapCache).length, 'of', cfg.levels.length, 'levels');
+      })
+      .catch(function() {
+        state.windMapLoading = false;
         renderCurrentTab();
       });
   }
@@ -1110,119 +1230,71 @@
     state.avwxStationLoading = true;
     renderCurrentTab();
 
-    // PRIMARY: CheckWX Station — supports batch request + timezone data
-    var batchIcaos = needFetch.join(',');
-    return fetch(CHECKWX_BASE + '/station/' + batchIcaos, {
-      headers: { 'X-API-KEY': CHECKWX_KEY, 'Accept': 'application/json' }
-    })
-    .then(function(res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function(cd) {
-      var arr = cd.data;
-      if (!Array.isArray(arr) || arr.length === 0) throw new Error('No station data from CheckWX');
-      arr.forEach(function(s) {
-        var icao = s.icao || '';
-        if (!icao) return;
-        state.avwxStation[icao] = {
-          city: s.city || '',
-          country: (s.country && s.country.name) || '',
-          elevation: s.elevation || null,
-          latitude: s.latitude ? s.latitude.decimal : null,
-          longitude: s.longitude ? s.longitude.decimal : null,
-          name: s.name || AIRPORT_NAMES[icao] || icao,
-          icao: icao,
-          iata: s.iata || '',
-          type: '',
-          reporting: false,
-          runways: [],
-          timezone: (s.timeinfo && s.timeinfo.timezone) || '',
-          utcOffset: (s.timeinfo && s.timeinfo.gmt_offset) || null,
-          dstActive: (s.timeinfo && s.timeinfo.dst_active) || false
-        };
-        if (s.name) AIRPORT_NAMES[icao] = s.name;
-      });
-      // For any ICAO not returned by CheckWX, try AVWX individually
-      var missing = needFetch.filter(function(icao) { return !state.avwxStation[icao]; });
-      if (missing.length === 0) return;
-      return Promise.all(missing.map(function(icao) {
-        return fetch(AVWX_BASE + '/station/' + icao, {
-          headers: { 'Authorization': 'Token ' + AVWX_TOKEN, 'Accept': 'application/json' }
-        })
+    // Task 28: Worker /wx-station proxy (CheckWX primary → AVWX fallback, secrets in Worker env).
+    // Worker handles the CheckWX→AVWX fallback internally. Client calls once per ICAO.
+    return Promise.all(needFetch.map(function(icao) {
+      return fetch(AWC_PROXY_URL + '/wx-station?icao=' + encodeURIComponent(icao))
         .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
+          if (!res.ok) throw new Error('wx-station HTTP ' + res.status);
           return res.json();
         })
-        .then(function(d) {
-          if (d.error) throw new Error(d.error);
-          state.avwxStation[icao] = {
-            city: d.city || '',
-            country: d.country || '',
-            elevation: d.elevation_ft ? { feet: d.elevation_ft } : null,
-            latitude: d.latitude || null,
-            longitude: d.longitude || null,
-            name: d.name || AIRPORT_NAMES[icao] || icao,
-            icao: d.icao || icao,
-            iata: d.iata || '',
-            type: d.type || '',
-            reporting: d.reporting || false,
-            runways: d.runways || [],
-            timezone: getIcaoTz(icao) || '',
-            utcOffset: null,
-            dstActive: false
-          };
-          if (d.name) AIRPORT_NAMES[icao] = d.name;
+        .then(function(resp) {
+          if (resp.error) throw new Error(resp.error);
+          var provider = resp.provider; // 'CheckWX' | 'AVWX'
+          var d = resp.data;
+          if (!d) throw new Error('No station data');
+          if (provider === 'CheckWX') {
+            // CheckWX returns array — take first element
+            var s = Array.isArray(d) ? d[0] : d;
+            if (!s) throw new Error('Empty CheckWX station response');
+            state.avwxStation[icao] = {
+              city: s.city || '',
+              country: (s.country && s.country.name) || '',
+              elevation: s.elevation || null,
+              latitude: s.latitude ? s.latitude.decimal : null,
+              longitude: s.longitude ? s.longitude.decimal : null,
+              name: s.name || AIRPORT_NAMES[icao] || icao,
+              icao: icao,
+              iata: s.iata || '',
+              type: '',
+              reporting: false,
+              runways: [],
+              timezone: (s.timeinfo && s.timeinfo.timezone) || '',
+              utcOffset: (s.timeinfo && s.timeinfo.gmt_offset) || null,
+              dstActive: (s.timeinfo && s.timeinfo.dst_active) || false
+            };
+            if (s.name) AIRPORT_NAMES[icao] = s.name;
+          } else {
+            // AVWX format
+            if (d.error) throw new Error(d.error);
+            state.avwxStation[icao] = {
+              city: d.city || '',
+              country: d.country || '',
+              elevation: d.elevation_ft ? { feet: d.elevation_ft } : null,
+              latitude: d.latitude || null,
+              longitude: d.longitude || null,
+              name: d.name || AIRPORT_NAMES[icao] || icao,
+              icao: d.icao || icao,
+              iata: d.iata || '',
+              type: d.type || '',
+              reporting: d.reporting || false,
+              runways: d.runways || [],
+              timezone: getIcaoTz(icao) || '',
+              utcOffset: null,
+              dstActive: false
+            };
+            if (d.name) AIRPORT_NAMES[icao] = d.name;
+          }
         })
         .catch(function() {
+          // Fallback: use AIRPORT_NAMES from JSON if available, else null
           if (!state.avwxStation[icao] && AIRPORT_NAMES[icao]) {
             state.avwxStation[icao] = { name: AIRPORT_NAMES[icao], icao: icao, city: '', country: '', iata: '', type: '', reporting: false, runways: [], elevation: null, latitude: null, longitude: null, timezone: getIcaoTz(icao) || '', utcOffset: null, dstActive: false };
           } else if (!state.avwxStation[icao]) {
             state.avwxStation[icao] = null;
           }
         });
-      }));
-    })
-    .catch(function(err) {
-      // FALLBACK: AVWX individually (CheckWX failed entirely)
-      console.warn('CheckWX Station batch failed, trying AVWX individually:', err.message);
-      return Promise.all(needFetch.map(function(icao) {
-        return fetch(AVWX_BASE + '/station/' + icao, {
-          headers: { 'Authorization': 'Token ' + AVWX_TOKEN, 'Accept': 'application/json' }
-        })
-        .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function(d) {
-          if (d.error) throw new Error(d.error);
-          state.avwxStation[icao] = {
-            city: d.city || '',
-            country: d.country || '',
-            elevation: d.elevation_ft ? { feet: d.elevation_ft } : null,
-            latitude: d.latitude || null,
-            longitude: d.longitude || null,
-            name: d.name || AIRPORT_NAMES[icao] || icao,
-            icao: d.icao || icao,
-            iata: d.iata || '',
-            type: d.type || '',
-            reporting: d.reporting || false,
-            runways: d.runways || [],
-            timezone: getIcaoTz(icao) || '',
-            utcOffset: null,
-            dstActive: false
-          };
-          if (d.name) AIRPORT_NAMES[icao] = d.name;
-        })
-        .catch(function() {
-          if (!state.avwxStation[icao] && AIRPORT_NAMES[icao]) {
-            state.avwxStation[icao] = { name: AIRPORT_NAMES[icao], icao: icao, city: '', country: '', iata: '', type: '', reporting: false, runways: [], elevation: null, latitude: null, longitude: null, timezone: getIcaoTz(icao) || '', utcOffset: null, dstActive: false };
-          } else if (!state.avwxStation[icao]) {
-            state.avwxStation[icao] = null;
-          }
-        });
-      }));
-    })
+    }))
     .then(function() {
       state.avwxStationLoading = false;
       saveStationCache();
@@ -1230,8 +1302,112 @@
     });
   }
 
+  // ===== avia-meteo.ru bulk text fetch (PRIMARY source — Task 28) =====
+  // Fetches full metar.txt / taf.txt via Worker /am-metar, /am-taf (CORS + 5min cache).
+  // Client parses the bulk text for route airports. Cached in state.amMetarBulk/amTafBulk (5 min).
+  var AM_BULK_TTL_MS = 5 * 60 * 1000; // sync with Worker AM_CACHE_TTL
+
+  function fetchAmMetarBulk(forceRefresh) {
+    if (!AWC_PROXY_URL) return Promise.resolve(null);
+    var cached = state.amMetarBulk;
+    if (!forceRefresh && cached && (Date.now() - cached.fetchedAt) < AM_BULK_TTL_MS) {
+      return Promise.resolve(cached.text);
+    }
+    state.amLoading = true;
+    return fetch(AWC_PROXY_URL + '/am-metar')
+      .then(function(res) {
+        if (!res.ok) throw new Error('AM METAR HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(text) {
+        state.amMetarBulk = { text: text, fetchedAt: Date.now() };
+        console.info('[AM] METAR bulk fetched:', text.length, 'bytes');
+        return text;
+      })
+      .catch(function(err) {
+        console.warn('[AM] METAR bulk fetch failed:', err.message);
+        return null;
+      })
+      .then(function(text) {
+        state.amLoading = false;
+        return text;
+      });
+  }
+
+  function fetchAmTafBulk(forceRefresh) {
+    if (!AWC_PROXY_URL) return Promise.resolve(null);
+    var cached = state.amTafBulk;
+    if (!forceRefresh && cached && (Date.now() - cached.fetchedAt) < AM_BULK_TTL_MS) {
+      return Promise.resolve(cached.text);
+    }
+    state.amLoading = true;
+    return fetch(AWC_PROXY_URL + '/am-taf')
+      .then(function(res) {
+        if (!res.ok) throw new Error('AM TAF HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(text) {
+        state.amTafBulk = { text: text, fetchedAt: Date.now() };
+        console.info('[AM] TAF bulk fetched:', text.length, 'bytes');
+        return text;
+      })
+      .catch(function(err) {
+        console.warn('[AM] TAF bulk fetch failed:', err.message);
+        return null;
+      })
+      .then(function(text) {
+        state.amLoading = false;
+        return text;
+      });
+  }
+
+  // Parse avia-meteo.ru metar.txt — one METAR per line, format "ICAO DDHHMMZ ...="
+  // Returns: { ICAO: rawMetarString } for ICAOs in the icaos list (first occurrence wins).
+  function parseAmMetarText(text, icaos) {
+    var result = {};
+    var icaoSet = {};
+    icaos.forEach(function(icao) { icaoSet[icao.toUpperCase()] = true; });
+    var lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      var m = line.match(/^([A-Z]{4})\s/);
+      if (!m) continue;
+      var icao = m[1];
+      if (!icaoSet[icao]) continue;
+      if (result[icao]) continue; // first occurrence wins
+      var raw = line.replace(/=\s*$/, '').replace(/^(METAR|SPECI)\s+/i, '');
+      result[icao] = raw;
+    }
+    return result;
+  }
+
+  // Parse avia-meteo.ru taf.txt — blocks separated by '=', each block starts with "ICAO DDHHMMZ ...".
+  // Continuation lines (indented) are collapsed into one space-separated string.
+  // Returns: { ICAO: rawTafString } for ICAOs in the icaos list (first occurrence wins).
+  function parseAmTafText(text, icaos) {
+    var result = {};
+    var icaoSet = {};
+    icaos.forEach(function(icao) { icaoSet[icao.toUpperCase()] = true; });
+    var blocks = text.split('=');
+    for (var b = 0; b < blocks.length; b++) {
+      var block = blocks[b].replace(/^\s+|\s+$/g, '');
+      if (!block) continue;
+      // Collapse continuation lines (indented or wrapped) into one line
+      var collapsed = block.replace(/\s*\n\s*/g, ' ');
+      var m = collapsed.match(/^([A-Z]{4})\s/);
+      if (!m) continue;
+      var icao = m[1];
+      if (!icaoSet[icao]) continue;
+      if (result[icao]) continue; // first occurrence wins
+      var raw = collapsed.replace(/^TAF\s+/i, '');
+      result[icao] = raw;
+    }
+    return result;
+  }
+
   // ===== Batched METAR Fetch =====
-  // Uses CheckWX /v2/metar/{ICAO1,ICAO2,...} — single batch request
+  // Task 28: avia-meteo.ru PRIMARY → Worker /wx-metar (CheckWX→AVWX) → AWC proxy (last resort)
   function fetchMetarBatch(icaos, forceRefresh) {
     if (!icaos || icaos.length === 0) return Promise.resolve();
 
@@ -1239,7 +1415,6 @@
     if (forceRefresh) {
       // Don't delete cache upfront — old METAR stays visible until new data arrives.
       // Clear only errors so retry isn't blocked by stale error state.
-      // fetchedThisCycle tracks which ICAOs got fresh data (for AWC fallback trigger).
       icaos.forEach(function(icao) {
         delete state.wxErrors[icao];
       });
@@ -1256,184 +1431,132 @@
     needFetch.forEach(function(icao) { state.wxLoading[icao] = true; });
     renderCurrentTab();
 
-    // Max 25 ICAOs per batch request
-    var batches = [];
-    for (var i = 0; i < needFetch.length; i += 25) {
-      batches.push(needFetch.slice(i, i + 25));
-    }
-
-    var promises = batches.map(function(batch) {
-      var icaoList = batch.join(',').toUpperCase();
-      return fetch(CHECKWX_BASE + '/metar/' + icaoList, {
-        headers: { 'X-API-KEY': CHECKWX_KEY, 'Accept': 'application/json' }
-      })
-      .then(function(res) {
-        if (!res.ok) {
-          if (res.status === 429) showApiError('rate_limit');
-          else if (res.status >= 500) showApiError('server_error', res.status);
-          throw new Error('HTTP ' + res.status);
-        }
-        return res.json();
-      })
-      .then(function(cd) {
-        var dataArr = cd.data;
-        // CheckWX batch METAR returns array of raw strings or objects
-        var grouped = {};
-        if (Array.isArray(dataArr) && dataArr.length > 0) {
-          dataArr.forEach(function(item) {
-            var raw = '';
-            if (typeof item === 'string') {
-              raw = item;
-            } else if (item && (item.raw_text || item.rawOb)) {
-              raw = item.raw_text || item.rawOb;
-              // Object format — extract ICAO from item
-              if (item.icao) {
-                var code = item.icao.toUpperCase();
-                raw = raw.toString().replace(/^(METAR|SPECI)\s+/i, '');
-                if (raw && !grouped[code]) grouped[code] = { raw: raw, flight_category: item.flight_category || '' };
-                return;
-              }
-            }
-            if (raw) {
-              raw = raw.toString().replace(/^(METAR|SPECI)\s+/i, '');
-              // Extract ICAO from raw METAR string (first 4-char word)
-              var match = raw.match(/^([A-Z]{4})\s/);
-              if (match) {
-                var icaoCode = match[1];
-                if (!grouped[icaoCode]) grouped[icaoCode] = { raw: raw, flight_category: '' };
-              }
-            }
-          });
-        }
-
-        // Process each ICAO
-        var foundIcaos = [];
-        batch.forEach(function(icao) {
-          var entry = grouped[icao.toUpperCase()];
-          if (entry && entry.raw) {
-            foundIcaos.push(icao);
-            var airportName = AIRPORT_NAMES[icao] || icao;
-            var parsed = parseMetar(entry.raw);
-            // Determine flight rules from parsed data if not provided by API
-            var flightRules = entry.flight_category || determineFlightRules(parsed);
+    // Step 1: avia-meteo.ru PRIMARY — fetch bulk metar.txt once, parse for all needFetch
+    return fetchAmMetarBulk(forceRefresh)
+      .then(function(text) {
+        if (!text) return;
+        var parsed = parseAmMetarText(text, needFetch);
+        for (var icao in parsed) {
+          if (parsed.hasOwnProperty(icao)) {
+            var raw = parsed[icao];
+            var parsedMetar = parseMetar(raw);
             state.weatherCache[icao] = {
               icao: icao,
-              airportName: airportName,
-              metar: entry.raw,
+              airportName: AIRPORT_NAMES[icao] || icao,
+              metar: raw,
               taf: (state.weatherCache[icao] && state.weatherCache[icao].taf) || '',
-              parsed: parsed,
+              parsed: parsedMetar,
               observedAt: new Date().toISOString(),
               station: state.avwxStation[icao] || (state.weatherCache[icao] && state.weatherCache[icao].station) || null,
-              flight_rules: flightRules,
-              source: 'CheckWX',
+              flight_rules: determineFlightRules(parsedMetar),
+              source: 'avia-meteo',
               cachedAt: Date.now()
             };
             fetchedThisCycle[icao] = true;
             state.weatherLoaded = true;
           }
-        });
-
-        // Fallback: AVWX for ICAOs not found in CheckWX response
-        var missingIcaos = batch.filter(function(icao) { return foundIcaos.indexOf(icao) === -1; });
-        if (missingIcaos.length > 0) {
-          return Promise.all(missingIcaos.map(function(icao) {
-            return fetch(AVWX_BASE + '/metar/' + icao + '?options=info,translate&format=json', {
-              headers: { 'Authorization': 'Token ' + AVWX_TOKEN, 'Accept': 'application/json' }
-            })
+        }
+        console.info('[AM] METAR parsed:', Object.keys(parsed).length, 'of', needFetch.length, 'ICAOs');
+      })
+      .then(function() {
+        // Step 2: Worker /wx-metar fallback (CheckWX → AVWX, secrets in Worker env) for missing ICAOs
+        var stillMissing = needFetch.filter(function(icao) { return !fetchedThisCycle[icao]; });
+        if (stillMissing.length === 0) return;
+        var batches = [];
+        for (var i = 0; i < stillMissing.length; i += 25) {
+          batches.push(stillMissing.slice(i, i + 25));
+        }
+        return Promise.all(batches.map(function(batch) {
+          var icaoList = batch.join(',').toUpperCase();
+          return fetch(AWC_PROXY_URL + '/wx-metar?ids=' + encodeURIComponent(icaoList))
             .then(function(res) {
-              if (!res.ok) throw new Error('HTTP ' + res.status);
+              if (!res.ok) throw new Error('wx-metar HTTP ' + res.status);
               return res.json();
             })
-            .then(function(d) {
-              if (d.error) {
-                if (d.error.indexOf(AVWX_BLOCK_MSG) !== -1) showApiError('avwx_block', icao);
-                throw new Error(d.error);
+            .then(function(resp) {
+              // resp: { checkwx: { data: [...] }, avwxFallback: [{ icao, data }] }
+              var grouped = {};
+              if (resp.checkwx && Array.isArray(resp.checkwx.data)) {
+                resp.checkwx.data.forEach(function(item) {
+                  var raw = '';
+                  var code = '';
+                  if (typeof item === 'string') {
+                    raw = item;
+                  } else if (item) {
+                    code = (item.icao || '').toUpperCase();
+                    raw = item.raw_text || item.rawOb || '';
+                  }
+                  raw = raw.toString().replace(/^(METAR|SPECI)\s+/i, '');
+                  if (!code && raw) {
+                    var m = raw.match(/^([A-Z]{4})\s/);
+                    if (m) code = m[1];
+                  }
+                  if (code && raw && !grouped[code]) {
+                    grouped[code] = { raw: raw, flight_category: (item && item.flight_category) || '' };
+                  }
+                });
               }
-              var rawMetar = (d.raw || '').replace(/^(METAR|SPECI)\s+/i, '');
-              if (rawMetar) {
-                state.weatherCache[icao] = {
-                  icao: icao,
-                  airportName: AIRPORT_NAMES[icao] || (d.info && d.info.name) || icao,
-                  metar: rawMetar,
-                  taf: (state.weatherCache[icao] && state.weatherCache[icao].taf) || '',
-                  parsed: parseMetar(rawMetar),
-                  observedAt: (d.time && d.time.dt) || new Date().toISOString(),
-                  station: state.avwxStation[icao] || (d.info) || (state.weatherCache[icao] && state.weatherCache[icao].station) || null,
-                  flight_rules: d.flight_rules || 'VFR',
-                  source: 'AVWX',
-                  cachedAt: Date.now()
-                };
-                fetchedThisCycle[icao] = true;
-                if (d.info) {
-                  state.avwxStation[icao] = d.info;
-                  if (d.info.name) AIRPORT_NAMES[icao] = d.info.name;
+              batch.forEach(function(icao) {
+                var entry = grouped[icao.toUpperCase()];
+                if (entry && entry.raw) {
+                  var parsed2 = parseMetar(entry.raw);
+                  state.weatherCache[icao] = {
+                    icao: icao,
+                    airportName: AIRPORT_NAMES[icao] || icao,
+                    metar: entry.raw,
+                    taf: (state.weatherCache[icao] && state.weatherCache[icao].taf) || '',
+                    parsed: parsed2,
+                    observedAt: new Date().toISOString(),
+                    station: state.avwxStation[icao] || (state.weatherCache[icao] && state.weatherCache[icao].station) || null,
+                    flight_rules: entry.flight_category || determineFlightRules(parsed2),
+                    source: 'CheckWX',
+                    cachedAt: Date.now()
+                  };
+                  fetchedThisCycle[icao] = true;
+                  state.weatherLoaded = true;
                 }
-                state.weatherLoaded = true;
+              });
+              // AVWX fallback items (ICAOs missing from CheckWX)
+              if (Array.isArray(resp.avwxFallback)) {
+                resp.avwxFallback.forEach(function(fb) {
+                  var fbIcao = (fb.icao || '').toUpperCase();
+                  var d = fb.data;
+                  if (!fbIcao || !d || d.error) return;
+                  var rawMetar = (d.raw || '').replace(/^(METAR|SPECI)\s+/i, '');
+                  if (rawMetar) {
+                    state.weatherCache[fbIcao] = {
+                      icao: fbIcao,
+                      airportName: AIRPORT_NAMES[fbIcao] || (d.info && d.info.name) || fbIcao,
+                      metar: rawMetar,
+                      taf: (state.weatherCache[fbIcao] && state.weatherCache[fbIcao].taf) || '',
+                      parsed: parseMetar(rawMetar),
+                      observedAt: (d.time && d.time.dt) || new Date().toISOString(),
+                      station: state.avwxStation[fbIcao] || d.info || (state.weatherCache[fbIcao] && state.weatherCache[fbIcao].station) || null,
+                      flight_rules: d.flight_rules || 'VFR',
+                      source: 'AVWX',
+                      cachedAt: Date.now()
+                    };
+                    fetchedThisCycle[fbIcao] = true;
+                    if (d.info) {
+                      state.avwxStation[fbIcao] = d.info;
+                      if (d.info.name) AIRPORT_NAMES[fbIcao] = d.info.name;
+                    }
+                    state.weatherLoaded = true;
+                  }
+                });
               }
             })
-            .catch(function() {
-              // Individual airport failed (AVWX block, network error, etc.)
+            .catch(function(err) {
+              console.warn('[wx-metar] Worker fallback failed:', err.message);
             });
-          }));
-        }
-      })
-      .catch(function(err) {
-        // CheckWX batch request completely failed — try AVWX individually for ALL
-        handleApiError(err, batch.join(','));
-        return Promise.all(batch.map(function(icao) {
-          return fetch(AVWX_BASE + '/metar/' + icao + '?options=info,translate&format=json', {
-            headers: { 'Authorization': 'Token ' + AVWX_TOKEN, 'Accept': 'application/json' }
-          })
-          .then(function(res) {
-            if (!res.ok) {
-              if (res.status === 429) showApiError('rate_limit');
-              throw new Error('HTTP ' + res.status);
-            }
-            return res.json();
-          })
-          .then(function(d) {
-            if (d.error) {
-              if (d.error.indexOf(AVWX_BLOCK_MSG) !== -1) showApiError('avwx_block', icao);
-              throw new Error(d.error);
-            }
-            var rawMetar = (d.raw || '').replace(/^(METAR|SPECI)\s+/i, '');
-            if (rawMetar) {
-              state.weatherCache[icao] = {
-                icao: icao,
-                airportName: AIRPORT_NAMES[icao] || (d.info && d.info.name) || icao,
-                metar: rawMetar,
-                taf: (state.weatherCache[icao] && state.weatherCache[icao].taf) || '',
-                parsed: parseMetar(rawMetar),
-                observedAt: (d.time && d.time.dt) || new Date().toISOString(),
-                station: state.avwxStation[icao] || (d.info) || (state.weatherCache[icao] && state.weatherCache[icao].station) || null,
-                flight_rules: d.flight_rules || 'VFR',
-                source: 'AVWX',
-                cachedAt: Date.now()
-              };
-              fetchedThisCycle[icao] = true;
-              if (d.info) {
-                state.avwxStation[icao] = d.info;
-                if (d.info.name) AIRPORT_NAMES[icao] = d.info.name;
-              }
-              state.weatherLoaded = true;
-            }
-          })
-          .catch(function() {
-            // Individual airport failed
-          });
         }));
-      });
-    });
-
-    return Promise.all(promises)
+      })
       .then(function() {
-        // AWC proxy fallback: try for any ICAOs still missing METAR
+        // Step 3: AWC proxy fallback (last resort) for any ICAOs still missing
         if (AWC_PROXY_URL) {
-          var stillMissing = needFetch.filter(function(icao) {
-            return !fetchedThisCycle[icao];
-          });
-          if (stillMissing.length > 0) {
-            return fetchAwcFallback(stillMissing, 'metar');
+          var stillMissing2 = needFetch.filter(function(icao) { return !fetchedThisCycle[icao]; });
+          if (stillMissing2.length > 0) {
+            return fetchAwcFallback(stillMissing2, 'metar');
           }
         }
       })
@@ -1562,179 +1685,142 @@
     if (needFetch.length === 0) return Promise.resolve();
 
     var fetchedThisCycle = {};
-    // Max 25 ICAOs per batch request
-    var batches = [];
-    for (var i = 0; i < needFetch.length; i += 25) {
-      batches.push(needFetch.slice(i, i + 25));
-    }
+    needFetch.forEach(function(icao) { state.wxLoading[icao] = true; });
+    renderCurrentTab();
 
-    var promises = batches.map(function(batch) {
-      var icaoList = batch.join(',').toUpperCase();
-      return fetch(CHECKWX_BASE + '/taf/' + icaoList, {
-        headers: { 'X-API-KEY': CHECKWX_KEY, 'Accept': 'application/json' }
-      })
-      .then(function(res) {
-        if (!res.ok) {
-          if (res.status === 429) showApiError('rate_limit');
-          else if (res.status >= 500) showApiError('server_error', res.status);
-          throw new Error('HTTP ' + res.status);
-        }
-        return res.json();
-      })
-      .then(function(cd) {
-        var dataArr = cd.data;
-        // DON'T throw on empty — some ICAOs may have no TAF
-        var grouped = {};
-        if (Array.isArray(dataArr) && dataArr.length > 0) {
-          dataArr.forEach(function(item) {
-            var rawTaf = '';
-            var code = '';
-            if (typeof item === 'string') {
-              rawTaf = item;
-            } else if (item) {
-              code = (item.icao || '').toUpperCase();
-              rawTaf = item.raw_text || '';
-            }
-            rawTaf = rawTaf.toString().replace(/^TAF\s+/i, '');
-            // Extract ICAO from raw TAF string if not already known
-            if (!code && rawTaf) {
-              var m = rawTaf.match(/^([A-Z]{4})\s/);
-              if (m) code = m[1];
-            }
-            if (code && rawTaf && !grouped[code]) {
-              grouped[code] = rawTaf;
-            }
-          });
-        }
-
-        var foundIcaos = [];
-        batch.forEach(function(icao) {
-          var tafRaw = grouped[icao.toUpperCase()] || '';
-          if (tafRaw) {
-            foundIcaos.push(icao);
+    // Step 1: avia-meteo.ru PRIMARY — fetch bulk taf.txt once, parse for all needFetch
+    return fetchAmTafBulk(forceRefresh)
+      .then(function(text) {
+        if (!text) return;
+        var parsed = parseAmTafText(text, needFetch);
+        for (var icao in parsed) {
+          if (parsed.hasOwnProperty(icao)) {
+            var rawTaf = parsed[icao];
             if (state.weatherCache[icao]) {
-              state.weatherCache[icao].taf = tafRaw;
+              state.weatherCache[icao].taf = rawTaf;
+              if (!state.weatherCache[icao].source || state.weatherCache[icao].source === 'AWC') {
+                state.weatherCache[icao].source = 'avia-meteo';
+              }
             } else {
               state.weatherCache[icao] = {
                 icao: icao,
                 airportName: AIRPORT_NAMES[icao] || icao,
                 metar: '',
-                taf: tafRaw,
+                taf: rawTaf,
                 parsed: null,
                 observedAt: new Date().toISOString(),
                 station: state.avwxStation[icao] || null,
                 flight_rules: 'VFR',
-                source: 'CheckWX',
+                source: 'avia-meteo',
                 cachedAt: Date.now()
               };
             }
             fetchedThisCycle[icao] = true;
+            state.weatherLoaded = true;
           }
-        });
-
-        // Fallback: AVWX for ICAOs not found in CheckWX response
-        var missingIcaos = batch.filter(function(icao) { return foundIcaos.indexOf(icao) === -1; });
-        if (missingIcaos.length > 0) {
-          return Promise.all(missingIcaos.map(function(icao) {
-            return fetch(AVWX_BASE + '/taf/' + icao + '?options=info,translate&format=json', {
-              headers: { 'Authorization': 'Token ' + AVWX_TOKEN, 'Accept': 'application/json' }
-            })
+        }
+        console.info('[AM] TAF parsed:', Object.keys(parsed).length, 'of', needFetch.length, 'ICAOs');
+      })
+      .then(function() {
+        // Step 2: Worker /wx-taf fallback (CheckWX → AVWX, secrets in Worker env) for missing ICAOs
+        var stillMissing = needFetch.filter(function(icao) { return !fetchedThisCycle[icao]; });
+        if (stillMissing.length === 0) return;
+        var batches = [];
+        for (var i = 0; i < stillMissing.length; i += 25) {
+          batches.push(stillMissing.slice(i, i + 25));
+        }
+        return Promise.all(batches.map(function(batch) {
+          var icaoList = batch.join(',').toUpperCase();
+          return fetch(AWC_PROXY_URL + '/wx-taf?ids=' + encodeURIComponent(icaoList))
             .then(function(res) {
-              if (!res.ok) throw new Error('HTTP ' + res.status);
+              if (!res.ok) throw new Error('wx-taf HTTP ' + res.status);
               return res.json();
             })
-            .then(function(d) {
-              if (d.error) {
-                if (d.error.indexOf(AVWX_BLOCK_MSG) !== -1) showApiError('avwx_block', icao);
-                throw new Error(d.error);
+            .then(function(resp) {
+              // resp: { checkwx: { data: [...] }, avwxFallback: [{ icao, data }] }
+              var grouped = {};
+              if (resp.checkwx && Array.isArray(resp.checkwx.data)) {
+                resp.checkwx.data.forEach(function(item) {
+                  var rawTaf = '';
+                  var code = '';
+                  if (typeof item === 'string') {
+                    rawTaf = item;
+                  } else if (item) {
+                    code = (item.icao || '').toUpperCase();
+                    rawTaf = item.raw_text || '';
+                  }
+                  rawTaf = rawTaf.toString().replace(/^TAF\s+/i, '');
+                  if (!code && rawTaf) {
+                    var m = rawTaf.match(/^([A-Z]{4})\s/);
+                    if (m) code = m[1];
+                  }
+                  if (code && rawTaf && !grouped[code]) grouped[code] = rawTaf;
+                });
               }
-              var rawTaf = (d.raw || '').replace(/^TAF\s+/i, '');
-              if (rawTaf) {
-                if (state.weatherCache[icao]) {
-                  state.weatherCache[icao].taf = rawTaf;
-                } else {
-                  state.weatherCache[icao] = {
-                    icao: icao,
-                    airportName: AIRPORT_NAMES[icao] || (d.info && d.info.name) || icao,
-                    metar: '',
-                    taf: rawTaf,
-                    parsed: null,
-                    observedAt: new Date().toISOString(),
-                    station: d.info || state.avwxStation[icao] || null,
-                    flight_rules: 'VFR',
-                    source: 'AVWX',
-                    cachedAt: Date.now()
-                  };
+              batch.forEach(function(icao) {
+                var tafRaw = grouped[icao.toUpperCase()] || '';
+                if (tafRaw) {
+                  if (state.weatherCache[icao]) {
+                    state.weatherCache[icao].taf = tafRaw;
+                  } else {
+                    state.weatherCache[icao] = {
+                      icao: icao,
+                      airportName: AIRPORT_NAMES[icao] || icao,
+                      metar: '',
+                      taf: tafRaw,
+                      parsed: null,
+                      observedAt: new Date().toISOString(),
+                      station: state.avwxStation[icao] || null,
+                      flight_rules: 'VFR',
+                      source: 'CheckWX',
+                      cachedAt: Date.now()
+                    };
+                  }
+                  fetchedThisCycle[icao] = true;
                 }
-                fetchedThisCycle[icao] = true;
-                if (d.info) {
-                  state.avwxStation[icao] = d.info;
-                  if (d.info.name) AIRPORT_NAMES[icao] = d.info.name;
-                }
+              });
+              // AVWX fallback items
+              if (Array.isArray(resp.avwxFallback)) {
+                resp.avwxFallback.forEach(function(fb) {
+                  var fbIcao = (fb.icao || '').toUpperCase();
+                  var d = fb.data;
+                  if (!fbIcao || !d || d.error) return;
+                  var rawTaf = (d.raw || '').replace(/^TAF\s+/i, '');
+                  if (rawTaf) {
+                    if (state.weatherCache[fbIcao]) {
+                      state.weatherCache[fbIcao].taf = rawTaf;
+                    } else {
+                      state.weatherCache[fbIcao] = {
+                        icao: fbIcao,
+                        airportName: AIRPORT_NAMES[fbIcao] || (d.info && d.info.name) || fbIcao,
+                        metar: '',
+                        taf: rawTaf,
+                        parsed: null,
+                        observedAt: new Date().toISOString(),
+                        station: d.info || state.avwxStation[fbIcao] || null,
+                        flight_rules: 'VFR',
+                        source: 'AVWX',
+                        cachedAt: Date.now()
+                      };
+                    }
+                    fetchedThisCycle[fbIcao] = true;
+                    if (d.info) {
+                      state.avwxStation[fbIcao] = d.info;
+                      if (d.info.name) AIRPORT_NAMES[fbIcao] = d.info.name;
+                    }
+                  }
+                });
               }
             })
-            .catch(function() {
-              // Individual airport failed (AVWX block, etc.)
+            .catch(function(err) {
+              console.warn('[wx-taf] Worker fallback failed:', err.message);
             });
-          }));
-        }
-      })
-      .catch(function(err) {
-        handleApiError(err, batch.join(','));
-        // FALLBACK: AVWX individually for TAF
-        return Promise.all(batch.map(function(icao) {
-          return fetch(AVWX_BASE + '/taf/' + icao + '?options=info,translate&format=json', {
-            headers: { 'Authorization': 'Token ' + AVWX_TOKEN, 'Accept': 'application/json' }
-          })
-          .then(function(res) {
-            if (!res.ok) {
-              if (res.status === 429) showApiError('rate_limit');
-              throw new Error('HTTP ' + res.status);
-            }
-            return res.json();
-          })
-          .then(function(d) {
-            if (d.error) {
-              if (d.error.indexOf(AVWX_BLOCK_MSG) !== -1) showApiError('avwx_block', icao);
-              throw new Error(d.error);
-            }
-            var rawTaf = (d.raw || '').replace(/^TAF\s+/i, '');
-            if (rawTaf) {
-              if (state.weatherCache[icao]) {
-                state.weatherCache[icao].taf = rawTaf;
-              } else {
-                state.weatherCache[icao] = {
-                  icao: icao,
-                  airportName: AIRPORT_NAMES[icao] || (d.info && d.info.name) || icao,
-                  metar: '',
-                  taf: rawTaf,
-                  parsed: null,
-                  observedAt: new Date().toISOString(),
-                  station: d.info || state.avwxStation[icao] || null,
-                  flight_rules: 'VFR',
-                  source: 'AVWX',
-                  cachedAt: Date.now()
-                };
-              }
-              fetchedThisCycle[icao] = true;
-              if (d.info) {
-                state.avwxStation[icao] = d.info;
-                if (d.info.name) AIRPORT_NAMES[icao] = d.info.name;
-              }
-            }
-          })
-          .catch(function() {});
         }));
-      });
-    });
-
-    return Promise.all(promises)
+      })
       .then(function() {
-        // AWC proxy fallback: try for any ICAOs still missing TAF
+        // Step 3: AWC proxy fallback (last resort)
         if (AWC_PROXY_URL) {
-          var stillMissingTaf = needFetch.filter(function(icao) {
-            return !fetchedThisCycle[icao];
-          });
+          var stillMissingTaf = needFetch.filter(function(icao) { return !fetchedThisCycle[icao]; });
           if (stillMissingTaf.length > 0) {
             return fetchAwcFallback(stillMissingTaf, 'taf');
           }
@@ -1747,12 +1833,6 @@
       .then(function() {
         renderCurrentTab();
       });
-  }
-
-  // Force-refresh weather (for manual refresh button) — just re-fetches METAR
-  function refreshMetarHistory(icaos) {
-    if (!icaos || icaos.length === 0) return Promise.resolve();
-    return fetchMetarBatch(icaos, true);
   }
 
   // Refresh weather for a single airport
@@ -1839,19 +1919,6 @@
           fetchNotam(icao);
         }
       });
-    }
-  }
-
-  // Fetch weather for all route airports that don't have cached data
-  function fetchWeatherForRoute() {
-    var allAirports = getAllRouteAirports();
-    var extraAirports = state.extraAirports.filter(function(a) { return allAirports.indexOf(a) === -1; });
-    var all = allAirports.concat(extraAirports);
-
-    if (all.length > 0) {
-      fetchAvwxStation(all);
-      fetchMetarBatch(all);
-      fetchTafBatch(all);
     }
   }
 
@@ -1971,16 +2038,6 @@
       });
   }
 
-  // Refresh all NOTAMs for airports currently in the NOTAM tab
-  function refreshAllNotams() {
-    var airports = state.notamAirports.slice();
-    if (airports.length === 0) return;
-
-    airports.forEach(function(icao) {
-      fetchNotam(icao);
-    });
-  }
-
   // ===== Targeted DOM Update Helpers (avoid re-rendering inputs) =====
   function updateRouteHints() {
     var depGroup = document.getElementById('depIcaoInput');
@@ -2005,18 +2062,37 @@
         if (hint) hint.remove();
       }
     }
+    // Task 30: под инпутом ЗАПАСНЫЕ — названия аэропортов (как под ВЫЛЕТ/ПОСАДКА)
+    var altGroup = document.getElementById('altIcaoInput');
+    if (altGroup) {
+      var altParent = altGroup.closest('.metbriefing-input-group');
+      var altHint = altParent ? altParent.querySelector('.metbriefing-input-hint') : null;
+      var altNames = state.altIcaos
+        .filter(function(icao) { return AIRPORT_NAMES[icao]; })
+        .map(function(icao) { return AIRPORT_NAMES[icao]; });
+      if (altNames.length > 0) {
+        var altText = altNames.join(', ');
+        if (altHint) { altHint.textContent = altText; }
+        else if (altParent) { var altSpan = document.createElement('span'); altSpan.className = 'metbriefing-input-hint'; altSpan.textContent = altText; altParent.appendChild(altSpan); }
+      } else {
+        if (altHint) altHint.remove();
+      }
+    }
   }
 
   function updateRouteDisplay() {
     var display = document.querySelector('.metbriefing-route-display');
     if (!display) return;
-    var altDisplay = '';
+    // Task 30: ALT — на второй строке под красной частью маршрута
+    var altLine = '';
     if (state.altIcaos.length > 0) {
-      altDisplay = '<span class="metbriefing-route-alt-sep">/</span><span class="metbriefing-route-alt-codes">ALT: ' + state.altIcaos.join(', ') + '</span>';
+      altLine = '<div class="metbriefing-route-alt">ALT: ' + state.altIcaos.join(', ') + '</div>';
     }
-    display.innerHTML = '<span class="metbriefing-route-code">' + (state.depIcao || '----') + '</span>' +
-      '<span class="metbriefing-route-line"><span class="metbriefing-route-dots"></span>' + icon('plane', 18, 'metbriefing-route-plane') + '<span class="metbriefing-route-dots"></span></span>' +
-      '<span class="metbriefing-route-code">' + (state.arrIcao || '----') + '</span>' + altDisplay;
+    display.innerHTML = '<div class="metbriefing-route-main">' +
+        '<span class="metbriefing-route-code">' + (state.depIcao || '----') + '</span>' +
+        '<span class="metbriefing-route-line"><span class="metbriefing-route-dots"></span>' + icon('plane', 18, 'metbriefing-route-plane') + '<span class="metbriefing-route-dots"></span></span>' +
+        '<span class="metbriefing-route-code">' + (state.arrIcao || '----') + '</span>' +
+      '</div>' + altLine;
   }
 
   // ===== Render: Route Card =====
@@ -2028,48 +2104,42 @@
       ? '<span class="metbriefing-input-hint">' + AIRPORT_NAMES[state.depIcao] + '</span>' : '';
     var hintArr = state.arrIcao.length === 4 && AIRPORT_NAMES[state.arrIcao]
       ? '<span class="metbriefing-input-hint">' + AIRPORT_NAMES[state.arrIcao] + '</span>' : '';
+    // Task 30: под инпутом ЗАПАСНЫЕ — названия аэропортов (как под ВЫЛЕТ/ПОСАДКА)
+    var altNames = state.altIcaos
+      .filter(function(icao) { return AIRPORT_NAMES[icao]; })
+      .map(function(icao) { return AIRPORT_NAMES[icao]; });
+    var hintAlt = altNames.length > 0
+      ? '<span class="metbriefing-input-hint">' + altNames.join(', ') + '</span>' : '';
 
-    var altTags = '';
+    // Task 30: ALT — на второй строке под красной частью маршрута
+    var altLine = '';
     if (state.altIcaos.length > 0) {
-      altTags = '<div class="metbriefing-alternate-tags">';
-      state.altIcaos.forEach(function(icao) {
-        altTags += '<div class="metbriefing-alternate-tag">' +
-          icon('flag', 12) +
-          '<span class="metbriefing-alternate-tag-icao">' + icao + '</span>' +
-          (AIRPORT_NAMES[icao] ? '<span class="metbriefing-alternate-tag-name">' + AIRPORT_NAMES[icao] + '</span>' : '') +
-          '<button class="metbriefing-alternate-tag-remove" data-alt-remove="' + icao + '" aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C ' + icao + '">' + icon('x', 12) + '</button>' +
-          '</div>';
-      });
-      altTags += '</div>';
-    }
-
-    var altDisplay = '';
-    if (state.altIcaos.length > 0) {
-      altDisplay = '<span class="metbriefing-route-alt-sep">/</span>' +
-        '<span class="metbriefing-route-alt-codes">ALT: ' + state.altIcaos.join(', ') + '</span>';
+      altLine = '<div class="metbriefing-route-alt">ALT: ' + state.altIcaos.join(', ') + '</div>';
     }
 
     el.innerHTML =
       '<div class="metbriefing-section-title">' + icon('map', 18) + '<span>\u041C\u0430\u0440\u0448\u0440\u0443\u0442</span></div>' +
+      '<div class="metbriefing-route-display">' +
+        '<div class="metbriefing-route-main">' +
+          '<span class="metbriefing-route-code">' + (state.depIcao || '----') + '</span>' +
+          '<span class="metbriefing-route-line"><span class="metbriefing-route-dots"></span>' + icon('plane', 18, 'metbriefing-route-plane') + '<span class="metbriefing-route-dots"></span></span>' +
+          '<span class="metbriefing-route-code">' + (state.arrIcao || '----') + '</span>' +
+        '</div>' +
+        altLine +
+      '</div>' +
       '<div class="metbriefing-route-inputs">' +
-        '<div class="metbriefing-input-group"><label class="metbriefing-input-label">\u0412\u044B\u043B\u0435\u0442</label>' +
-          '<input type="text" class="metbriefing-icao-input" id="depIcaoInput" placeholder="ICAO" value="' + state.depIcao + '" maxlength="4" autocomplete="off" inputmode="text" autocapitalize="characters">' +
+        '<div class="metbriefing-input-group metbriefing-input-group--short"><label class="metbriefing-input-label">\u0412\u044B\u043B\u0435\u0442</label>' +
+          '<input type="text" class="metbriefing-icao-input metbriefing-icao-input--short" id="depIcaoInput" placeholder="ICAO" value="' + state.depIcao + '" maxlength="4" autocomplete="off" inputmode="text" autocapitalize="characters">' +
           hintDep +
         '</div>' +
-        '<div class="metbriefing-input-group"><label class="metbriefing-input-label">\u041F\u043E\u0441\u0430\u0434\u043A\u0430</label>' +
-          '<input type="text" class="metbriefing-icao-input" id="arrIcaoInput" placeholder="ICAO" value="' + state.arrIcao + '" maxlength="4" autocomplete="off" inputmode="text" autocapitalize="characters">' +
+        '<div class="metbriefing-input-group metbriefing-input-group--short"><label class="metbriefing-input-label">\u041F\u043E\u0441\u0430\u0434\u043A\u0430</label>' +
+          '<input type="text" class="metbriefing-icao-input metbriefing-icao-input--short" id="arrIcaoInput" placeholder="ICAO" value="' + state.arrIcao + '" maxlength="4" autocomplete="off" inputmode="text" autocapitalize="characters">' +
           hintArr +
         '</div>' +
-      '</div>' +
-      '<div class="metbriefing-input-group" style="margin-top:8px"><label class="metbriefing-input-label">\u0417\u0430\u043F\u0430\u0441\u043D\u044B\u0435</label>' +
-        '<input type="text" class="metbriefing-icao-input" id="altIcaoInput" placeholder="UUWW, UUDD" value="' + state.altInput + '" autocomplete="off" inputmode="text" autocapitalize="characters" pattern="[A-Z, ]*">' +
-      '</div>' +
-      altTags +
-      '<div class="metbriefing-route-display">' +
-        '<span class="metbriefing-route-code">' + (state.depIcao || '----') + '</span>' +
-        '<span class="metbriefing-route-line"><span class="metbriefing-route-dots"></span>' + icon('plane', 18, 'metbriefing-route-plane') + '<span class="metbriefing-route-dots"></span></span>' +
-        '<span class="metbriefing-route-code">' + (state.arrIcao || '----') + '</span>' +
-        altDisplay +
+        '<div class="metbriefing-input-group metbriefing-input-group--alt"><label class="metbriefing-input-label">\u0417\u0430\u043F\u0430\u0441\u043D\u044B\u0435</label>' +
+          '<input type="text" class="metbriefing-icao-input" id="altIcaoInput" placeholder="UUWW, UUDD" value="' + state.altInput + '" autocomplete="off" inputmode="text" autocapitalize="characters" pattern="[A-Z, ]*">' +
+          hintAlt +
+        '</div>' +
       '</div>';
 
     // Bind events
@@ -2083,6 +2153,8 @@
       onRouteChange();
       updateRouteHints();
       updateRouteDisplay();
+      // Обновить SIGMET-блок — FIR пересчитывается из текущего маршрута
+      renderCurrentTab();
       // When dep or arr is entered, fetch station+summary
       if (state.depIcao.length === 4 || state.arrIcao.length === 4) {
         fetchRouteWeather();
@@ -2094,6 +2166,8 @@
       onRouteChange();
       updateRouteHints();
       updateRouteDisplay();
+      // Обновить SIGMET-блок — FIR пересчитывается из текущего маршрута
+      renderCurrentTab();
       // When dep or arr is entered, fetch station+summary
       if (state.depIcao.length === 4 || state.arrIcao.length === 4) {
         fetchRouteWeather();
@@ -2115,11 +2189,16 @@
   }
 
   function processAltInput() {
-    if (!state.altInput.trim()) return;
+    // Task 25 (Правка C): replace вместо concat + очистка при пустом вводе —
+    // если аэродрома нет в инпутах, то и погоду для него больше не запрашиваем.
+    if (!state.altInput.trim()) {
+      state.altIcaos = [];
+      onRouteChange(); saveRouteInfo(); renderRouteCard(); renderCurrentTab();
+      return;
+    }
     var codes = state.altInput.split(',').map(function(c) { return c.trim().toUpperCase(); })
       .filter(function(c) { return c.length === 4 && /^[A-Z]{4}$/.test(c); });
-    var newCodes = codes.filter(function(c) { return state.altIcaos.indexOf(c) === -1; });
-    if (newCodes.length > 0) state.altIcaos = state.altIcaos.concat(newCodes);
+    state.altIcaos = codes;
     state.altInput = codes.join(', ');
     onRouteChange(); saveRouteInfo(); renderRouteCard(); renderCurrentTab();
     // Fetch station+summary for all alternate airports on blur
@@ -2159,7 +2238,7 @@
 
     // Inline Weather — only show cached data
     if (allAirports.length > 0) {
-      html += '<div class="metbriefing-status-section">' +
+      html += '<div class="metbriefing-status-section metbriefing-status-section--full-bleed">' +
         '<div class="metbriefing-section-title">' + icon('cloud', 18) + '<span>\u041F\u043E\u0433\u043E\u0434\u0430 \u043F\u043E \u043C\u0430\u0440\u0448\u0440\u0443\u0442\u0443</span></div>' +
         '<div class="metbriefing-inline-weather-list">';
 
@@ -2177,7 +2256,7 @@
         var stationInfo = state.avwxStation[icao] || (wxData && wxData.station);
         if (stationInfo) {
           var parts = [];
-          if (stationInfo.city) parts.push(stationInfo.city + (stationInfo.country ? ', ' + (typeof stationInfo.country === 'string' ? stationInfo.country : stationInfo.country.name || '') : ''));
+          if (stationInfo.city) parts.push(escapeHtml(stationInfo.city + (stationInfo.country ? ', ' + (typeof stationInfo.country === 'string' ? stationInfo.country : stationInfo.country.name || '') : '')));
           if (stationInfo.elevation) {
             var elevVal = (typeof stationInfo.elevation === 'object' && stationInfo.elevation.feet) ? stationInfo.elevation.feet : (typeof stationInfo.elevation === 'number' ? stationInfo.elevation : null);
             if (elevVal !== null) parts.push(Math.round(elevVal) + ' ft');
@@ -2194,7 +2273,7 @@
         html += '<div class="metbriefing-inline-weather-header">' +
           '<div class="metbriefing-inline-weather-airport">' +
             '<span class="metbriefing-inline-weather-icao">' + icao + '</span>' +
-            (wxData && wxData.airportName ? '<span class="metbriefing-inline-weather-name">' + wxData.airportName + '</span>' : '') +
+            (wxData && wxData.airportName ? '<span class="metbriefing-inline-weather-name">' + escapeHtml(wxData.airportName) + '</span>' : '') +
             stationLine +
           '</div>' +
           '<div class="metbriefing-inline-weather-actions">' +
@@ -2408,11 +2487,10 @@
     firOptionsHtml += '<option value="all"' + (state.sigmetFirFilter === 'all' ? ' selected' : '') + '>Показать все (' + allSigmets.length + ')</option>';
 
     // Render SIGMET section
-    html += '<div class="metbriefing-status-section">' +
+    html += '<div class="metbriefing-status-section metbriefing-status-section--full-bleed">' +
       '<div class="metbriefing-section-title">' + icon('cloud-lightning', 18) + '<span>SIGMET — опасные явления</span>' +
       (state.sigmetLoading ? ' <span class="metbriefing-sigmet-refreshing">' + icon('rotate-ccw', 14, 'metbriefing-spin') + '</span>' : '') +
       (state.sigmetCache && isStale(state.sigmetCache.fetchedAt, SIGMET_STALE_MS) ? ' <span class="metbriefing-stale-badge">' + icon('alert-triangle', 10) + '</span>' : '') +
-      '<button class="metbriefing-sigmet-refresh" data-sigmet-refresh aria-label="Обновить SIGMET">' + icon('rotate-ccw', 14) + '</button>' +
       '</div>';
 
     // Error (no cache)
@@ -2457,7 +2535,7 @@
 
     // Inline NOTAM
     if (allAirports.length > 0) {
-      html += '<div class="metbriefing-status-section">' +
+      html += '<div class="metbriefing-status-section metbriefing-status-section--full-bleed">' +
         '<div class="metbriefing-section-title">' + icon('alert-triangle', 18) + '<span>NOTAM \u043F\u043E \u043C\u0430\u0440\u0448\u0440\u0443\u0442\u0443</span></div>' +
         '<div class="metbriefing-inline-notam-list">';
 
@@ -2546,6 +2624,43 @@
       '</div>';
     });
     html += '</div></div>';
+
+    // Task 28: Wind-by-flight-level maps (FL100-FL390, +6h, area C) — preload + dropdown
+    var windCfg = getWindMaps();
+    if (windCfg && windCfg.levels && windCfg.levels.length > 0) {
+      var curLevel = state.windLevel || windCfg.defaultLevel || 340;
+      var curCached = state.windMapCache[curLevel];
+      var windImgSrc = (curCached && curCached.blobUrl) ? curCached.blobUrl : '';
+      var windLoaded = state.windMapLoaded[curLevel];
+      var preloadedCount = Object.keys(state.windMapCache).filter(function(k) {
+        return state.windMapCache[k] && state.windMapCache[k].blobUrl;
+      }).length;
+      var totalLevels = windCfg.levels.length;
+      html += '<div class="metbriefing-status-section metbriefing-wind-section">' +
+        '<div class="metbriefing-section-title">' + icon('wind', 18) +
+          '<span>\u0412\u0435\u0442\u0435\u0440 \u043F\u043E \u044D\u0448\u0435\u043B\u043E\u043D\u0430\u043C</span>' +
+          '<span class="metbriefing-wind-area">\u0420\u0430\u0439\u043E\u043D: ' + escapeHtml(windCfg.areaLabel || windCfg.area || 'C') + ' \u00B7 +' + windCfg.hours + '\u0447</span>' +
+          (state.windMapLoading ? ' <span class="metbriefing-wx-maps-refreshing">' + icon('rotate-ccw', 14, 'metbriefing-spin') + '</span>' : '') +
+        '</div>' +
+        '<div class="metbriefing-wind-controls">' +
+          '<label class="metbriefing-wind-label" for="metbriefing-wind-level">\u042D\u0448\u0435\u043B\u043E\u043D:</label>' +
+          '<select id="metbriefing-wind-level" class="metbriefing-wind-select" data-wind-level>' +
+            windCfg.levels.map(function(lvl) {
+              var sel = (lvl === curLevel) ? ' selected' : '';
+              return '<option value="' + lvl + '"' + sel + '>FL' + lvl + '</option>';
+            }).join('') +
+          '</select>' +
+          '<button class="metbriefing-wind-refresh-btn" data-wind-refresh aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0432\u0441\u0435 \u0432\u0435\u0442\u0440\u043E\u0432\u044B\u0435 \u043A\u0430\u0440\u0442\u044B">' + icon('rotate-ccw', 16) + '</button>' +
+          '<span class="metbriefing-wind-progress">\u041A\u044D\u0448: ' + preloadedCount + '/' + totalLevels + '</span>' +
+        '</div>' +
+        '<div class="metbriefing-wind-map-container">' +
+          (state.windMapLoading && !windImgSrc ? '<div class="metbriefing-wx-map-thumb-loading">' + icon('rotate-ccw', 24, 'metbriefing-spin') + '</div>' : '') +
+          (windImgSrc ?
+            '<img class="metbriefing-wind-map-img" src="' + windImgSrc + '" data-full-src="' + windImgSrc + '" alt="\u0412\u0435\u0442\u0435\u0440 FL' + curLevel + ' +' + windCfg.hours + '\u0447 (' + escapeHtml(windCfg.areaLabel || windCfg.area) + ')" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' :
+            (!state.windMapLoading ? '<div class="metbriefing-wind-map-placeholder">\u041A\u0430\u0440\u0442\u0430 \u043D\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u0430. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u2197 \u0434\u043B\u044F \u043F\u0440\u0435\u0434\u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438.</div>' : '')) +
+        '</div>' +
+      '</div>';
+    }
 
     // Summary
     var dataWarnings = getDataStatusWarnings();
@@ -2682,6 +2797,37 @@
         }
       });
     });
+    // Task 28: Wind-by-flight-level maps — dropdown level change + refresh button
+    var windLevelSelect = el.querySelector('[data-wind-level]');
+    if (windLevelSelect) {
+      windLevelSelect.addEventListener('change', function() {
+        var newLevel = parseInt(windLevelSelect.value, 10);
+        if (!isNaN(newLevel)) {
+          state.windLevel = newLevel;
+          renderCurrentTab();
+          // If this level not yet cached, fetch it on demand
+          if (!state.windMapCache[newLevel] || !state.windMapCache[newLevel].blobUrl) {
+            fetchAndCacheWindMap(newLevel, false).then(function() { renderCurrentTab(); });
+          }
+        }
+      });
+    }
+    var windRefreshBtn = el.querySelector('[data-wind-refresh]');
+    if (windRefreshBtn) {
+      windRefreshBtn.addEventListener('click', function() {
+        preloadAllWindMaps(true);
+      });
+    }
+    // Wind map image → open PhotoSwipe
+    var windImg = el.querySelector('.metbriefing-wind-map-img');
+    if (windImg) {
+      windImg.addEventListener('click', function() {
+        if (window.app && window.app.openPhotoSwipe) {
+          window.app.openPhotoSwipe(windImg, el);
+        }
+      });
+      windImg.style.cursor = 'zoom-in';
+    }
     // Weather Maps — hide loading spinner when image loads, open PhotoSwipe on click
     el.querySelectorAll('.metbriefing-wx-map-thumb').forEach(function(thumb) {
       var img = thumb.querySelector('img');
@@ -2742,7 +2888,7 @@
         if (data && data.station) {
           var wxSt = data.station;
           var wxStParts = [];
-          if (wxSt.city) wxStParts.push(wxSt.city + (wxSt.country && wxSt.country.name ? ', ' + wxSt.country.name : (wxSt.country && typeof wxSt.country === 'string' ? ', ' + wxSt.country : '')));
+          if (wxSt.city) wxStParts.push(escapeHtml(wxSt.city + (wxSt.country && wxSt.country.name ? ', ' + wxSt.country.name : (wxSt.country && typeof wxSt.country === 'string' ? ', ' + wxSt.country : ''))));
           if (wxSt.elevation) {
             var elevFt = (typeof wxSt.elevation === 'object' && wxSt.elevation.feet) ? wxSt.elevation.feet : (typeof wxSt.elevation === 'number' ? wxSt.elevation : null);
             if (elevFt !== null) wxStParts.push(Math.round(elevFt) + ' ft');
@@ -2764,7 +2910,7 @@
         html += '<div class="metbriefing-wx-card-header">' +
           '<div class="metbriefing-wx-card-airport">' +
             '<span class="metbriefing-wx-card-icao">' + icao + '</span>' +
-            (data && data.airportName ? '<span class="metbriefing-wx-card-name">' + data.airportName + '</span>' : '') +
+            (data && data.airportName ? '<span class="metbriefing-wx-card-name">' + escapeHtml(data.airportName) + '</span>' : '') +
             wxStationLine +
           '</div>' +
           '<div class="metbriefing-wx-card-actions">' +
@@ -2788,12 +2934,12 @@
         if (data) {
           // METAR (always expanded)
           if (data.metar) {
-            html += '<div class="metbriefing-wx-metar-raw"><span class="metbriefing-wx-metar-label">METAR</span><code class="metbriefing-wx-metar-code">' + data.metar + '</code></div>';
+            html += '<div class="metbriefing-wx-metar-raw"><span class="metbriefing-wx-metar-label">METAR</span><code class="metbriefing-wx-metar-code">' + escapeHtml(data.metar) + '</code></div>';
           }
 
           // TAF (always expanded)
           if (data.taf) {
-            html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code">' + data.taf + '</code></div>';
+            html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code">' + escapeHtml(data.taf) + '</code></div>';
           }
 
           // METAR History — fetched on demand from AWC proxy (last 2 hours)
@@ -2810,7 +2956,7 @@
                 var catClass = h.flightCat ? ' metbriefing-condition--' + h.flightCat.toLowerCase() : '';
                 html += '<div class="metbriefing-wx-metar-history-item' + catClass + '">';
                 html += '<span class="metbriefing-wx-metar-history-label">' + timeLabel + (h.flightCat ? ' <span class="metbriefing-wx-hist-cat">' + h.flightCat + '</span>' : '') + '</span>';
-                html += '<code class="metbriefing-wx-metar-history-code">' + h.raw + '</code>';
+                html += '<code class="metbriefing-wx-metar-history-code">' + escapeHtml(h.raw) + '</code>';
                 html += '</div>';
               });
               html += '</div>';
@@ -3005,31 +3151,9 @@
       '</div>';
     }
 
-    // Airport chips + refresh button
-    if (airports.length > 0) {
-      var anyNotamLoading = airports.some(function(icao) { return !!state.notamLoading[icao]; });
-      html += '<div class="metbriefing-notam-airports-bar">';
-      airports.forEach(function(icao) {
-        var data = state.notamCache[icao];
-        var isLoading = state.notamLoading[icao];
-        var activeCount = data && data.notams ? data.notams.filter(function(n) { return n.status === 'active'; }).length : 0;
-        var sourceLabel = '';
-        if (data && data.source && data.source.indexOf('FIR') !== -1) {
-          sourceLabel = ' <span class="metbriefing-notam-airport-chip-fir" title="\u0418\u0441\u0442\u043E\u0447\u043D\u0438\u043A: ' + data.source + '">FIR</span>';
-        }
-        html += '<div class="metbriefing-notam-airport-chip' + (isStale(data && data.fetchedAt, NOTAM_STALE_MS) ? ' metbriefing-notam-airport-chip--stale' : '') + '">' +
-          '<span class="metbriefing-notam-airport-chip-icao">' + icao + '</span>' + sourceLabel +
-          (isLoading ? icon('rotate-ccw', 12, 'metbriefing-spin') : '<span class="metbriefing-notam-airport-chip-count">' + activeCount + '</span>') +
-          '<button class="metbriefing-notam-airport-chip-remove" data-nt-remove="' + icao + '" aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C ' + icao + '">' + icon('x', 12) + '</button>' +
-        '</div>';
-      });
-      // Refresh-all button
-      html += '<button class="metbriefing-notam-refresh-all" id="notamRefreshAll" aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0432\u0441\u0435 NOTAM"' + (anyNotamLoading ? ' disabled' : '') + '>' +
-        icon('rotate-ccw', 14, anyNotamLoading ? 'metbriefing-spin' : '') +
-      '</button>';
-      html += '</div>';
-    }
-
+    // Airport chips bar + refresh-all удалены как дублирующие —
+    // код/кол-во/удаление уже есть в accordion-заголовках ниже,
+    // обновление — через кнопку «Брифинг готов».
     // Text filter
     if (airports.length > 0) {
       html += '<div class="metbriefing-notam-filters"><div class="metbriefing-notam-text-filter">' +
@@ -3101,17 +3225,17 @@
               html += '<div class="metbriefing-notam-card metbriefing-notam-card--' + notam.criticality + ' metbriefing-notam-card--' + notam.status + '">' +
                 '<div class="metbriefing-notam-card-header">' +
                   '<div class="metbriefing-notam-card-id">' +
-                    '<span class="metbriefing-notam-card-identifier">' + notam.id + '</span>' +
-                    (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + notam.qcode + '</span>' : '') +
-                    '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + notam.type + '</span>' +
-                    '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + getCriticalityLabel(notam.criticality) + '</span>' +
+                    '<span class="metbriefing-notam-card-identifier">' + escapeHtml(notam.id) + '</span>' +
+                    (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + escapeHtml(notam.qcode) + '</span>' : '') +
+                    '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + escapeHtml(notam.type) + '</span>' +
+                    '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + escapeHtml(getCriticalityLabel(notam.criticality)) + '</span>' +
                   '</div>' +
                   '<div class="metbriefing-notam-card-meta">' +
                     '<span class="metbriefing-notam-status-badge metbriefing-notam-status-badge--' + notam.status + '">' + (notam.status === 'active' ? '\u0410\u043A\u0442\u0438\u0432\u0435\u043D' : '\u0418\u0441\u0442\u0451\u043A') + '</span>' +
                   '</div>' +
                 '</div>' +
-                '<div class="metbriefing-notam-card-subject">' + notam.subject + '</div>' +
-                '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + l + '</p>'; }).join('') + '</div>' +
+                '<div class="metbriefing-notam-card-subject">' + escapeHtml(notam.subject) + '</div>' +
+                '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + escapeHtml(l) + '</p>'; }).join('') + '</div>' +
                 '<div class="metbriefing-notam-card-dates">' +
                   '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u0421:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveFrom) + '</span></div>' +
                   '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u041F\u043E:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveTo) + '</span></div>' +
@@ -3146,13 +3270,7 @@
     var searchClear = document.getElementById('notamSearchClear');
     var textFilter = document.getElementById('notamTextFilter');
     var textClear = document.getElementById('notamTextClear');
-    var refreshAllBtn = document.getElementById('notamRefreshAll');
-
-    if (refreshAllBtn) {
-      refreshAllBtn.addEventListener('click', function() {
-        refreshAllNotams();
-      });
-    }
+    // notamRefreshAll удалён — обновление через «Брифинг готов»
 
     if (searchInput) {
       searchInput.addEventListener('input', function(e) {
@@ -3261,18 +3379,18 @@
         html += '<div class="metbriefing-notam-card metbriefing-notam-card--' + notam.criticality + ' metbriefing-notam-card--' + notam.status + '">' +
           '<div class="metbriefing-notam-card-header">' +
             '<div class="metbriefing-notam-card-id">' +
-              '<span class="metbriefing-notam-card-identifier">' + notam.id + '</span>' +
-              (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + notam.qcode + '</span>' : '') +
-              '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + notam.type + '</span>' +
-              '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + getCriticalityLabel(notam.criticality) + '</span>' +
+              '<span class="metbriefing-notam-card-identifier">' + escapeHtml(notam.id) + '</span>' +
+              (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + escapeHtml(notam.qcode) + '</span>' : '') +
+              '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + escapeHtml(notam.type) + '</span>' +
+              '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + escapeHtml(getCriticalityLabel(notam.criticality)) + '</span>' +
             '</div>' +
             '<div class="metbriefing-notam-card-meta">' +
-              '<span class="metbriefing-notam-card-icao">' + notam.icao + '</span>' +
+              '<span class="metbriefing-notam-card-icao">' + escapeHtml(notam.icao) + '</span>' +
               '<span class="metbriefing-notam-status-badge metbriefing-notam-status-badge--' + notam.status + '">' + (notam.status === 'active' ? '\u0410\u043A\u0442\u0438\u0432\u0435\u043D' : '\u0418\u0441\u0442\u0451\u043A') + '</span>' +
             '</div>' +
           '</div>' +
-          '<div class="metbriefing-notam-card-subject">' + notam.subject + '</div>' +
-          '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + l + '</p>'; }).join('') + '</div>' +
+          '<div class="metbriefing-notam-card-subject">' + escapeHtml(notam.subject) + '</div>' +
+          '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + escapeHtml(l) + '</p>'; }).join('') + '</div>' +
           '<div class="metbriefing-notam-card-dates">' +
             '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u0421:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveFrom) + '</span></div>' +
             '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u041F\u043E:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveTo) + '</span></div>' +
@@ -3350,12 +3468,12 @@
   function copyToClipboard(text) {
     try {
       navigator.clipboard.writeText(text).then(function() {
-        app.showToast('\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u043D \u0432 \u0431\u0443\u0444\u0435\u0440 \u043E\u0431\u043C\u0435\u043D\u0430', 'success');
+        app.showToast('\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u043D \u0432 \u0431\u0443\u0444\u0435\u0440 \u043E\u0431\u043C\u0435\u043D\u0430');
       }).catch(function() {
-        app.showToast('\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C', 'error');
+        app.showToast('\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C');
       });
     } catch(e) {
-      app.showToast('\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C', 'error');
+      app.showToast('\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C');
     }
   }
 
@@ -3378,14 +3496,173 @@
     var right = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
+    // Task 24 (#4): при ре-рендере header (Shell зовёт renderHeader на каждый init/re-entry)
+    // обязательно сбрасываем open state + снимаем listeners — иначе dropdown зависнет открытым.
+    closeHeaderMenu();
+
     left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="\u041C\u0435\u043D\u044E" onclick="app.toggleMenu()">'
       + window.ICONS.menu + '</button>';
     left.onclick = null;
 
     center.innerHTML = '<div class="hc-module">\u041C\u0435\u0442\u0435\u043E\u0431\u0440\u0438\u0444\u0438\u043D\u0433</div>';
 
-    right.innerHTML = '';
+    right.innerHTML = '<button id="mbHeaderMenuBtn" class="icon-btn" aria-label="\u041C\u0435\u043D\u044E \u043E\u0447\u0438\u0441\u0442\u043A\u0438" aria-haspopup="true" aria-expanded="false">' + icon('ellipsis-vertical', 22) + '</button>';
     right.onclick = null;
+
+    // Toggle dropdown on button click
+    var menuBtn = document.getElementById('mbHeaderMenuBtn');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var dropdown = document.getElementById('mbHeaderMenuDropdown');
+        if (!dropdown) return;
+        var isOpen = dropdown.classList.toggle('metbriefing-header-menu--open');
+        menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        var overlay = document.getElementById('mbHeaderMenuOverlay');
+        if (overlay) {
+          if (isOpen) overlay.classList.add('metbriefing-header-menu-overlay--visible');
+          else overlay.classList.remove('metbriefing-header-menu-overlay--visible');
+        }
+        // Task 24 (#7, #8): §8 attach-on-open / detach-on-close + setTimeout(0)
+        if (isOpen) {
+          // Вешаем document listeners (вне container — фиксированный overlay/dropdown).
+          // setTimeout(0) защищает от немедленного срабатывания на тот же клик (§8 условие 3).
+          _onHeaderMenuDocClick = function(ev) {
+            var ov = document.getElementById('mbHeaderMenuOverlay');
+            // Закрываем только если клик не по dropdown, не по btn и не по overlay
+            // (overlay клик обрабатывается отдельно в ensureHeaderMenuDropdown)
+            if (!dropdown.contains(ev.target) && !menuBtn.contains(ev.target) && !(ov && ov.contains(ev.target))) {
+              closeHeaderMenu();
+            }
+          };
+          _onHeaderMenuKeydown = function(ev) {
+            if (ev.key === 'Escape') closeHeaderMenu();
+          };
+          setTimeout(function() {
+            if (_onHeaderMenuDocClick) document.addEventListener('click', _onHeaderMenuDocClick);
+            if (_onHeaderMenuKeydown) document.addEventListener('keydown', _onHeaderMenuKeydown);
+          }, 0);
+        } else {
+          // Закрыли toggle'ом — снимаем listeners
+          closeHeaderMenu();
+        }
+      });
+    }
+  }
+
+  // ===== Header Menu: Очистка брифинга (дом + кеш) =====
+  function clearBriefingAll() {
+    // Очистка маршрута (дом)
+    state.depIcao = '';
+    state.arrIcao = '';
+    state.altIcaos = [];
+    state.altInput = '';
+    state.extraAirports = [];
+    state.manualNotamAirports = {};
+    state.notamAirports = [];
+    state.prevRoute = '';
+
+    // Очистка кешей в памяти
+    state.weatherCache = {};
+    state.wxErrors = {};
+    state.wxLoading = {};
+    state.metarHistory = {};
+    state.metarHistoryLoading = {};
+    state.notamCache = {};
+    state.notamErrors = {};
+    state.notamLoading = {};
+    state.avwxStation = {};
+    state.sigmetCache = null;
+    state.sigmetError = null;
+    state.sigmetFirFilter = 'route';
+    state.wxMapLoaded = {};
+
+    // Очистка blob URL для карт (память), но НЕ трогаем IndexedDB — браузер сам хранит
+    Object.keys(state.wxMapCache).forEach(function(url) {
+      var c = state.wxMapCache[url];
+      if (c && c.blobUrl) {
+        try { URL.revokeObjectURL(c.blobUrl); } catch(e) {}
+      }
+    });
+    state.wxMapCache = {};
+
+    // Task 28: Очистка ветровых карт по эшелонам (blob URLs)
+    Object.keys(state.windMapCache).forEach(function(lvl) {
+      var c = state.windMapCache[lvl];
+      if (c && c.blobUrl) {
+        try { URL.revokeObjectURL(c.blobUrl); } catch(e) {}
+      }
+    });
+    state.windMapCache = {};
+    state.windMapLoaded = {};
+    state.windLevel = (getWindMaps() && getWindMaps().defaultLevel) || 340;
+
+    // Очистка localStorage
+    try {
+      localStorage.removeItem('wx-cache');
+      localStorage.removeItem('wx-route');
+      localStorage.removeItem('sigmet-cache');
+      localStorage.removeItem('notam-cache');
+      localStorage.removeItem('station-cache');
+      localStorage.removeItem('wx-recent'); // legacy
+    } catch(e) {}
+
+    // Очистка IndexedDB wx-map-cache (всё хранилище)
+    openWxMapDb().then(function(db) {
+      try {
+        var tx = db.transaction(WX_MAP_STORE, 'readwrite');
+        tx.objectStore(WX_MAP_STORE).clear();
+        tx.onerror = function() {};
+      } catch(e) {}
+    }).catch(function() {});
+
+    // Ре-рендер
+    renderRouteCard();
+    renderCurrentTab();
+    app.showToast('\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u043E\u0447\u0438\u0449\u0435\u043D');
+
+    // После очистки — НЕ фетчим автоматически. Пользователь нажал «Очистить» — значит хочет чистое
+    // состояние. Свежие данные загрузятся при следующем вводе маршрута, или по кнопке «Брифинг готов»,
+    // или автоматически по таймеру SIGMET (каждые 1 час — Task 21).
+  }
+
+  // Создаёт dropdown-меню в DOM (вызывается один раз при init, persistent)
+  function ensureHeaderMenuDropdown(container) {
+    if (document.getElementById('mbHeaderMenuDropdown')) return;
+
+    // Task 21: полноэкранный overlay поверх header (z:1099, под dropdown z:1100)
+    var overlay = document.createElement('div');
+    overlay.id = 'mbHeaderMenuOverlay';
+    overlay.className = 'metbriefing-header-menu-overlay';
+    overlay.setAttribute('aria-hidden', 'true');
+    container.appendChild(overlay);
+
+    var dropdown = document.createElement('div');
+    dropdown.id = 'mbHeaderMenuDropdown';
+    dropdown.className = 'metbriefing-header-menu';
+    dropdown.setAttribute('role', 'menu');
+    dropdown.innerHTML =
+      '<button class="metbriefing-header-menu-item" role="menuitem" data-mb-clear-all>' +
+        icon('trash', 16) + '<span>\u041E\u0447\u0438\u0441\u0442\u043A\u0430 \u0431\u0440\u0438\u0444\u0438\u043D\u0433\u0430</span>' +
+      '</button>';
+    container.appendChild(dropdown);
+
+    // Клик по overlay → закрыть dropdown (через closeHeaderMenu — снимает listeners)
+    overlay.addEventListener('click', function() {
+      closeHeaderMenu();
+    });
+
+    // Клик по пункту → подтверждение → очистка
+    dropdown.addEventListener('click', function(e) {
+      var item = e.target.closest('[data-mb-clear-all]');
+      if (item) {
+        closeHeaderMenu();
+        app.showConfirm(
+          '\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0431\u0440\u0438\u0444\u0438\u043D\u0433?\n\n\u0411\u0443\u0434\u0443\u0442 \u0443\u0434\u0430\u043B\u0435\u043D\u044B \u043C\u0430\u0440\u0448\u0440\u0443\u0442 \u0438 \u0432\u0441\u0435 \u0434\u0430\u043D\u043D\u044B\u0435 (\u043F\u043E\u0433\u043E\u0434\u0430, NOTAM, SIGMET, \u043A\u0430\u0440\u0442\u044B, \u0441\u0442\u0430\u043D\u0446\u0438\u0438). \u0414\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u043D\u0435\u043E\u0431\u0440\u0430\u0442\u0438\u043C\u043E.',
+          clearBriefingAll
+        );
+      }
+    });
   }
 
   // ═══════════════════════════════════════════
@@ -3396,13 +3673,19 @@
     var container = document.getElementById('metbriefingContainer');
     if (!container) { console.error('\u041A\u043E\u043D\u0442\u0435\u0439\u043D\u0435\u0440 metbriefingContainer \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D!'); return; }
 
-    // Build shell structure — wrap in .module-container per §7
+    // Build shell structure — wrap in .module-container per §7 (lang=ru для hyphens)
     container.innerHTML =
-        '<div class="module-container">' +
+        '<div class="module-container" lang="ru">' +
         '<div id="metbriefing-route-card" class="metbriefing-route-card"></div>' +
         '<div id="metbriefing-tab-switcher" class="metbriefing-tab-switcher"></div>' +
         '<div id="metbriefing-tab-content" class="metbriefing-tab-content"></div>' +
         '</div>';
+
+    // Создаём dropdown-меню очистки (один раз, persistent)
+    ensureHeaderMenuDropdown(container);
+
+    // Task 24 (#7, #8): §8 — глобальные listeners перенесены в renderHeader (attach-on-open),
+    // здесь они больше НЕ вешаются. closeHeaderMenu() снимает их при закрытии/destroy.
 
     // Event delegation
     // Track weather map image load/error via capture phase (load/error don't bubble)
@@ -3444,16 +3727,6 @@
         var refreshAllBtn = e.target.closest('[data-mb-refresh-all]');
         if (refreshAllBtn) {
           refreshAllWeather();
-          return;
-        }
-
-        // Alt remove
-        var altRemove = e.target.closest('[data-alt-remove]');
-        if (altRemove) {
-          var icao = altRemove.getAttribute('data-alt-remove');
-          state.altIcaos = state.altIcaos.filter(function(a) { return a !== icao; });
-          state.altInput = state.altIcaos.join(', ');
-          onRouteChange(); saveRouteInfo(); renderRouteCard(); renderCurrentTab();
           return;
         }
 
@@ -3566,14 +3839,7 @@
           return;
         }
 
-        // SIGMET refresh
-        var sigmetRefresh = e.target.closest('[data-sigmet-refresh]');
-        if (sigmetRefresh) {
-          fetchSigmetData(true);
-          return;
-        }
-
-        // SIGMET retry
+        // SIGMET retry (кнопка в error-блоке, не refresh)
         var sigmetRetry = e.target.closest('[data-sigmet-retry]');
         if (sigmetRetry) {
           fetchSigmetData(true);
@@ -3621,6 +3887,13 @@
         fetchAllWxMaps(false);
       });
 
+      // Task 28: Wind-by-flight-level maps — set default level from config + preload all
+      var wcfg = getWindMaps();
+      if (wcfg && wcfg.defaultLevel) {
+        state.windLevel = wcfg.defaultLevel;
+      }
+      preloadAllWindMaps(false);
+
       // Fetch SIGMET data (uses cache if fresh, otherwise fetches from API)
       fetchSigmetData();
 
@@ -3655,6 +3928,15 @@
         if (state.activeTab === 'briefing' || state.activeTab === 'weather') renderCurrentTab();
       }, 30000);
 
+      // Автообновление SIGMET — как карты погоды (каждые SIGMET_STALE_MS = 1 час — Task 21).
+      // fetchSigmetData() без forceRefresh сам проверит isStale и фетчит только если устарел.
+      if (state.sigmetRefreshInterval !== null) {
+        clearInterval(state.sigmetRefreshInterval);
+      }
+      state.sigmetRefreshInterval = setInterval(function() {
+        fetchSigmetData(false);
+      }, SIGMET_STALE_MS);
+
     });
   }
 
@@ -3667,6 +3949,13 @@
       clearInterval(state.tickInterval);
       state.tickInterval = null;
     }
+    if (state.sigmetRefreshInterval !== null) {
+      clearInterval(state.sigmetRefreshInterval);
+      state.sigmetRefreshInterval = null;
+    }
+    // Task 24 (#4, #7, #8): §8 — закрываем dropdown + overlay + снимаем document listeners.
+    // Вызов closeHeaderMenu() покрывает все 3 условия §8 (attach-on-open / detach-on-close / destroy cleanup).
+    closeHeaderMenu();
     // Do NOT revoke blob URLs or clear wxMapCache — IndexedDB still holds the blobs,
     // and init() is not called again on re-entry (contract §5). Revoking kills
     // offline map display. Blob URLs live until page unload — that's fine.

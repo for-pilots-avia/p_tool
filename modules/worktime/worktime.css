@@ -12,13 +12,12 @@
   --wt-badge-ok-bg: rgba(40, 167, 69, 0.1);
   --wt-badge-ok-text: #1a7a36;
   --wt-badge-ok-border: rgba(0, 176, 80, 0.15);
-
-  /* Segment palette (flight segments) */
-  --color-seg-0: #3b82f6;
-  --color-seg-1: #8b5cf6;
-  --color-seg-2: #ec4899;
-  --color-seg-3: #f59e0b;
-  --color-seg-4: #10b981;
+  /* Цвета сегментов таймлайна (light) */
+  --color-seg-0: #17a2b8;
+  --color-seg-1: #28a745;
+  --color-seg-2: #ffc107;
+  --color-seg-3: #fd7e14;
+  --color-seg-4: #6f42c1;
 }
 #worktimeContainer .module-container {
   padding: 20px var(--content-padding-x) 40px;
@@ -32,13 +31,12 @@ body.dark-theme #worktimeContainer {
   --wt-badge-ok-bg: rgba(52, 199, 89, 0.12);
   --wt-badge-ok-text: #34c759;
   --wt-badge-ok-border: rgba(52, 199, 89, 0.2);
-
-  /* Segment palette (flight segments — dark theme) */
-  --color-seg-0: #3b82f6;
-  --color-seg-1: #8b5cf6;
-  --color-seg-2: #ec4899;
-  --color-seg-3: #f59e0b;
-  --color-seg-4: #10b981;
+  /* Цвета сегментов таймлайна (dark) */
+  --color-seg-0: #5ac8fa;
+  --color-seg-1: #34c759;
+  --color-seg-2: #ffcc02;
+  --color-seg-3: #ff9500;
+  --color-seg-4: #af52de;
 }
 /* max-width обеспечивается .module-container из style.css */
 
@@ -121,13 +119,13 @@ body.dark-theme #worktimeContainer {
 .wt-progress-bar {
   height: 6px;
   background: var(--color-border-subtle);
-  border-radius: 3px;
+  border-radius: var(--border-radius-xs);
   overflow: hidden;
   margin-bottom: 4px;
 }
 .wt-progress-bar-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: var(--border-radius-xs);
   transition: width 0.4s var(--transition-ease-out);
 }
 .wt-progress-bar-fill--ok {
@@ -323,7 +321,7 @@ body.dark-theme #worktimeContainer {
   position: relative;
   height: 16px;
   margin-bottom: 6px;
-  font-size: 10px;
+  font-size: var(--font-xs);
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   white-space: nowrap;
@@ -336,7 +334,7 @@ body.dark-theme #worktimeContainer {
   position: relative;
   height: 24px;
   background: var(--color-border-subtle);
-  border-radius: 4px;
+  border-radius: var(--border-radius-xs);
   overflow: visible;
   margin-bottom: 14px;
 }
@@ -350,7 +348,6 @@ body.dark-theme #worktimeContainer {
 }
 .wt-timeline-gridline--midnight {
   width: 1px;
-  background: var(--color-text-muted);
   opacity: 0.6;
   border-left: 1px dashed var(--color-text-muted);
   background: none;
@@ -363,7 +360,7 @@ body.dark-theme #worktimeContainer {
   position: absolute;
   top: 2px;
   bottom: 2px;
-  border-radius: 3px;
+  border-radius: var(--border-radius-xs);
   opacity: 0.75;
   min-width: 2px;
 }
@@ -377,15 +374,43 @@ body.dark-theme #worktimeContainer {
   border: 2px solid var(--color-text-white);
   z-index: 1;
 }
-.wt-timeline-marker--takeoff {
+.wt-timeline-marker--engine-start {
   background: var(--color-success);
+  z-index: 2;
 }
-.wt-timeline-marker--landing {
+.wt-timeline-marker--engine-start::after {
+  content: 'Запуск';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-xs);
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-success);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.wt-timeline-marker--engine-stop {
   background: var(--color-warning);
+  z-index: 2;
+}
+.wt-timeline-marker--engine-stop::after {
+  content: 'Выключ.';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-xs);
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-warning);
+  white-space: nowrap;
+  margin-top: 2px;
 }
 .wt-timeline-marker--report {
   background: var(--color-primary);
-  z-index: 2;
+  z-index: 3;
 }
 .wt-timeline-marker--report::after {
   content: 'Явка';
@@ -393,27 +418,62 @@ body.dark-theme #worktimeContainer {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 9px;
+  font-size: var(--font-xs);
   font-family: var(--font-main);
   font-weight: 600;
   color: var(--color-primary);
   white-space: nowrap;
   margin-top: 2px;
 }
-.wt-timeline-marker--shift-end {
-  background: var(--color-info);
-  z-index: 2;
+/* Маркер «Явка 2» — раздельный режим, начало второй смены (фиолетовый) */
+.wt-timeline-marker--report2 {
+  background: var(--color-seg-4);
+  z-index: 3;
 }
-.wt-timeline-marker--shift-end::after {
-  content: 'Конец';
+.wt-timeline-marker--report2::after {
+  content: 'Явка 2';
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 9px;
+  font-size: var(--font-xs);
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-seg-4);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.wt-timeline-marker--shift-end {
+  background: var(--color-info);
+  z-index: 3;
+}
+.wt-timeline-marker--shift-end::after {
+  content: 'Конец смены';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-xs);
   font-family: var(--font-main);
   font-weight: 600;
   color: var(--color-info);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.wt-timeline-marker--seg-end {
+  background: var(--color-seg-4);
+  z-index: 3;
+}
+.wt-timeline-marker--seg-end::after {
+  content: 'Конец сегм.';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-xs);
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-seg-4);
   white-space: nowrap;
   margin-top: 2px;
 }
@@ -427,7 +487,7 @@ body.dark-theme #worktimeContainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .wt-results-grid {
     grid-template-columns: 1fr;
   }
@@ -542,6 +602,28 @@ body.dark-theme #worktimeContainer {
   font-size: var(--font-xs);
 }
 
+/* ─── Бейдж «Разделенная полетная смена» (в конфиг-строке Нормы) ─── */
+.wt-split-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-main);
+  background: var(--color-bg-hover);
+  border: 1px solid var(--color-danger);
+  white-space: nowrap;
+}
+.wt-split-badge svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+  vertical-align: -1px;
+}
+
 /* ─── Badge icons inline sizing ─── */
 .badge-danger svg,
 .badge-ok svg {
@@ -585,7 +667,7 @@ body.dark-theme #worktimeContainer {
   right: 0;
   z-index: 1110;
   background: var(--color-bg-card);
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
   padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
   max-height: 88vh;
   overflow-y: auto;
@@ -643,6 +725,13 @@ body.dark-theme #worktimeContainer {
   letter-spacing: 0.01em;
   margin-bottom: 6px;
 }
+/* В row-раскладке (Явка + Час.пояс) резервируем 2 строки под label,
+   чтобы поле выбора часового пояса не смещалось вниз при переносе
+   длинной подписи «ЧАС. ПОЯС БАЗИРОВАНИЯ» на вторую строку. */
+.wt-field-row .wt-field-label {
+  line-height: 1.3;
+  min-height: 2.6em;
+}
 
 .wt-field-input {
   width: 100%;
@@ -687,9 +776,10 @@ body.dark-theme #worktimeContainer {
 }
 
 /* ─── Dialog summary ─── */
+/* Две строки: Row1 = Явка/Посадки/Сегм., Row2 = Отдых/Час.пояс/[Разд.] */
 .wt-dialog-summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 0;
   margin-bottom: 12px;
   border: 1px solid var(--color-border-subtle);
@@ -697,28 +787,124 @@ body.dark-theme #worktimeContainer {
   overflow: hidden;
   background: var(--color-bg-card);
 }
+.wt-dialog-summary-row {
+  display: grid;
+  gap: 0;
+}
+.wt-dialog-summary-row + .wt-dialog-summary-row {
+  border-top: 1px solid var(--color-border-subtle);
+}
+.wt-dialog-summary-row--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.wt-dialog-summary-row--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
 .wt-dialog-summary-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 4px;
+  justify-content: center;
+  padding: 10px 6px;
   border-right: 1px solid var(--color-border-subtle);
 }
 .wt-dialog-summary-item:last-child {
   border-right: none;
 }
 .wt-dialog-summary-label {
-  font-size: 10px;
+  font-size: var(--font-xs);
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .wt-dialog-summary-value {
-  font-size: var(--font-sm);
+  font-size: var(--font-base);
   font-weight: 700;
   color: var(--color-text-main);
   font-family: var(--font-mono);
-  margin-top: 2px;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ─── Field row (Явка + Часовой пояс) ─── */
+.wt-field-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.wt-field-tz {
+  max-width: 110px;
+  flex-shrink: 0;
+}
+.wt-field-tz .wt-field-input {
+  width: 100%;
+}
+
+/* ─── Раздельный режим (splitMode) ─── */
+.wt-shift-block {
+  padding: 8px 0;
+}
+.wt-shift-block--1 {
+  opacity: 0.85;
+}
+.wt-shift-block--2 {
+  /* Смена 2 — без особенностей */
+}
+.wt-shift-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 6px;
+}
+.wt-shift-lock {
+  display: inline-flex;
+  color: var(--wt-badge-ok-text, var(--color-success));
+  flex-shrink: 0;
+}
+.wt-shift-duty-label {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+.wt-shift-divider {
+  height: 2px;
+  background: var(--color-border-subtle);
+  border: none;
+  border-top: 1px dashed var(--color-border);
+  margin: 8px 0;
+}
+
+/* ─── Кнопка «Разделить смену» ─── */
+.wt-split-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-xs);
+  padding: 6px 12px;
+  min-height: 36px;
+  background: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background var(--transition-ease);
+  white-space: nowrap;
+}
+.wt-split-btn:hover {
+  background: var(--color-bg-hover);
+}
+.wt-split-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 /* ─── Dialog actions ─── */

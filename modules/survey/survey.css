@@ -92,7 +92,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 14px 14px;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -190,7 +190,7 @@
 /* ─── Question Cards ─── */
 .survey-questions {
   display: none;
-  padding: 0 12px 12px;
+  padding: 0;
 }
 
 .survey-category.open .survey-questions {
@@ -214,7 +214,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 12px;
+  padding: 12px 14px;
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -279,7 +279,7 @@
 /* ─── Answer ─── */
 .survey-answer {
   display: none;
-  padding: 0 12px 12px 44px;
+  padding: 0 0 12px var(--accordion-indent);
 }
 
 .survey-question.open .survey-answer {
@@ -301,7 +301,7 @@
   font-size: var(--font-xs);
   color: var(--color-text-muted);
   margin-top: 6px;
-  padding-left: 12px;
+  padding-left: var(--accordion-indent);
 }
 
 .survey-answer-ref::before {
@@ -477,15 +477,15 @@ body.dark-theme .survey-answer-text {
   background: var(--color-primary-light);
 }
 
-/* ─── Narrow screen adjustments (≤480px) ─── */
-@media (max-width: 480px) {
+/* ─── Narrow screen adjustments (≤560px) — §7 v4.7 breakpoint ─── */
+@media (max-width: 560px) {
   .survey-category-header {
-    padding: 10px 10px;
+    padding: 12px 12px;
     gap: 8px;
   }
   .survey-category-title {
     font-size: var(--font-sm);
-    line-height: 1.35;
+    line-height: 1.4;
     word-break: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
@@ -508,27 +508,24 @@ body.dark-theme .survey-answer-text {
     height: 40px;
   }
   .survey-questions {
-    padding: 0 4px 6px;
+    padding: 0;
   }
   .survey-question-header {
-    padding: 8px 8px;
+    padding: 10px 12px;
     gap: 8px;
   }
   .survey-answer {
-    padding: 0 4px 6px 28px;
+    padding: 0 0 10px var(--accordion-indent);
   }
   .survey-answer-text {
     padding: 6px 6px;
-  }
-  .survey-answer-ref {
-    padding-left: 6px;
   }
   .survey-stat-card {
     padding: 8px;
     min-width: 80px;
   }
   .survey-section-tab {
-    padding: 8px 8px;
+    padding: 8px 0;
     font-size: var(--font-xs);
   }
   .survey-overview {
@@ -537,15 +534,15 @@ body.dark-theme .survey-answer-text {
   }
 }
 
-/* ─── Very narrow screen adjustments (≤380px) ─── */
+/* ─── Very narrow screen adjustments (≤380px) — §7 v4.7: 0.8125rem ─── */
 @media (max-width: 380px) {
   .survey-category-header {
-    padding: 8px 8px;
+    padding: 10px 10px;
     gap: 6px;
   }
   .survey-category-title {
-    font-size: 12px;
-    line-height: 1.3;
+    font-size: 0.8125rem; /* 13px — компактный хардкод для 380px, вне общей шкалы — намеренно (§7 v4.7) */
+    line-height: 1.35;
   }
   .survey-category-icon {
     width: 26px;
@@ -567,14 +564,14 @@ body.dark-theme .survey-answer-text {
     font-size: 9px;
   }
   .survey-questions {
-    padding: 0 2px 4px;
+    padding: 0;
   }
   .survey-question-header {
-    padding: 6px 6px;
+    padding: 8px 10px;
     gap: 6px;
   }
   .survey-answer {
-    padding: 0 2px 4px 24px;
+    padding: 0 0 8px var(--accordion-indent);
   }
   .survey-answer-text {
     padding: 5px 5px;
@@ -584,7 +581,7 @@ body.dark-theme .survey-answer-text {
     min-width: 70px;
   }
   .survey-section-tab {
-    padding: 6px 6px;
+    padding: 6px 0;
     font-size: 10px;
   }
   .survey-overview {

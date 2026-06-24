@@ -27,6 +27,11 @@
   --mb-color-danger-text:       #cd202c;
   --mb-color-ok-bg:             rgba(40,167,69,0.12);
   --mb-color-ok-text:           #28a745;
+
+  /* Task 24 (#3): недостающие CSS-переменные (использовались, но не были объявлены) */
+  --color-primary-rgb:          205, 32, 44;        /* RGB-канон для rgba(var(--color-primary-rgb), X) */
+  --color-primary-deeper:       var(--color-primary-dark);  /* #a01a24 — hover для .metbriefing-share-btn */
+  --color-bg-secondary:         var(--color-bg-hover);       /* фон disabled-кнопок поиска */
 }
 body.dark-theme #metbriefingContainer {
   --mb-color-vfr:               #66BB6A;
@@ -49,6 +54,11 @@ body.dark-theme #metbriefingContainer {
   --mb-color-danger-text:       #ef5350;
   --mb-color-ok-bg:             rgba(52,199,89,0.18);
   --mb-color-ok-text:           #34c759;
+
+  /* Task 24 (#3): dark-theme значения для недостающих переменных */
+  --color-primary-rgb:          230, 57, 70;        /* RGB для dark-theme primary #e63946 */
+  --color-primary-deeper:       var(--color-primary-dark);  /* dark --color-primary-dark = #cd202c (из style.css L100) */
+  --color-bg-secondary:         var(--color-bg-hover);       /* dark --color-bg-hover из dark-theme */
 }
 /* ── Aviabit Quick Link ── */
 .metbriefing-aviabit-link {
@@ -151,6 +161,77 @@ body.dark-theme #metbriefingContainer {
   font-weight: 500;
 }
 
+/* ── Узкие инпуты ВЫЛЕТ/ПОСАДКА (4 буквы CAPS) — Task 21: flex:1, шрифт как в ЗАПАСНЫЕ ── */
+.metbriefing-input-group--short {
+  flex: 1;
+  min-width: 0;
+}
+/* --short больше НЕ переопределяет font-weight/letter-spacing/text-align/padding —
+   используется базовый стиль .metbriefing-icao-input (как в инпуте ЗАПАСНЫЕ).
+   Остаётся только CAPS (text-transform: uppercase унаследован от базового). */
+
+/* ── Header Menu (Очистка брифинга) ── */
+/* Полноэкранный overlay поверх header (z:1200 > header z:1100, = dropdown z:1201) */
+.metbriefing-header-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  z-index: 1200;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s var(--transition-ease), visibility 0.15s var(--transition-ease);
+}
+.metbriefing-header-menu-overlay--visible {
+  opacity: 1;
+  visibility: visible;
+}
+.metbriefing-header-menu {
+  position: fixed;
+  top: calc(var(--header-height) + env(safe-area-inset-top, 0px) + 4px);
+  right: 8px;
+  z-index: 1201;
+  min-width: 200px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  padding: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s var(--transition-ease), transform 0.15s var(--transition-ease), visibility 0.15s;
+}
+.metbriefing-header-menu--open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.metbriefing-header-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-main);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s var(--transition-ease);
+}
+.metbriefing-header-menu-item:hover,
+.metbriefing-header-menu-item:focus-visible {
+  background: var(--color-bg-hover, rgba(0,0,0,0.04));
+  outline: none;
+}
+.metbriefing-header-menu-item svg {
+  color: var(--color-danger, #d64545);
+  flex-shrink: 0;
+}
+
 .metbriefing-text-input {
   height: 44px;
   padding: 0 12px;
@@ -185,68 +266,28 @@ body.dark-theme #metbriefingContainer {
   flex: 1;
   min-width: 0;
 }
-
-/* ── Alternate Airport Tags ── */
-.metbriefing-alternate-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-.metbriefing-alternate-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: var(--color-primary-ghost);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: 6px;
-  font-size: var(--font-xs);
-  color: var(--color-primary-dark);
-}
-.metbriefing-alternate-tag svg {
-  width: 12px; height: 12px;
-}
-.metbriefing-alternate-tag-icao {
-  font-weight: 700;
-}
-.metbriefing-alternate-tag-name {
-  font-weight: 400;
-  color: var(--color-text-secondary);
-}
-.metbriefing-alternate-tag-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px; height: 20px;
-  background: transparent;
-  border: none;
-  outline: none;
-  box-shadow: none;
-  -webkit-appearance: none;
-  appearance: none;
-  color: var(--color-text-muted);
-  margin-left: 2px;
-  cursor: pointer;
-  padding: 0;
-}
-.metbriefing-alternate-tag-remove svg {
-  width: 12px; height: 12px;
-}
-@media (hover: hover) {
-  .metbriefing-alternate-tag-remove:hover {
-    color: var(--color-danger);
-  }
+/* Task 21: ЗАПАСНЫЕ input-group — шире DEP/ARR (flex:2 vs flex:1) на широком экране */
+.metbriefing-input-group--alt {
+  flex: 2;
+  min-width: 0;
 }
 
 /* ── Visual Route Display ── */
+/* Task 30: ALT — на второй строке под красной частью маршрута */
 .metbriefing-route-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 16px 0 12px;
+  padding: 12px 0;
+}
+.metbriefing-route-main {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 16px 0 12px;
-  padding: 12px 0;
+  width: 100%;
 }
 .metbriefing-route-code {
   font-size: var(--font-xl);
@@ -273,15 +314,12 @@ body.dark-theme #metbriefingContainer {
   flex-shrink: 0;
   margin: 0 4px;
 }
-.metbriefing-route-alt-sep {
-  color: var(--color-text-muted);
-  font-size: var(--font-sm);
-  margin: 0 4px;
-}
-.metbriefing-route-alt-codes {
+/* Task 30: ALT — вторая строка (вместо inline `-sep`/`-codes`) */
+.metbriefing-route-alt {
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
   font-weight: 500;
+  text-align: center;
 }
 
 /* ── Route Extra (Flight Number & Date) ── */
@@ -341,6 +379,29 @@ body.dark-theme #metbriefingContainer {
   border-radius: var(--border-radius-md);
   padding: 16px;
   margin: 4px 0;
+}
+/* Task 21: full-bleed модификатор — карточки на всю ширину блока без паддингов.
+   Заголовок секции получает свой padding, контент — без отступов. */
+.metbriefing-status-section--full-bleed {
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+}
+.metbriefing-status-section--full-bleed > .metbriefing-section-title {
+  padding: 12px 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 8px;
+}
+.metbriefing-status-section--full-bleed > .metbriefing-inline-weather-list,
+.metbriefing-status-section--full-bleed > .metbriefing-sigmet-list,
+.metbriefing-status-section--full-bleed > .metbriefing-sigmet-empty,
+.metbriefing-status-section--full-bleed > .metbriefing-sigmet-route-firs,
+.metbriefing-status-section--full-bleed > .metbriefing-inline-notam-list {
+  margin: 0;
 }
 
 /* ── Status Row ── */
@@ -484,6 +545,113 @@ body.dark-theme .metbriefing-status-badge--warn {
 @keyframes metbriefing-spin-keyframes {
   from { transform: rotate(0deg); }
   to   { transform: rotate(-360deg); }
+}
+
+/* ── Task 28: Wind-by-flight-level maps (FL100-FL390, +6h, area C) ── */
+.metbriefing-wind-section {
+  /* inherits .metbriefing-status-section (card) */
+}
+.metbriefing-wind-area {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+.metbriefing-wind-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 0 10px;
+}
+.metbriefing-wind-label {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  white-space: nowrap;
+}
+.metbriefing-wind-select {
+  flex: 0 1 auto;
+  min-width: 90px;
+  padding: 6px 28px 6px 10px;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+.metbriefing-wind-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light, rgba(205,32,44,0.15));
+}
+.metbriefing-wind-refresh-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+}
+.metbriefing-wind-refresh-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.metbriefing-wind-progress {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.metbriefing-wind-map-container {
+  position: relative;
+  width: 100%;
+  min-height: 120px;
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.metbriefing-wind-map-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  width: 100%;
+  object-fit: contain;
+}
+.metbriefing-wind-map-placeholder {
+  padding: 24px 16px;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+@media (max-width: 560px) {
+  .metbriefing-wind-area {
+    display: none;
+  }
+  .metbriefing-wind-progress {
+    margin-left: 0;
+    width: 100%;
+    text-align: right;
+    font-size: 10px;
+  }
 }
 
 /* ── Inline Weather (Briefing Tab) ── */
@@ -1872,10 +2040,10 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   background: var(--color-bg-card);
 }
 .metbriefing-notam-group-cards {
-  padding: 8px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 .metbriefing-notam-no-results--inner {
   padding: 16px;
@@ -2119,18 +2287,37 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 
 /* ── Responsive Tweaks ── */
-@media (max-width: 412px) {
+/* Task 21: на узком экране (<640px) ЗАПАСНЫЕ переносится на новую строку,
+   DEP+ARR остаются в одной строке, растянутые по ширине (flex:1) */
+@media (max-width: 639px) {
   .metbriefing-route-inputs {
-    flex-direction: column;
+    flex-wrap: wrap;
   }
+  .metbriefing-input-group--alt {
+    flex-basis: 100%;
+    margin-top: 8px;
+  }
+}
+@media (max-width: 412px) {
+  /* .metbriefing-route-inputs БОЛЬШЕ НЕ переходит в column —
+     DEP+ARR (flex:1) помещаются в одну строку на 320px экране */
   .metbriefing-route-extra {
     flex-direction: column;
   }
+  /* Task 25 (Правка B): погода остаётся в 2 колонки на узких экранах,
+     но с компенсацией — tighter gap + smaller font-size чтобы поля не теснились */
   .metbriefing-wx-parsed-grid {
-    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .metbriefing-wx-field {
+    padding: 6px;
+    font-size: var(--font-xs);
   }
   .metbriefing-inline-weather-fields {
-    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .metbriefing-inline-field {
+    font-size: var(--font-xs);
   }
 }
 
@@ -2281,7 +2468,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 
 /* FIR dropdown */
 .metbriefing-sigmet-filter {
-  padding: 0 12px 8px;
+  padding: 0 0 8px;
 }
 .metbriefing-sigmet-fir-select {
   width: 100%;
@@ -2312,7 +2499,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 
 /* Route FIR list */
 .metbriefing-sigmet-route-firs {
-  padding: 4px 12px 6px;
+  padding: 4px 0 6px;
   font-size: var(--font-xs);
   color: var(--color-text-muted);
   line-height: 1.5;
@@ -2324,7 +2511,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
+  padding: 12px 0;
   color: var(--color-text-muted);
   font-size: var(--font-sm);
 }
@@ -2337,7 +2524,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 0 12px 8px;
+  padding: 0 0 8px;
 }
 
 /* Individual SIGMET card */

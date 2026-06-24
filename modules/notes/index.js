@@ -15,7 +15,6 @@
   var _currentView = 'list';        /* 'list' | 'draw' | 'text' */
   var _activeCategory = 'all';      /* 'all' | 'Важно' | 'Работа' | 'Личное' */
   var _menuOpen = false;
-  var _menuOutsideHandler = null;
   var _drawCtx = null;
   var _drawStrokeWidth = 2;         /* 2 | 5 | 10 — actual pixel widths */
   var _drawEraser = false;
@@ -262,14 +261,6 @@
     var dropdown = document.getElementById('notesMenuDropdown');
     if (overlay) overlay.remove();
     if (dropdown) dropdown.remove();
-  }
-
-  function setupMenuOutsideClick() {
-    /* No longer needed — overlay click handles closing */
-    if (_menuOutsideHandler) {
-      document.removeEventListener('pointerdown', _menuOutsideHandler);
-      _menuOutsideHandler = null;
-    }
   }
 
   function renderDrawHeader() {
@@ -682,10 +673,6 @@
     _editingTextId = null;
     /* Clean up menu overlay */
     _hideMenuOverlay();
-    if (_menuOutsideHandler) {
-      document.removeEventListener('pointerdown', _menuOutsideHandler);
-      _menuOutsideHandler = null;
-    }
     var container = document.getElementById('notesContainer');
     if (container) {
       container.classList.remove('notes-fullscreen');
@@ -1067,10 +1054,6 @@
     _cachedDrawNotes = [];
     _cachedTextNotes = [];
     _hideMenuOverlay();
-    if (_menuOutsideHandler) {
-      document.removeEventListener('pointerdown', _menuOutsideHandler);
-      _menuOutsideHandler = null;
-    }
   }
 
   /* ═══════════════════════════════════════════

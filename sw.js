@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v41 */
+/* Pilot's Tool — Service Worker v42 */
 
-var CACHE_NAME = 'pilots-tool-v41';
+var CACHE_NAME = 'pilots-tool-v42';
 
 var JSON_MODULE_NAMES = { 
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
@@ -8,17 +8,20 @@ var JSON_MODULE_NAMES = {
   'modules/faq/data/faq.json':                            'FAQ',
   'modules/checklists/data/checklists.json':              'Чеклисты',
   'modules/krs/data/krs.json':                            'Указания КРС',
-  'modules/metbriefing/data/metbriefing.json':             'Метеобрифинг',
+  'modules/krs/data/metbriefing.json':                    'Метеобрифинг',
   'modules/rulesthumb/data/rules.json':                    'Rules of Thumb',
   'modules/flightprocedures/data/flightprocedures.json':   'Лётные процедуры',
   'modules/survey/data/survey.json':                       'Контрольный опрос',
   'modules/ffstraining/data/ffstraining.json':             'FFS Training',
   'modules/checkride/data/line.json':                      'Checkride LINE',
   'modules/checkride/data/ffs.json':                       'Checkride FFS',
-  'modules/quiz/data/afl-first_aid.json':                  'Quiz test1',
-  'modules/quiz/data/test-comm.json':                      'Quiz test2',
-  'modules/quiz/data/test-instructor.json':                'Quiz test3',
-  'modules/quiz/data/test-line.json':                      'Quiz test4',
+  'modules/quiz/data/quiz-tests.json':                     'Quiz test1',
+  'modules/quiz/data/test-line.json':                      'Quiz test2',
+  'modules/quiz/data/test-comm.json':                      'Quiz test3',
+  'modules/quiz/data/test-instructor.json':                'Quiz test4',
+  'modules/quiz/data/tb_2024.json':                        'Quiz test5',
+  'modules/quiz/data/afl-first_aid.json':                  'Quiz test6',
+  'modules/quiz/data/kpk_meteorology.json':                'Quiz test7',
 };
 
 var STATIC_ASSETS = [
@@ -72,17 +75,19 @@ var STATIC_ASSETS = [
   // JSON данных
   './modules/checklists/data/checklists.json',
   './modules/krs/data/krs.json',
-  './modules/metbriefing/data/metbriefing.json',
   './modules/flightprocedures/data/flightprocedures.json',
   './modules/rulesthumb/data/rules.json',
   './modules/survey/data/survey.json',
   './modules/ffstraining/data/ffstraining.json',
   './modules/checkride/data/line.json',
   './modules/checkride/data/ffs.json',
-  './modules/quiz/data/afl-first_aid.json',
+  './modules/quiz/data/quiz-tests.json',
   './modules/quiz/data/test-comm.json',
-  './modules/quiz/data/test-instructor.json',
   './modules/quiz/data/test-line.json',
+  './modules/quiz/data/test-instructor.json',
+  './modules/quiz/data/afl-first_aid.json',
+  './modules/quiz/data/tb_2024.json',
+  './modules/quiz/data/kpk_meteorology.json',
   './modules/phonebook/data/phonebook.json',
   './modules/faq/data/faq.json',
   './modules/aviation_sayings.json',
@@ -96,7 +101,6 @@ var STATIC_ASSETS = [
   // Медиа — ffstraining
   './modules/ffstraining/data/ext_walk1.png',
   // Медиа — krs
-  './modules/krs/data/krs_029.webp',
   './modules/krs/data/krs001.webp',
   './modules/krs/data/krs009_1.webp',
   './modules/krs/data/krs009_2.webp',
@@ -108,12 +112,19 @@ var STATIC_ASSETS = [
   './modules/krs/data/krs023_1.webp',
   './modules/krs/data/krs023_2.webp',
   './modules/krs/data/krs023_3.webp',
-  './modules/krs/data/krs044.webp',
   './modules/krs/data/page027_1.pdf',
   './modules/krs/data/page027_2.pdf',
+  './modules/krs/data/krs029.webp',
   './modules/krs/data/page039.pdf',
+  './modules/krs/data/krs044.webp',
   // Медиа — quiz
-
+  './modules/quiz/data/questions.txt',
+  './modules/quiz/data/images/B737NG.jpg',
+  './modules/quiz/data/images/boeing737.svg',
+  './modules/quiz/data/images/evac-slide.svg',
+  './modules/quiz/data/images/fragile.svg',
+  './modules/quiz/data/images/papi.svg',
+  './modules/quiz/data/images/tow-tractor.svg',
   // Библиотеки
   './libs/photoswipe/photoswipe.min.js',
   './libs/photoswipe/photoswipe-ui-default.min.js',

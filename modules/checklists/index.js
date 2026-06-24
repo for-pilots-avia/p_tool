@@ -651,7 +651,7 @@
 
   function renderDivider(entry) {
     return '<div class="list-divider cl-divider">'
-      + '<span class="list-divider-label">' + entry.label + '</span>'
+      + '<span class="list-divider-label">' + restoreInlineTags(escapeHtml(entry.label)) + '</span>'
       + '</div>';
   }
 
@@ -926,7 +926,15 @@
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Восстановить разрешённые inline-теги после escapeHtml (MODULE_CONTRACT §13: <b>, <i>)
+  function restoreInlineTags(str) {
+    return str
+      .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
+      .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
   }
 
   /**
@@ -934,7 +942,7 @@
    */
   function escapeHtmlWithBreaks(str) {
     if (!str) return '';
-    return escapeHtml(str)
+    return restoreInlineTags(escapeHtml(str))
       .replace(/\n/g, '<br>');
   }
 
@@ -948,6 +956,9 @@
       console.error('Контейнер checklistsContainer не найден!');
       return;
     }
+
+    // lang="ru" для корректной расстановки переносов (hyphens: auto в CSS, MODULE_CONTRACT §7)
+    container.setAttribute('lang', 'ru');
 
     // Контракт MODULE_CONTRACT §7: запросить библиотеку лениво через ensureLib
     app.ensureLib('photoswipe', function() {});

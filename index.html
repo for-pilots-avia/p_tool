@@ -53,14 +53,22 @@
   <!-- Затемнение при обновлении SW -->
   <div id="swUpdateOverlay" class="sw-update-overlay"></div>
 
-  <!-- Баннер обновления SW -->
+  <!-- Баннер обновления SW (сверху экрана, прогресс-бар над контентом) -->
   <div id="swUpdateBanner" style="
     display: none;
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 9998;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
     background: #1a1a1a; color: #fff;
     padding: 12px 16px; font-family: sans-serif; font-size: 0.875rem;
     flex-direction: column; gap: 8px;
   ">
+    <div id="swUpdateProgress" style="
+      height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;
+    ">
+      <div id="swUpdateProgressFill" style="
+        height: 3px; width: 0%; background: #CD202C;
+        transition: width 0.2s ease;
+      "></div>
+    </div>
     <div style="display: flex; align-items: center; justify-content: space-between;">
       <span id="swUpdateBannerText">Загружается обновление...</span>
       <button id="swUpdateReloadBtn" style="
@@ -70,14 +78,6 @@
       ">Обновить</button>
     </div>
     <span id="swUpdateFile" style="font-size: 0.75rem; opacity: 0.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
-    <div id="swUpdateProgress" style="
-      height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;
-    ">
-      <div id="swUpdateProgressFill" style="
-        height: 3px; width: 0%; background: #CD202C;
-        transition: width 0.2s ease;
-      "></div>
-    </div>
   </div>
 
   <div id="app">

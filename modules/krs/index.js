@@ -219,7 +219,7 @@
 
   function renderDivider(entry) {
     return '<div class="list-divider krs-divider">'
-      + '<span class="list-divider-label">' + escapeHtml(entry.label || '') + '</span>'
+      + '<span class="list-divider-label">' + restoreInlineTags(escapeHtml(entry.label || '')) + '</span>'
       + '</div>';
   }
 
@@ -237,7 +237,16 @@
 
     // Заголовок аккордеона
     html += '<div class="krs-block-header" data-block-id="' + inst.id + '">';
-    if (ageLabel) {
+    var addres = inst.addres ? restoreInlineTags(escapeHtml(inst.addres)) : '';
+    if (addres) {
+      // Бейдж даты + маркер адресата в вертикальном стеке
+      html += '<div class="krs-badge-stack">';
+      if (ageLabel) {
+        html += '<span class="krs-age-badge krs-age-badge--' + ageCat + '">' + ageLabel + '</span>';
+      }
+      html += '<span class="krs-addres-marker">' + addres + '</span>';
+      html += '</div>';
+    } else if (ageLabel) {
       html += '<span class="krs-age-badge krs-age-badge--' + ageCat + '">' + ageLabel + '</span>';
     }
     html += '<span class="collapsible-title"><span class="marquee-inner">' + escapeHtml(inst.title) + '</span></span>';
@@ -432,10 +441,11 @@
         // Пропускаем <pre> блоки как есть (с HTML)
         result += part;
       } else {
-        // Обычный текст: экранируем HTML (кроме <b> и </b>), \n → <br>
+        // Обычный текст: экранируем HTML, восстанавливаем разрешённые теги (§13: <b>, <i>), <p>→абзац, \n→<br>
         var escaped = escapeHtml(part);
-        // Восстанавливаем <b> и </b> из исходного текста
-        escaped = escaped.replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>');
+        escaped = restoreInlineTags(escaped);
+        // <p> не входит в §13, но встречается в данных — конвертируем в абзацный отступ
+        escaped = escaped.replace(/&lt;p&gt;/g, '\n\n').replace(/&lt;\/p&gt;/g, '\n\n');
         escaped = escaped.replace(/\n/g, '<br>');
         result += escaped;
       }
@@ -453,7 +463,15 @@
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // Восстановить разрешённые inline-теги после escapeHtml (MODULE_CONTRACT §13: <b>, <i>)
+  function restoreInlineTags(str) {
+    return str
+      .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
+      .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
   }
 
   function escapeAttr(str) {

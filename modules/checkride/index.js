@@ -245,15 +245,6 @@
     });
   }
 
-  /** Записать значения из _pilotData в DOM-поля формы */
-  function writePilotToDOM() {
-    var fields = ['fio', 'license', 'instructor', 'route', 'ac_number', 'flight_time'];
-    fields.forEach(function(f) {
-      var el = document.getElementById('cr_' + f);
-      if (el) el.value = _pilotData[f] || '';
-    });
-  }
-
   /* ═══════════════════════════════════════════
      RENDER: All content
      ═══════════════════════════════════════════ */
@@ -278,7 +269,7 @@
      SCREEN: START — Регистрация пилота
      ═══════════════════════════════════════════ */
   function renderStartScreen(container) {
-    var html = '<div class="module-container checkride-start">';
+    var html = '<div class="module-container checkride-start" lang="ru">';
 
     html += '<h2 class="checkride-start-title">\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F \u043F\u0438\u043B\u043E\u0442\u0430</h2>';
 
@@ -325,7 +316,7 @@
     if (!_data) return;
     var mainSection = _data.checklists[_sectionIndex];
 
-    var html = '<div class="module-container checkride-test">';
+    var html = '<div class="module-container checkride-test" lang="ru">';
 
     /* Section title */
     html += '<h2 class="checkride-section-title">' + mainSection.name + '</h2>';
@@ -468,7 +459,7 @@
      SCREEN: REPORT — Отчёт по проверке
      ═══════════════════════════════════════════ */
   function renderReportScreen(container) {
-    var html = '<div class="module-container checkride-report">';
+    var html = '<div class="module-container checkride-report" lang="ru">';
 
     html += '<h2 class="checkride-report-main-title">\u041E\u0422\u0427\u0415\u0422 \u041F\u041E \u041F\u0420\u041E\u0412\u0415\u0420\u041A\u0415</h2>';
 
@@ -532,7 +523,7 @@
       if (raw) history = JSON.parse(raw);
     } catch(e) { history = []; }
 
-    var html = '<div class="module-container checkride-history">';
+    var html = '<div class="module-container checkride-history" lang="ru">';
 
     html += '<h2 class="checkride-history-title">\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A</h2>';
 
@@ -1029,13 +1020,42 @@
   }
 
   /* ═══════════════════════════════════════════
+     HEADER — аналогично survey/metbriefing (§5 renderHeader обязателен)
+     ═══════════════════════════════════════════ */
+  function renderHeader() {
+    var left   = document.getElementById('headerLeft');
+    var center = document.getElementById('headerCenter');
+    var right  = document.getElementById('headerRight');
+    if (!left || !center || !right) return;
+
+    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="\u041C\u0435\u043D\u044E">'
+      + window.ICONS.menu + '</button>';
+    left.onclick = function() { app.toggleMenu(); };
+
+    center.innerHTML = '<div class="hc-module">Checkride</div>';
+
+    right.innerHTML = '';
+    right.onclick = null;
+  }
+
+  /* ═══════════════════════════════════════════
+     DESTROY — очистка таймера автосохранения (§5 cleanup)
+     ═══════════════════════════════════════════ */
+  function destroy() {
+    if (_saveStateTimer) {
+      clearTimeout(_saveStateTimer);
+      _saveStateTimer = null;
+    }
+  }
+
+  /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
   function init(params) {
     var container = document.getElementById('checkrideContainer');
     if (!container) { console.error('checkrideContainer not found'); return; }
 
-    /* Reset state on re-entry */
+    /* init() вызывается один раз (registry guard) — состояние модуля сохраняется между переходами */
     _screen = 'start';
     _sectionIndex = 0;
 
@@ -1295,6 +1315,8 @@
     title:        'Checkride',
     icon:         'badge-check',
     init:          init,
+    renderHeader:  renderHeader,
+    destroy:       destroy
   });
 
 })();

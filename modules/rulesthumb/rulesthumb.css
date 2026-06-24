@@ -3,13 +3,31 @@
    Namespace: rt-
    ═══════════════════════════════════════════ */
 
+/* ─── Module CSS variables (SHELL_CONTRACT §4 — переменные вне §4 объявляем на контейнере) ─── */
+#rulesthumbContainer {
+  --rt-primary-contrast: #ffffff;
+  --rt-success-light: rgba(40, 167, 69, 0.12);
+  --rt-warning-light: rgba(255, 193, 7, 0.12);
+  --rt-danger-light: rgba(205, 32, 44, 0.12);
+  --rt-bg-deep: var(--color-bg-card);
+  --rt-border-light: var(--color-border-subtle);
+}
+body.dark-theme #rulesthumbContainer {
+  --rt-primary-contrast: #ffffff;
+  --rt-success-light: rgba(52, 199, 89, 0.12);
+  --rt-warning-light: rgba(255, 204, 2, 0.12);
+  --rt-danger-light: rgba(230, 57, 70, 0.12);
+  --rt-bg-deep: rgba(0, 0, 0, 0.3);
+  --rt-border-light: rgba(255, 255, 255, 0.06);
+}
+
 /* ─── Mobile width optimisation ─── */
 #rulesthumbContainer .module-container {
   padding-left: 8px;
   padding-right: 8px;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 560px) {
   #rulesthumbContainer .module-container {
     padding-left: var(--content-padding-x);
     padding-right: var(--content-padding-x);
@@ -127,12 +145,12 @@
 
 /* ─── Warning banner ─── */
 .rt-warning {
-  background: var(--color-danger-light, rgba(205,32,44,0.08));
-  border: 1px solid var(--color-danger, #cd202c);
-  border-radius: 8px;
+  background: var(--rt-danger-light);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--border-radius-sm);
   padding: 10px 14px;
-  font-size: 0.8rem;
-  color: var(--color-danger, #cd202c);
+  font-size: var(--font-xs);
+  color: var(--color-danger);
   text-align: center;
   margin-bottom: 20px;
   letter-spacing: 0.3px;
@@ -142,9 +160,9 @@
 .rt-attribution {
   text-align: center;
   padding: 20px 0 8px;
-  font-size: 0.72rem;
-  color: var(--color-text-muted, #6b7280);
-  border-top: 1px solid var(--color-border, #e5e7eb);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
   margin-top: 24px;
 }
 
@@ -171,9 +189,9 @@
 }
 
 .rt-accordion-title {
-  font-size: 0.95rem;
+  font-size: var(--font-sm);
   font-weight: 700;
-  color: var(--color-text-main, #111827);
+  color: var(--color-text-main);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   flex: 1;
@@ -182,8 +200,8 @@
 
 .rt-accordion-subtitle {
   font-weight: 400;
-  font-size: 0.82rem;
-  color: var(--color-text-muted, #6b7280);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
   text-transform: none;
 }
 
@@ -191,8 +209,8 @@
   flex-shrink: 0;
   width: 20px;
   height: 20px;
-  color: var(--color-text-muted, #6b7280);
-  transition: transform 0.25s ease;
+  color: var(--color-text-muted);
+  transition: transform 0.25s var(--transition-ease);
 }
 
 .rt-accordion-open .rt-accordion-chevron {
@@ -218,7 +236,7 @@
   gap: 12px;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 560px) {
   .rt-rules-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -234,68 +252,68 @@
 
 .rt-rule-num {
   display: inline-block;
-  background: var(--color-primary, #cd202c);
-  color: var(--color-primary-contrast, #fff);
-  font-size: 0.68rem;
+  background: var(--color-primary);
+  color: var(--rt-primary-contrast);
+  font-size: var(--font-xs);
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: var(--border-radius-xs);
   padding: 2px 7px;
   margin-bottom: 6px;
   letter-spacing: 0.5px;
 }
 
 .rt-rule-title {
-  font-size: 0.88rem;
+  font-size: var(--font-sm);
   font-weight: 600;
-  color: var(--color-text-main, #111827);
+  color: var(--color-text-main);
   margin-bottom: 8px;
 }
 
 .rt-formula {
-  background: var(--color-bg-deep, #f3f4f6);
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-left: 3px solid var(--color-primary, #cd202c);
-  border-radius: 5px;
+  background: var(--rt-bg-deep);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--border-radius-xs);
   padding: 8px 12px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.82rem;
-  color: var(--color-text-secondary, #374151);
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
   margin: 6px 0;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .rt-example {
-  background: var(--color-bg-deep, #f3f4f6);
-  border-radius: 5px;
+  background: var(--rt-bg-deep);
+  border-radius: var(--border-radius-xs);
   padding: 7px 10px;
-  font-size: 0.78rem;
-  color: var(--color-text-muted, #6b7280);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
   margin-top: 6px;
-  border-left: 2px solid var(--color-border, #d1d5db);
+  border-left: 2px solid var(--color-border);
 }
 
 .rt-example strong {
-  color: var(--color-text-secondary, #374151);
+  color: var(--color-text-secondary);
 }
 
 .rt-tip {
-  background: var(--color-success-light, rgba(22,101,52,0.06));
-  border: 1px solid var(--color-success, #166534);
-  border-radius: 5px;
+  background: var(--rt-success-light);
+  border: 1px solid var(--color-success);
+  border-radius: var(--border-radius-xs);
   padding: 7px 12px;
-  font-size: 0.8rem;
-  color: var(--color-success, #166534);
+  font-size: var(--font-xs);
+  color: var(--color-success);
   margin: 6px 0;
 }
 
 .rt-alert {
-  background: var(--color-warning-light, rgba(217,119,6,0.08));
-  border: 1px solid var(--color-warning, #d97706);
-  border-radius: 8px;
+  background: var(--rt-warning-light);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--border-radius-sm);
   padding: 12px 16px;
-  font-size: 0.85rem;
-  color: var(--color-warning, #d97706);
+  font-size: var(--font-sm);
+  color: var(--color-warning);
   margin-top: 12px;
 }
 
@@ -309,17 +327,19 @@
 
 .rt-calc-toggle {
   background: none;
-  border: 1px dashed var(--color-primary, #cd202c);
-  color: var(--color-primary, #cd202c);
-  border-radius: 6px;
+  border: 1px dashed var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-xs);
   padding: 4px 12px;
-  font-size: 0.76rem;
+  font-size: var(--font-xs);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s var(--transition-ease);
 }
 
-.rt-calc-toggle:hover {
-  background: var(--color-primary-light, rgba(205,32,44,0.06));
+@media (hover: hover) {
+  .rt-calc-toggle:hover {
+    background: var(--color-primary-light);
+  }
 }
 
 .rt-calc-body {
@@ -340,35 +360,35 @@
 
 .rt-calc-label {
   flex: 0 0 auto;
-  font-size: 0.78rem;
-  color: var(--color-text-secondary, #374151);
+  font-size: var(--font-xs);
+  color: var(--color-text-secondary);
   min-width: 80px;
 }
 
 .rt-calc-unit {
-  font-size: 0.7rem;
-  color: var(--color-text-muted, #9ca3af);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
 }
 
 .rt-calc-field {
   flex: 1;
   min-width: 0;
   padding: 5px 8px;
-  border: 1px solid var(--color-border, #d1d5db);
-  border-radius: 5px;
-  font-size: 0.82rem;
-  background: var(--color-bg-input, #fff);
-  color: var(--color-text-main, #111827);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-xs);
+  font-size: var(--font-xs);
+  background: var(--color-bg-card);
+  color: var(--color-text-main);
   max-width: 120px;
 }
 
 .rt-calc-btn {
-  background: var(--color-primary, #cd202c);
-  color: var(--color-primary-contrast, #fff);
+  background: var(--color-primary);
+  color: var(--rt-primary-contrast);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius-xs);
   padding: 6px 16px;
-  font-size: 0.78rem;
+  font-size: var(--font-xs);
   font-weight: 600;
   cursor: pointer;
   margin-top: 4px;
@@ -376,7 +396,7 @@
 
 .rt-calc-result {
   margin-top: 8px;
-  font-size: 0.84rem;
+  font-size: var(--font-sm);
 }
 
 .rt-calc-result-row {
@@ -384,52 +404,52 @@
 }
 
 .rt-calc-result-label {
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-muted);
 }
 
 .rt-calc-result-value {
   font-weight: 700;
-  color: var(--color-primary, #cd202c);
+  color: var(--color-primary);
 }
 
 .rt-calc-error {
-  color: var(--color-danger, #cd202c);
-  font-size: 0.78rem;
+  color: var(--color-danger);
+  font-size: var(--font-xs);
 }
 
 /* ─── Mobile font comfort (formulas & calculator) ─── */
-@media (max-width: 599px) {
+@media (max-width: 560px) {
   .rt-formula {
-    font-size: 0.9rem;
+    font-size: var(--font-sm);
     padding: 10px 14px;
   }
   .rt-example {
-    font-size: 0.84rem;
+    font-size: var(--font-sm);
   }
   .rt-calc-toggle {
-    font-size: 0.84rem;
+    font-size: var(--font-sm);
     padding: 6px 14px;
   }
   .rt-calc-label {
-    font-size: 0.85rem;
+    font-size: var(--font-sm);
     min-width: 70px;
   }
   .rt-calc-unit {
-    font-size: 0.78rem;
+    font-size: var(--font-xs);
   }
   .rt-calc-field {
-    font-size: 0.9rem;
+    font-size: var(--font-sm);
     padding: 7px 10px;
   }
   .rt-calc-btn {
-    font-size: 0.85rem;
+    font-size: var(--font-sm);
     padding: 8px 18px;
   }
   .rt-calc-result {
-    font-size: 0.9rem;
+    font-size: var(--font-sm);
   }
   .rt-calc-error {
-    font-size: 0.84rem;
+    font-size: var(--font-sm);
   }
 }
 
@@ -443,7 +463,7 @@
   gap: 12px;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 560px) {
   .rt-tips-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -458,10 +478,10 @@
 }
 
 .rt-tip-card-title {
-  font-size: 0.9rem;
+  font-size: var(--font-sm);
   font-weight: 700;
-  color: var(--color-warning, #d97706);
-  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  color: var(--color-warning);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 8px;
   margin-bottom: 10px;
   letter-spacing: 0.3px;
@@ -470,9 +490,9 @@
 .rt-tip-row {
   display: flex;
   gap: 10px;
-  font-size: 0.78rem;
+  font-size: var(--font-xs);
   padding: 4px 0;
-  border-bottom: 1px solid var(--color-border-light, rgba(0,0,0,0.04));
+  border-bottom: 1px solid var(--rt-border-light);
 }
 
 .rt-tip-row:last-child {
@@ -480,14 +500,14 @@
 }
 
 .rt-tip-label {
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-muted);
   flex: 0 0 120px;
   font-style: italic;
-  font-size: 0.76rem;
+  font-size: var(--font-xs);
 }
 
 .rt-tip-value {
-  color: var(--color-text-secondary, #374151);
+  color: var(--color-text-secondary);
   flex: 1;
   white-space: pre-line;
 }
@@ -501,9 +521,9 @@
 }
 
 .rt-table-title {
-  font-size: 0.8rem;
+  font-size: var(--font-xs);
   font-weight: 600;
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-muted);
   margin-bottom: 6px;
   font-style: italic;
 }
@@ -511,35 +531,35 @@
 .rt-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: var(--font-xs);
 }
 
 .rt-table th {
-  background: var(--color-bg-deep, #f3f4f6);
-  color: var(--color-text-secondary, #374151);
+  background: var(--rt-bg-deep);
+  color: var(--color-text-secondary);
   padding: 7px 10px;
   text-align: left;
   font-weight: 600;
-  font-size: 0.76rem;
+  font-size: var(--font-xs);
 }
 
 .rt-table td {
   padding: 6px 10px;
-  border-bottom: 1px solid var(--color-border-light, rgba(0,0,0,0.06));
-  color: var(--color-text-secondary, #374151);
+  border-bottom: 1px solid var(--rt-border-light);
+  color: var(--color-text-secondary);
 }
 
 .rt-table tr:nth-child(even) td {
-  background: var(--color-bg-deep, #f9fafb);
+  background: var(--rt-bg-deep);
 }
 
 /* ─── Checklist inside tip cards ─── */
 .rt-checklist-list {
   margin: 8px 0 0 20px;
   padding: 0;
-  font-size: 0.82rem;
+  font-size: var(--font-xs);
   line-height: 1.8;
-  color: var(--color-text-secondary, #374151);
+  color: var(--color-text-secondary);
 }
 
 /* ═══════════════════════════════════════════
@@ -547,7 +567,7 @@
    ═══════════════════════════════════════════ */
 
 body.dark-theme .rt-warning {
-  background: rgba(205,32,44,0.15);
+  background: var(--color-primary-light);
 }
 
 body.dark-theme .rt-accordion-item {
@@ -560,44 +580,46 @@ body.dark-theme .rt-rule-card {
 }
 
 body.dark-theme .rt-formula {
-  background: rgba(0,0,0,0.3);
+  background: var(--rt-bg-deep);
   border-color: rgba(255,255,255,0.1);
-  color: var(--color-text-main, #e8e8e8);
+  color: var(--color-text-main);
 }
 
 body.dark-theme .rt-example {
   background: rgba(0,0,0,0.2);
   border-color: rgba(255,255,255,0.08);
-  color: var(--color-text-secondary, #aaaaaa);
+  color: var(--color-text-secondary);
 }
 
 body.dark-theme .rt-tip {
-  background: rgba(22,101,52,0.12);
-  color: var(--color-success, #4ade80);
+  background: var(--rt-success-light);
+  color: var(--color-success);
 }
 
 body.dark-theme .rt-alert {
-  background: rgba(217,119,6,0.12);
-  color: var(--color-warning, #fbbf24);
+  background: var(--rt-warning-light);
+  color: var(--color-warning);
 }
 
 body.dark-theme .rt-calc-toggle {
-  border-color: var(--color-primary, #ef4444);
-  color: var(--color-primary, #ef4444);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
-body.dark-theme .rt-calc-toggle:hover {
-  background: rgba(205,32,44,0.12);
+@media (hover: hover) {
+  body.dark-theme .rt-calc-toggle:hover {
+    background: var(--color-primary-light);
+  }
 }
 
 body.dark-theme .rt-calc-field {
-  background: rgba(0,0,0,0.3);
+  background: var(--rt-bg-deep);
   border-color: rgba(255,255,255,0.15);
-  color: var(--color-text-main, #f3f4f6);
+  color: var(--color-text-main);
 }
 
 body.dark-theme .rt-calc-result-value {
-  color: var(--color-primary, #f87171);
+  color: var(--color-primary);
 }
 
 body.dark-theme .rt-tip-card {
@@ -607,7 +629,7 @@ body.dark-theme .rt-tip-card {
 
 body.dark-theme .rt-tip-card-title {
   border-color: rgba(255,255,255,0.1);
-  color: var(--color-warning, #fbbf24);
+  color: var(--color-warning);
 }
 
 body.dark-theme .rt-tip-row {
@@ -616,12 +638,12 @@ body.dark-theme .rt-tip-row {
 
 body.dark-theme .rt-table th {
   background: rgba(255,255,255,0.06);
-  color: var(--color-text-main, #e8e8e8);
+  color: var(--color-text-main);
 }
 
 body.dark-theme .rt-table td {
   border-color: rgba(255,255,255,0.06);
-  color: var(--color-text-main, #e8e8e8);
+  color: var(--color-text-main);
 }
 
 body.dark-theme .rt-table tr:nth-child(even) td {
@@ -633,16 +655,16 @@ body.dark-theme .rt-attribution {
 }
 
 body.dark-theme .rt-checklist-list {
-  color: var(--color-text-main, #e8e8e8);
+  color: var(--color-text-main);
 }
 
 body.dark-theme .rt-search-input {
-  background: rgba(0,0,0,0.3);
+  background: var(--rt-bg-deep);
   border-color: rgba(255,255,255,0.15);
-  color: var(--color-text-main, #f3f4f6);
+  color: var(--color-text-main);
 }
 
 body.dark-theme .rt-search-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(205,32,44,0.2);
+  box-shadow: 0 0 0 3px var(--color-primary-ghost);
 }

@@ -206,7 +206,7 @@ body.dark-theme #phonebookContainer {
 .pb-phone-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 10px;
+  font-size: var(--font-xs);
   font-weight: 600;
   letter-spacing: 0.03em;
   padding: 1px 6px;
@@ -229,10 +229,10 @@ body.dark-theme #phonebookContainer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px;
-  min-height: 36px;
-  width: 36px;
-  height: 36px;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-sm);
@@ -303,10 +303,10 @@ body.dark-theme #phonebookContainer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 36px;
-  min-height: 36px;
-  width: 36px;
-  height: 36px;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-sm);
@@ -359,4 +359,19 @@ body.dark-theme #phonebookContainer {
   font-size: var(--font-sm);
   color: var(--color-text-muted);
   margin: 0;
+}
+
+/* ─── Адаптивность: узкие экраны (≤560px) ─── */
+/* Строки телефонов/почты — full-width с минимальным padding.
+   Аватар и имя/должность остаются с нормальным padding карточки (14px).
+   Строки внутри .pb-card-info (правее аватара на 42+12=54px) —
+   negative margin компенсирует avatar+gap слева и card-padding справа. */
+@media (max-width: 560px) {
+  .pb-phones,
+  .pb-email-row {
+    margin-left: calc(-1 * (42px + 12px));  /* -54px: avatar + gap → левый край карточки */
+    margin-right: -14px;                      /* правый край карточки */
+    padding-left: 4px;
+    padding-right: 4px;
+  }
 }

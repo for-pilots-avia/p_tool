@@ -76,17 +76,20 @@
   --font-accent: 'Caveat', Georgia, cursive;
   --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
 
-  /* Font sizes */
-  --font-xs: 0.75rem;                        /* 12px  бейджи, лейблы          */
-  --font-sm: 0.875rem;                       /* 14px  вторичный текст          */
-  --font-base: 1rem;                         /* 16px  основной текст           */
-  --font-md: 1.125rem;                       /* 18px  меню, заголовки карточек */
-  --font-lg: 1.25rem;                        /* 20px  подзаголовки экранов     */
-  --font-xl: 1.5rem;                         /* 24px  заголовки секций         */
-  --font-hero: clamp(1.75rem, 5vw, 2.75rem); /* 28–44px главная цитата         */
+  /* Font sizes — шкала v2.8 (SHELL_CONTRACT §4) */
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-base: 1rem;
+  --font-md: 1.125rem;
+  --font-lg: 1.25rem;
+  --font-xl: 1.5rem;
+  --font-hero: clamp(1.75rem, 5vw, 2.75rem);
 
   /* Content padding */
   --content-padding-x: 16px;
+
+  /* Accordion nesting indent (MODULE_CONTRACT §7, SHELL_CONTRACT §4) */
+  --accordion-indent: 12px;
 }
 
 /* ─── DARK THEME ─── */
@@ -130,6 +133,12 @@ body.dark-theme {
   :root {
     --header-height: var(--header-height-desktop);
     --content-padding-x: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --accordion-indent: 8px;
   }
 }
 
@@ -915,6 +924,13 @@ body.dark-theme #notesQuickBtn {
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+/* ─── Shared accordion utilities (MODULE_CONTRACT §7, SHELL_CONTRACT §5 Блок В) ─── */
+.collapsible-title {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 /* ─── Module container ─── */
