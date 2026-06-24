@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v42 */
+/* Pilot's Tool — Service Worker v43 */
 
-var CACHE_NAME = 'pilots-tool-v42';
+var CACHE_NAME = 'pilots-tool-v43';
 
 var JSON_MODULE_NAMES = { 
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
@@ -8,7 +8,7 @@ var JSON_MODULE_NAMES = {
   'modules/faq/data/faq.json':                            'FAQ',
   'modules/checklists/data/checklists.json':              'Чеклисты',
   'modules/krs/data/krs.json':                            'Указания КРС',
-  'modules/krs/data/metbriefing.json':                    'Метеобрифинг',
+  'modules/metbriefing/data/metbriefing.json':             'Метеобрифинг',
   'modules/rulesthumb/data/rules.json':                    'Rules of Thumb',
   'modules/flightprocedures/data/flightprocedures.json':   'Лётные процедуры',
   'modules/survey/data/survey.json':                       'Контрольный опрос',
@@ -75,6 +75,7 @@ var STATIC_ASSETS = [
   // JSON данных
   './modules/checklists/data/checklists.json',
   './modules/krs/data/krs.json',
+  './modules/metbriefing/data/metbriefing.json',
   './modules/flightprocedures/data/flightprocedures.json',
   './modules/rulesthumb/data/rules.json',
   './modules/survey/data/survey.json',
