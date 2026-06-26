@@ -61,8 +61,8 @@
 }
 
 .divider-list-chevron svg {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 }
 
 .divider-list-toggle.is-open .divider-list-chevron {
@@ -127,6 +127,17 @@
   order: 0;
 }
 
+/* ─── .list-divider-body — контейнер полей под Smart Divider label ───
+   ФИЧА 9 (расширение v4.9.1): layout:"divider" без children, но с полями
+   (ITEMS/DOC/REF/IMAGE/...) рендерит label + body.
+   Без полей — только label (старое поведение ФИЧИ 9). */
+.list-divider-body {
+  padding: 0 var(--content-padding-x) 12px;
+}
+.list-divider-body > .items-block:first-child {
+  margin-top: 0;
+}
+
 /* ─── Badges (унифицированная палитра 5 цветов) ───
    success   → синий     #17a2b8
    normal    → зелёный   #28a745
@@ -180,7 +191,7 @@
    Текстовый блок с форматированием (\n, <b>, <i>, {{badge:}}, {{link:}}). */
 .items-block {
   margin: 10px 0;
-  padding: 10px 14px;
+  padding: 10px 8px;
   border-radius: var(--border-radius-sm);
   border-left: 3px solid transparent;
   font-size: var(--font-sm);
@@ -215,6 +226,9 @@
   margin-bottom: 6px;
   padding-bottom: 4px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 .items-block--success   .items-block-title { color: var(--color-info); }
 .items-block--normal    .items-block-title { color: var(--color-success); }
@@ -230,6 +244,7 @@ body.dark-theme .items-block-title {
   color: var(--color-text-secondary);
   word-break: break-word;
   overflow-wrap: break-word;
+  hyphens: auto;
 }
 .items-block-content b,
 .items-block-content strong {
@@ -352,12 +367,16 @@ body.dark-theme .ffstraining-search-input {
   color: var(--color-text-main);
   line-height: 1.4;
   margin-bottom: 2px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .ffstraining-card-ref {
   font-family: var(--font-mono);
   font-size: var(--font-xs);
   color: var(--color-text-muted);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .ffstraining-card-meta {
@@ -453,7 +472,7 @@ body.dark-theme .ffstraining-search-input {
 }
 
 .ffstraining-card-content {
-  padding: 0 16px 16px;
+  padding: 0 8px 16px;
   border-top: 1px solid var(--color-border-subtle);
 }
 
@@ -464,6 +483,9 @@ body.dark-theme .ffstraining-search-input {
   line-height: 1.6;
   padding-top: 14px;
   margin-bottom: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 /* ─── Image Gallery (PhotoSwipe by contract) ─── */
@@ -527,7 +549,7 @@ body.dark-theme .ffstraining-search-input {
 
 /* ─── Text Block (без аккордеона, layout: "text") ─── */
 .ffstraining-text-block {
-  padding: 12px 0;
+  padding: 0;
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
@@ -541,14 +563,14 @@ body.dark-theme .ffstraining-search-input {
   color: var(--color-text-main);
   margin-bottom: 6px;
   line-height: 1.4;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
-.ffstraining-text-block-desc {
-  font-size: var(--font-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  margin-bottom: 10px;
-}
+/* .ffstraining-text-block-desc — УДАЛЕНО (v4.9.4): класс никогда не
+   рендерится в DOM (renderTextBlock не выводит text-block-desc). Защита
+   от переполнения применяется к items-block-content (уже есть) и
+   items-block-title (добавлено выше). */
 
 /* ─── Inline HTML Table (tableHtml) ─── */
 .ffstraining-table-inline {
@@ -686,7 +708,7 @@ body.dark-theme .ffstraining-search-input {
   background: rgba(255, 193, 7, 0.06);
   border: 1px solid rgba(255, 193, 7, 0.15);
   border-radius: var(--border-radius-sm);
-  padding: 12px 14px;
+  padding: 12px 8px;
   margin-bottom: 16px;
 }
 
@@ -712,6 +734,8 @@ body.dark-theme .ffstraining-search-input {
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
   line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ─── Completion Criteria ─── */
@@ -741,6 +765,8 @@ body.dark-theme .ffstraining-search-input {
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
   line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ═══════════════════════════════════════════
@@ -1040,6 +1066,18 @@ body.dark-theme .ffstraining-search-input {
   vertical-align: top;
 }
 
+/* v4.9.7 (B1): td only — word-wrap + hyphens для длинных слов в ячейках.
+   th намеренно НЕ затронут: заголовки должны оставаться в одну строку. */
+[data-block="table"] td,
+[data-block="table-file"] td,
+.ffstraining-table-inline td,
+.ffstraining-table-file td,
+.ffstraining-table-wrap td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
 [data-block="table"] th,
 [data-block="table-file"] th,
 .ffstraining-table-inline th,
@@ -1328,29 +1366,13 @@ body.dark-theme .ffstraining-search-input {
   order: 10;
 }
 
-/* Depth-based styling for nested cards
-   ─── ANTI-MATRYOSHKA ───
-   Вложенные карты (depth>=2) получают negative horizontal margin,
-   равный padding родительского .card-content (16px), чтобы «съесть»
-   родительский отступ. Свой .card-content получает padding:0 по
-   горизонтали. Результат: ширина контента одинакова на любой глубине.
-   Визуальная вложенность — через left border (solid/dashed). */
-.ffstraining-card[data-depth="2"] {
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  margin-left: -16px;
-  margin-right: -16px;
-}
-
-.ffstraining-card[data-depth="2"] .ffstraining-card-header {
-  padding: 10px 16px;
-  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
-}
-
-body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
-}
-
+/* ═══════════════════════════════════════════════════════════════
+   Depth-based TYPOGRAPHY (font-size / font-weight)
+   ═══════════════════════════════════════════════════════════════
+   Шрифт зависит ТОЛЬКО от data-depth (глубины вложенности).
+   Chrome (border, background, header padding) — на .ffs-card--{marker}.
+   Это разделяет оформление и типографику: GROUP/CARD/CHILD всегда
+   выглядят одинаково (chrome), но размер шрифта уменьшается с глубиной. */
 .ffstraining-card[data-depth="2"] .ffstraining-card-title {
   font-size: var(--font-sm);
   font-weight: 600;
@@ -1359,22 +1381,6 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
 .ffstraining-card[data-depth="2"] .badge {
   padding: 2px 7px;
   font-size: 0.6rem;
-}
-
-.ffstraining-card[data-depth="2"].open > .ffstraining-card-body {
-  max-height: 5000px;
-}
-
-.ffstraining-card[data-depth="3"] {
-  border: 1px dashed var(--color-border);
-  border-radius: var(--border-radius-xs);
-  background: transparent;
-  /* negative margin НЕ нужен: родитель (depth-2 content) уже имеет padding:0 */
-}
-
-.ffstraining-card[data-depth="3"] .ffstraining-card-header {
-  padding: 8px 16px;
-  background: var(--color-bg-hover);
 }
 
 .ffstraining-card[data-depth="3"] .ffstraining-card-title {
@@ -1387,14 +1393,91 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
   font-size: 0.55rem;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Layout-marker CHROME (border / background / header padding)
+   ═══════════════════════════════════════════════════════════════
+   Оформление зависит от маркера TXT (GROUP/CARD/CHILD → layout),
+   НЕ от глубины. Аналог .card--{group|card|child} в HTML.
+   ─── GROUP — контейнер-секция: без рамки, transparent ─── */
+.ffstraining-card--group {
+  border: none;
+  background: transparent;
+}
+
+.ffstraining-card--group .ffstraining-card-header {
+  background: transparent;
+}
+
+/* ─── CARD — карточка: solid рамка, gradient header ─── */
+.ffstraining-card--card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+.ffstraining-card--card .ffstraining-card-header {
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
+}
+
+body.dark-theme .ffstraining-card--card .ffstraining-card-header {
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+}
+
+/* ─── CHILD — вложенная карточка: dashed рамка, hover header ─── */
+.ffstraining-card--child {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-xs);
+  background: transparent;
+}
+
+.ffstraining-card--child .ffstraining-card-header {
+  padding: 8px 16px;
+  background: var(--color-bg-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Open-state HIGHLIGHT (как CARD=Маневры) — GROUP + CHILD
+   ═══════════════════════════════════════════════════════════════
+   При раскрытии GROUP/CHILD получают solid border + bg-fill,
+   как CARD. DIVIDER не трогаем (по требованию). Специфичность
+   (0,3,0) перебивает chrome (0,2,0). */
+.ffstraining-card--group.open {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-sm);
+}
+
+.ffstraining-card--group.open .ffstraining-card-header {
+  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
+}
+
+body.dark-theme .ffstraining-card--group.open .ffstraining-card-header {
+  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
+}
+
+.ffstraining-card--child.open {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANTI-MATRYOSHKA (depth-based, компенсация padding)
+   ═══════════════════════════════════════════════════════════════
+   Вложенные карты (depth>=2) получают negative horizontal margin,
+   равный padding родительского .card-content (8px desktop / 4px narrow),
+   чтобы «съесть» родительский отступ. Свой .card-content получает
+   padding:0 по горизонтали. Результат: ширина контента одинакова на
+   любой глубине. */
+.ffstraining-card[data-depth="2"] {
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+.ffstraining-card[data-depth="2"].open > .ffstraining-card-body,
 .ffstraining-card[data-depth="3"].open > .ffstraining-card-body {
   max-height: 5000px;
 }
 
-/* ─── ANTI-MATRYOSHKA: zero horizontal padding для вложенных card-content ───
-   Родительский .card-content уже дал отступ (16px), вложенная карта
-   «съела» его через negative margin. Свой padding — 0 по горизонтали,
-   иначе суммирование (матрёшка) вернётся. */
 .ffstraining-card[data-depth="2"] > .ffstraining-card-body > .ffstraining-card-content,
 .ffstraining-card[data-depth="3"] > .ffstraining-card-body > .ffstraining-card-content {
   padding-left: 0;
@@ -1416,38 +1499,45 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
    MODULE_CONTRACT §7: контекстные правила на #nameContainer разрешены. */
 @media (max-width: 480px) {
   #ffstrainingContainer .module-container { padding-left: 12px; padding-right: 12px; }
-  /* depth-1 content: базовый отступ 12px */
+  /* depth-1 content: базовый отступ 4px */
   .ffstraining-card[data-depth="1"] > .ffstraining-card-body > .ffstraining-card-content {
-    padding-left: 12px; padding-right: 12px;
+    padding-left: 4px; padding-right: 4px;
   }
-  /* depth-2: negative margin = -12px (компенсирует depth-1 content padding) */
+  /* depth-2: negative margin = -4px (компенсирует depth-1 content padding) */
   .ffstraining-card[data-depth="2"] {
-    margin-left: -12px; margin-right: -12px;
+    margin-left: -4px; margin-right: -4px;
   }
-  .ffstraining-card[data-depth="2"] .ffstraining-card-header { padding: 10px 12px; }
-  .ffstraining-card[data-depth="3"] .ffstraining-card-header { padding: 8px 12px; }
-  .items-block { padding: 8px 10px; }
-  .ffstraining-memory { padding: 10px 10px; }
-  .ffstraining-notes  { padding: 10px 10px; }
+  /* chrome padding по marker (card/child), не по depth */
+  .ffstraining-card--card  .ffstraining-card-header { padding: 10px 4px; }
+  .ffstraining-card--child .ffstraining-card-header { padding: 8px 4px; }
+  .items-block { padding: 8px 4px; }
+  .ffstraining-text-block { padding: 0; }
+  .ffstraining-memory { padding: 10px 4px; }
+  .ffstraining-notes  { padding: 10px 4px; }
   /* Smart Divider + divider-list: синхронно с module-container */
   .divider-list-toggle { padding: 14px 12px 6px; }
   .divider-list-items  { padding: 0 12px; }
   .list-divider        { padding: 18px 12px 6px; }
+  /* Chevron: 16px на узких (desktop = 20px) */
+  .ffstraining-card-chevron { width: 16px; height: 16px; }
+  .divider-list-chevron svg { width: 16px; height: 16px; }
 }
 
 @media (max-width: 380px) {
   #ffstrainingContainer .module-container { padding-left: 10px; padding-right: 10px; }
   .ffstraining-card[data-depth="1"] > .ffstraining-card-body > .ffstraining-card-content {
-    padding-left: 10px; padding-right: 10px;
+    padding-left: 4px; padding-right: 4px;
   }
   .ffstraining-card[data-depth="2"] {
-    margin-left: -10px; margin-right: -10px;
+    margin-left: -4px; margin-right: -4px;
   }
-  .ffstraining-card[data-depth="2"] .ffstraining-card-header { padding: 8px 10px; }
-  .ffstraining-card[data-depth="3"] .ffstraining-card-header { padding: 6px 10px; }
-  .items-block { padding: 6px 8px; }
-  .ffstraining-memory { padding: 8px 8px; }
-  .ffstraining-notes  { padding: 8px 8px; }
+  /* chrome padding по marker (card/child), не по depth */
+  .ffstraining-card--card  .ffstraining-card-header { padding: 8px 4px; }
+  .ffstraining-card--child .ffstraining-card-header { padding: 6px 4px; }
+  .items-block { padding: 6px 4px; }
+  .ffstraining-text-block { padding: 0; }
+  .ffstraining-memory { padding: 8px 4px; }
+  .ffstraining-notes  { padding: 8px 4px; }
   /* Smart Divider + divider-list: синхронно с module-container */
   .divider-list-toggle { padding: 14px 10px 6px; }
   .divider-list-items  { padding: 0 10px; }
@@ -1460,7 +1550,7 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
    включит слоговые переносы для hyphens: auto. */
 @media (max-width: 560px) {
   .ffstraining-card-header {
-    padding: 12px 12px;
+    padding: 12px 4px;
     gap: 8px;
   }
 
@@ -1473,7 +1563,7 @@ body.dark-theme .ffstraining-card[data-depth="2"] .ffstraining-card-header {
 
 @media (max-width: 380px) {
   .ffstraining-card-header {
-    padding: 10px 10px;
+    padding: 10px 4px;
     gap: 6px;
   }
 

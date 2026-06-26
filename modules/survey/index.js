@@ -122,6 +122,22 @@
   /* ═══════════════════════════════════════════
      RENDER: Full Content
      ═══════════════════════════════════════════ */
+  /* ─── Task 47: Language detector for hyphens:auto ───
+     Возвращает 'en' / 'ru' / '' в зависимости от соотношения латиницы и кириллицы.
+     Пустая строка — нейтральный (родительский lang attr побеждает). */
+  function detectLang(text) {
+    if (!text) return '';
+    var latin = (text.match(/[A-Za-z]/g) || []).length;
+    var cyrillic = (text.match(/[\u0410-\u044F]/g) || []).length;
+    if (latin > cyrillic && latin > 0) return 'en';
+    if (cyrillic > 0 && cyrillic >= latin) return 'ru';
+    return '';
+  }
+  function langAttr(text) {
+    var l = detectLang(text);
+    return l ? ' lang="' + l + '"' : '';
+  }
+
   function renderAll() {
     var container = document.getElementById('surveyContainer');
     if (!container || !_data) return;
@@ -135,8 +151,8 @@
     /* ─── Section Tabs (LINE/FFS) — только для v2 ─── */
     if (isV2) {
       html += '<div class="survey-section-tabs">' +
-        '<button class="survey-section-tab' + (_activeSection === 'line' ? ' active' : '') + '" data-survey-section="line">LINE</button>' +
-        '<button class="survey-section-tab' + (_activeSection === 'ffs' ? ' active' : '') + '" data-survey-section="ffs">FFS</button>' +
+        '<button class="survey-section-tab' + (_activeSection === 'line' ? ' active' : '') + '" data-survey-section="line" lang="en">LINE</button>' +
+        '<button class="survey-section-tab' + (_activeSection === 'ffs' ? ' active' : '') + '" data-survey-section="ffs" lang="en">FFS</button>' +
       '</div>';
     }
 
@@ -225,7 +241,7 @@
       html += '<div class="survey-category-header" data-cat-toggle="' + cat.id + '" role="button" tabindex="0" aria-expanded="' + effectiveExpanded + '">' +
         '<span class="survey-category-icon">' + icon(cat.icon || 'checklist', 20) + '</span>' +
         '<div class="survey-category-info">' +
-          '<div class="survey-category-title">' + cat.title + '</div>' +
+          '<div class="survey-category-title"' + langAttr(cat.title) + '>' + cat.title + '</div>' +
           '<div class="survey-category-meta">' + prog.done + '/' + prog.total + ' \u043E\u0442\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043E' + (prog.pct === 100 ? ' \u2713' : '') + '</div>' +
         '</div>' +
         '<div class="survey-category-progress">' +
@@ -249,7 +265,7 @@
           '<span class="survey-question-checkbox" data-q-check="' + fqItem.id + '" role="checkbox" aria-checked="' + isMastered + '" aria-label="\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u043E\u0442\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u043E\u0435">' +
             icon('check-square', 14) +
           '</span>' +
-          '<span class="survey-question-text">' + fqItem.q + '</span>' +
+          '<span class="survey-question-text"' + langAttr(fqItem.q) + '>' + fqItem.q + '</span>' +
           '<span class="survey-question-toggle">' + icon('chevron-down', 18) + '</span>' +
         '</div>';
 
@@ -260,9 +276,9 @@
 
         /* Answer */
         html += '<div class="survey-answer">' +
-          '<div class="survey-answer-text">' + fqItem.a + '</div>' +
+          '<div class="survey-answer-text"' + langAttr(fqItem.a) + '>' + fqItem.a + '</div>' +
           (fqItem.img ? '<img class="survey-answer-img" src="modules/survey/data/' + fqItem.img + '" data-full-src="modules/survey/data/' + fqItem.img + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">' : '') +
-          (fqItem.ref ? '<div class="survey-answer-ref">' + fqItem.ref + '</div>' : '') +
+          (fqItem.ref ? '<div class="survey-answer-ref"' + langAttr(fqItem.ref) + '>' + fqItem.ref + '</div>' : '') +
         '</div>';
 
         html += '</div>';

@@ -2287,9 +2287,9 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 
 /* ── Responsive Tweaks ── */
-/* Task 21: на узком экране (<640px) ЗАПАСНЫЕ переносится на новую строку,
+/* Task 21/50: на узком экране (≤560px по контракту §7 v4.7) ЗАПАСНЫЕ переносится на новую строку,
    DEP+ARR остаются в одной строке, растянутые по ширине (flex:1) */
-@media (max-width: 639px) {
+@media (max-width: 560px) {
   .metbriefing-route-inputs {
     flex-wrap: wrap;
   }
@@ -2297,8 +2297,22 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
     flex-basis: 100%;
     margin-top: 8px;
   }
+
+  /* Task 49: компактные select на мобильном (консистентность с checkride Task 48) */
+  .metbriefing-wind-controls {
+    padding: 0 0 6px;
+    gap: 6px;
+  }
+  .metbriefing-wind-label {
+    font-size: var(--font-sm);
+  }
+  .metbriefing-wind-select {
+    padding: 6px 26px 6px 8px;
+    min-width: 80px;
+    background-position: right 8px center;
+  }
 }
-@media (max-width: 412px) {
+@media (max-width: 380px) {
   /* .metbriefing-route-inputs БОЛЬШЕ НЕ переходит в column —
      DEP+ARR (flex:1) помещаются в одну строку на 320px экране */
   .metbriefing-route-extra {
@@ -2318,6 +2332,22 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   }
   .metbriefing-inline-field {
     font-size: var(--font-xs);
+  }
+
+  /* Task 49: ещё компактнее на очень узких */
+  .metbriefing-wind-controls {
+    padding: 0 0 4px;
+    gap: 4px;
+  }
+  .metbriefing-wind-label {
+    font-size: var(--font-xs);
+  }
+  .metbriefing-wind-select {
+    padding: 5px 22px 5px 6px;
+    min-width: 68px;
+    font-size: var(--font-xs);
+    background-position: right 6px center;
+    background-size: 10px;
   }
 }
 
@@ -2567,7 +2597,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   overflow: hidden;
   display: none;
 }
-@media (max-width: 639px) {
+@media (max-width: 560px) {
   .metbriefing-sigmet-row-break {
     display: block;
   }
@@ -2681,4 +2711,94 @@ body.dark-theme .metbriefing-sigmet-fir-select {
 }
 body.dark-theme .metbriefing-sigmet-raw {
   background: rgba(0,0,0,0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Task 45 — Long-word protection для всех контейнеров с динамическим контентом
+   overflow-wrap: break-word; word-break: break-word; hyphens: auto;
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Естественно-языковые контейнеры (Russian текст, имена аэропортов, NOTAM, SIGMET) */
+.metbriefing-input-hint,
+.metbriefing-route-alt,
+.metbriefing-inline-weather-name,
+.metbriefing-inline-weather-station,
+.metbriefing-wx-card-station,
+.metbriefing-wx-card-name,
+.metbriefing-readiness-issues li,
+.metbriefing-sigmet-route-firs,
+.metbriefing-sigmet-hazard-label,
+.metbriefing-inline-notam-name,
+.metbriefing-inline-notam-message,
+.metbriefing-inline-notam-item-subject,
+.metbriefing-notam-group-name,
+.metbriefing-notam-card-subject,
+.metbriefing-notam-card-description,
+.metbriefing-notam-card-description p,
+.metbriefing-wx-map-label {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Flex-дети — min-width: 0 позволяет сжиматься ниже самого длинного слова */
+.metbriefing-input-hint {
+  min-width: 0;
+}
+
+.metbriefing-inline-clouds > span {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.metbriefing-inline-error > span,
+.metbriefing-wx-card-error > span {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* ⚠️ CRITICAL: убираем опасный white-space: nowrap на контейнерах с динамическим русским текстом */
+.metbriefing-sigmet-card-fir {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.metbriefing-readiness-warning-label {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* ⚠️ CRITICAL: .metbriefing-sigmet-raw имеет word-break: normal, но НЕ было overflow-wrap
+   — длинные токены координат типа "5520N03530E" переполняли контейнер по горизонтали */
+.metbriefing-sigmet-raw {
+  overflow-wrap: break-word;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Task 49 — Compact mobile styles для .metbriefing-sigmet-fir-select
+   ВНИМАНИЕ: размещено ПОСЛЕ base-стиля (L2513), т.к. base имеет ту же
+   специфичность (.class) и идёт позже @media блоков L2292/L2319 — без этого
+   compact-правила проигрывали бы base-стилю (padding 8px 30px 8px 10px).
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+  .metbriefing-sigmet-fir-select {
+    padding: 6px 26px 6px 8px;
+    background-position: right 8px center;
+  }
+}
+@media (max-width: 380px) {
+  .metbriefing-sigmet-fir-select {
+    padding: 5px 22px 5px 6px;
+    font-size: var(--font-xs);
+    background-position: right 6px center;
+    background-size: 10px;
+  }
 }

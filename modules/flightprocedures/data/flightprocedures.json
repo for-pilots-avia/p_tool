@@ -5,13 +5,20 @@
     "layout": "divider",
     "children": [
       {
+        "id": "fp-sep-general",
+        "title": "General",
+        "layout": "divider"
+      },
+      {
         "id": "fp-group-maydayorpanpan",
         "title": "MAYDAY or PANPAN",
+        "layout": "group",
         "children": [
           {
             "id": "fp-001",
             "title": "PAN PAN",
             "refCode": "SOP-and-AOMA",
+            "layout": "card",
             "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
             "documents": [
               {
@@ -34,11 +41,381 @@
             "id": "fp-002",
             "title": "MAY DAY",
             "refCode": "SOP-and-AOMA",
+            "layout": "card",
             "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
             "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
             "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
             "references": [
               "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-evacuaiton",
+        "title": "EVACUATION",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-003",
+            "title": "Evacuation",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff стр. 12",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-004",
+            "title": "Controlled diembarcarion",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-sep-procedures",
+        "title": "Procedures",
+        "layout": "divider"
+      },
+      {
+        "id": "fp-group-reject",
+        "title": "REJECTED Take Off",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-005",
+            "title": "РПП ч.А",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff стр. 12",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-006",
+            "title": "prior to 80 kts",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ],
+        "{{items:normal}}": "<b>PF: Call \"REJECT\" (\"REJECT, I HAVE CONTROL\")</b>\nIf a malfunction occurs before V1, for which the Captain does not intend to reject the takeoff, he will announce his intention by calling \"GO\". If the decision is to reject the takeoff, the Captain must clearly announce \"REJECT\"."
+      },
+      {
+        "id": "fp-group-engout",
+        "title": "ENG out takeoff",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-007",
+            "title": "Rotation:",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff стр. 12",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-008",
+            "title": "400 ft",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-radiocom",
+        "title": "Radiocommunication failure",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-009",
+            "title": "РПП:",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff стр. 12",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-010",
+            "title": "ICAO",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-driftdown",
+        "title": "ENG out driftdown",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-011",
+            "title": "SOP",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff стр. 12",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-012",
+            "title": "FCTM",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          },
+          {
+            "id": "fp-013",
+            "title": "Loss of Thrust on Both Engines",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-emdescent",
+        "title": "Emergency descent / RAPID DECOMPRESSION",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-014",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff стр. 12",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-015",
+            "title": "ICAO",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+          },
+          {
+            "id": "fp-016",
+            "title": "Differenceses",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
+            "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
+            "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-unrul",
+        "title": "Угроза захвата ВС / Недисциплинированный пассажир",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-017",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-medical",
+        "title": "Medical Emergency",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-018",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "children": [
+              {
+                "id": "fp-018a",
+                "title": "Взлёт с ограниченной ВПП",
+                "refCode": "SOP-TO-SHORT",
+                "layout": "child",
+                "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
+                "{{items:abnormal}}": "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-lost",
+        "title": "Потеря местоположения",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-019",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
+            "{{items:abnormal}}": "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp",
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-group-intercept",
+        "title": "Перехват ВС",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-020",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
             ]
           }
         ]
@@ -48,16 +425,110 @@
   {
     "id": "fp-sep-predeparture",
     "title": "2. Pre-departure preparations.",
-    "layout": "divider"
+    "layout": "divider",
+    "children": [
+      {
+        "id": "fp-group-predeparture",
+        "title": "РПП",
+        "refCode": "Предполетная подготовка",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-021",
+            "title": "РПП 1",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
+            "documents": [
+              {
+                "title": "SOP — AOMB стр. 1",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-022",
+        "title": "CPT: ОБЯЗАННОСТИ И ОТВЕТСТВЕННОСТЬ ЧЛЕНОВ ЭКИПАЖА ВС",
+        "refCode": "SOP-and-AOMA",
+        "layout": "card",
+        "children": [
+          {
+            "id": "fp-022a",
+            "title": "Заданиена полет",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
+            "{{items:abnormal}}": "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp",
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA стр. 1",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b",
+            "title": "Личные документы",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA стр. 1",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-023",
+        "title": "FO: ОБЯЗАННОСТИ И ОТВЕТСТВЕННОСТЬ ЧЛЕНОВ ЭКИПАЖА ВС",
+        "refCode": "SOP-and-AOMA",
+        "layout": "card",
+        "children": [
+          {
+            "id": "fp-023a",
+            "title": "DDL",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          },
+          {
+            "id": "fp-023b",
+            "title": "Метео и Навигация",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "fp-group-normal",
     "title": "Взлёт и заход",
+    "layout": "group",
     "children": [
       {
         "id": "fp-0010",
         "title": "Стандартный взлёт",
         "refCode": "SOP-TO-STD",
+        "layout": "card",
         "{{items:normal}}": "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС.",
         "images": [
           {
@@ -96,6 +567,7 @@
             "id": "fp-001a",
             "title": "Взлёт с ограниченной ВПП",
             "refCode": "SOP-TO-SHORT",
+            "layout": "child",
             "{{items:normal}}": "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей.",
             "{{items:abnormal}}": "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp",
             "references": [
@@ -106,6 +578,7 @@
             "id": "fp-0010b",
             "title": "Взлёт в условиях сдвига ветра",
             "refCode": "SOP-TO-WS",
+            "layout": "child",
             "{{items:normal}}": "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности.",
             "{{items:emergency:Memory items}}": "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA",
             "{{items:abnormal}}": "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт",
@@ -119,6 +592,7 @@
         "id": "fp-0020",
         "title": "Заход на посадку по ILS",
         "refCode": "SOP-APP-ILS",
+        "layout": "card",
         "{{items:normal}}": "Стандартная процедура точного захода на посадку по ILS Category I. {{badge:normal}}",
         "{{items:abnormal}}": "Получить ATIS и подтвердить тип захода (ILS)\nУстановить частоту ILS и курс на MCP, подтвердить идентификатор морзянкой\nВыполнить Approach Briefing: runway, DH, missed approach procedure",
         "documents": [
@@ -138,6 +612,7 @@
     "id": "fp-maneuvers",
     "title": "Маневры",
     "refCode": "MANEUVERS",
+    "layout": "card",
     "{{items:normal}}": "Процедуры выполнения маневров — Stall Recovery. {{badge:abnormal:Внимание}} Срыв может произойти при <b>любом</b> угле атаки и любой скорости.",
     "tableFile": "modules/flightprocedures/data/maneuvers_stall.html",
     "references": [
@@ -156,9 +631,10 @@
     "layout": "divider",
     "children": [
       {
-        "id": "fp-004",
+        "id": "fp-0040",
         "title": "Отказ двигателя после V1",
         "refCode": "ECAM-ENG-FAIL-AV1",
+        "layout": "card",
         "{{items:normal}}": "Действия экипажа при отказе двигателя на скорости V1 и выше. {{badge:abnormal}} Взлёт продолжается на одном двигателе. См. также: {{link:ffstraining:ffs-001a:Отработка EFATO в FFS}}.",
         "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
         "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1 {{badge:abnormal}}\nPF: удерживать направление по оси ВПП (rudder)\nПри VR: оторвать, установить тангаж +15° (V2 + 10 kt)",
@@ -175,9 +651,10 @@
         ]
       },
       {
-        "id": "fp-008",
+        "id": "fp-0080",
         "title": "Двойной отказ двигателей",
         "refCode": "ECAM-ENG-DUAL-FAIL",
+        "layout": "card",
         "{{items:normal}}": "Отказ обоих двигателей. {{badge:emergency}} Экстренная ситуация. <b>Немедленно</b> выполнить авторотацию (если применимо) или вынужденную посадку.",
         "{{items:emergency:Memory items}}": "Speed — Vseo (best glide)\nMAYDAY — declare emergency",
         "{{items:abnormal}}": "Установить скорость планирования (Vseo)\nВыбрать площадку для вынужденной посадки\nСообщить ATC \"Mayday, Mayday, Mayday\"",

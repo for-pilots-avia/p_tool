@@ -595,3 +595,24 @@ body.dark-theme .survey-dropdown-menu {
   background: var(--color-bg-card);
   border-color: var(--color-border);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Task 45 — Long-word protection для всех контейнеров с динамическим контентом
+   overflow-wrap: break-word; word-break: break-word; hyphens: auto;
+   ═══════════════════════════════════════════════════════════════════ */
+.survey-category-title,
+.survey-category-meta,
+.survey-answer-text,
+.survey-answer-ref {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* .survey-question-text — flex-ребёнок .survey-question-header: min-width: 0 обязателен */
+.survey-question-text {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}

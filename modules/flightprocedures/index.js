@@ -165,7 +165,69 @@
        - остальные теги экранируются
        - HTML-сущности (&amp; &lt; &gt; &nbsp; &quot; &#39;) сохраняются
        - затем применяются бейджи и ссылки
+       - наконец, EN-слова длиной ≥14 оборачиваются в <span lang="en"> (v4.9.7, A1)
+         чтобы hyphens:auto с lang="ru" на контейнере мог применять EN словарь переноса
   */
+  function wrapLongEnglishWords(html) {
+    // Оборачивает последовательности латинских букв длиной ≥14 в <span lang="en">.
+    // Внимание: работает на уже-HTML строке (после escapeHtml + renderInlineBadges/Links).
+    // Поэтому нужно пропускать содержимое внутри тегов: <... attr="..."> и </tag>.
+    // Подход: проходим по строке, отслеживаем «внутри тега» (между < и >).
+    var out = '';
+    var inTag = false;
+    var i = 0;
+    while (i < html.length) {
+      var ch = html.charAt(i);
+      if (ch === '<') { inTag = true; out += ch; i++; continue; }
+      if (inTag) {
+        out += ch;
+        if (ch === '>') inTag = false;
+        i++;
+        continue;
+      }
+      // вне тега — ищем латинское слово
+      if (/[A-Za-z]/.test(ch)) {
+        var j = i;
+        while (j < html.length && /[A-Za-z]/.test(html.charAt(j))) j++;
+        var word = html.substring(i, j);
+        if (word.length >= 14) {
+          out += '<span lang="en">' + word + '</span>';
+        } else {
+          out += word;
+        }
+        i = j;
+      } else {
+        out += ch;
+        i++;
+      }
+    }
+    return out;
+  }
+
+  /* ─── detectLang(text) + langAttr(text) (v4.9.9, D1 — Вариант A) ───
+     Блочный детектор языка: считает латиницу vs кириллицу.
+     Возвращает "en" / "ru" / "" (пусто = нейтрально/смешанно).
+     langAttr(text): возвращает ' lang="en"' или "" (RU наследует от module-container).
+     Применяется в рендерерах динамического контента для accessibility + hyphens.
+     A1+C1 (пословное wrapLongEnglishWords) остаются как safety net. */
+  function detectLang(text) {
+    if (!text) return '';
+    var s = String(text);
+    var lat = 0, cyr = 0;
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charAt(i);
+      if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) lat++;
+      else if ((ch >= 'А' && ch <= 'я') || ch === 'Ё' || ch === 'ё') cyr++;
+    }
+    if (lat === 0 && cyr === 0) return '';
+    if (lat > cyr) return 'en';
+    if (cyr > lat) return 'ru';
+    return '';
+  }
+
+  function langAttr(text) {
+    return detectLang(text) === 'en' ? ' lang="en"' : '';
+  }
   function renderRichText(text) {
     if (text === null || text === undefined || text === '') return '';
     var s = String(text);
@@ -212,7 +274,7 @@
         i++;
       }
     }
-    return renderInlineLinks(renderInlineBadges(out));
+    return wrapLongEnglishWords(renderInlineLinks(renderInlineBadges(out)));
   }
 
   /* ─── sanitizeHtml(html) ───
@@ -262,7 +324,10 @@
         i++;
       }
     }
-    return out;
+    // C1 (v4.9.8): оборачиваем EN-слова ≥14 символов в <span lang="en">,
+    // чтобы hyphens:auto с lang="ru" на контейнере мог применять EN словарь
+    // переноса к ячейкам таблиц (инлайн b.content + внешние HTML-файлы).
+    return wrapLongEnglishWords(out);
   }
 
   /* ─── Inline link renderer ───
@@ -370,7 +435,7 @@
   /* ─── Конкретные рендереры блоков ─── */
 
   function renderBlockText(b, ctx) {
-    return '<div data-block="text"' + styleAttr(b.style) + '>'
+    return '<div data-block="text"' + styleAttr(b.style) + langAttr(b.content) + '>'
       + renderRichText(b.content)
       + '</div>';
   }
@@ -381,34 +446,34 @@
     if (lvl > 6) lvl = 6;
     var content = b.content || b.title || '';
     return '<div data-block="heading" data-level="' + lvl + '"' + styleAttr(b.style) + '>'
-      + '<h' + lvl + '>' + renderRichText(content) + '</h' + lvl + '>'
+      + '<h' + lvl + langAttr(content) + '>' + renderRichText(content) + '</h' + lvl + '>'
       + '</div>';
   }
 
   function renderBlockProcedure(b, ctx) {
     var html = '<div data-block="procedure"' + styleAttr(b.style) + '>';
-    if (b.action) html += '<span class="block-action">' + renderRichText(b.action) + '</span>';
+    if (b.action) html += '<span class="block-action"' + langAttr(b.action) + '>' + renderRichText(b.action) + '</span>';
     if (b.action && b.result) html += '<span class="block-dots" aria-hidden="true"> … </span>';
-    if (b.result) html += '<span class="block-result">' + renderRichText(b.result) + '</span>';
-    if (b.content) html += ' <span class="block-content">' + renderRichText(b.content) + '</span>';
+    if (b.result) html += '<span class="block-result"' + langAttr(b.result) + '>' + renderRichText(b.result) + '</span>';
+    if (b.content) html += ' <span class="block-content"' + langAttr(b.content) + '>' + renderRichText(b.content) + '</span>';
     html += '</div>';
     return html;
   }
 
   function renderBlockChecklist(b, ctx) {
     var html = '<div data-block="checklist"' + styleOrDefault(b.style, 'success') + '>';
-    if (b.action) html += '<span class="block-action">' + renderRichText(b.action) + '</span>';
+    if (b.action) html += '<span class="block-action"' + langAttr(b.action) + '>' + renderRichText(b.action) + '</span>';
     if (b.action && b.result) html += '<span class="block-dots" aria-hidden="true"> … </span>';
-    if (b.result) html += '<span class="block-result">' + renderRichText(b.result) + '</span>';
-    if (b.content) html += ' <span class="block-content">' + renderRichText(b.content) + '</span>';
+    if (b.result) html += '<span class="block-result"' + langAttr(b.result) + '>' + renderRichText(b.result) + '</span>';
+    if (b.content) html += ' <span class="block-content"' + langAttr(b.content) + '>' + renderRichText(b.content) + '</span>';
     html += '</div>';
     return html;
   }
 
   function renderBlockCallout(b, ctx) {
     var html = '<div data-block="callout"' + styleOrDefault(b.style, 'info') + '>';
-    if (b.label) html += '<span class="block-label">' + renderRichText(b.label) + '</span>';
-    html += '<span class="block-content">' + renderRichText(b.content) + '</span>';
+    if (b.label) html += '<span class="block-label"' + langAttr(b.label) + '>' + renderRichText(b.label) + '</span>';
+    html += '<span class="block-content"' + langAttr(b.content) + '>' + renderRichText(b.content) + '</span>';
     html += '</div>';
     return html;
   }
@@ -444,13 +509,13 @@
   }
 
   function renderBlockVerify(b, ctx) {
-    return '<div data-block="verify"' + styleOrDefault(b.style, 'neutral') + '>'
+    return '<div data-block="verify"' + styleOrDefault(b.style, 'neutral') + langAttr(b.content) + '>'
       + renderRichText(b.content)
       + '</div>';
   }
 
   function renderBlockConditional(b, ctx) {
-    var html = '<div data-block="conditional"' + styleOrDefault(b.style, 'warning') + '>'
+    var html = '<div data-block="conditional"' + styleOrDefault(b.style, 'warning') + langAttr(b.content) + '>'
       + renderRichText(b.content)
       + '</div>';
     var nested = b.blocks || b.children;
@@ -462,13 +527,13 @@
   }
 
   function renderBlockTailMarker(b, ctx) {
-    return '<div data-block="tail-marker"' + styleOrDefault(b.style, 'neutral') + '>'
+    return '<div data-block="tail-marker"' + styleOrDefault(b.style, 'neutral') + langAttr(b.content) + '>'
       + renderRichText(b.content)
       + '</div>';
   }
 
   function renderBlockSubNote(b, ctx) {
-    return '<div data-block="sub-note"' + styleOrDefault(b.style, 'neutral') + '>'
+    return '<div data-block="sub-note"' + styleOrDefault(b.style, 'neutral') + langAttr(b.content) + '>'
       + renderRichText(b.content)
       + '</div>';
   }
@@ -481,7 +546,7 @@
       for (var i = 0; i < b.items.length; i++) {
         var it = b.items[i];
         if (typeof it === 'string') {
-          html += '<li>' + renderRichText(it) + '</li>';
+          html += '<li' + langAttr(it) + '>' + renderRichText(it) + '</li>';
         } else if (it && typeof it === 'object') {
           html += '<li>' + renderBlock(it, ctx) + '</li>';
         }
@@ -528,7 +593,7 @@
     }
     html += '</div>';
     if (b.title) {
-      html += '<div class="block-image-caption">' + renderRichText(b.title) + '</div>';
+      html += '<div class="block-image-caption"' + langAttr(b.title) + '>' + renderRichText(b.title) + '</div>';
     }
     html += '</div>';
     return html;
@@ -570,7 +635,7 @@
   function renderBlockAccordion(b, ctx) {
     var html = '<details data-block="accordion"' + styleAttr(b.style)
       + ' class="' + CSS_PREFIX + '-block-accordion">';
-    html += '<summary>' + renderRichText(b.title) + '</summary>';
+    html += '<summary' + langAttr(b.title) + '>' + renderRichText(b.title) + '</summary>';
     html += '<div class="block-accordion-body">';
     if (b.content) {
       html += renderBlockText({ type: 'text', content: b.content, style: b.style }, ctx);
@@ -587,7 +652,7 @@
     var html = '<section data-block="card"' + styleAttr(b.style)
       + ' class="' + CSS_PREFIX + '-block-card">';
     if (b.title) {
-      html += '<header class="block-card-title">' + renderRichText(b.title) + '</header>';
+      html += '<header class="block-card-title"' + langAttr(b.title) + '>' + renderRichText(b.title) + '</header>';
     }
     html += '<div class="block-card-body">';
     if (b.content) {
@@ -607,7 +672,7 @@
     if (lvl > 6) lvl = 6;
     var html = '<section data-block="sub-section"' + styleAttr(b.style) + '>';
     if (b.title) {
-      html += '<h' + lvl + ' class="block-subsection-title">' + renderRichText(b.title) + '</h' + lvl + '>';
+      html += '<h' + lvl + ' class="block-subsection-title"' + langAttr(b.title) + '>' + renderRichText(b.title) + '</h' + lvl + '>';
     }
     if (b.content) {
       html += renderBlockText({ type: 'text', content: b.content, style: b.style }, ctx);
@@ -635,9 +700,9 @@
     }
     var html = '<div class="items-block items-block--' + palette + '" data-palette="' + palette + '">';
     if (title) {
-      html += '<div class="items-block-title">' + renderRichText(title) + '</div>';
+      html += '<div class="items-block-title"' + langAttr(title) + '>' + renderRichText(title) + '</div>';
     }
-    html += '<div class="items-block-content">' + renderRichText(text) + '</div>';
+    html += '<div class="items-block-content"' + langAttr(text) + '>' + renderRichText(text) + '</div>';
     html += '</div>';
     return html;
   }
@@ -870,12 +935,19 @@
     }
     var hasChildren = item.children && item.children.length > 0;
 
-    var html = '<div class="' + CSS_PREFIX + '-card" data-depth="' + depth + '" data-id="' + escapeAttr(item.id || '') + '">';
+    // Layout-based modifier class (group/card/child) для chrome (border, bg).
+    // Typography (font-size/weight) остаётся на data-depth.
+    var layoutMod = '';
+    if (item.layout === 'group' || item.layout === 'card' || item.layout === 'child') {
+      layoutMod = ' ' + CSS_PREFIX + '-card--' + item.layout;
+    }
+
+    var html = '<div class="' + CSS_PREFIX + '-card' + layoutMod + '" data-depth="' + depth + '" data-id="' + escapeAttr(item.id || '') + '">';
 
     // Card header (accordion toggle) — без badge, только title/refCode/duration
     html += '<div class="' + CSS_PREFIX + '-card-header ' + CSS_PREFIX + '-card-header--no-badge">';
     html += '<div class="' + CSS_PREFIX + '-card-info">';
-    html += '<div class="' + CSS_PREFIX + '-card-title">' + renderRichText(item.title) + '</div>';
+    html += '<div class="' + CSS_PREFIX + '-card-title"' + langAttr(item.title) + '>' + renderRichText(item.title) + '</div>';
 
     // refCode
     if (item.refCode) {
@@ -927,7 +999,7 @@
     var html = '<div class="' + CSS_PREFIX + '-text-block" data-depth="' + depth + '" data-id="' + escapeAttr(item.id || '') + '">';
 
     if (item.title) {
-      html += '<div class="' + CSS_PREFIX + '-text-block-title">' + renderRichText(item.title) + '</div>';
+      html += '<div class="' + CSS_PREFIX + '-text-block-title"' + langAttr(item.title) + '>' + renderRichText(item.title) + '</div>';
     }
 
     // Body: Variant B
@@ -960,9 +1032,19 @@
     // layout: "divider" + без children = неинтерактивный разделитель.
     // Контракт: .list-divider — класс с осознанным дублированием (§7 L437, §5 L419).
     // Вариант A: линия только справа от лейбла.
+    // Если у divider есть поля (ITEMS/DOC/REF/IMAGE/...) — рендерим их под лейбелом
+    // в .list-divider-body (расширение ФИЧИ 9, v4.9.1).
     if (!hasChildren) {
-      return '<div class="list-divider"><span class="list-divider-label">'
+      var labelHtml = '<div class="list-divider"><span class="list-divider-label"' + langAttr(item.title) + '>'
         + renderRichText(item.title || '') + '</span></div>';
+      var bodyHtml = renderItemBody(item, { depth: depth });
+      if (bodyHtml) {
+        return labelHtml
+          + '<div class="list-divider-body" data-depth="' + depth + '">'
+          + bodyHtml
+          + '</div>';
+      }
+      return labelHtml;
     }
 
     var isOpen = item.open === true || (_filter.trim() !== '' && hasChildren);

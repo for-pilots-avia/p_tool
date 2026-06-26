@@ -62,6 +62,11 @@
   var STATION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours for station cache
   var WX_MAP_STALE_MS = 2 * 60 * 60 * 1000; // 2 hours — weather maps stale threshold
   var SIGMET_STALE_MS = 60 * 60 * 1000; // 1 hour — Task 21: было 10 мин, стало 1 час (по запросу пользователя)
+  // Task 41: автообновление METAR (30 мин), TAF (1 час), карт погоды (2 часа).
+  // Интервалы работают в фоне; fetch*Batch сами решают — фетчить ли (по isStale/forceRefresh).
+  var METAR_REFRESH_MS = 30 * 60 * 1000;   // 30 min — автообновление METAR + history
+  var TAF_REFRESH_MS = 60 * 60 * 1000;     // 1 hour — автообновление TAF
+  var WX_MAP_REFRESH_MS = 2 * 60 * 60 * 1000; // 2 часа — автообновление карт погоды (= WX_MAP_STALE_MS)
 
   // ===== API Constants (secrets moved to Worker env — Task 28) =====
   // AVWX_TOKEN, CHECKWX_KEY — теперь живут в Cloudflare Worker env (wrangler secret put),
@@ -270,6 +275,10 @@
     // checklistProgress removed — replaced by Weather Maps block
     tickInterval: null,
     sigmetRefreshInterval: null,   // автообновление SIGMET (как карты погоды)
+    // Task 41: автообновление METAR/TAF/карт
+    metarRefreshInterval: null,    // автообновление METAR + history (каждые METAR_REFRESH_MS = 30 мин)
+    tafRefreshInterval: null,      // автообновление TAF (каждые TAF_REFRESH_MS = 1 час)
+    wxMapRefreshInterval: null,    // автообновление карт погоды (каждые WX_MAP_REFRESH_MS = 2 часа)
     weatherLoaded: false,
     // AVWX data
     avwxStation: {},    // { ICAO: stationInfo }
@@ -1299,6 +1308,8 @@
       state.avwxStationLoading = false;
       saveStationCache();
       renderCurrentTab();
+      // Update route hints now that station names are available (Task 40 P2)
+      updateRouteHints();
     });
   }
 
@@ -1326,6 +1337,15 @@
       })
       .catch(function(err) {
         console.warn('[AM] METAR bulk fetch failed:', err.message);
+        // Task 41 (A6, вариант B): офлайн-фолбэк на устаревший bulk.
+        // Если в памяти есть bulk (даже устаревший >5 мин) — возвращаем его вместо null.
+        // Сценарий: онлайн-сессия → потеря сети → пользователь добавляет новый ICAO →
+        // bulk ещё в памяти, парсинг найдёт METAR для нового ICAO (даже если данные не свежие).
+        // Полностью офлайн после перезагрузки страницы этот фолбэк НЕ покрывает (state сброшен).
+        if (cached) {
+          console.warn('[AM] METAR — fallback to stale bulk (age ' + Math.round((Date.now() - cached.fetchedAt) / 1000) + 's)');
+          return cached.text;
+        }
         return null;
       })
       .then(function(text) {
@@ -1353,6 +1373,11 @@
       })
       .catch(function(err) {
         console.warn('[AM] TAF bulk fetch failed:', err.message);
+        // Task 41 (A6, вариант B): офлайн-фолбэк на устаревший bulk (см. fetchAmMetarBulk).
+        if (cached) {
+          console.warn('[AM] TAF — fallback to stale bulk (age ' + Math.round((Date.now() - cached.fetchedAt) / 1000) + 's)');
+          return cached.text;
+        }
         return null;
       })
       .then(function(text) {
@@ -1422,7 +1447,8 @@
     } else {
       // Skip airports that already have fresh data
       needFetch = icaos.filter(function(icao) {
-        return !state.weatherCache[icao] || !state.weatherCache[icao].metar;
+        var c = state.weatherCache[icao];
+        return !c || !c.metar || isStale(c.cachedAt, STALE_MS);  /* Task 46: проверка stale — иначе кэш никогда не обновляется */
       });
     }
     if (needFetch.length === 0) return Promise.resolve();
@@ -1679,7 +1705,8 @@
     if (!forceRefresh) {
       // Skip airports that already have TAF data in cache
       needFetch = icaos.filter(function(icao) {
-        return !state.weatherCache[icao] || !state.weatherCache[icao].taf;
+        var c = state.weatherCache[icao];
+        return !c || !c.taf || isStale(c.cachedAt, STALE_MS);  /* Task 46: проверка stale — иначе кэш никогда не обновляется */
       });
     }
     if (needFetch.length === 0) return Promise.resolve();
@@ -1845,6 +1872,9 @@
     return fetchMetarBatch([icao], true).then(function() {
       return fetchTafBatch([icao], true);
     }).then(function() {
+      // Task 41: обновляем и историю METAR — иначе ↻ на карточке оставляет историю устаревшей (Task 33 bug).
+      return fetchMetarHistory(icao);
+    }).then(function() {
       state.wxLoading[icao] = false;
       renderCurrentTab();
     }).catch(function() {
@@ -1896,6 +1926,8 @@
       fetchMetarBatch(mainAirports);
       // Fetch TAF batched
       fetchTafBatch(mainAirports);
+      // Fetch METAR history for each route airport (Task 40 P1a)
+      mainAirports.forEach(function(icao) { fetchMetarHistory(icao); });
       // Fetch NOTAM once for route airports
       mainAirports.forEach(function(icao) {
         if (!state.notamCache[icao] && !state.notamLoading[icao]) {
@@ -1913,6 +1945,8 @@
       fetchAvwxStation(allAlt);
       fetchMetarBatch(allAlt);
       fetchTafBatch(allAlt);
+      // Fetch METAR history for each alternate airport (Task 40 P1b)
+      allAlt.forEach(function(icao) { fetchMetarHistory(icao); });
       // Fetch NOTAM once for alternate airports
       allAlt.forEach(function(icao) {
         if (!state.notamCache[icao] && !state.notamLoading[icao]) {
@@ -2450,7 +2484,7 @@
             (rowRight ? rowRight : '') +
           '</div>' +
           (rawText ? '<div class="metbriefing-sigmet-raw-toggle" data-sigmet-raw-toggle="' + idx + '">Исходный текст</div>' +
-            '<div class="metbriefing-sigmet-raw" data-sigmet-raw="' + idx + '">' + rawText.replace(/</g, '&lt;') + '</div>' : '') +
+            '<div class="metbriefing-sigmet-raw" data-sigmet-raw="' + idx + '" lang="en">' + rawText.replace(/</g, '&lt;') + '</div>' : '') +
         '</div>';
       });
       cardsHtml += '</div>';
@@ -2511,7 +2545,7 @@
         }
         // Route SIGMET cards or "not found" message
         if (routeSigmets.length === 0) {
-          var routeEmptyMsg = routeFirIds.length > 0 ? 'SIGMET по маршруту не обнаружены' : 'Добавьте аэропорты для проверки SIGMET';
+          var routeEmptyMsg = routeFirIds.length > 0 ? 'SIGMET по маршруту не обнаружены (AWC: только US/Intl)' : 'Добавьте аэропорты для проверки SIGMET';
           html += '<div class="metbriefing-sigmet-empty metbriefing-sigmet-empty--ok">' + icon('check-circle', 14) + '<span>' + routeEmptyMsg + '</span></div>';
         } else {
           html += renderSigmetCards(routeSigmets, 0);
@@ -2934,12 +2968,12 @@
         if (data) {
           // METAR (always expanded)
           if (data.metar) {
-            html += '<div class="metbriefing-wx-metar-raw"><span class="metbriefing-wx-metar-label">METAR</span><code class="metbriefing-wx-metar-code">' + escapeHtml(data.metar) + '</code></div>';
+            html += '<div class="metbriefing-wx-metar-raw"><span class="metbriefing-wx-metar-label">METAR</span><code class="metbriefing-wx-metar-code" lang="en">' + escapeHtml(data.metar) + '</code></div>';
           }
 
           // TAF (always expanded)
           if (data.taf) {
-            html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code">' + escapeHtml(data.taf) + '</code></div>';
+            html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code" lang="en">' + escapeHtml(data.taf) + '</code></div>';
           }
 
           // METAR History — fetched on demand from AWC proxy (last 2 hours)
@@ -2956,7 +2990,7 @@
                 var catClass = h.flightCat ? ' metbriefing-condition--' + h.flightCat.toLowerCase() : '';
                 html += '<div class="metbriefing-wx-metar-history-item' + catClass + '">';
                 html += '<span class="metbriefing-wx-metar-history-label">' + timeLabel + (h.flightCat ? ' <span class="metbriefing-wx-hist-cat">' + h.flightCat + '</span>' : '') + '</span>';
-                html += '<code class="metbriefing-wx-metar-history-code">' + escapeHtml(h.raw) + '</code>';
+                html += '<code class="metbriefing-wx-metar-history-code" lang="en">' + escapeHtml(h.raw) + '</code>';
                 html += '</div>';
               });
               html += '</div>';
@@ -3621,9 +3655,9 @@
     renderCurrentTab();
     app.showToast('\u0411\u0440\u0438\u0444\u0438\u043D\u0433 \u043E\u0447\u0438\u0449\u0435\u043D');
 
-    // После очистки — НЕ фетчим автоматически. Пользователь нажал «Очистить» — значит хочет чистое
-    // состояние. Свежие данные загрузятся при следующем вводе маршрута, или по кнопке «Брифинг готов»,
-    // или автоматически по таймеру SIGMET (каждые 1 час — Task 21).
+    // После очистки — загружаем свежие карты погоды и ветра по эшелонам (Task 40 P3, вариант B).
+    preloadAllWindMaps(false);
+    fetchAllWxMaps(false);
   }
 
   // Создаёт dropdown-меню в DOM (вызывается один раз при init, persistent)
@@ -3895,7 +3929,7 @@
       preloadAllWindMaps(false);
 
       // Fetch SIGMET data (uses cache if fresh, otherwise fetches from API)
-      fetchSigmetData();
+      fetchSigmetData(true);  /* Task 46: принудительный fetch при init — иначе старый кэш блокирует обновление */
 
       // Fetch missing data for previously entered airports
       var initAirports = getAllRouteAirports();
@@ -3937,6 +3971,41 @@
         fetchSigmetData(false);
       }, SIGMET_STALE_MS);
 
+      // Task 41: автообновление METAR + history (каждые 30 мин).
+      // fetchMetarBatch(icaos, false) сам пропустит свежие данные (по STALE_MS),
+      // фетчит только устаревшие. История METAR тянется заново для всех аэропортов маршрута.
+      if (state.metarRefreshInterval !== null) {
+        clearInterval(state.metarRefreshInterval);
+      }
+      state.metarRefreshInterval = setInterval(function() {
+        var icaos = getAllRouteAirports().concat(state.extraAirports);
+        if (icaos.length === 0) return;
+        fetchMetarBatch(icaos, false);
+        icaos.forEach(function(icao) { fetchMetarHistory(icao); });
+      }, METAR_REFRESH_MS);
+
+      // Task 41: автообновление TAF (каждые 1 час).
+      // fetchTafBatch(icaos, false) сам пропустит свежие данные.
+      if (state.tafRefreshInterval !== null) {
+        clearInterval(state.tafRefreshInterval);
+      }
+      state.tafRefreshInterval = setInterval(function() {
+        var icaos = getAllRouteAirports().concat(state.extraAirports);
+        if (icaos.length === 0) return;
+        fetchTafBatch(icaos, false);
+      }, TAF_REFRESH_MS);
+
+      // Task 41: автообновление карт погоды (каждые 2 часа).
+      // fetchAllWxMaps(false) сам решает по wxMapCache.fetchedAt + WX_MAP_STALE_MS.
+      // Ветровые карты (metavia.ru) НЕ обновляются автоматически — только по кнопке ↻ в UI,
+      // т.к. каждый уровень требует отдельного fetch с session-bound hash (дорого).
+      if (state.wxMapRefreshInterval !== null) {
+        clearInterval(state.wxMapRefreshInterval);
+      }
+      state.wxMapRefreshInterval = setInterval(function() {
+        fetchAllWxMaps(false);
+      }, WX_MAP_REFRESH_MS);
+
     });
   }
 
@@ -3952,6 +4021,19 @@
     if (state.sigmetRefreshInterval !== null) {
       clearInterval(state.sigmetRefreshInterval);
       state.sigmetRefreshInterval = null;
+    }
+    // Task 41: очистка новых интервалов автообновления METAR/TAF/карт.
+    if (state.metarRefreshInterval !== null) {
+      clearInterval(state.metarRefreshInterval);
+      state.metarRefreshInterval = null;
+    }
+    if (state.tafRefreshInterval !== null) {
+      clearInterval(state.tafRefreshInterval);
+      state.tafRefreshInterval = null;
+    }
+    if (state.wxMapRefreshInterval !== null) {
+      clearInterval(state.wxMapRefreshInterval);
+      state.wxMapRefreshInterval = null;
     }
     // Task 24 (#4, #7, #8): §8 — закрываем dropdown + overlay + снимаем document listeners.
     // Вызов closeHeaderMenu() покрывает все 3 условия §8 (attach-on-open / detach-on-close / destroy cleanup).

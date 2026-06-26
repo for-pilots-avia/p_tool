@@ -434,8 +434,10 @@ body.dark-theme #checkrideContainer {
 }
 
 .checkride-attached-img {
-  width: 100%;
+  /* Task 41: max-width:100% (не width:100%) + height:auto — НЕ растягиваем маленькие фото */
   max-width: 200px;
+  width: 100%;
+  height: auto;
   margin-top: 10px;
   border-radius: var(--border-radius-xs);
   cursor: pointer;
@@ -444,6 +446,17 @@ body.dark-theme #checkrideContainer {
 
 .checkride-attached-img:active {
   opacity: 0.8;
+}
+
+/* Task 41: отображение сохранённой подписи инструктора в просмотре истории */
+.checkride-signature-img {
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-xs);
+  background: var(--color-bg-main);
+  display: block;
 }
 
 .checkride-report-img {
@@ -691,17 +704,45 @@ body.dark-theme #checkrideContainer {
 }
 
 #checkrideContainer .checkride-competency-count {
-  font-size: var(--font-xs);
-  color: var(--color-text-muted);
-  background: var(--color-bg-card);
-  border-radius: 10px;
-  padding: 2px 8px;
-  min-width: 24px;
-  text-align: center;
-  font-weight: 600;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 0;
   order: 2;
+  background: transparent;
+  border-radius: 50%;
+  padding: 0;
+}
+
+#checkrideContainer .checkride-competency-count .checkride-progress-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#checkrideContainer .checkride-competency-count .ring-track {
+  stroke: var(--color-border);
+  opacity: 0.5;
+}
+
+#checkrideContainer .checkride-competency-count .ring-fill {
+  stroke: var(--color-danger);
+  transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#checkrideContainer .checkride-competency-count .ring-text {
+  position: relative;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 #checkrideContainer .checkride-competency-toggle .checkride-competency-chevron {
@@ -944,6 +985,97 @@ body.dark-theme #checkrideContainer {
   }
 }
 
+/* ─── Task 41: Узкие экраны — кнопки в столбик, текст не переносится ─── */
+/* На узких экранах (<480px) переводим ряды кнопок в колонку по одной в ряд.
+   На очень узких (<380px) — уменьшаем padding, чтобы длинные подписи помещались. */
+
+/* Запрет переноса названия кнопок на две строки — всегда */
+.checkride-main-btn span,
+.checkride-secondary-btn span,
+.checkride-danger-btn span,
+.checkride-nav-btn span,
+.checkride-finish-btn span {
+  white-space: nowrap;
+}
+
+/* Средне-узкие экраны (<560px): кнопки в ряду переходят в колонку */
+@media (max-width: 560px) {
+  /* Report row: Печать / Отправить / Скопировать — в колонку */
+  .checkride-report-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .checkride-report-row .checkride-secondary-btn {
+    flex: none;
+    width: 100%;
+  }
+
+  /* Start actions: История проверок / Начать проверку — в колонку.
+     По требованию пользователя «Начать проверку» ВЫШЕ «История проверок».
+     flex-direction:column-reverse сохраняет DOM-порядок «История» → «Начать»,
+     но визуально «Начать» (последний ребёнок) становится первым сверху. */
+  .checkride-start-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .checkride-start-actions .checkride-main-btn,
+  .checkride-start-actions .checkride-secondary-btn {
+    flex: none;
+    width: 100%;
+  }
+
+  /* Test screen nav: Назад / Далее — в колонку на самых узких */
+  .checkride-nav-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .checkride-nav-btn,
+  .checkride-finish-btn {
+    flex: none;
+    width: 100%;
+  }
+
+  /* Task 48: компактные dropdown-строки на мобильном */
+  .checkride-grade-item {
+    padding: 6px 0;
+    gap: 8px;
+  }
+  .checkride-grade-select {
+    padding: 6px 26px 6px 8px;
+    min-width: 56px;
+    background-position: right 8px center;
+  }
+}
+
+/* Очень узкие экраны (<380px) — уменьшаем padding кнопок */
+@media (max-width: 380px) {
+  .checkride-main-btn,
+  .checkride-secondary-btn,
+  .checkride-nav-btn,
+  .checkride-finish-btn {
+    padding: 12px 10px;
+    font-size: var(--font-sm);
+  }
+  .checkride-danger-btn {
+    padding: 10px 8px;
+    font-size: var(--font-sm);
+  }
+
+  /* Task 48: ещё компактнее на очень узких */
+  .checkride-grade-item {
+    padding: 4px 0;
+    gap: 6px;
+    font-size: var(--font-sm);
+  }
+  .checkride-grade-select {
+    padding: 5px 22px 5px 6px;
+    min-width: 48px;
+    font-size: var(--font-xs);
+    background-position: right 6px center;
+    background-size: 10px;
+  }
+}
+
 /* ─── Dark theme corrections ─── */
 body.dark-theme .checkride-rating-summary {
   background: var(--cr-color-dark-surface);
@@ -974,4 +1106,61 @@ body.dark-theme #checkride-signature {
   .checkride-report {
     padding: 0;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Task 45 — Long-word protection для всех контейнеров с динамическим контентом
+   overflow-wrap: break-word; word-break: break-word; hyphens: auto;
+   ═══════════════════════════════════════════════════════════════════ */
+.checkride-section-title,
+.checkride-subname,
+#checkrideContainer .checkride-competency-toggle .list-divider-label,
+.checkride-topitem,
+.checkride-divider,
+.checkride-textarea,
+.checkride-report-main-title,
+.checkride-report-meta p,
+.checkride-rating-block,
+.checkride-report-subname,
+.checkride-report-topitem,
+.checkride-report-item-row p,
+.checkride-report-comment,
+.checkride-competency-item,
+.checkride-signature-section,
+.checkride-history-info {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Flex-дети — min-width: 0 позволяет сжиматься ниже самого длинного слова */
+.checkride-check-item label {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.checkride-grade-label {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.checkride-radio-label,
+.checkride-radio-option span {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.checkride-competency-check span {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }

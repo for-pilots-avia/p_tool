@@ -2,7 +2,7 @@
   "airportNames": {
     "UUEE": "Шереметьево",
     "ULKK": "Ульяновск",
-    "ULLL": "Пулково",
+    "ULLI": "Пулково (Санкт-Петербург)",
     "UUWW": "Внуково",
     "UUDD": "Домодедово",
     "UUOO": "Орск",
@@ -63,7 +63,8 @@
     "ULBD": "Калининград",
     "ULWW": "Вологда",
     "ULRR": "Петрозаводск",
-    "ULLI": "Псков",
+    "ULOO": "Псков",
+    "USCC": "Челябинск (Баландино)",
     "ULTK": "Киров",
     "UUBP": "Белгород",
     "UUBK": "Курск",
@@ -72,7 +73,6 @@
   "icaoTimezones": {
     "UUEE": "Europe/Moscow",
     "ULKK": "Europe/Ulyanovsk",
-    "ULLL": "Europe/Moscow",
     "UUWW": "Europe/Moscow",
     "UUDD": "Europe/Moscow",
     "UUOO": "Europe/Moscow",
@@ -134,6 +134,8 @@
     "ULWW": "Europe/Moscow",
     "ULRR": "Europe/Moscow",
     "ULLI": "Europe/Moscow",
+    "ULOO": "Europe/Moscow",
+    "USCC": "Asia/Yekaterinburg",
     "ULTK": "Europe/Moscow",
     "UUBP": "Europe/Moscow",
     "UUBK": "Europe/Moscow",
@@ -143,7 +145,7 @@
     "UU": "UUWV",
     "UW": "UWWW",
     "UR": "URRV",
-    "UL": "ULLL",
+    "UL": "ULLI",
     "UN": "UNLL",
     "US": "USSS",
     "UI": "UIII",
@@ -1919,12 +1921,7 @@
     {
       "firId": "ULLI",
       "country": "Россия",
-      "nameRu": "Мурманск"
-    },
-    {
-      "firId": "ULLL",
-      "country": "Россия",
-      "nameRu": "Санкт-Петербург"
+      "nameRu": "Санкт-Петербург (Пулково)"
     },
     {
       "firId": "ULLU",

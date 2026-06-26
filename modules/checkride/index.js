@@ -15,6 +15,7 @@
   var _sectionIndex = 0;      // текущий этап проверки
   var _screen       = 'start'; // start | test | report | history
   var _saveStateTimer = null;   // debounce для автосохранения textarea
+  var _viewingHistory = false;  // Task 41: true когда отчёт открыт из истории (readonly режим)
 
   /* ─── Swipe-навигация (touch) ─── */
   var _swipeStartX    = 0;
@@ -29,7 +30,8 @@
     instructor: '',
     route: '',
     ac_number: '',
-    flight_time: ''
+    flight_time: '',
+    signature: null   // Task 41: подпись инструктора (data URL, сохраняется в истории)
   };
 
   var STORAGE_HISTORY = 'checkride_v8';
@@ -110,7 +112,13 @@
      ═══════════════════════════════════════════ */
   function savePilotToCache() {
     try {
-      localStorage.setItem(STORAGE_PILOT, JSON.stringify(_pilotData));
+      // Task 41: НЕ сохраняем signature в автозаполнение пилота — она одноразовая,
+      // для каждой новой проверки инструктор расписывается заново.
+      var toSave = {};
+      for (var k in _pilotData) {
+        if (k !== 'signature') toSave[k] = _pilotData[k];
+      }
+      localStorage.setItem(STORAGE_PILOT, JSON.stringify(toSave));
     } catch(e) {}
   }
 
@@ -120,6 +128,8 @@
       if (raw) {
         var saved = JSON.parse(raw);
         for (var key in _pilotData) {
+          // Task 41: НЕ восстанавливаем signature из автозаполнения
+          if (key === 'signature') continue;
           if (saved[key] !== undefined) _pilotData[key] = saved[key];
         }
       }
@@ -245,6 +255,22 @@
     });
   }
 
+  /* ─── Task 47: Language detector for hyphens:auto ───
+     Возвращает 'en' / 'ru' / '' в зависимости от соотношения латиницы и кириллицы.
+     Пустая строка — нейтральный (родительский lang attr побеждает). */
+  function detectLang(text) {
+    if (!text) return '';
+    var latin = (text.match(/[A-Za-z]/g) || []).length;
+    var cyrillic = (text.match(/[\u0410-\u044F]/g) || []).length;
+    if (latin > cyrillic && latin > 0) return 'en';
+    if (cyrillic > 0 && cyrillic >= latin) return 'ru';
+    return '';
+  }
+  function langAttr(text) {
+    var l = detectLang(text);
+    return l ? ' lang="' + l + '"' : '';
+  }
+
   /* ═══════════════════════════════════════════
      RENDER: All content
      ═══════════════════════════════════════════ */
@@ -275,8 +301,8 @@
 
     /* Mode selector */
     html += '<div class="checkride-mode-selector">'
-      + '<button class="checkride-mode-btn' + (_currentMode === 'line' ? ' active' : '') + '" data-cr-mode="line">LINE</button>'
-      + '<button class="checkride-mode-btn' + (_currentMode === 'ffs' ? ' active' : '') + '" data-cr-mode="ffs">FFS</button>'
+      + '<button class="checkride-mode-btn' + (_currentMode === 'line' ? ' active' : '') + '" data-cr-mode="line" lang="en">LINE</button>'
+      + '<button class="checkride-mode-btn' + (_currentMode === 'ffs' ? ' active' : '') + '" data-cr-mode="ffs" lang="en">FFS</button>'
     + '</div>';
 
     /* Input fields */
@@ -310,6 +336,33 @@
   }
 
   /* ═══════════════════════════════════════════
+     Task 44: обновление кольца прогресса компетенции
+     ═══════════════════════════════════════════ */
+  function updateCompetencyRing(compCode) {
+    var items = document.querySelector('#checkrideContainer .checkride-competency-items[data-competency="' + compCode + '"]');
+    if (!items) return;
+    var checkboxes = items.querySelectorAll('input[type="checkbox"]');
+    var total = checkboxes.length;
+    var checked = 0;
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) checked++;
+    }
+    var toggle = document.querySelector('#checkrideContainer .checkride-competency-toggle[data-competency="' + compCode + '"]');
+    if (!toggle) return;
+    var countEl = toggle.querySelector('.checkride-competency-count');
+    if (!countEl) return;
+    var fill = countEl.querySelector('.ring-fill');
+    var text = countEl.querySelector('.ring-text');
+    var circumference = 2 * Math.PI * 11;
+    var progress = total > 0 ? checked / total : 0;
+    var offset = circumference * (1 - progress);
+    if (fill) fill.style.strokeDashoffset = offset;
+    if (text) text.textContent = checked + '/' + total;
+    countEl.setAttribute('data-checked', checked);
+    countEl.setAttribute('data-total', total);
+  }
+
+  /* ═══════════════════════════════════════════
      SCREEN: TEST — Чеклист проверки
      ═══════════════════════════════════════════ */
   function renderTestScreen(container) {
@@ -319,7 +372,7 @@
     var html = '<div class="module-container checkride-test" lang="ru">';
 
     /* Section title */
-    html += '<h2 class="checkride-section-title">' + mainSection.name + '</h2>';
+    html += '<h2 class="checkride-section-title"' + langAttr(mainSection.name) + '>' + mainSection.name + '</h2>';
 
     /* Progress indicator */
     html += '<div class="checkride-progress-bar">'
@@ -353,10 +406,25 @@
             if (group.items[ci].type === 'checkbox') compCheckboxes.push(group.items[ci]);
           }
 
+          /* Task 44: считаем прогресс для кольца */
+          var compChecked = 0;
+          for (var ci2 = 0; ci2 < compCheckboxes.length; ci2++) {
+            if (compCheckboxes[ci2].ok) compChecked++;
+          }
+          var compTotal = compCheckboxes.length;
+          var compCircumference = 2 * Math.PI * 11; /* r=11 → 69.115 */
+          var compOffset = compTotal > 0 ? compCircumference * (1 - compChecked / compTotal) : compCircumference;
+
           /* Заголовок-аккордеон (ЗАКРЫТ — нет is-open) */
           html += '<div class="list-divider checkride-competency-toggle" data-competency="' + compCode + '">';
           html += '<span class="list-divider-label">' + compCode + ' \u2014 ' + compLabel + '</span>';
-          html += '<span class="checkride-competency-count">' + compCheckboxes.length + '</span>';
+          html += '<span class="checkride-competency-count" data-total="' + compTotal + '" data-checked="' + compChecked + '">'
+            + '<svg class="checkride-progress-ring" viewBox="0 0 28 28" aria-hidden="true">'
+            + '<circle class="ring-track" cx="14" cy="14" r="11" fill="none" stroke="var(--color-border)" stroke-width="2.5"/>'
+            + '<circle class="ring-fill" cx="14" cy="14" r="11" fill="none" stroke="var(--color-danger)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + compCircumference + '" stroke-dashoffset="' + compOffset + '" transform="rotate(-90 14 14)"/>'
+            + '</svg>'
+            + '<span class="ring-text">' + compChecked + '/' + compTotal + '</span>'
+            + '</span>';
           html += '<span class="checkride-competency-chevron">' + icon('chevron-down', 16) + '</span>';
           html += '</div>';
 
@@ -480,23 +548,31 @@
     /* Competencies */
     html += '<div id="checkride-competencies"></div>';
 
-    /* Signature */
-    html += '<div class="checkride-signature-section">'
+    /* Signature — Task 41: если открываем из истории и есть сохранённая подпись, показываем <img>.
+       Иначе (новый отчёт) — пустой canvas для рисования. */
+    var sigHtml = '<div class="checkride-signature-section">'
       + '<p><b>\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439:</b> <span id="r_instructor"></span></p>'
-      + '<p><b>\u041F\u043E\u0434\u043F\u0438\u0441\u044C:</b></p>'
-      + '<canvas id="checkride-signature"></canvas>'
-    + '</div>';
+      + '<p><b>\u041F\u043E\u0434\u043F\u0438\u0441\u044C:</b></p>';
+    if (_viewingHistory && _pilotData.signature) {
+      sigHtml += '<img src="' + _pilotData.signature + '" class="checkride-signature-img" alt="\u041F\u043E\u0434\u043F\u0438\u0441\u044C \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0430">';
+    } else {
+      sigHtml += '<canvas id="checkride-signature"></canvas>';
+    }
+    sigHtml += '</div>';
+    html += sigHtml;
 
-    /* Action buttons — Печать+Отправить в одну строку, На главную ниже */
+    /* Action buttons — Печать+Отправить+Скопировать в одну строку, Новая проверка ниже */
     html += '<div class="checkride-report-actions">'
       + '<div class="checkride-report-row">'
         + '<button class="checkride-secondary-btn" data-cr-action="export-pdf">'
           + icon('download', 18) + ' <span>\u041F\u0435\u0447\u0430\u0442\u044C / PDF</span></button>'
         + '<button class="checkride-secondary-btn" data-cr-action="send-email">'
           + icon('mail', 18) + ' <span>\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u043F\u043E \u043F\u043E\u0447\u0442\u0435</span></button>'
+        + '<button class="checkride-secondary-btn" data-cr-action="copy-report">'
+          + icon('clipboard-check', 18) + ' <span>\u0421\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C</span></button>'
       + '</div>'
       + '<button class="checkride-main-btn" data-cr-action="go-start">'
-        + icon('home', 18) + ' <span>\u041D\u0430 \u0433\u043B\u0430\u0432\u043D\u0443\u044E</span></button>'
+        + icon('checklist', 18) + ' <span>\u041D\u043E\u0432\u0430\u044F \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0430</span></button>'
     + '</div>';
 
     html += '</div>';
@@ -572,6 +648,10 @@
 
     /* 3. Сохраняем в localStorage для автозаполнения при следующем входе */
     savePilotToCache();
+
+    /* Task 41: сброс флага истории и подписи — новая проверка, старая подпись недействительна */
+    _viewingHistory = false;
+    _pilotData.signature = null;
 
     /* 4. Deep clone */
     _data = JSON.parse(JSON.stringify(dataToUse));
@@ -789,7 +869,7 @@
         if (sec.note || sec.img) {
           sHtml += '<div class="checkride-report-comment">'
             + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> ' + sec.note + '</p>' : '')
-            + (sec.img ? '<img src="' + sec.img + '" data-full-src="' + sec.img + '" class="checkride-report-img" data-cr-report-img="1" style="width:100%;max-width:200px;margin-top:10px;cursor:pointer;border-radius:var(--border-radius-xs);">' : '')
+            + (sec.img ? '<img src="' + sec.img + '" data-full-src="' + sec.img + '" class="checkride-report-img" data-cr-report-img="1" style="max-width:200px;width:100%;height:auto;margin-top:10px;cursor:pointer;border-radius:var(--border-radius-xs);">' : '')
           + '</div>';
         }
         dataEl.innerHTML += sHtml + '</div>';
@@ -846,12 +926,23 @@
         var img = new Image();
         img.src = e.target.result;
         img.onload = function() {
-          var canvas = document.createElement('canvas');
+          // Task 41: НЕ апскейлим маленькие изображения — иначе они становятся размытыми.
+          // Если исходная ширина <= MAX_WIDTH — сохраняем как есть (только JPEG-компрессия).
+          // Если больше — масштабируем к MAX_WIDTH с сохранением пропорций.
           var MAX_WIDTH = 800;
-          var scale = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scale;
-          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          var targetW, targetH;
+          if (img.width <= MAX_WIDTH) {
+            targetW = img.width;
+            targetH = img.height;
+          } else {
+            var scale = MAX_WIDTH / img.width;
+            targetW = MAX_WIDTH;
+            targetH = Math.round(img.height * scale);
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          canvas.getContext('2d').drawImage(img, 0, 0, targetW, targetH);
           _data.checklists[mainIdx].sections[secIdx].img = canvas.toDataURL('image/jpeg', 0.6);
           _screen = 'test';
           renderAll();
@@ -873,6 +964,42 @@
     clearInspectionState();
   }
 
+  /* Task 41: извлечение подписи из canvas в data URL.
+     Вызывается из обработчика "go-start" ПОСЛЕ того, как пользователь нарисовал
+     подпись на экране отчёта. Возвращает null если canvas пустой или не найден. */
+  function extractSignatureDataUrl() {
+    var canvas = document.getElementById('checkride-signature');
+    if (!canvas) return null;
+    try {
+      // Проверяем что canvas не пустой: ищем любой непрозрачный пиксель
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      var w = canvas.width, h = canvas.height;
+      if (!w || !h) return null;
+      var data;
+      try { data = ctx.getImageData(0, 0, w, h).data; } catch(e) { return null; }
+      var hasInk = false;
+      for (var i = 3; i < data.length; i += 4) {
+        if (data[i] !== 0) { hasInk = true; break; }
+      }
+      if (!hasInk) return null;
+      return canvas.toDataURL('image/png');
+    } catch(e) { return null; }
+  }
+
+  /* Task 41: обновляет signature в последней записи истории (history[0]).
+     Вызывается из обработчика "go-start" после извлечения подписи из canvas. */
+  function updateSignatureInHistory(signatureDataUrl) {
+    try {
+      var raw = localStorage.getItem(STORAGE_HISTORY);
+      if (!raw) return;
+      var history = JSON.parse(raw);
+      if (history.length === 0) return;
+      history[0].signature = signatureDataUrl;
+      localStorage.setItem(STORAGE_HISTORY, JSON.stringify(history));
+    } catch(e) {}
+  }
+
   /* ═══════════════════════════════════════════
      CORE LOGIC: Save to localStorage
      ═══════════════════════════════════════════ */
@@ -886,7 +1013,9 @@
       flight_time: _pilotData.flight_time,
       date:        new Date().toLocaleString(),
       mode:        _currentMode,
-      fullData:    JSON.parse(JSON.stringify(_data))
+      fullData:    JSON.parse(JSON.stringify(_data)),
+      signature:   null  // Task 41: подпись обновляется в history[0] через updateSignatureInHistory()
+                         // при уходе с экрана отчёта (extractSignatureDataUrl из canvas).
     };
 
     var history = [];
@@ -921,16 +1050,14 @@
     _pilotData.route       = h.route || '';
     _pilotData.ac_number   = h.ac_number || '';
     _pilotData.flight_time = h.flight_time || '';
+    _pilotData.signature   = h.signature || null;  // Task 41: восстанавливаем подпись
 
     _data = h.fullData;
     _data.savedDate = h.date;
     _currentMode = h.mode;
     _screen = 'report';
+    _viewingHistory = true;  // Task 41: флаг просмотра истории
     renderAll();
-
-    /* Hide signature for viewed reports */
-    var sigCanvas = document.getElementById('checkride-signature');
-    if (sigCanvas) sigCanvas.style.display = 'none';
   }
 
   /* ═══════════════════════════════════════════
@@ -994,7 +1121,10 @@
      ═══════════════════════════════════════════ */
   function exportPDF() { window.print(); }
 
-  function sendEmail() {
+  /* ═══════════════════════════════════════════
+     CORE LOGIC: Build full report text (for copy + email body)
+     ═══════════════════════════════════════════ */
+  function buildReportText() {
     var fio        = _pilotData.fio;
     var license    = _pilotData.license;
     var instructor = _pilotData.instructor;
@@ -1005,18 +1135,179 @@
     var dateEl = document.getElementById('r_date');
     if (dateEl) date = dateEl.innerText;
 
-    var body = '\u041E\u0422\u0427\u0415\u0422 \u041F\u041E \u041F\u0420\u041E\u0412\u0415\u0420\u041A\u0415\n\n'
-      + '\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u044B\u0439: ' + fio + '\n'
-      + '\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F: ' + license + '\n'
-      + '\u0414\u0430\u0442\u0430: ' + date + '\n'
-      + '\u0420\u0435\u0436\u0438\u043C: ' + _currentMode.toUpperCase() + '\n';
-    if (route) body += '\u041C\u0430\u0440\u0448\u0440\u0443\u0442: ' + route + '\n';
-    if (acNumber) body += '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421: ' + acNumber + '\n';
-    if (flightTime) body += '\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F: ' + flightTime + '\n';
-    body += '\n\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439: ' + instructor + '\n';
+    var lines = [];
+    lines.push('ОТЧЕТ ПО ПРОВЕРКЕ');
+    lines.push('=================');
+    lines.push('');
+    lines.push('Проверяемый: ' + fio);
+    lines.push('Лицензия: ' + license);
+    lines.push('Дата: ' + date);
+    lines.push('Режим: ' + _currentMode.toUpperCase());
+    if (route)      lines.push('Маршрут: ' + route);
+    if (acNumber)   lines.push('Номер ВС: ' + acNumber);
+    if (flightTime) lines.push('Полётное время: ' + flightTime);
+    lines.push('Проверяющий: ' + instructor);
+    lines.push('');
 
+    if (_data && _data.checklists) {
+      _data.checklists.forEach(function(mainSec) {
+        lines.push('');
+        lines.push('### ' + mainSec.name + ' ###');
+        mainSec.sections.forEach(function(sec) {
+          if (sec.subname === 'Компетенции.') return;
+          lines.push('');
+          lines.push('— ' + sec.subname + ' —');
+          var groups = sec.groups || [{ items: sec.items || [] }];
+          groups.forEach(function(group) {
+            if (group.topitem) lines.push('  [' + getCompetencyLabel(group.topitem) + ']');
+            group.items.forEach(function(item) {
+              if (item.type === 'divider') return;
+              var label = item.label || '';
+              if (item.type === 'checkbox' && sec.subname === 'Стандартные процедуры.') {
+                var gv = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
+                var gLabel = gv === 'na' ? 'н/п' : (gv || '—');
+                lines.push('  • ' + label + ' — оценка: ' + gLabel);
+              } else if (item.type === 'checkbox') {
+                lines.push('  ' + (item.ok ? '[x]' : '[ ]') + ' ' + label);
+              } else if (item.type === 'radio') {
+                lines.push('  • ' + label + ' — оценка: ' + (item.ok || 'не указано'));
+              }
+            });
+          });
+          if (sec.note) {
+            lines.push('  Комментарий: ' + sec.note);
+          }
+        });
+      });
+
+      // Компетенции в конце
+      var competencies = calculateCompetencies();
+      if (Object.keys(competencies).length > 0) {
+        lines.push('');
+        lines.push('=== КОМПЕТЕНЦИИ ===');
+        for (var code in competencies) {
+          lines.push(code + ' — ' + getCompetencyLabel(code) + ': оценка ' + competencies[code].score
+            + ' (' + Math.round(competencies[code].percent) + '%)');
+        }
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  /* ═══════════════════════════════════════════
+     CORE LOGIC: Copy full report to clipboard
+     ═══════════════════════════════════════════ */
+  function copyReport() {
+    var text = buildReportText();
+    function onSuccess() {
+      app.showToast('Отчёт скопирован в буфер обмена');
+    }
+    function onFail() {
+      app.showToast('Не удалось скопировать отчёт');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess, function() {
+        // Фолбэк на старый execCommand
+        if (legacyCopyText(text)) onSuccess(); else onFail();
+      });
+    } else if (legacyCopyText(text)) {
+      onSuccess();
+    } else {
+      onFail();
+    }
+  }
+
+  function legacyCopyText(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.top = '-9999px';
+      ta.setAttribute('readonly', '');
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch(e) { return false; }
+  }
+
+  /* ═══════════════════════════════════════════
+     CORE LOGIC: Send email — 3-level degradation (Task 41)
+       Level 1: navigator.share with files (mobile ShareSheet, .txt attachment)
+       Level 2: navigator.share without files (text only)
+       Level 3: clipboard + mailto: short body (full text in clipboard)
+     ═══════════════════════════════════════════ */
+  function sendEmail() {
+    var fio = _pilotData.fio;
+    var date = '';
+    var dateEl = document.getElementById('r_date');
+    if (dateEl) date = dateEl.innerText;
+
+    var fullText = buildReportText();
     var subject = 'CheckRide Report - ' + fio + ' (' + date + ')';
-    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+
+    // Level 1: navigator.share с файлами (мобильный ShareSheet)
+    if (navigator.canShare && navigator.canShare({ files: [] })) {
+      try {
+        var blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
+        var file = new File([blob], 'checkride_report_' + Date.now() + '.txt', { type: 'text/plain;charset=utf-8' });
+        var shareData = {
+          title: subject,
+          text: 'Отчёт по проверке — ' + fio + ' (' + date + ')\n\nПолный текст в прикреплённом файле.',
+          files: [file]
+        };
+        navigator.share(shareData).then(function() {
+          app.showToast('Отчёт отправлен через ShareSheet');
+        }).catch(function(err) {
+          if (err && err.name === 'AbortError') return; // пользователь отменил
+          // Фолбэк на Level 2
+          shareTextOnly(subject, fullText, fio, date);
+        });
+        return;
+      } catch(e) { /* пробуем Level 2 */ }
+    }
+
+    // Level 2: navigator.share без файлов (только текст)
+    if (navigator.share) {
+      shareTextOnly(subject, fullText, fio, date);
+      return;
+    }
+
+    // Level 3: clipboard + короткий mailto
+    clipboardAndMailto(subject, fullText, fio, date);
+  }
+
+  function shareTextOnly(subject, fullText, fio, date) {
+    navigator.share({
+      title: subject,
+      text: fullText
+    }).then(function() {
+      app.showToast('Отчёт отправлен через ShareSheet');
+    }).catch(function(err) {
+      if (err && err.name === 'AbortError') return;
+      clipboardAndMailto(subject, fullText, fio, date);
+    });
+  }
+
+  function clipboardAndMailto(subject, fullText, fio, date) {
+    // Кладём полный текст в буфер обмена
+    var copied = false;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fullText).then(function() { copied = true; }, function() {});
+    }
+    if (!copied) copied = legacyCopyText(fullText);
+
+    // Короткий mailto — только метаданные, тело < 500 символов (избегаем CSP-блокировки в Yandex Mail)
+    var shortBody = 'ОТЧЕТ ПО ПРОВЕРКЕ\n\n'
+      + 'Проверяемый: ' + fio + '\n'
+      + 'Дата: ' + date + '\n'
+      + 'Режим: ' + _currentMode.toUpperCase() + '\n'
+      + 'Проверяющий: ' + _pilotData.instructor + '\n\n'
+      + '--- Полный текст отчёта ' + (copied ? 'скопирован в буфер обмена.' : 'не поместился в тело письма.') + ' ---';
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(shortBody);
+    app.showToast(copied ? 'Полный отчёт в буфере. Открыт почтовый клиент с метаданными.' : 'Открыт почтовый клиент с метаданными.');
   }
 
   /* ═══════════════════════════════════════════
@@ -1115,8 +1406,20 @@
             case 'send-email':
               sendEmail();
               break;
+            case 'copy-report':
+              copyReport();
+              break;
             case 'go-start':
+              // Task 41: извлекаем подпись инструктора из canvas ДО смены экрана.
+              // Canvas существует только на свежем отчёте (не при просмотре из истории).
+              // Сохраняем в историю (history[0]) для последующего просмотра.
+              if (!_viewingHistory) {
+                var sig = extractSignatureDataUrl();
+                if (sig) updateSignatureInHistory(sig);
+                _pilotData.signature = sig;
+              }
               _screen = 'start';
+              _viewingHistory = false;
               renderAll();
               clearInspectionState();
               break;
@@ -1209,6 +1512,11 @@
         if (_screen === 'test' && (e.target.type === 'checkbox' || e.target.type === 'radio' || e.target.classList.contains('checkride-grade-select'))) {
           saveState();
           saveInspectionState();
+          /* Task 44: обновить красное кольцо прогресса компетенции */
+          var compItems = e.target.closest('.checkride-competency-items');
+          if (compItems && compItems.dataset.competency) {
+            updateCompetencyRing(compItems.dataset.competency);
+          }
         }
       });
 
