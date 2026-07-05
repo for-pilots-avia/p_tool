@@ -100,7 +100,7 @@
     if (!left || !center || !right) return;
 
     // Левая кнопка: Боковое меню
-    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню">'
+    left.innerHTML = '<button class="icon-btn" aria-label="Меню">'
       + (window.ICONS.menu || '') + '</button>';
     left.onclick = function() { app.toggleMenu(); };
 
@@ -346,7 +346,7 @@
     for (var i = 0; i < _cameraPhotos.length; i++) {
       var photo = _cameraPhotos[i];
       html += '<div class="cl-camera-thumb" data-index="' + i + '">'
-        + '<img src="' + photo.dataUrl + '" data-full-src="' + photo.dataUrl + '" alt="' + escapeHtml(photo.name) + '">'
+        + '<img src="' + photo.dataUrl + '" data-full-src="' + photo.dataUrl + '" alt="' + window.app.escapeAttr(photo.name) + '">'
         + '<button class="cl-camera-thumb-delete" data-photo-id="' + photo.id + '" aria-label="Удалить">'
         + (window.ICONS['x'] || '') + '</button>'
         + '</div>';
@@ -487,8 +487,8 @@
     for (var i = 0; i < _notes.length; i++) {
       var note = _notes[i];
       html += '<div class="cl-note-item">'
-        + '<div class="cl-note-item-text">' + escapeHtmlWithBreaks(note.text) + '</div>'
-        + '<div class="cl-note-item-time">' + escapeHtml(note.time) + '</div>'
+        + '<div class="cl-note-item-text">' + window.app.escapeHtmlWithBreaks(note.text) + '</div>'
+        + '<div class="cl-note-item-time">' + window.app.escapeHtml(note.time) + '</div>'
         + '<button class="cl-note-item-delete" data-note-id="' + note.id + '" aria-label="Удалить">'
         + (window.ICONS['trash-2'] || '') + '</button>'
         + '</div>';
@@ -574,7 +574,7 @@
       for (var i = 0; i < _cameraPhotos.length; i++) {
         var photo = _cameraPhotos[i];
         html += '<div class="cl-docs-photo-thumb" data-doc-photo-index="' + i + '">'
-          + '<img src="' + photo.dataUrl + '" data-full-src="' + photo.dataUrl + '" alt="' + escapeHtml(photo.name) + '">'
+          + '<img src="' + photo.dataUrl + '" data-full-src="' + photo.dataUrl + '" alt="' + window.app.escapeAttr(photo.name) + '">'
           + '</div>';
       }
       html += '</div></div>';
@@ -591,8 +591,8 @@
       for (var j = 0; j < _notes.length; j++) {
         var note = _notes[j];
         html += '<div class="cl-docs-note">'
-          + '<div class="cl-docs-note-text">' + escapeHtmlWithBreaks(note.text) + '</div>'
-          + '<div class="cl-docs-note-time">' + escapeHtml(note.time) + '</div>'
+          + '<div class="cl-docs-note-text">' + window.app.escapeHtmlWithBreaks(note.text) + '</div>'
+          + '<div class="cl-docs-note-time">' + window.app.escapeHtml(note.time) + '</div>'
           + '</div>';
       }
       html += '</div>';
@@ -651,7 +651,7 @@
 
   function renderDivider(entry) {
     return '<div class="list-divider cl-divider">'
-      + '<span class="list-divider-label">' + restoreInlineTags(escapeHtml(entry.label)) + '</span>'
+      + '<span class="list-divider-label">' + window.app.renderRichText(entry.label) + '</span>'
       + '</div>';
   }
 
@@ -678,18 +678,17 @@
     html += '<div class="cl-block-header" data-block-id="' + block.id + '">';
     html += '<span class="collapsible-chevron">'
       + (window.ICONS['chevron-down'] || '') + '</span>';
-    html += '<span class="collapsible-title"><span class="marquee-inner">' + escapeHtml(block.title) + '</span></span>';
+    html += '<span class="collapsible-title"' + window.app.langAttr(block.title) + '><span class="marquee-inner">' + window.app.escapeHtml(block.title) + '</span></span>';
     html += '<span class="' + badgeClass + '">' + badgeText + '</span>';
     html += '</div>';
 
     // Заметка блока (видна всегда)
     if (block.note) {
-      html += '<div class="cl-block-note">' + escapeHtmlWithBreaks(block.note) + '</div>';
+      html += '<div class="cl-block-note"' + window.app.langAttr(block.note) + '>' + window.app.escapeHtmlWithBreaks(block.note) + '</div>';
     }
 
     // Контент (сворачиваемый)
-    html += '<div class="cl-block-content" id="cl-content-' + block.id + '"'
-      + ' style="max-height:' + (isOpen ? '2000px' : '0') + ';">';
+    html += '<div class="cl-block-content' + (isOpen ? ' cl-block-content--open' : '') + '" id="cl-content-' + block.id + '">';
     html += '<div class="cl-block-items">';
 
     // Прогресс-бар
@@ -715,12 +714,12 @@
         + '<polyline points="20 6 9 17 4 12"></polyline>'
         + '</svg></span>';
       html += '<span class="cl-item-text">';
-      html += '<span class="cl-item-label">' + escapeHtml(item.label) + '</span>';
+      html += '<span class="cl-item-label"' + window.app.langAttr(item.label) + '>' + window.app.escapeHtml(item.label) + '</span>';
       if (!item.required) {
         html += '<span class="cl-optional-badge">необязательно</span>';
       }
       if (item.note) {
-        html += '<span class="cl-item-note">' + escapeHtmlWithBreaks(item.note) + '</span>';
+        html += '<span class="cl-item-note"' + window.app.langAttr(item.note) + '>' + window.app.escapeHtmlWithBreaks(item.note) + '</span>';
       }
       html += '</span>';
       html += '</label>';
@@ -914,36 +913,6 @@
       renderAll();
       app.showToast('Рейс сброшен');
     }, 'Сбросить');
-  }
-
-  /* ═══════════════════════════════════════════
-     HTML ESCAPE
-     ═══════════════════════════════════════════ */
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  // Восстановить разрешённые inline-теги после escapeHtml (MODULE_CONTRACT §13: <b>, <i>)
-  function restoreInlineTags(str) {
-    return str
-      .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
-      .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
-  }
-
-  /**
-   * Экранировать HTML и преобразовать переносы строк в <br>
-   */
-  function escapeHtmlWithBreaks(str) {
-    if (!str) return '';
-    return restoreInlineTags(escapeHtml(str))
-      .replace(/\n/g, '<br>');
   }
 
   /* ═══════════════════════════════════════════

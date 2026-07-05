@@ -1,0 +1,1102 @@
+{
+  "categories": [
+    {
+      "id": "lim_general",
+      "title": "General",
+      "icon": "info",
+      "items": [
+        {
+          "id": "lim_general_tailwind",
+          "label": "Max Tailwind Component (T/O & Landing)",
+          "value": "15 kt",
+          "source": "FCOM L.10.2",
+          "severity": "limit",
+          "detail": {
+            "description": "The maximum allowable tailwind component for both takeoff and landing is <b>15 knots</b>.\n\nThis limitation applies to all runways and all weather conditions. Operations with a reported tailwind component exceeding this value are <b>prohibited</b>.\n\nThe tailwind component is calculated as:\n<b>TW = WS × cos(WA − RWY)</b>\nwhere WS = wind speed, WA = wind angle, RWY = runway heading.",
+            "pics": [
+              "modules/limitations/data/tailwind-component.svg"
+            ],
+            "tables": [
+              "modules/limitations/data/tailwind-table.html"
+            ],
+            "pdfs": [
+              "modules/docs/page039.pdf"
+            ]
+          }
+        },
+        {
+          "label": "Runway Slope",
+          "value": "±2%",
+          "source": "FCOM L.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Maximum Zero Fuel Weight",
+          "value": "61,688 kg",
+          "source": "FCOM L.10.4",
+          "severity": "limit"
+        },
+        {
+          "label": "Maximum Taxi Weight",
+          "value": "79,242 kg",
+          "source": "FCOM L.10.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Maximum Takeoff Weight",
+          "value": "79,015 kg",
+          "source": "FCOM L.10.4",
+          "severity": "limit"
+        },
+        {
+          "label": "Minimum Flight Weight",
+          "value": "36,651 kg",
+          "source": "AFM 1.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Maximum Landing Weight",
+          "value": "66,360 kg",
+          "source": "FCOM L.10.4",
+          "severity": "limit"
+        },
+        {
+          "label": "Maximum Operating Altitude",
+          "value": "41,000 ft PA",
+          "source": "FCOM L.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Max T/O & Landing Altitude",
+          "value": "8,400 ft PA",
+          "source": "FCOM L.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Pilot Seat Armrest",
+          "value": "Must be stowed up/inboard for taxi, T/O and landing",
+          "source": "Cockpit Placard",
+          "severity": "caution"
+        },
+        {
+          "label": "Overwing Exit Handle Covers",
+          "value": "Must be verified prior to departure with pax",
+          "source": "FCOM L.10.2",
+          "severity": "caution"
+        },
+        {
+          "label": "Flight Deck Door Access System",
+          "value": "Operational check must be accomplished before flight",
+          "source": "FCOM L.10.2",
+          "severity": "caution"
+        },
+        {
+          "label": "Weather Radar",
+          "value": "Avoid operation in hangar (except test mode). Avoid when personnel near nose radome",
+          "source": "FCOM L.10.8",
+          "severity": "warning"
+        },
+        {
+          "label": "Pressure Altitude Below -2,000 ft",
+          "value": "Use performance data for -2,000 ft",
+          "source": "AFM 1.4",
+          "severity": "caution"
+        }
+      ]
+    },
+    {
+      "id": "lim_airspeed",
+      "title": "Airspeed Limitations",
+      "icon": "gauge",
+      "items": [
+        {
+          "label": "VMO / MMO",
+          "value": "340 kt / 0.82M",
+          "source": "AFM 1.10-1.11",
+          "severity": "limit"
+        },
+        {
+          "label": "Flap 1-5",
+          "value": "250 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Flap 10",
+          "value": "210 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Flap 15",
+          "value": "200 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Flap 25",
+          "value": "190 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Flap 30",
+          "value": "175 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Flap 40",
+          "value": "162 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Alternate Flap Extension",
+          "value": "Do not exceed 230 kt IAS",
+          "source": "QRH 9.35",
+          "severity": "limit"
+        },
+        {
+          "label": "LE Flaps Transit (multiple/roll)",
+          "value": "230 kt",
+          "source": "AFM 2.8A",
+          "severity": "limit"
+        },
+        {
+          "label": "LE Flaps Transit (single, no roll)",
+          "value": "300 kt",
+          "source": "AFM 2.8A",
+          "severity": "limit"
+        },
+        {
+          "label": "Severe Turbulence Penetration (Climb)",
+          "value": "280 kt / 0.76M (lower)",
+          "source": "FCOM L.10.3",
+          "severity": "caution"
+        },
+        {
+          "label": "Severe Turbulence Penetration (Descent)",
+          "value": "0.76M / 280 / 250 kt (lower)",
+          "source": "FCOM SP.16.25",
+          "severity": "caution"
+        },
+        {
+          "label": "Unreliable Airspeed Criteria",
+          "value": "Differs by >20 kt or >0.03M",
+          "source": "QRH 10.2",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_lg",
+      "title": "Landing Gear & Brakes",
+      "icon": "circle-dot",
+      "items": [
+        {
+          "label": "LG Extend",
+          "value": "270 kt / 0.82M",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "LG Retract",
+          "value": "235 kt",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "LG Extended",
+          "value": "320 kt / 0.82M",
+          "source": "Cabin Placard",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Tire Speed",
+          "value": "225 mph (195.5 kt)",
+          "source": "FCOM PD 14.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Brake Accumulator Normal Pressure",
+          "value": "3,000 psi",
+          "source": "FCOM 14.10.7",
+          "severity": "info"
+        },
+        {
+          "label": "Brake Accumulator Max Pressure",
+          "value": "3,500 psi",
+          "source": "FCOM 14.10.7",
+          "severity": "limit"
+        },
+        {
+          "label": "Brake Accumulator Precharge",
+          "value": "1,000 psi",
+          "source": "FCOM 14.10.7",
+          "severity": "info"
+        },
+        {
+          "label": "AFL: Min Brake Pressure at Pushback",
+          "value": "2,800 psi",
+          "source": "FCOM NP.21.33",
+          "severity": "caution"
+        },
+        {
+          "label": "Nose Wheel Steering in Pushback",
+          "value": "Do NOT hold or turn — damage risk",
+          "source": "FCOM NP.21.33",
+          "severity": "warning"
+        },
+        {
+          "label": "Brakes After Airborne",
+          "value": "Do NOT apply — auto braking during retraction",
+          "source": "FCTM 3.29",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_engines",
+      "title": "Engines",
+      "icon": "cog",
+      "items": [
+        {
+          "label": "Engine Type",
+          "value": "CFM56-7B26/3 (or -7B24/3)",
+          "source": "AFM",
+          "severity": "info"
+        },
+        {
+          "label": "Max Takeoff Thrust",
+          "value": "26,300 lb (or 24,200 lb)",
+          "source": "AFM 1.5",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Continuous Thrust",
+          "value": "24,200 lb (or 22,700 lb)",
+          "source": "AFM 1.5",
+          "severity": "limit"
+        },
+        {
+          "label": "Max N1",
+          "value": "106.1% (26K) / 104.5% (24K)",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "Max N2",
+          "value": "108.4%",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "Max EGT (Takeoff)",
+          "value": "950°C",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "Max EGT (Continuous)",
+          "value": "925°C",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "Engine Starter Limits (1st attempt)",
+          "value": "Max 5 minutes",
+          "source": "FCOM SP 7.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Engine Starter Limits (2nd attempt)",
+          "value": "Max 5 min, 2 min between attempts",
+          "source": "FCOM SP 7.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Engine Starter Limits (3rd+)",
+          "value": "Max 5 min, 10 min between attempts",
+          "source": "FCOM SP 7.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Engine Warm Up",
+          "value": "At least 2 minutes before thrust advance",
+          "source": "FOM B 2.3.33",
+          "severity": "caution"
+        },
+        {
+          "label": "Engine Cooldown",
+          "value": "Min 3 minutes at/near idle before shutdown",
+          "source": "FCOM NP 21.67",
+          "severity": "caution"
+        },
+        {
+          "label": "Reverser Unlocked In-Flight",
+          "value": "Do NOT actuate reverse thrust lever",
+          "source": "QRH 7.37",
+          "severity": "warning"
+        },
+        {
+          "label": "Crossbleed Start During Pushback",
+          "value": "Do NOT accomplish",
+          "source": "FCOM SP 7.5",
+          "severity": "warning"
+        },
+        {
+          "label": "Engine Cold Soak (-40°C, ≥1 hr)",
+          "value": "Do not start/motor without HMU maint procedures",
+          "source": "FCOM SP 16.4",
+          "severity": "warning"
+        },
+        {
+          "label": "Engine Cold Soak (-40°C, ≥3 hr)",
+          "value": "Do not start/motor without starter maint procedures",
+          "source": "FCOM SP 16.4",
+          "severity": "warning"
+        },
+        {
+          "label": "Cold Weather (-35°C) Idle",
+          "value": "Idle for 2 minutes before changing thrust",
+          "source": "FCOM SP 16.4",
+          "severity": "caution"
+        },
+        {
+          "label": "Anti-Ice Required (OAT ≤3°C) T/O",
+          "value": "Must be preceded by static engine run-up",
+          "source": "FCOM SP 16.4",
+          "severity": "caution"
+        },
+        {
+          "label": "Volcanic Ash",
+          "value": "Exit ASAP — consider 180° turn, descending turn",
+          "source": "QRH 7.40",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_eng_oil",
+      "title": "Engine Oil System",
+      "icon": "droplets",
+      "items": [
+        {
+          "label": "Min Oil Pressure",
+          "value": "13 psi",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Oil Temp (Continuous)",
+          "value": "140°C",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Oil Temp (Absolute)",
+          "value": "155°C (45 min between 140–155°C)",
+          "source": "AFM 1.8",
+          "severity": "limit"
+        },
+        {
+          "label": "AFL: Min Oil Quantity (Preflight)",
+          "value": "12 lt + 0.4 lt/hr consumption",
+          "source": "FCOM NP 21.3 / FOM B 2.3.3",
+          "severity": "caution"
+        },
+        {
+          "label": "Cold Weather: High Oil Pressure",
+          "value": "If above normal after temp stabilised — shutdown engine",
+          "source": "FCOM SP 16.4",
+          "severity": "warning"
+        },
+        {
+          "label": "Oil Filter Bypass Light (Cold Wx)",
+          "value": "Operate at idle until pressure returns to normal range",
+          "source": "FCOM SP 16.4",
+          "severity": "caution"
+        }
+      ]
+    },
+    {
+      "id": "lim_apu",
+      "title": "APU",
+      "icon": "power",
+      "items": [
+        {
+          "label": "APU On Ground — Electric+Bleed",
+          "value": "Max 15,000 ft",
+          "source": "FCOM L.10.5",
+          "severity": "limit"
+        },
+        {
+          "label": "APU On Ground — Bleed Only",
+          "value": "Max 10,000 ft",
+          "source": "FCOM L.10.5",
+          "severity": "limit"
+        },
+        {
+          "label": "APU In-Flight — Electric+Bleed",
+          "value": "Max 17,000 ft",
+          "source": "FCOM L.10.5",
+          "severity": "limit"
+        },
+        {
+          "label": "APU In-Flight — Electrical Load",
+          "value": "Max 41,000 ft",
+          "source": "FCOM L.10.5",
+          "severity": "limit"
+        },
+        {
+          "label": "APU Max Operating Altitude",
+          "value": "41,000 ft",
+          "source": "FCOM L.10.5",
+          "severity": "limit"
+        },
+        {
+          "label": "APU Bleed Must Be Closed When",
+          "value": "Ground air connected + ISOL valve open; Eng 1 bleed open; ISOL + Eng 2 bleed open",
+          "source": "FCOM L.10.7",
+          "severity": "limit"
+        },
+        {
+          "label": "APU During Engine Start",
+          "value": "May be open, but avoid engine power above idle",
+          "source": "FCOM L.10.7",
+          "severity": "caution"
+        },
+        {
+          "label": "3 Aborted Starts → Cooling",
+          "value": "15 minutes cooling required",
+          "source": "FCOM L.10.7",
+          "severity": "caution"
+        },
+        {
+          "label": "APU Before Bleed Use",
+          "value": "Operate for 2 full minutes",
+          "source": "FCOM 7.30.3",
+          "severity": "caution"
+        },
+        {
+          "label": "APU for ETOPS",
+          "value": "Must be ON for entire ETOPS segment",
+          "source": "FCOM SP.1.3",
+          "severity": "limit"
+        },
+        {
+          "label": "APU Inlet Door — Snow/Ice",
+          "value": "Must be free of snow and ice before start",
+          "source": "FCOM SP 16.3",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_air",
+      "title": "Air System / Pressurization",
+      "icon": "wind",
+      "items": [
+        {
+          "label": "Max Cabin Differential Pressure",
+          "value": "9.1 psi",
+          "source": "FCOM L.10.4",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Cabin Diff Pressure (T/O & Landing)",
+          "value": "0.125 psi (236 ft below airport PA)",
+          "source": "AFM 1.12",
+          "severity": "limit"
+        },
+        {
+          "label": "Engine Bleed ON + Packs in HIGH",
+          "value": "Do NOT use for T/O, approach or landing (except NNP/NNC)",
+          "source": "FCOM L.10.4",
+          "severity": "warning"
+        },
+        {
+          "label": "Interior Unattended with Pack Running",
+          "value": "Do NOT leave — risk of unscheduled pressurization",
+          "source": "FCOM SP.16.15",
+          "severity": "warning"
+        },
+        {
+          "label": "One Pack per Engine",
+          "value": "Operate no more than one pack from one engine",
+          "source": "AFM L.10.7",
+          "severity": "limit"
+        },
+        {
+          "label": "External Air Cart Min Duct Pressure",
+          "value": "20 psi (BATTERY must be ON)",
+          "source": "FCOM SP.2.1",
+          "severity": "limit"
+        },
+        {
+          "label": "Ground Conditioned Air",
+          "value": "PACK switches OFF before connecting",
+          "source": "FCOM SP.2.2",
+          "severity": "caution"
+        },
+        {
+          "label": "Unpressurized T/O: Reconfiguration",
+          "value": "Not less than 400 ft, prior to 2,000 ft AFE",
+          "source": "FCOM SP.2.5",
+          "severity": "caution"
+        },
+        {
+          "label": "Unpressurized T/O: Engine Failure",
+          "value": "Do not position BLEED ON until 1,500 ft AFE",
+          "source": "FCOM SP.2.5",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_antiice",
+      "title": "Anti-Ice",
+      "icon": "snowflake",
+      "items": [
+        {
+          "label": "Engine Anti-Ice",
+          "value": "Must be ON when icing conditions exist or anticipated",
+          "source": "FCOM L.10.6",
+          "severity": "limit"
+        },
+        {
+          "label": "Wing Anti-Ice on Ground",
+          "value": "Do NOT use — not effective, may damage",
+          "source": "FCOM SP.16.9",
+          "severity": "warning"
+        },
+        {
+          "label": "T/O in Icing Conditions (OAT ≤3°C)",
+          "value": "Must be preceded by static engine run-up",
+          "source": "FCOM SP 16.4",
+          "severity": "caution"
+        },
+        {
+          "label": "Icing Conditions — Flaps",
+          "value": "Holding with flaps extended is PROHIBITED",
+          "source": "FCOM L.10.7",
+          "severity": "warning"
+        },
+        {
+          "label": "Cold Soak — Fuel Freezing Point",
+          "value": "Tank fuel must not be less than -43°C or 3°C above freezing point (whichever higher)",
+          "source": "FCOM L.10.9",
+          "severity": "limit"
+        }
+      ]
+    },
+    {
+      "id": "lim_autoflight",
+      "title": "Auto Flight",
+      "icon": "plane",
+      "items": [
+        {
+          "label": "Max Alt for Flaps Extended",
+          "value": "20,000 ft",
+          "source": "FCOM L.10.7",
+          "severity": "limit"
+        },
+        {
+          "label": "Min Alt for Flap Retraction",
+          "value": "400 ft",
+          "source": "FCTM 3.31",
+          "severity": "limit"
+        },
+        {
+          "label": "Speedbrakes Below 1,000 ft RA",
+          "value": "Do NOT deploy in flight",
+          "source": "FCOM L.10.7",
+          "severity": "warning"
+        },
+        {
+          "label": "Speedbrake Lever in Flight",
+          "value": "Do NOT extend beyond FLIGHT detent",
+          "source": "FCOM L.10.7",
+          "severity": "warning"
+        },
+        {
+          "label": "Rapid Alternating Control Inputs",
+          "value": "AVOID — may cause structural failure at any speed incl. below VA",
+          "source": "FCOM L.10.7",
+          "severity": "warning"
+        },
+        {
+          "label": "Flight Maneuvering Load (Flaps Up)",
+          "value": "+2.5g to -1.0g",
+          "source": "AFM 1.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Flight Maneuvering Load (Flaps Down)",
+          "value": "+2.0g to 0.0g",
+          "source": "AFM 1.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Alt Flap Duty Cycle",
+          "value": "15 sec after releasing switch before moving again; 5 min cooling after full cycle",
+          "source": "FCOM L.10.7",
+          "severity": "caution"
+        },
+        {
+          "label": "Autoland — Max Tailwind",
+          "value": "15 kt",
+          "source": "FCOM L.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "A/P Disengage Below 200 ft RA",
+          "value": "Must be disconnected by 200 ft on non-precision; 50 ft on Cat I",
+          "source": "FCOM L.10.7",
+          "severity": "caution"
+        }
+      ]
+    },
+    {
+      "id": "lim_electrical",
+      "title": "Electrical",
+      "icon": "zap",
+      "items": [
+        {
+          "label": "Flight Deck Aux Power Outlets",
+          "value": "Requires operational regulatory approval",
+          "source": "FCOM L.10.6",
+          "severity": "caution"
+        },
+        {
+          "label": "One Generator Ground Operation",
+          "value": "Max 75 KVA (215 amps)",
+          "source": "AFM 1.18",
+          "severity": "limit"
+        },
+        {
+          "label": "Battery Standby Power",
+          "value": "Min 60 minutes (fully charged)",
+          "source": "QRH 6.7",
+          "severity": "info"
+        },
+        {
+          "label": "Batteries Below -18°C",
+          "value": "Remove and store warmer than -18°C but below 40°C",
+          "source": "FCOM SP 16.16",
+          "severity": "warning"
+        },
+        {
+          "label": "Cooling While Electrically Powered",
+          "value": "Packs should be run or cooling air supplied to E&E bay",
+          "source": "FCOM SP 16.16",
+          "severity": "caution"
+        }
+      ]
+    },
+    {
+      "id": "lim_fuel",
+      "title": "Fuel System",
+      "icon": "fuel",
+      "items": [
+        {
+          "label": "Max Tank Fuel Temperature",
+          "value": "49°C",
+          "source": "FCOM L.10.9",
+          "severity": "limit"
+        },
+        {
+          "label": "Min Tank Fuel Temperature",
+          "value": "-43°C or 3°C above freezing point (whichever higher)",
+          "source": "FCOM L.10.9",
+          "severity": "limit"
+        },
+        {
+          "label": "Main Tanks with Center > 453 kg",
+          "value": "Main tanks 1 and 2 must be FULL",
+          "source": "FCOM L.10.9",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Lateral Fuel Imbalance",
+          "value": "453 kg (taxi, T/O, flight, landing)",
+          "source": "FCOM L.10.9",
+          "severity": "limit"
+        },
+        {
+          "label": "Fuel Balancing — Pump Pressure",
+          "value": "Must be supplied to engines at all times",
+          "source": "FCOM SP.12.2",
+          "severity": "warning"
+        },
+        {
+          "label": "Manual Refuelling Override",
+          "value": "Caution — no automatic fuel shutoff",
+          "source": "FCOM SP.12.5",
+          "severity": "caution"
+        },
+        {
+          "label": "Fuel Transfer with Pax",
+          "value": "Prohibited unless source tank ≥ 900 kg",
+          "source": "FCOM SP.12.5",
+          "severity": "warning"
+        },
+        {
+          "label": "Wide Cut Fuels (JP-4, JetB)",
+          "value": "PROHIBITED",
+          "source": "AFM 1.8",
+          "severity": "warning"
+        },
+        {
+          "label": "Center Tank Pumps ON (Ground)",
+          "value": "Only if fuel > 453 kg (AFL: 460 kg)",
+          "source": "FCOM L.10.9 / SP.6.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Center Tank Dry Running",
+          "value": "Intentional dry running PROHIBITED",
+          "source": "FCOM L.10.9",
+          "severity": "warning"
+        },
+        {
+          "label": "LOW Fuel Alert",
+          "value": "Main Tanks < 907 kg (resets > 1,134 kg)",
+          "source": "FCOM 12.10.4",
+          "severity": "warning"
+        },
+        {
+          "label": "IMBAL Fuel Alert",
+          "value": "Main Tanks > 453 kg diff (resets < 91 kg diff)",
+          "source": "FCOM 12.10.4",
+          "severity": "caution"
+        },
+        {
+          "label": "Main Wing Tank Max Fuel",
+          "value": "4,147 kg",
+          "source": "AFM 1.6",
+          "severity": "limit"
+        },
+        {
+          "label": "Center Tank Max Fuel",
+          "value": "13,843 kg",
+          "source": "AFM 1.6",
+          "severity": "limit"
+        },
+        {
+          "label": "Fuel Leak Indication",
+          "value": "Spray from engine/strut, or 230 kg imbalance within 30 min",
+          "source": "QRH 12.6",
+          "severity": "warning"
+        },
+        {
+          "label": "AFL: Refuelling Tolerance",
+          "value": "± 200 kg",
+          "source": "FOM B 2.2.6",
+          "severity": "info"
+        },
+        {
+          "label": "Fuel Quantity Accuracy (w/ Densitometer)",
+          "value": "± 1.0%",
+          "source": "MRG",
+          "severity": "info"
+        },
+        {
+          "label": "Fuel Quantity Accuracy (w/o Densitometer)",
+          "value": "± 2.0%",
+          "source": "MRG",
+          "severity": "info"
+        }
+      ]
+    },
+    {
+      "id": "lim_hyd",
+      "title": "Hydraulic Systems",
+      "icon": "droplet",
+      "items": [
+        {
+          "label": "Min System Pressure",
+          "value": "2,800 psi",
+          "source": "FCOM 13.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Normal System Pressure",
+          "value": "3,000 psi",
+          "source": "FCOM 13.10.2",
+          "severity": "info"
+        },
+        {
+          "label": "Max System Pressure",
+          "value": "3,500 psi",
+          "source": "FCOM 13.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "REFILL Indication (RF)",
+          "value": "Quantity below 76% (ground, both eng shutdown or after landing flaps up)",
+          "source": "FCOM 13.10.2",
+          "severity": "caution"
+        },
+        {
+          "label": "AFL: Hyd Quantity After Daily Check",
+          "value": "92%",
+          "source": "FCOM NP 21.3",
+          "severity": "caution"
+        },
+        {
+          "label": "AFL: Verify No RF Indication",
+          "value": "Must check after flight",
+          "source": "FOM B 2.3.18",
+          "severity": "caution"
+        },
+        {
+          "label": "Electric Pumps Ground Operation",
+          "value": "Min 760 kg fuel in related main tank",
+          "source": "FCOM 13.20.3",
+          "severity": "limit"
+        }
+      ]
+    },
+    {
+      "id": "lim_fire",
+      "title": "Fire Protection",
+      "icon": "flame",
+      "items": [
+        {
+          "label": "Halon Discharge on Flight Deck",
+          "value": "All crew must wear O2 masks, 100% emergency",
+          "source": "FCOM 1.40.24",
+          "severity": "warning"
+        },
+        {
+          "label": "After Full Extinguisher Discharge",
+          "value": "Up to 7 min for agent to dissipate",
+          "source": "FCOM 1.40.24",
+          "severity": "caution"
+        },
+        {
+          "label": "Cargo Fire: 1-Bottle Config",
+          "value": "60 minutes fire suppression",
+          "source": "FCOM 8.20.6 + MRG",
+          "severity": "info"
+        },
+        {
+          "label": "Cargo Fire: 2-Bottle Config",
+          "value": "195 min (180 min to land + 15 min for missed approach)",
+          "source": "FCOM 8.20.6 + MRG",
+          "severity": "info"
+        }
+      ]
+    },
+    {
+      "id": "lim_fms",
+      "title": "Flight Management & Navigation",
+      "icon": "navigation",
+      "items": [
+        {
+          "label": "Max Flight Operating Latitude (YT101-104)",
+          "value": "82°N/82°S (except 80°W–130°W: 70°N, 120°E–160°E: 60°S)",
+          "source": "FCOM L.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "Max Flight Operating Latitude (YT105-YW212)",
+          "value": "82°N/82°S (except 80°W–170°W: 73°N, 120°E–160°E: 60°S)",
+          "source": "FCOM L.10.2",
+          "severity": "limit"
+        },
+        {
+          "label": "ADIRU Alignment",
+          "value": "Must NOT be attempted at latitudes > 78°15'",
+          "source": "FCOM L.10.7",
+          "severity": "limit"
+        },
+        {
+          "label": "MagVar Error > 5°",
+          "value": "All operations based on magnetic heading/track PROHIBITED",
+          "source": "FCOM L.10.7",
+          "severity": "warning"
+        },
+        {
+          "label": "Fail-Operational A/P: MagVar > 3°",
+          "value": "ILS/GLS approach and landing PROHIBITED",
+          "source": "FCOM L.10.7",
+          "severity": "warning"
+        },
+        {
+          "label": "IRS on DC Power (AC Loss)",
+          "value": "Right IRS operates 5 minutes",
+          "source": "QRH 6.7",
+          "severity": "caution"
+        },
+        {
+          "label": "IRS: Full Alignment",
+          "value": "Required before first flight of day",
+          "source": "FCOM B17 p.2",
+          "severity": "caution"
+        },
+        {
+          "label": "IRS: Fast Realignment",
+          "value": "May be performed between successive legs",
+          "source": "FCOM B17 p.2",
+          "severity": "info"
+        },
+        {
+          "label": "IRS Residual GS Error (2 flights)",
+          "value": "< 15 kt",
+          "source": "FCOM B17 p.2",
+          "severity": "limit"
+        },
+        {
+          "label": "IRS Residual GS Error (1 flight)",
+          "value": "< 21 kt",
+          "source": "FCOM B17 p.2",
+          "severity": "limit"
+        },
+        {
+          "label": "VNAV Approach Requirements",
+          "value": "Published GP angle, RWxx waypoint, or missed approach waypoint before runway",
+          "source": "NP 21.58",
+          "severity": "caution"
+        },
+        {
+          "label": "VNAV/LNAV with QFE (YT105-YW212)",
+          "value": "PROHIBITED",
+          "source": "FCOM L.10.8",
+          "severity": "warning"
+        },
+        {
+          "label": "VSD with QFE",
+          "value": "PROHIBITED",
+          "source": "FCOM L.10.8",
+          "severity": "warning"
+        },
+        {
+          "label": "IAN Approach with QFE",
+          "value": "Not authorized",
+          "source": "FCOM L.10.8",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_rvsm",
+      "title": "RVSM / Altimetry",
+      "icon": "move-vertical",
+      "items": [
+        {
+          "label": "RVSM: Max Ground Alt Display Diff (0-5,000 ft)",
+          "value": "50 ft (CPT/FO), 75 ft (CPT or FO vs Field)",
+          "source": "FCOM L.10.3",
+          "severity": "limit"
+        },
+        {
+          "label": "RVSM: Max Ground Alt Display Diff (5,001-10,000 ft)",
+          "value": "60 ft (CPT/FO), 75 ft (CPT or FO vs Field)",
+          "source": "FCOM L.10.3",
+          "severity": "limit"
+        },
+        {
+          "label": "RVSM: Max In-Flight CPT/FO Diff",
+          "value": "200 ft",
+          "source": "FCOM L.10.3",
+          "severity": "limit"
+        },
+        {
+          "label": "Standby Alt Diff (0-5,000 ft)",
+          "value": "60 ft",
+          "source": "FCOM SP.10.1",
+          "severity": "limit"
+        },
+        {
+          "label": "Standby Alt Diff (5,001-10,000 ft)",
+          "value": "80 ft",
+          "source": "FCOM SP.10.1",
+          "severity": "limit"
+        },
+        {
+          "label": "Standby Alt Diff (10,000-29,000 ft)",
+          "value": "> 400 ft: suspect, verify by maint",
+          "source": "FCOM SP.10.1",
+          "severity": "caution"
+        },
+        {
+          "label": "Standby Alt Diff (> 29,000 ft)",
+          "value": "> 500 ft: suspect, verify by maint",
+          "source": "FCOM SP.10.1",
+          "severity": "caution"
+        }
+      ]
+    },
+    {
+      "id": "lim_warning",
+      "title": "Warning Systems / GPWS",
+      "icon": "alert-triangle",
+      "items": [
+        {
+          "label": "Terrain Display for Navigation",
+          "value": "Do NOT use for navigation",
+          "source": "FCOM L.10.8",
+          "severity": "warning"
+        },
+        {
+          "label": "Look-Ahead Terrain + IRS NAV ONLY",
+          "value": "Must inhibit (TERR INHIBIT → INHIBIT)",
+          "source": "AFM 1.12",
+          "severity": "limit"
+        },
+        {
+          "label": "Look-Ahead Terrain Within 15 nm",
+          "value": "PROHIBITED if airport/runway not in GPWS database",
+          "source": "FCOM L.10.8",
+          "severity": "warning"
+        },
+        {
+          "label": "Look-Ahead Terrain with QFE",
+          "value": "PROHIBITED",
+          "source": "AFM 1.12",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": "lim_comms",
+      "title": "Communications",
+      "icon": "radio",
+      "items": [
+        {
+          "label": "ACARS Usage Limitation",
+          "value": "Only for messages that will not create unsafe condition if improperly received",
+          "source": "AFM",
+          "severity": "caution"
+        },
+        {
+          "label": "PM-CPDLC",
+          "value": "Only for cruise flight phase and non-critical messaging",
+          "source": "AFM",
+          "severity": "caution"
+        },
+        {
+          "label": "TCAS II Resolution Advisory",
+          "value": "Pilots authorized to deviate from ATC clearance to comply",
+          "source": "AFM 1.14",
+          "severity": "info"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "aircraft": "Boeing 737-800 (CFM56-7B)",
+    "source": "B737 Limitations QRG v3.3 (19/02/2021)",
+    "disclaimer": "All limitations must be crosschecked with the Company latest documents",
+    "colorCodes": {
+      "red": "Prohibited, not permitted or should be switched OFF",
+      "orange": "Caution items and actions",
+      "green": "Should / Must be ON items",
+      "purple": "Reference docs and sources",
+      "bold": "Limit values and numbers"
+    }
+  }
+}

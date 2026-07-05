@@ -35,35 +35,9 @@ body.dark-theme #krsContainer {
 }
 
 /* ─── Accordion base classes (контракт MODULE_CONTRACT v4.1 §7) ─── */
-/* Унифицированных базовых классов в style.css НЕТ — модуль объявляет всё сам. */
+/* .collapsible-title, .collapsible-chevron, .marquee-inner — промотированы в style.css (shared).
+   Модуль добавляет только контекстные правила через #{name}Container. */
 /* @keyframes marquee — единственное исключение, остаётся в style.css. */
-
-.collapsible-title {
-  flex: 1;
-  min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.marquee-inner {
-  display: inline;
-}
-
-.collapsible-chevron {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-muted);
-  transition: transform var(--transition-speed) var(--transition-ease);
-}
-.collapsible-chevron svg {
-  width: 20px;
-  height: 20px;
-}
 
 /* ─── Accordion: context-specific selectors ─── */
 
@@ -77,83 +51,28 @@ body.dark-theme #krsContainer {
 /* ─── Touch-action (перенесено из style.css по MODULE_CONTRACT §7) ─── */
 .krs-block-header {
   touch-action: manipulation;
+  min-height: 56px;
 }
 
-/* ─── Responsive (перенесено из style.css по MODULE_CONTRACT §7) ─── */
-@media (min-width: 768px) {
-  .krs-block-header { min-height: 56px; }
-}
+/* ─── Search Bar (контракт MODULE_CONTRACT §7: ct-search-* из style.css) ─── */
+/* Используем shared-классы .ct-search-bar/.ct-search-input/.ct-search-clear.
+   Специфика KRS — через контекстные селекторы ниже. */
 
-/* ─── Search Bar ─── */
-.krs-search-bar {
+.krs-search {
   padding: 8px 0 4px;
   transition: opacity var(--transition-speed) var(--transition-ease);
 }
 
-.krs-search-input-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--color-bg-card);
-  border: 1.5px solid var(--color-border-subtle);
-  border-radius: var(--border-radius-sm);
+/* .ct-search-input-wrap и .ct-search-icon — shared-классы из style.css (MODULE_CONTRACT §7).
+   Специфика KRS — через контекстные селекторы ниже. */
+
+/* Переопределение shared-инпута под KRS-обёртку (убрать border/bg — перенесены на wrap) */
+#krsContainer .ct-search-input {
+  border: none;
+  background: none;
   padding: 0 12px;
-  transition: border-color var(--transition-speed) var(--transition-ease);
-}
-
-.krs-search-input-wrap:focus-within {
-  border-color: var(--color-primary);
-}
-
-.krs-search-icon {
-  display: flex;
-  align-items: center;
-  color: var(--color-text-muted);
-  flex-shrink: 0;
-}
-
-.krs-search-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.krs-search-input {
-  flex: 1;
-  min-width: 0;
   height: 40px;
-  font-size: var(--font-base);
-  color: var(--color-text-main);
-  background: none;
-  border: none;
-  outline: none;
-}
-
-.krs-search-input::placeholder {
-  color: var(--color-text-muted);
-}
-
-.krs-search-clear {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-  transition: background-color var(--transition-speed) var(--transition-ease);
-}
-
-@media (hover: hover) {
-  .krs-search-clear:hover { background-color: var(--color-bg-hover); }
-}
-
-.krs-search-clear svg {
-  width: 16px;
-  height: 16px;
+  box-shadow: none;
 }
 
 /* ─── Divider (контракт MODULE_CONTRACT §7: осознанное дублирование, не в style.css) ─── */
@@ -292,7 +211,7 @@ body.dark-theme #krsContainer {
 }
 
 .krs-addres-marker {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   line-height: 1.2;
   color: var(--color-text-muted);
   text-transform: uppercase;
@@ -334,8 +253,13 @@ body.dark-theme #krsContainer {
 
 /* ─── Block Content (collapsible) ─── */
 .krs-block-content {
+  max-height: 0;
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.krs-block-content--open {
+  max-height: 5000px;
 }
 
 .krs-block-inner {
@@ -614,7 +538,7 @@ body.dark-theme #krsContainer {
   }
 
   .krs-addres-marker {
-    font-size: 0.5625rem;
+    font-size: 0.625rem;
   }
 }
 

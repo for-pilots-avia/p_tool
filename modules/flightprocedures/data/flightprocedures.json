@@ -11,7 +11,7 @@
       },
       {
         "id": "fp-group-maydayorpanpan",
-        "title": "MAYDAY or PANPAN",
+        "title": "- MAYDAY or PANPAN",
         "layout": "group",
         "children": [
           {
@@ -53,7 +53,7 @@
       },
       {
         "id": "fp-group-evacuaiton",
-        "title": "EVACUATION",
+        "title": "- EVACUATION",
         "layout": "group",
         "children": [
           {
@@ -100,7 +100,7 @@
       },
       {
         "id": "fp-group-reject",
-        "title": "REJECTED Take Off",
+        "title": "1) REJECTED Take Off",
         "layout": "group",
         "children": [
           {
@@ -143,7 +143,7 @@
       },
       {
         "id": "fp-group-engout",
-        "title": "ENG out takeoff",
+        "title": "2) ENG out takeoff",
         "layout": "group",
         "children": [
           {
@@ -185,7 +185,7 @@
       },
       {
         "id": "fp-group-radiocom",
-        "title": "Radiocommunication failure",
+        "title": "3) Radiocommunication failure",
         "layout": "group",
         "children": [
           {
@@ -227,7 +227,7 @@
       },
       {
         "id": "fp-group-driftdown",
-        "title": "ENG out driftdown",
+        "title": "4) ENG out driftdown",
         "layout": "group",
         "children": [
           {
@@ -281,7 +281,7 @@
       },
       {
         "id": "fp-group-emdescent",
-        "title": "Emergency descent / RAPID DECOMPRESSION",
+        "title": "5) Emergency descent / RAPID DECOMPRESSION",
         "layout": "group",
         "children": [
           {
@@ -330,7 +330,7 @@
       },
       {
         "id": "fp-group-unrul",
-        "title": "Угроза захвата ВС / Недисциплинированный пассажир",
+        "title": "6) Угроза захвата ВС / Недисциплинированный пассажир",
         "layout": "group",
         "children": [
           {
@@ -354,7 +354,7 @@
       },
       {
         "id": "fp-group-medical",
-        "title": "Medical Emergency",
+        "title": "7) Medical Emergency",
         "layout": "group",
         "children": [
           {
@@ -380,7 +380,7 @@
       },
       {
         "id": "fp-group-lost",
-        "title": "Потеря местоположения",
+        "title": "8) Потеря местоположения",
         "layout": "group",
         "children": [
           {
@@ -398,7 +398,7 @@
       },
       {
         "id": "fp-group-intercept",
-        "title": "Перехват ВС",
+        "title": "9) Перехват ВС",
         "layout": "group",
         "children": [
           {

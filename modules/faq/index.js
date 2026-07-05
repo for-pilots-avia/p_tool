@@ -46,6 +46,8 @@
     var container = document.getElementById('faqContainer');
     if (!container) { console.error('Контейнер faqContainer не найден!'); return; }
 
+    container.setAttribute('lang', 'ru');
+
     /* Делегирование: init() вызывается строго один раз (контракт MODULE_CONTRACT §5) */
     container.addEventListener('click', function(e) {
       var pill = e.target.closest('.faq-toc-pill');
@@ -93,7 +95,7 @@
     if (_data.sections) {
       for (var i = 0; i < _data.sections.length; i++) {
         var s = _data.sections[i];
-        html += '<button class="faq-toc-pill' + (i === 0 ? ' faq-toc-pill--active' : '') + '" data-section="' + s.id + '">' + s.title + '</button>';
+        html += '<button class="faq-toc-pill' + (i === 0 ? ' faq-toc-pill--active' : '') + '" data-section="' + s.id + '"' + window.app.langAttr(s.title) + '>' + window.app.escapeHtml(s.title) + '</button>';
       }
     }
     if (_data.links && _data.links.length > 0) {
@@ -106,14 +108,14 @@
       for (var j = 0; j < _data.sections.length; j++) {
         var sec = _data.sections[j];
         html += '<section id="' + sec.id + '" class="faq-section">';
-        html += '<h2 class="faq-section-title">' + sec.title + '</h2>';
+        html += '<h2 class="faq-section-title"' + window.app.langAttr(sec.title) + '>' + window.app.escapeHtml(sec.title) + '</h2>';
         var paragraphs = sec.content.split('\n\n');
         for (var k = 0; k < paragraphs.length; k++) {
-          html += '<p class="faq-paragraph">' + paragraphs[k] + '</p>';
+          html += '<p class="faq-paragraph"' + window.app.langAttr(paragraphs[k]) + '>' + window.app.renderRichText(paragraphs[k]) + '</p>';
         }
         /* Install URL link */
         if (sec.url) {
-          html += '<a href="' + sec.url + '" target="_blank" rel="noopener noreferrer" class="faq-install-url">';
+          html += '<a href="' + window.app.escapeAttr(sec.url) + '" target="_blank" rel="noopener noreferrer" class="faq-install-url">';
           html += '<span class="faq-install-url-label">Открыть сайт приложения</span>';
           html += '<span class="faq-install-url-icon">' + (window.ICONS['external-link'] || '') + '</span>';
           html += '</a>';
@@ -123,10 +125,10 @@
           html += '<div class="faq-contacts-grid">';
           for (var c = 0; c < sec.contactLinks.length; c++) {
             var cl = sec.contactLinks[c];
-            html += '<a href="' + cl.url + '" target="_blank" rel="noopener noreferrer" class="faq-contact-card">';
+            html += '<a href="' + window.app.escapeAttr(cl.url) + '" target="_blank" rel="noopener noreferrer" class="faq-contact-card">';
             html += '<div class="faq-contact-icon">' + (window.ICONS[cl.icon] || '') + '</div>';
             html += '<div class="faq-contact-content">';
-            html += '<span class="faq-contact-label">' + cl.label + '</span>';
+            html += '<span class="faq-contact-label"' + window.app.langAttr(cl.label) + '>' + window.app.escapeHtml(cl.label) + '</span>';
             html += '<span class="faq-contact-type">' + (cl.type === 'email' ? 'Электронная почта' : 'Telegram') + '</span>';
             html += '</div></a>';
           }
@@ -143,11 +145,11 @@
       html += '<div class="faq-links-grid">';
       for (var l = 0; l < _data.links.length; l++) {
         var link = _data.links[l];
-        html += '<a href="' + link.url + '" target="_blank" rel="noopener noreferrer" class="faq-link-card">';
+        html += '<a href="' + window.app.escapeAttr(link.url) + '" target="_blank" rel="noopener noreferrer" class="faq-link-card">';
         html += '<div class="faq-link-icon">' + (window.ICONS['external-link'] || '') + '</div>';
         html += '<div class="faq-link-content">';
-        html += '<span class="faq-link-label">' + link.label + '</span>';
-        if (link.desc) html += '<span class="faq-link-desc">' + link.desc + '</span>';
+        html += '<span class="faq-link-label"' + window.app.langAttr(link.label) + '>' + window.app.escapeHtml(link.label) + '</span>';
+        if (link.desc) html += '<span class="faq-link-desc"' + window.app.langAttr(link.desc) + '>' + window.app.escapeHtml(link.desc) + '</span>';
         html += '</div></a>';
       }
       html += '</div></section>';

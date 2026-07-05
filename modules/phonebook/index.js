@@ -53,10 +53,6 @@
     return 'pb-phone-badge';
   }
 
-  function escapeAttr(s) {
-    return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
   /* ═══════════════════════════════════════════
      RENDER
      ═══════════════════════════════════════════ */
@@ -99,15 +95,15 @@
     var html = '<div class="module-container">';
 
     /* Search bar */
-    html += '<div class="pb-search-bar">';
-    html += '<div class="pb-search-input-wrap">';
-    html += '<span class="pb-search-input-icon">' + window.ICONS.search + '</span>';
-    html += '<input type="text" class="pb-search-input" placeholder="Поиск по имени, должности, телефону…"'
-      + ' value="' + escapeAttr(_filter || '') + '">';
-    html += '</div>';
+    html += '<div class="ct-search-bar">';
+    html += '<div class="ct-search-input-wrap">';
+    html += '<span class="ct-search-icon">' + window.ICONS.search + '</span>';
+    html += '<input type="text" class="ct-search-input" placeholder="Поиск по имени, должности, телефону…"'
+      + ' value="' + window.app.escapeAttr(_filter || '') + '">';
     if (_filter) {
-      html += '<button class="pb-search-clear" aria-label="Очистить">' + window.ICONS.x + '</button>';
+      html += '<button class="ct-search-clear visible" aria-label="Очистить">' + window.ICONS.x + '</button>';
     }
+    html += '</div>';
     html += '</div>';
 
     if (!hasContacts) {
@@ -123,7 +119,10 @@
         if (isDivider(entry)) {
           html += '<div class="pb-divider">';
           if (entry.label) {
-            html += '<span class="pb-divider-label">' + entry.label + '</span>';
+            var divLabelLang = window.app.detectLang(entry.label);
+            var divLabelAttr = window.app.langAttr(entry.label);
+            var divLabelContent = (divLabelLang === 'ru') ? window.app.wrapLongWords(entry.label, 8) : window.app.escapeHtml(entry.label);
+            html += '<span class="pb-divider-label"' + divLabelAttr + '>' + divLabelContent + '</span>';
           }
           html += '</div>';
         } else {
@@ -140,12 +139,12 @@
     bindSearchInput();
 
     // Bind clear button
-    var clearBtn = container.querySelector('.pb-search-clear');
+    var clearBtn = container.querySelector('.ct-search-clear');
     if (clearBtn) {
       clearBtn.addEventListener('click', function() {
         _filter = '';
         renderAll();
-        var inp = container.querySelector('.pb-search-input');
+        var inp = container.querySelector('.ct-search-input');
         if (inp) inp.focus();
       });
     }
@@ -164,9 +163,15 @@
 
     // Info
     html += '<div class="pb-card-info">';
-    html += '<div class="pb-card-name">' + escapeAttr(contact.name) + '</div>';
+    var nameLang = window.app.detectLang(contact.name);
+    var nameAttrStr = window.app.langAttr(contact.name);
+    var nameContent = (nameLang === 'ru') ? window.app.wrapLongWords(contact.name, 8) : window.app.escapeHtml(contact.name);
+    html += '<div class="pb-card-name"' + nameAttrStr + '>' + nameContent + '</div>';
     if (contact.position) {
-      html += '<div class="pb-card-position">' + escapeAttr(contact.position) + '</div>';
+      var posLang = window.app.detectLang(contact.position);
+      var posAttrStr = window.app.langAttr(contact.position);
+      var posContent = (posLang === 'ru') ? window.app.wrapLongWords(contact.position, 8) : window.app.escapeHtml(contact.position);
+      html += '<div class="pb-card-position"' + posAttrStr + '>' + posContent + '</div>';
     }
 
     // Phones
@@ -175,14 +180,14 @@
       for (var i = 0; i < contact.phones.length; i++) {
         var phone = contact.phones[i];
         html += '<div class="pb-phone-row">';
-        html += '<a href="tel:' + escapeAttr(phone.tel) + '" class="pb-phone-link">';
+        html += '<a href="tel:' + window.app.escapeAttr(phone.tel) + '" class="pb-phone-link">';
         html += '<span class="pb-phone-icon">' + window.ICONS.phone + '</span>';
-        html += '<span class="pb-phone-number">' + formatPhoneNumber(phone.tel) + '</span>';
+        html += '<span class="pb-phone-number">' + window.app.escapeHtml(formatPhoneNumber(phone.tel)) + '</span>';
         if (phoneTypeLabel(phone.type)) {
           html += '<span class="' + phoneBadgeClass(phone.type) + '">' + phoneTypeLabel(phone.type) + '</span>';
         }
         html += '</a>';
-        html += '<button class="pb-copy-btn" data-phone="' + escapeAttr(phone.tel) + '" aria-label="Скопировать номер">';
+        html += '<button class="pb-copy-btn" data-phone="' + window.app.escapeAttr(phone.tel) + '" aria-label="Скопировать номер">';
         html += window.ICONS['clipboard-check'] || window.ICONS.check;
         html += '</button>';
         html += '</div>';
@@ -193,11 +198,11 @@
     // Email
     if (contact.email) {
       html += '<div class="pb-email-row">';
-      html += '<a href="mailto:' + escapeAttr(contact.email) + '" class="pb-email-link">';
+      html += '<a href="mailto:' + window.app.escapeAttr(contact.email) + '" class="pb-email-link">';
       html += '<span class="pb-email-icon">' + (window.ICONS['mail'] || '') + '</span>';
-      html += '<span class="pb-email-text">' + escapeAttr(contact.email) + '</span>';
+      html += '<span class="pb-email-text">' + window.app.escapeHtml(contact.email) + '</span>';
       html += '</a>';
-      html += '<a href="mailto:' + escapeAttr(contact.email) + '" class="pb-mail-btn" aria-label="Написать письмо">';
+      html += '<a href="mailto:' + window.app.escapeAttr(contact.email) + '" class="pb-mail-btn" aria-label="Написать письмо">';
       html += window.ICONS['mail'] || '';
       html += '</a>';
       html += '</div>';
@@ -214,13 +219,13 @@
   function bindSearchInput() {
     var container = document.getElementById('phonebookContainer');
     if (!container) return;
-    var input = container.querySelector('.pb-search-input');
+    var input = container.querySelector('.ct-search-input');
     if (input) {
       input.addEventListener('input', function(e) {
         _filter = e.target.value;
         renderAll();
         // Restore focus and cursor
-        var inp = container.querySelector('.pb-search-input');
+        var inp = container.querySelector('.ct-search-input');
         if (inp) {
           inp.focus();
           inp.setSelectionRange(_filter.length, _filter.length);
@@ -260,6 +265,7 @@
   function init() {
     var container = document.getElementById('phonebookContainer');
     if (!container) { console.error('Контейнер phonebookContainer не найден!'); return; }
+    container.setAttribute('lang', 'ru');
 
     // Делегирование: вешать ровно ОДИН раз
     // Делегирование: init() вызывается строго один раз (MODULE_CONTRACT §5)

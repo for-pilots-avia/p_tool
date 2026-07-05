@@ -74,7 +74,7 @@ body.dark-theme #metbriefingContainer {
   font-size: var(--font-sm);
   font-weight: 500;
   text-decoration: none;
-  transition: all 0.2s var(--transition-ease);
+  transition: all var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-aviabit-link svg {
   width: 16px; height: 16px; flex-shrink: 0;
@@ -143,7 +143,7 @@ body.dark-theme #metbriefingContainer {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: border-color 0.2s var(--transition-ease);
+  transition: border-color var(--transition-speed) var(--transition-ease);
   width: 100%;
 }
 .metbriefing-icao-input:focus {
@@ -179,7 +179,7 @@ body.dark-theme #metbriefingContainer {
   z-index: 1200;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.15s var(--transition-ease), visibility 0.15s var(--transition-ease);
+  transition: opacity var(--transition-speed) var(--transition-ease), visibility var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-header-menu-overlay--visible {
   opacity: 1;
@@ -199,7 +199,7 @@ body.dark-theme #metbriefingContainer {
   opacity: 0;
   visibility: hidden;
   transform: translateY(-4px);
-  transition: opacity 0.15s var(--transition-ease), transform 0.15s var(--transition-ease), visibility 0.15s;
+  transition: opacity var(--transition-speed) var(--transition-ease), transform var(--transition-speed) var(--transition-ease), visibility var(--transition-speed);
 }
 .metbriefing-header-menu--open {
   opacity: 1;
@@ -220,7 +220,7 @@ body.dark-theme #metbriefingContainer {
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-header-menu-item:hover,
 .metbriefing-header-menu-item:focus-visible {
@@ -240,7 +240,7 @@ body.dark-theme #metbriefingContainer {
   background: var(--color-bg-main);
   color: var(--color-text-main);
   font-size: var(--font-sm);
-  transition: border-color 0.2s var(--transition-ease);
+  transition: border-color var(--transition-speed) var(--transition-ease);
   width: 100%;
 }
 .metbriefing-text-input:focus {
@@ -349,7 +349,7 @@ body.dark-theme #metbriefingContainer {
   font-size: var(--font-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--transition-ease);
+  transition: all var(--transition-speed) var(--transition-ease);
   text-align: center;
   min-height: 44px;
 }
@@ -488,7 +488,7 @@ body.dark-theme .metbriefing-status-badge--warn {
   overflow: hidden;
   cursor: pointer;
   aspect-ratio: 4 / 3;
-  transition: border-color 0.2s var(--transition-ease);
+  transition: border-color var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-wx-map-thumb--full {
   grid-column: 1 / -1;
@@ -512,6 +512,10 @@ body.dark-theme .metbriefing-status-badge--warn {
 .metbriefing-wx-map-thumb-loading svg {
   width: 24px; height: 24px;
 }
+.metbriefing-wx-map-error-text {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
 .metbriefing-wx-map-label {
   position: absolute;
   bottom: 0;
@@ -519,7 +523,7 @@ body.dark-theme .metbriefing-status-badge--warn {
   right: 0;
   padding: 4px 8px;
   background: linear-gradient(transparent, rgba(0,0,0,0.6));
-  color: #fff;
+  color: var(--color-text-white);
   font-size: var(--font-xs);
   font-weight: 600;
 }
@@ -545,6 +549,34 @@ body.dark-theme .metbriefing-status-badge--warn {
 @keyframes metbriefing-spin-keyframes {
   from { transform: rotate(0deg); }
   to   { transform: rotate(-360deg); }
+}
+
+/* Task 53 (B4): кнопка-иконка обновления wind maps (заменила span spin + старую кнопку рядом с select) */
+.metbriefing-wind-refresh-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin-left: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  border-radius: var(--border-radius-sm);
+  transition: color var(--transition-speed) var(--transition-ease), background var(--transition-speed) var(--transition-ease);
+  touch-action: manipulation;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.metbriefing-wind-refresh-icon-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-hover);
+}
+.metbriefing-wind-refresh-icon-btn--loading svg {
+  animation: metbriefing-spin-keyframes 1s linear infinite;
+  color: var(--color-primary);  /* красный (#cd202c) */
 }
 
 /* ── Task 28: Wind-by-flight-level maps (FL100-FL390, +6h, area C) ── */
@@ -604,7 +636,7 @@ body.dark-theme .metbriefing-status-badge--warn {
   border-radius: var(--border-radius-sm);
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), color var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-wind-refresh-btn:hover {
   background: var(--color-bg-hover);
@@ -650,7 +682,7 @@ body.dark-theme .metbriefing-status-badge--warn {
     margin-left: 0;
     width: 100%;
     text-align: right;
-    font-size: 10px;
+    font-size: var(--font-2xs);
   }
 }
 
@@ -666,7 +698,7 @@ body.dark-theme .metbriefing-status-badge--warn {
   border-radius: var(--border-radius-sm);
   padding: 12px;
   cursor: pointer;
-  transition: background 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 @media (hover: hover) {
   .metbriefing-inline-weather:hover {
@@ -695,7 +727,7 @@ body.dark-theme .metbriefing-status-badge--warn {
 }
 /* Flight rules badge */
 .metbriefing-inline-weather-fr {
-  font-size: 10px;
+  font-size: var(--font-2xs);
   font-weight: 800;
   letter-spacing: 0.04em;
   padding: 2px 6px;
@@ -795,6 +827,9 @@ body.dark-theme .metbriefing-status-badge--warn {
 }
 .metbriefing-inline-loading svg {
   width: 18px; height: 18px;
+}
+.metbriefing-inline-loading--hint {
+  color: var(--color-text-muted);
 }
 .metbriefing-inline-error {
   display: flex;
@@ -971,7 +1006,7 @@ body.dark-theme .metbriefing-status-badge--warn {
 }
 .metbriefing-inline-notam-chevron {
   flex-shrink: 0;
-  transition: transform 0.2s;
+  transition: transform var(--transition-speed);
 }
 .metbriefing-inline-notam--expanded .metbriefing-inline-notam-chevron {
   transform: rotate(0deg);
@@ -1057,7 +1092,7 @@ body.dark-theme .metbriefing-inline-notam-item--medium {
 }
 .metbriefing-inline-notam-item[data-nt-goto-icao] {
   cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
+  transition: background var(--transition-speed), transform var(--transition-speed);
 }
 @media (hover: hover) {
   .metbriefing-inline-notam-item[data-nt-goto-icao]:hover {
@@ -1077,7 +1112,7 @@ body.dark-theme .metbriefing-inline-notam-item--medium {
   color: var(--color-text-main);
 }
 .metbriefing-inline-notam-crit {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
@@ -1105,7 +1140,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 }
 /* .metbriefing-inline-notam-item-desc and .metbriefing-inline-notam-item-dates removed — not used in briefing NOTAM */
 .metbriefing-inline-notam-qcode {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
@@ -1139,7 +1174,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   padding: 4px;
   color: inherit;
   opacity: 0.7;
-  transition: opacity 0.15s var(--transition-ease);
+  transition: opacity var(--transition-speed) var(--transition-ease);
   touch-action: manipulation;
   flex-shrink: 0;
 }
@@ -1154,6 +1189,15 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 .metbriefing-readiness-refresh-btn svg {
   width: 18px;
   height: 18px;
+}
+
+/* Task 55 (C2): spin + красный при загрузке любых данных */
+.metbriefing-readiness-refresh-btn--loading svg {
+  animation: metbriefing-spin-keyframes 1s linear infinite;
+  color: var(--color-primary);  /* красный (#cd202c) */
+}
+.metbriefing-readiness-refresh-btn--loading {
+  opacity: 1;  /* всегда яркая при loading, не 0.7 */
 }
 .metbriefing-readiness-dot {
   width: 10px; height: 10px;
@@ -1267,7 +1311,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   font-size: var(--font-xs);
   padding: 2px 6px;
   cursor: pointer;
-  transition: all 0.15s var(--transition-ease);
+  transition: all var(--transition-speed) var(--transition-ease);
   white-space: nowrap;
 }
 .metbriefing-readiness-warning-action svg {
@@ -1296,7 +1340,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 8px var(--color-shadow-primary);
-  transition: all 0.2s var(--transition-ease);
+  transition: all var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-share-btn svg {
   width: 16px; height: 16px;
@@ -1314,69 +1358,28 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
    WEATHER TAB
    ──────────────────────────────────────────── */
 
-/* ── Search Bar ── */
-.metbriefing-wx-search-bar,
-.metbriefing-notam-search-bar {
-  display: flex;
-  gap: 8px;
-  margin: 4px 0 8px;
-}
-.metbriefing-wx-search-input-wrap,
-.metbriefing-notam-search-input-wrap {
-  position: relative;
-  flex: 1;
-}
-.metbriefing-wx-search-icon,
-.metbriefing-notam-search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px; height: 18px;
-  color: var(--color-text-muted);
-  pointer-events: none;
-}
-.metbriefing-wx-search-input,
-.metbriefing-notam-search-input {
-  width: 100%;
-  height: 44px;
-  padding: 0 36px 0 40px;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background: var(--color-bg-main);
-  color: var(--color-text-main);
-  font-size: var(--font-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.metbriefing-wx-search-input:focus,
-.metbriefing-notam-search-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
-}
-.metbriefing-wx-search-input::placeholder,
-.metbriefing-notam-search-input::placeholder {
-  color: var(--color-text-muted);
-  text-transform: none;
-}
-.metbriefing-wx-search-clear,
-.metbriefing-notam-search-clear {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+/* ── Search Bar — shared .ct-search-* (SHELL_CONTRACT §5 Блок В v3.6, MODULE_CONTRACT §7 единый паттерн v5.4) ──
+   Структура: .ct-search-bar > .ct-search-input-wrap (border/bg) > .ct-search-icon + .ct-search-input + .ct-search-clear.
+   Кнопка "+" (.metbriefing-wx-search-btn / -notam-) — sibling обёртки внутри .ct-search-bar,
+   action-button добавления аэропорта в список, а не кнопка поиска.
+   Модульная специфика: text-transform uppercase для ICAO-кодов. */
+#metbriefingContainer .ct-search-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 28px; height: 28px;
-  border-radius: 4px;
-  color: var(--color-text-muted);
+  gap: 8px;  /* между .ct-search-input-wrap и кнопкой "+" */
+  margin: 4px 0 8px;
+  padding: 0;  /* переопределяем shell padding 8px 0 4px — у metbriefing свой отступ */
 }
-.metbriefing-wx-search-clear svg,
-.metbriefing-notam-search-clear svg {
-  width: 16px; height: 16px;
+#metbriefingContainer .ct-search-input {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--font-sm);
 }
+#metbriefingContainer .ct-search-input::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
+}
+/* "Plus" action button — module-specific (добавление аэропорта в список) */
 .metbriefing-wx-search-btn,
 .metbriefing-notam-search-btn {
   display: flex;
@@ -1390,7 +1393,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   border: none;
   border-radius: var(--border-radius-sm);
   cursor: pointer;
-  transition: background 0.2s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-wx-search-btn:disabled,
 .metbriefing-notam-search-btn:disabled {
@@ -1502,7 +1505,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   -webkit-appearance: none;
   appearance: none;
   color: var(--color-text-secondary);
-  transition: color 0.2s var(--transition-ease);
+  transition: color var(--transition-speed) var(--transition-ease);
   cursor: pointer;
 }
 .metbriefing-wx-card-action svg {
@@ -1666,7 +1669,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 .metbriefing-wx-wind-arrow {
   width: 28px !important; height: 28px !important;
   color: var(--color-primary);
-  transition: transform 0.3s var(--transition-ease);
+  transition: transform var(--transition-speed) var(--transition-ease);
 }
 .metbriefing-wx-wind-dir-label {
   font-size: var(--font-xs);
@@ -1722,6 +1725,9 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-text-muted);
   flex-wrap: wrap;
   gap: 4px;
+}
+.metbriefing-wx-cache-time {
+  margin-left: auto;
 }
 
 /* ── Stale Data Badge ── */
@@ -1806,7 +1812,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   font-size: var(--font-xs);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--transition-ease);
+  transition: all var(--transition-speed) var(--transition-ease);
   text-align: center;
   min-height: 36px;
   display: flex;
@@ -1819,7 +1825,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-text-white);
 }
 .metbriefing-nt-filter-count {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   background: rgba(255, 255, 255, 0.2);
   padding: 1px 5px;
   border-radius: 4px;
@@ -1861,7 +1867,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   background: var(--color-bg-card);
   padding: 1px 5px;
   border-radius: 3px;
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
 }
 .metbriefing-notam-airport-chip-remove {
   display: inline-flex;
@@ -1891,7 +1897,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 
 /* ── NOTAM Airport Chip FIR label ── */
 .metbriefing-notam-airport-chip-fir {
-  font-size: 0.5rem;
+  font-size: var(--font-2xs);
   font-weight: 700;
   color: var(--mb-color-warning-text);
   background: var(--mb-color-warning-bg);
@@ -1914,7 +1920,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-primary);
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s, color 0.15s, transform 0.15s;
+  transition: background var(--transition-speed), color var(--transition-speed), transform var(--transition-speed);
   flex-shrink: 0;
 }
 .metbriefing-notam-refresh-all svg {
@@ -1995,7 +2001,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
-  transition: background 0.15s;
+  transition: background var(--transition-speed);
   gap: 8px;
 }
 .metbriefing-notam-group-header:hover {
@@ -2011,7 +2017,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 }
 .metbriefing-notam-group-chevron {
   flex-shrink: 0;
-  transition: transform 0.2s;
+  transition: transform var(--transition-speed);
 }
 .metbriefing-notam-group--expanded .metbriefing-notam-group-chevron {
   transform: rotate(0deg);
@@ -2099,7 +2105,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-text-main);
 }
 .metbriefing-notam-type-badge {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2123,7 +2129,7 @@ body.dark-theme .metbriefing-notam-type-badge--R {
 }
 
 .metbriefing-notam-criticality-badge {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2145,7 +2151,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   color: var(--mb-color-ok-text);
 }
 .metbriefing-notam-qcode-badge {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2166,7 +2172,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   color: var(--color-text-secondary);
 }
 .metbriefing-notam-status-badge {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2353,7 +2359,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 
 /* Station Info (now inline in header) */
 .metbriefing-wx-card-station, .metbriefing-inline-weather-station {
-  font-size: 11px;
+  font-size: var(--font-2xs);
   color: var(--color-text-muted);
   font-weight: 400;
   margin-left: 4px;
@@ -2412,7 +2418,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   margin-bottom: 0;
 }
 .metbriefing-wx-metar-history-label {
-  font-size: 11px;
+  font-size: var(--font-2xs);
   font-weight: 600;
   color: var(--color-text-muted);
   display: flex;
@@ -2420,7 +2426,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   gap: 6px;
 }
 .metbriefing-wx-hist-cat {
-  font-size: 0.625rem;
+  font-size: var(--font-2xs);
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2430,7 +2436,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 .metbriefing-wx-metar-history-code {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-2xs);
   color: var(--color-text-secondary);
   font-family: 'Roboto Mono', 'JetBrains Mono', 'SF Mono', monospace;
   overflow-wrap: break-word;
@@ -2451,7 +2457,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   font-size: var(--font-xs);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s var(--transition-ease);
+  transition: all var(--transition-speed) var(--transition-ease);
   width: 100%;
 }
 .metbriefing-wx-metar-history-btn svg {
@@ -2468,7 +2474,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  font-size: 11px;
+  font-size: var(--font-2xs);
   color: var(--color-text-muted);
   opacity: 0.6;
 }
@@ -2565,6 +2571,9 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   background: var(--color-bg-card);
   border-left: 3px solid var(--color-warning);
 }
+/* Hazard-цвета SIGMET-типов — semantic colors, осознанный hardcoded
+   (нет в SHELL_CONTRACT §4, т.к. специализированы для авиационных hazards).
+   ICAO-стандарт: TS=красный, TURB=оранжевый, ICE=синий, VA=фиолетовый, MTW=коричневый. */
 .metbriefing-sigmet-card.metbriefing-sigmet-hazard--ts,
 .metbriefing-sigmet-card.metbriefing-sigmet-hazard--convective {
   border-left-color: #e63946;
@@ -2636,7 +2645,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 .metbriefing-sigmet-tag {
   display: inline-block;
-  font-size: 10px;
+  font-size: var(--font-2xs);
   color: var(--color-text-muted);
   background: var(--color-bg-hover);
   border-radius: 3px;
@@ -2675,7 +2684,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 .metbriefing-sigmet-raw-toggle::before {
   content: '▸ ';
-  transition: transform 0.2s;
+  transition: transform var(--transition-speed);
   display: inline-block;
 }
 .metbriefing-sigmet-raw-toggle--open::before {
@@ -2688,7 +2697,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   background: var(--color-bg-main);
   border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
-  font-size: 11px;
+  font-size: var(--font-2xs);
   font-family: 'Roboto Mono', 'JetBrains Mono', 'SF Mono', monospace;
   line-height: 1.5;
   white-space: pre-wrap;

@@ -10,6 +10,15 @@
   var _data = null;
   var _filter = '';
 
+  /* ─── Языковая обёртка для текстовых полей (MODULE_CONTRACT §7 v5.3) ─── */
+  function _t(text) {
+    if (!text) return '';
+    var lang = window.app.detectLang(text);
+    var attr = window.app.langAttr(text);
+    var content = (lang === 'ru') ? window.app.wrapLongWords(text, 8) : window.app.escapeHtml(text);
+    return '<span' + attr + '>' + content + '</span>';
+  }
+
   /* ═══════════════════════════════════════════
      CALCULATORS
      ═══════════════════════════════════════════ */
@@ -401,6 +410,7 @@
     var container = document.getElementById('rulesthumbContainer');
     if (!container) { console.error('Контейнер rulesthumbContainer не найден!'); return; }
 
+    container.setAttribute('lang', 'ru');
     _filter = '';
 
     if (_data) { renderAll(); return; }
@@ -434,18 +444,18 @@
 
     var html = '<div class="module-container">';
 
-    html += '<div class="rt-warning">' + _data.warning + '</div>';
+    html += '<div class="rt-warning">' + _t(_data.warning) + '</div>';
 
     /* Search bar — паттерн phonebook */
-    html += '<div class="rt-search-bar">';
-    html += '<div class="rt-search-input-wrap">';
-    html += '<span class="rt-search-input-icon">' + window.ICONS.search + '</span>';
-    html += '<input type="text" class="rt-search-input" placeholder="Поиск правила…"'
-      + ' value="' + escapeAttr(_filter || '') + '">';
-    html += '</div>';
+    html += '<div class="ct-search-bar">';
+    html += '<div class="ct-search-input-wrap">';
+    html += '<span class="ct-search-icon">' + window.ICONS.search + '</span>';
+    html += '<input type="text" class="ct-search-input" placeholder="Поиск правила…"'
+      + ' value="' + window.app.escapeAttr(_filter || '') + '">';
     if (_filter) {
-      html += '<button class="rt-search-clear" aria-label="Очистить">' + window.ICONS.x + '</button>';
+      html += '<button class="ct-search-clear visible" aria-label="Очистить">' + window.ICONS.x + '</button>';
     }
+    html += '</div>';
     html += '</div>';
 
     /* Filter categories */
@@ -507,7 +517,7 @@
       }
     }
 
-    html += '<div class="rt-attribution">' + _data.attribution + '</div>';
+    html += '<div class="rt-attribution">' + _t(_data.attribution) + '</div>';
     html += '</div>';
 
     app.hideSkeleton(container, html);
@@ -517,12 +527,12 @@
     bindSearchInput();
 
     /* Clear button */
-    var clearBtn = container.querySelector('.rt-search-clear');
+    var clearBtn = container.querySelector('.ct-search-clear');
     if (clearBtn) {
       clearBtn.addEventListener('click', function() {
         _filter = '';
         renderAll();
-        var inp = container.querySelector('.rt-search-input');
+        var inp = container.querySelector('.ct-search-input');
         if (inp) inp.focus();
       });
     }
@@ -532,12 +542,12 @@
   function bindSearchInput() {
     var container = document.getElementById('rulesthumbContainer');
     if (!container) return;
-    var input = container.querySelector('.rt-search-input');
+    var input = container.querySelector('.ct-search-input');
     if (input) {
       input.addEventListener('input', function(e) {
         _filter = e.target.value;
         renderAll();
-        var inp = container.querySelector('.rt-search-input');
+        var inp = container.querySelector('.ct-search-input');
         if (inp) {
           inp.focus();
           inp.setSelectionRange(_filter.length, _filter.length);
@@ -550,9 +560,9 @@
     var cat = filtered.cat;
     var html = '<div class="rt-accordion-item">';
     html += '<div class="rt-accordion-header" data-rt-cat="' + cat.id + '">';
-    html += '<span class="rt-accordion-title">' + escapeHtml(cat.title);
+    html += '<span class="rt-accordion-title">' + _t(cat.title);
     if (cat.subtitle) {
-      html += ' <span class="rt-accordion-subtitle">— ' + escapeHtml(cat.subtitle) + '</span>';
+      html += ' <span class="rt-accordion-subtitle">— ' + _t(cat.subtitle) + '</span>';
     }
     html += '</span>';
     html += '<span class="rt-accordion-chevron">' + window.ICONS['chevron-down'] + '</span>';
@@ -582,7 +592,7 @@
     }
 
     if (cat.alert) {
-      html += '<div class="rt-alert">⚠ <strong>Golden Rule:</strong> ' + escapeHtml(cat.alert) + '</div>';
+      html += '<div class="rt-alert">⚠ <strong>Golden Rule:</strong> ' + _t(cat.alert) + '</div>';
     }
 
     if (cat.checklist) {
@@ -596,20 +606,20 @@
   function renderRule(rule) {
     var html = '<div class="rt-rule-card">';
     if (rule.num) {
-      html += '<div class="rt-rule-num">' + escapeHtml(rule.num) + '</div>';
+      html += '<div class="rt-rule-num">' + window.app.escapeHtml(rule.num) + '</div>';
     }
-    html += '<div class="rt-rule-title">' + escapeHtml(rule.title) + '</div>';
+    html += '<div class="rt-rule-title">' + _t(rule.title) + '</div>';
 
     if (rule.tip) {
-      html += '<div class="rt-tip">💡 ' + escapeHtml(rule.tip) + '</div>';
+      html += '<div class="rt-tip">💡 ' + _t(rule.tip) + '</div>';
     }
 
     if (rule.formula) {
-      html += '<div class="rt-formula">' + escapeHtml(rule.formula) + '</div>';
+      html += '<div class="rt-formula">' + _t(rule.formula) + '</div>';
     }
 
     if (rule.example) {
-      html += '<div class="rt-example"><strong>Example:</strong> ' + escapeHtml(rule.example) + '</div>';
+      html += '<div class="rt-example"><strong>Example:</strong> ' + _t(rule.example) + '</div>';
     }
 
     if (rule.table) {
@@ -635,8 +645,8 @@
     for (var i = 0; i < calc.inputs.length; i++) {
       var inp = calc.inputs[i];
       html += '<div class="rt-calc-input-row">';
-      html += '<label class="rt-calc-label" for="rt-' + calcId + '-' + inp.id + '">' + escapeHtml(inp.label);
-      if (inp.unit) html += ' <span class="rt-calc-unit">(' + escapeHtml(inp.unit) + ')</span>';
+      html += '<label class="rt-calc-label" for="rt-' + calcId + '-' + inp.id + '">' + window.app.escapeHtml(inp.label);
+      if (inp.unit) html += ' <span class="rt-calc-unit">(' + window.app.escapeHtml(inp.unit) + ')</span>';
       html += '</label>';
       html += '<input type="number" class="rt-calc-field" id="rt-' + calcId + '-' + inp.id + '" data-calc-field="' + inp.id + '">';
       html += '</div>';
@@ -650,13 +660,13 @@
 
   function renderTipCard(tipCard) {
     var html = '<div class="rt-tip-card">';
-    html += '<div class="rt-tip-card-title">' + escapeHtml(tipCard.title) + '</div>';
+    html += '<div class="rt-tip-card-title">' + _t(tipCard.title) + '</div>';
 
     if (tipCard.rows && tipCard.rows.length > 0) {
       for (var i = 0; i < tipCard.rows.length; i++) {
         html += '<div class="rt-tip-row">';
-        html += '<span class="rt-tip-label">' + escapeHtml(tipCard.rows[i].label) + '</span>';
-        html += '<span class="rt-tip-value">' + escapeHtml(tipCard.rows[i].value) + '</span>';
+        html += '<span class="rt-tip-label">' + _t(tipCard.rows[i].label) + '</span>';
+        html += '<span class="rt-tip-value">' + _t(tipCard.rows[i].value) + '</span>';
         html += '</div>';
       }
     }
@@ -666,13 +676,13 @@
     }
 
     if (tipCard.note) {
-      html += '<div class="rt-example">' + escapeHtml(tipCard.note) + '</div>';
+      html += '<div class="rt-example">' + _t(tipCard.note) + '</div>';
     }
 
     if (tipCard.list) {
       html += '<ol class="rt-checklist-list">';
       for (var j = 0; j < tipCard.list.length; j++) {
-        html += '<li>' + escapeHtml(tipCard.list[j]) + '</li>';
+        html += '<li>' + _t(tipCard.list[j]) + '</li>';
       }
       html += '</ol>';
     }
@@ -683,23 +693,23 @@
 
   function renderTable(table) {
     var html = '<div class="rt-table-wrap">';
-    html += '<div class="rt-table-title">' + escapeHtml(table.title) + '</div>';
+    html += '<div class="rt-table-title">' + _t(table.title) + '</div>';
 
     if (table.formula) {
-      html += '<div class="rt-formula">' + escapeHtml(table.formula) + '</div>';
+      html += '<div class="rt-formula">' + _t(table.formula) + '</div>';
     }
 
     if (table.headers && table.rows) {
       html += '<table class="rt-table">';
       html += '<thead><tr>';
       for (var h = 0; h < table.headers.length; h++) {
-        html += '<th>' + escapeHtml(table.headers[h]) + '</th>';
+        html += '<th>' + _t(table.headers[h]) + '</th>';
       }
       html += '</tr></thead><tbody>';
       for (var r = 0; r < table.rows.length; r++) {
         html += '<tr>';
         for (var c = 0; c < table.rows[r].length; c++) {
-          html += '<td>' + escapeHtml(table.rows[r][c]) + '</td>';
+          html += '<td>' + _t(table.rows[r][c]) + '</td>';
         }
         html += '</tr>';
       }
@@ -712,10 +722,10 @@
 
   function renderChecklist(checklist) {
     var html = '<div class="rt-tip-card">';
-    html += '<div class="rt-tip-card-title">' + escapeHtml(checklist.title) + '</div>';
+    html += '<div class="rt-tip-card-title">' + _t(checklist.title) + '</div>';
     html += '<div class="rt-formula">';
     for (var i = 0; i < checklist.items.length; i++) {
-      html += escapeHtml(checklist.items[i]) + '\n';
+      html += _t(checklist.items[i]) + '\n';
     }
     html += '</div></div>';
     return html;
@@ -775,9 +785,9 @@
     var html = '';
     for (var j = 0; j < results.length; j++) {
       html += '<div class="rt-calc-result-row">';
-      html += '<span class="rt-calc-result-label">' + escapeHtml(results[j].label) + ':</span> ';
+      html += '<span class="rt-calc-result-label">' + window.app.escapeHtml(results[j].label) + ':</span> ';
       html += '<span class="rt-calc-result-value">' + results[j].value;
-      if (results[j].unit) html += ' ' + escapeHtml(results[j].unit);
+      if (results[j].unit) html += ' ' + window.app.escapeHtml(results[j].unit);
       html += '</span></div>';
     }
     showCalcResult(calcId, html);
@@ -786,23 +796,6 @@
   function showCalcResult(calcId, html) {
     var el = document.querySelector('[data-calc-result="' + calcId + '"]');
     if (el) el.innerHTML = html;
-  }
-
-  /* ═══════════════════════════════════════════
-     UTILS
-     ═══════════════════════════════════════════ */
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function escapeAttr(s) {
-    return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   /* ═══════════════════════════════════════════

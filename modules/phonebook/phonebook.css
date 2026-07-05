@@ -13,78 +13,7 @@ body.dark-theme #phonebookContainer {
 }
 /* max-width обеспечивается .module-container из style.css */
 
-/* ─── Search bar ─── */
-.pb-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 0 12px;
-}
-.pb-search-input-wrap {
-  position: relative;
-  flex: 1;
-}
-.pb-search-input-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-}
-.pb-search-input-icon svg {
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-  fill: none;
-}
-.pb-search-input {
-  width: 100%;
-  height: 44px;
-  padding: 0 12px 0 40px;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
-  color: var(--color-text-main);
-  font-size: var(--font-base);
-  font-family: var(--font-main);
-  box-sizing: border-box;
-  transition: border-color 0.2s var(--transition-ease), background 0.2s var(--transition-ease);
-}
-.pb-search-input:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-primary-ghost);
-}
-.pb-search-clear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  width: 44px;
-  height: 44px;
-  background: transparent;
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: 0;
-  border-radius: var(--border-radius-sm);
-  transition: color 0.15s var(--transition-ease), background 0.15s var(--transition-ease);
-}
-.pb-search-clear svg {
-  width: 20px;
-  height: 20px;
-  stroke: currentColor;
-  fill: none;
-}
-@media (hover: hover) {
-  .pb-search-clear:hover {
-    color: var(--color-danger);
-    background: var(--color-bg-hover);
-  }
-}
+/* Search bar: стили ct-search-* определены глобально в style.css (SHELL_CONTRACT §5 Блок В) */
 
 /* ─── Contact list ─── */
 .pb-list {
@@ -114,7 +43,7 @@ body.dark-theme #phonebookContainer {
   background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
   border-radius: var(--border-radius-md);
   border: 1px solid var(--color-border-subtle);
-  transition: background 0.2s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease);
 }
 .pb-card-inner {
   display: flex;
@@ -181,7 +110,7 @@ body.dark-theme #phonebookContainer {
   text-decoration: none;
   flex: 1;
   min-width: 0;
-  transition: opacity 0.15s var(--transition-ease);
+  transition: opacity var(--transition-speed) var(--transition-ease);
 }
 @media (hover: hover) {
   .pb-phone-link:hover {
@@ -240,7 +169,7 @@ body.dark-theme #phonebookContainer {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), color var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 .pb-copy-btn svg {
   width: 16px;
@@ -276,7 +205,7 @@ body.dark-theme #phonebookContainer {
   text-decoration: none;
   flex: 1;
   min-width: 0;
-  transition: color 0.15s var(--transition-ease);
+  transition: color var(--transition-speed) var(--transition-ease);
 }
 @media (hover: hover) {
   .pb-email-link:hover {
@@ -314,7 +243,7 @@ body.dark-theme #phonebookContainer {
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), color var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 .pb-mail-btn svg {
   width: 16px;

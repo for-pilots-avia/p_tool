@@ -73,8 +73,8 @@
   };
 
   /* ── DOM helpers (internal screen visibility) ── */
-  var show = function (el) { if (el) el.style.display = ''; };
-  var hide = function (el) { if (el) el.style.display = 'none'; };
+  var show = function (el) { if (el) el.classList.remove('screen-hidden'); };
+  var hide = function (el) { if (el) el.classList.add('screen-hidden'); };
 
   /* ── Module container reference (set inside init) ── */
   var container = null;
@@ -211,12 +211,12 @@
       var dateStr = new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
       row.innerHTML =
-        '<div class="history-grade" style="color:' + gradeColor + '">' + item.grade + '</div>' +
+        '<div class="history-grade" style="--grade-color:' + gradeColor + '">' + window.app.escapeHtml(item.grade) + '</div>' +
         '<div class="history-info">' +
-          '<div class="history-test-name">' + item.testName + '</div>' +
+          '<div class="history-test-name"' + window.app.langAttr(item.testName) + '>' + window.app.escapeHtml(item.testName) + '</div>' +
           '<div class="history-meta">' +
-            '<span style="color:var(--color-success);font-weight:600">' + item.score + '</span>/' + item.total +
-            ' \u00B7 ' + item.pct + '%' +
+            '<span class="history-meta-score">' + window.app.escapeHtml(item.score) + '</span>/' + window.app.escapeHtml(item.total) +
+            ' \u00B7 ' + window.app.escapeHtml(item.pct) + '%' +
             ' \u00B7 ' + fmtTime(item.time) +
             ' \u00B7 ' + dateStr +
           '</div>' +
@@ -226,7 +226,7 @@
       if (hasErrors) {
         row.setAttribute('role', 'button');
         row.setAttribute('tabindex', '0');
-        row.setAttribute('aria-label', '\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u043E\u0448\u0438\u0431\u043A\u0438: ' + item.testName); /* Повторить ошибки */
+        row.setAttribute('aria-label', '\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C: ' + item.testName); /* Повторить */
         (function (wq) {
           row.addEventListener('click', function () { retryFromHistory(wq); });
           row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); retryFromHistory(wq); } });
@@ -266,7 +266,7 @@
     if (modeExam) modeExam.classList.toggle('quiz-mode-btn--active', S.mode === 'exam');
     /* Stop button visible only during quiz/result */
     var stopBtn = container.querySelector('#modalBtnStop');
-    if (stopBtn) stopBtn.style.display = (S.screen === 'quiz' || S.screen === 'result') ? '' : 'none';
+    if (stopBtn) stopBtn.classList.toggle('screen-hidden', S.screen !== 'quiz' && S.screen !== 'result');
   }
 
   function rebuildSelector(sel) {
@@ -677,10 +677,15 @@
       }
     }
 
-    /* Question text — MODULE_CONTRACT §13: рендерим как HTML
-       (\n → <br>, разрешённые теги <b>/<i> рендерятся как HTML) */
+    /* Question text — MODULE_CONTRACT §13: рендерим как HTML через app.renderRichText
+       (sanitize + сохраняет <b>/<i>/<br> + wrapLongWords для EN-терминов).
+       \n → <br> ПЕРЕД renderRichText (§13 вариант А — модуль обязан обрабатывать \n).
+       langAttr — EN-вопросы получают lang="en", RU наследуют от container (§7 v4.9 У11). */
     var questionText = container.querySelector('#questionText');
-    if (questionText) questionText.innerHTML = (q.question || '').replace(/\n/g, '<br>');
+    if (questionText) {
+      var qHtml = (q.question || '').replace(/\n/g, '<br>');
+      questionText.innerHTML = '<span' + window.app.langAttr(q.question) + '>' + window.app.renderRichText(qHtml) + '</span>';
+    }
 
     /* Image */
     var questionImageWrap = container.querySelector('#questionImageWrap');
@@ -709,7 +714,7 @@
 
     /* Multi-hint — показываем только в multi-режиме */
     var multiHint = container.querySelector('#multiHint');
-    if (multiHint) multiHint.style.display = isMulti ? '' : 'none';
+    if (multiHint) multiHint.classList.toggle('screen-hidden', !isMulti);
 
     var answersContainer = container.querySelector('#answersContainer');
     if (answersContainer) {
@@ -717,7 +722,7 @@
       S.shuffledAnswers.forEach(function (ans, idx) {
         var btn = document.createElement('button');
         btn.className = isMulti ? 'answer-btn answer-multi' : 'answer-btn';
-        btn.innerHTML = '<span class="answer-letter">' + LETTERS[idx] + '</span><span>' + ans.text + '</span>';
+        btn.innerHTML = '<span class="answer-letter">' + LETTERS[idx] + '</span><span' + window.app.langAttr(ans.text) + '>' + window.app.escapeHtml(ans.text) + '</span>';
         if (isMulti) {
           btn.addEventListener('click', function () { toggleMultiAnswer(idx, btn); });
         } else {
@@ -730,7 +735,7 @@
     /* Confirm button (multi-mode only) */
     var btnConfirmMulti = container.querySelector('#btnConfirmMulti');
     if (btnConfirmMulti) {
-      btnConfirmMulti.style.display = isMulti ? '' : 'none';
+      btnConfirmMulti.classList.toggle('screen-hidden', !isMulti);
       btnConfirmMulti.disabled = true;
     }
 
@@ -966,17 +971,17 @@
     /* Work time bars */
     buildWorkTimeBars(total, totalTime);
 
-    /* Buttons: two in one row — Повторить ошибки + Завершить тест */
+    /* Buttons: two in one row — Повторить + Завершить тест */
     var btnRetryWrong = container.querySelector('#btnRetryWrong');
     var btnFinish = container.querySelector('#btnFinish');
     if (S.wrongQs.length > 0) {
       if (btnRetryWrong) {
-        btnRetryWrong.innerHTML = ico('refresh-ccw') + ' \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u043E\u0448\u0438\u0431\u043A\u0438'; /* Повторить ошибки */
+        btnRetryWrong.innerHTML = ico('refresh-ccw') + ' \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C'; /* Повторить */
         btnRetryWrong.onclick = retryWrong;
-        btnRetryWrong.style.display = '';
+        btnRetryWrong.classList.remove('screen-hidden');
       }
     } else {
-      if (btnRetryWrong) btnRetryWrong.style.display = 'none';
+      if (btnRetryWrong) btnRetryWrong.classList.add('screen-hidden');
     }
     if (btnFinish) {
       btnFinish.innerHTML = '\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044C \u0442\u0435\u0441\u0442'; /* Завершить тест */
@@ -1087,7 +1092,7 @@
       var tName = getCurrentTestName();
       if (tName) headerTitle = tName;
     }
-    center.innerHTML = '<div class="hc-module">' + headerTitle + '</div>';
+    center.innerHTML = '<div class="hc-module"' + window.app.langAttr(headerTitle) + '>' + window.app.escapeHtml(headerTitle) + '</div>';
 
     /* Right: settings button */
     right.innerHTML = '<button class="icon-btn" aria-label="Настройки">' /* Настройки */
@@ -1124,88 +1129,88 @@
 
       '<!-- \u2550\u2550\u2550 START SCREEN \u2550\u2550\u2550 -->' +
       '<div id="quizStartScreen">' +
-        '<div class="app-card animate-fade-in" style="text-align: center; margin-bottom: 16px">' +
-          '<div style="font-size: var(--font-hero); font-family: var(--font-accent); line-height: 1.2; color: var(--color-primary)">' +
+        '<div class="app-card animate-fade-in quiz-start-hero">' +
+          '<div class="quiz-start-hero-title">' +
             '\u041F\u0440\u043E\u0432\u0435\u0440\u044C\u0442\u0435 \u0441\u0432\u043E\u0438 \u0437\u043D\u0430\u043D\u0438\u044F' + /* Проверьте свои знания */
           '</div>' +
-          '<p id="startTestName" style="font-size: var(--font-md); color: var(--color-text-secondary); margin-top: 10px; font-weight: 600; letter-spacing: 0.01em"></p>' +
+          '<p id="startTestName" class="quiz-start-test-name"></p>' +
         '</div>' +
         '<div id="loader" class="app-card">' +
-          '<div class="skeleton" style="height: 44px; border-radius: var(--border-radius-sm); margin-bottom: 8px"></div>' +
-          '<div class="skeleton" style="height: 44px; border-radius: var(--border-radius-sm)"></div>' +
+          '<div class="skeleton quiz-skeleton-line quiz-skeleton-line--mb"></div>' +
+          '<div class="skeleton quiz-skeleton-line"></div>' +
         '</div>' +
-        '<div id="errorEl" class="app-card" style="display:none; text-align: center">' +
-          '<p style="color: var(--color-danger); font-size: var(--font-base); margin: 0 0 12px 0">\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438</p>' + /* Ошибка загрузки */
+        '<div id="errorEl" class="app-card screen-hidden quiz-error-centered">' +
+          '<p class="quiz-error-text">\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438</p>' + /* Ошибка загрузки */
           '<button id="btnRetryLoad" class="btn-primary">\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C</button>' + /* Повторить */
         '</div>' +
-        '<div id="startContent" style="display:none">' +
-          '<button id="btnStart" class="btn-primary" style="width: 100%; margin-top: 16px">' +
-            '<span id="btnStartIcon" style="display: inline-flex; margin-right: 8px"></span>' +
+        '<div id="startContent" class="screen-hidden">' +
+          '<button id="btnStart" class="btn-primary quiz-btn-start">' +
+            '<span id="btnStartIcon" class="quiz-icon-inline quiz-icon-inline--mr-md"></span>' +
             '\u041D\u0430\u0447\u0430\u0442\u044C \u0442\u0435\u0441\u0442' + /* Начать тест */
           '</button>' +
         '</div>' +
-        '<div id="historyContainer" style="display:none"></div>' +
+        '<div id="historyContainer" class="screen-hidden"></div>' +
       '</div>' +
 
       '<!-- \u2550\u2550\u2550 QUIZ SCREEN \u2550\u2550\u2550 -->' +
-      '<div id="quizScreen" style="display:none">' +
-        '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px">' +
-          '<span id="quizProgressLabel" style="font-size: var(--font-xs); font-weight: 700; color: var(--color-text-secondary); letter-spacing: 0.01em; text-transform: uppercase"></span>' +
-          '<span id="quizBadge" class="quiz-badge quiz-badge-danger" style="display:none">\u041E\u0428\u0418\u0411\u041A\u0418</span>' + /* ОШИБКИ */
+      '<div id="quizScreen" class="screen-hidden">' +
+        '<div class="quiz-progress-row">' +
+          '<span id="quizProgressLabel" class="quiz-progress-label"></span>' +
+          '<span id="quizBadge" class="quiz-badge quiz-badge-danger screen-hidden">\u041E\u0428\u0418\u0411\u041A\u0418</span>' + /* ОШИБКИ */
           '<span id="quizScreenTimer" class="quiz-screen-timer"></span>' +
         '</div>' +
         '<!-- Progress section with timeline -->' +
-        '<div id="progressSection" class="quiz-progress-section" style="display:none">' +
+        '<div id="progressSection" class="quiz-progress-section screen-hidden">' +
           '<div id="timeline" class="quiz-timeline"></div>' +
           '<div class="quiz-progress-track">' +
             '<div id="progressFill" class="quiz-progress-fill"></div>' +
           '</div>' +
         '</div>' + /* ОШИБКИ */
-        '<div class="app-card" style="border-left: 4px solid var(--color-primary)">' +
-          '<h2 id="questionText" style="font-size: var(--font-lg); font-weight: 700; line-height: 1.4; margin: 0; color: var(--color-text-main); letter-spacing: -0.01em"></h2>' +
-          '<div id="questionImageWrap" class="question-image-wrap" style="display:none">' +
+        '<div class="app-card quiz-question-card">' +
+          '<h2 id="questionText" class="quiz-question-text"></h2>' +
+          '<div id="questionImageWrap" class="question-image-wrap screen-hidden">' +
             '<img id="questionImage" alt="\u0438\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">' + /* иллюстрация */
           '</div>' +
         '</div>' +
-        '<div id="multiHint" class="multi-hint" style="display:none">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u0432\u0435\u0440\u043D\u044B\u0435 \u043E\u0442\u0432\u0435\u0442\u044B</div>' + /* Выберите все верные ответы */
-        '<div id="answersContainer" style="margin-top: 8px"></div>' +
-        '<button id="btnConfirmMulti" class="btn-primary" style="display:none; width: 100%; margin-top: 12px">\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C</button>' + /* Подтвердить */
+        '<div id="multiHint" class="multi-hint screen-hidden">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0441\u0435 \u0432\u0435\u0440\u043D\u044B\u0435 \u043E\u0442\u0432\u0435\u0442\u044B</div>' + /* Выберите все верные ответы */
+        '<div id="answersContainer" class="quiz-answers-container"></div>' +
+        '<button id="btnConfirmMulti" class="btn-primary quiz-btn-confirm-multi screen-hidden">\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C</button>' + /* Подтвердить */
         '<div id="feedbackLine" class="feedback-line"></div>' +
       '</div>' +
 
       '<!-- \u2550\u2550\u2550 RESULT SCREEN \u2550\u2550\u2550 -->' +
-      '<div id="resultScreen" style="display:none">' +
-        '<div class="app-card" style="padding: 32px 20px; text-align: center">' +
-          '<h2 id="resultTitle" style="font-size: var(--font-xl); font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.01em"></h2>' +
+      '<div id="resultScreen" class="screen-hidden">' +
+        '<div class="app-card quiz-result-card">' +
+          '<h2 id="resultTitle" class="quiz-result-title"></h2>' +
           '<div id="gradeDisplay" class="grade-display"></div>' +
-          '<p id="resultScoreInfo" style="font-size: var(--font-md); color: var(--color-text-secondary); margin: 8px 0 0 0"></p>' +
+          '<p id="resultScoreInfo" class="quiz-result-score-info"></p>' +
         '</div>' +
         '<div id="resultMsg" class="result-msg-box"></div>' +
-        '<div class="app-card" style="display: flex; justify-content: center; gap: 24px; padding: 16px 20px">' +
-          '<div style="text-align: center">' +
-            '<div id="resultStatOk" style="font-size: var(--font-xl); font-weight: 700; color: var(--color-success)"></div>' +
-            '<div style="font-size: var(--font-xs); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.01em; margin-top: 2px">\u0412\u0435\u0440\u043D\u043E</div>' + /* Верно */
+        '<div class="app-card quiz-stats-row">' +
+          '<div class="quiz-stat-block">' +
+            '<div id="resultStatOk" class="quiz-stat-value quiz-stat-value--ok"></div>' +
+            '<div class="quiz-stat-label">\u0412\u0435\u0440\u043D\u043E</div>' + /* Верно */
           '</div>' +
-          '<div style="width: 1px; background: var(--color-border-subtle)"></div>' +
-          '<div style="text-align: center">' +
-            '<div id="resultStatFail" style="font-size: var(--font-xl); font-weight: 700; color: var(--color-danger)"></div>' +
-            '<div style="font-size: var(--font-xs); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.01em; margin-top: 2px">\u041D\u0435\u0432\u0435\u0440\u043D\u043E</div>' + /* Неверно */
+          '<div class="quiz-stat-divider"></div>' +
+          '<div class="quiz-stat-block">' +
+            '<div id="resultStatFail" class="quiz-stat-value quiz-stat-value--fail"></div>' +
+            '<div class="quiz-stat-label">\u041D\u0435\u0432\u0435\u0440\u043D\u043E</div>' + /* Неверно */
           '</div>' +
-          '<div style="width: 1px; background: var(--color-border-subtle)"></div>' +
-          '<div style="text-align: center">' +
-            '<div id="resultStatPct" style="font-size: var(--font-xl); font-weight: 700; color: var(--color-primary)"></div>' +
-            '<div style="font-size: var(--font-xs); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.01em; margin-top: 2px">\u041F\u0440\u043E\u0446\u0435\u043D\u0442</div>' + /* Процент */
+          '<div class="quiz-stat-divider"></div>' +
+          '<div class="quiz-stat-block">' +
+            '<div id="resultStatPct" class="quiz-stat-value quiz-stat-value--pct"></div>' +
+            '<div class="quiz-stat-label">\u041F\u0440\u043E\u0446\u0435\u043D\u0442</div>' + /* Процент */
           '</div>' +
         '</div>' +
         '<div class="app-card">' +
-          '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">' +
-            '<span id="resultTotalTime" style="font-size: var(--font-sm); color: var(--color-text-secondary); display: flex; align-items: center; gap: 4px"></span>' +
-            '<span id="resultAvgTime" style="font-size: var(--font-sm); color: var(--color-text-muted)"></span>' +
+          '<div class="quiz-time-row">' +
+            '<span id="resultTotalTime" class="quiz-time-total"></span>' +
+            '<span id="resultAvgTime" class="quiz-time-avg"></span>' +
           '</div>' +
         '</div>' +
         '<div id="wtContainer" class="app-card"></div>' +
         '<div class="quiz-result-btns">' +
-          '<button id="btnRetryWrong" class="btn-outline" style="display: none"></button>' +
+          '<button id="btnRetryWrong" class="btn-outline screen-hidden"></button>' +
           '<button id="btnFinish" class="btn-primary"></button>' +
         '</div>' +
       '</div>' +
@@ -1220,7 +1225,7 @@
           '</div>' +
           '<div class="quiz-modal-body">' +
             '<div class="quiz-modal-section">' +
-              '<label for="modalTestSelector" style="font-size: var(--font-sm); font-weight: 600; color: var(--color-text-secondary); display: block; margin-bottom: 6px">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0435\u0441\u0442</label>' + /* Выберите тест */
+              '<label for="modalTestSelector" class="quiz-modal-label">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0435\u0441\u0442</label>' + /* Выберите тест */
               '<select id="modalTestSelector" class="quiz-select"></select>' +
             '</div>' +
             '<div class="quiz-mode-toggle-wrap quiz-modal-section">' +
@@ -1238,7 +1243,7 @@
               '<div class="quiz-mode-divider"></div>' +
               '<div class="quiz-toggle-wrap quiz-toggle-wrap--inline">' +
                 '<span class="quiz-toggle-label">' +
-                  '<span id="shuffleIcon" style="display: inline-flex"></span>' +
+                  '<span id="shuffleIcon" class="quiz-icon-inline"></span>' +
                   '\u041F\u0435\u0440\u0435\u043C\u0435\u0448\u0430\u0442\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B' + /* Перемешать вопросы */
                 '</span>' +
                 '<label class="quiz-switch">' +
@@ -1247,17 +1252,17 @@
                 '</label>' +
               '</div>' +
             '</div>' +
-            '<button id="modalBtnStop" class="btn-danger-outline quiz-modal-btn quiz-modal-section" style="display:none">' +
-              '<span id="stopIcon" style="display: inline-flex; margin-right: 6px"></span>' +
+            '<button id="modalBtnStop" class="btn-danger-outline quiz-modal-btn quiz-modal-section screen-hidden">' +
+              '<span id="stopIcon" class="quiz-icon-inline quiz-icon-inline--mr-sm"></span>' +
               '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C \u0442\u0435\u0441\u0442' + /* Прекратить тест */
             '</button>' +
             '<label class="quiz-file-label quiz-modal-btn quiz-modal-section">' +
-              '<span id="uploadIcon" style="display: inline-flex"></span>' +
+              '<span id="uploadIcon" class="quiz-icon-inline"></span>' +
               'Загрузить свой тест (JSON)' + /* Загрузить свой тест (JSON) */
-              '<input id="modalFileInput" type="file" accept=".json" style="display: none">' +
+              '<input id="modalFileInput" type="file" accept=".json" class="screen-hidden">' +
             '</label>' +
             '<button id="modalBtnClearHistory" class="btn-outline quiz-modal-btn quiz-modal-btn-danger quiz-modal-section">' +
-              '<span id="trashIcon" style="display: inline-flex; margin-right: 6px"></span>' +
+              '<span id="trashIcon" class="quiz-icon-inline quiz-icon-inline--mr-sm"></span>' +
               'Очистить результаты' + /* Очистить результаты */
             '</button>' +
           '</div>' +
@@ -1278,6 +1283,10 @@
       console.error('Quiz module: container #quizContainer not found');
       return;
     }
+
+    /* lang="ru" — ОБЯЗАТЕЛЬНО для hyphens:auto (MODULE_CONTRACT §7 v4.9).
+       RU-блоки наследуют lang отсюда; EN-блоки получают lang="en" через app.langAttr(). */
+    container.setAttribute('lang', 'ru');
 
     /* Reset state on re-entry */
     stopTimer();

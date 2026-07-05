@@ -1,0 +1,723 @@
+/* ═══════════════════════════════════════════
+   МОДУЛЬ: Limitations — B737-800
+   ═══════════════════════════════════════════ */
+
+/* ─── Scroll lock при открытом detail view ─── */
+/* position:fixed на body «схлопывает» html — скролл невозможен.
+   Вместо этого: делаем .screen scrollable-контейнером, а body блокируем */
+body.lim-detail-open {
+  overflow: hidden;
+  touch-action: none;
+}
+body.lim-detail-open .side-menu {
+  touch-action: pan-y;
+}
+body.lim-detail-open #limitationsScreen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0px));
+}
+
+/* ─── Module-specific CSS Variables ─── */
+/* Контракт MODULE_CONTRACT §7: :root и body запрещены в модуле → переменные на #limitationsContainer */
+#limitationsContainer {
+  --lim-color-limit: #cd202c;
+  --lim-color-limit-bg: rgba(205, 32, 44, 0.08);
+  --lim-color-caution: #ea580c;
+  --lim-color-caution-bg: rgba(234, 88, 12, 0.08);
+  --lim-color-warning: #cd202c;
+  --lim-color-warning-bg: rgba(205, 32, 44, 0.10);
+  --lim-color-info: #636e72;
+  --lim-color-info-bg: rgba(99, 110, 114, 0.06);
+}
+
+body.dark-theme #limitationsContainer {
+  --lim-color-limit: #e63946;
+  --lim-color-limit-bg: rgba(230, 57, 70, 0.12);
+  --lim-color-caution: #f97316;
+  --lim-color-caution-bg: rgba(249, 115, 22, 0.12);
+  --lim-color-warning: #e63946;
+  --lim-color-warning-bg: rgba(230, 57, 70, 0.14);
+  --lim-color-info: #b2bec3;
+  --lim-color-info-bg: rgba(178, 190, 195, 0.08);
+}
+
+/* ─── Module Container ─── */
+#limitationsContainer .module-container {
+  padding-top: 8px;
+  padding-bottom: 32px;
+}
+
+/* ═══════════════════════════════════════════
+   SEARCH BAR (ct-search-* из style.css + module-specific иконка)
+   Контракт MODULE_CONTRACT §7: поиск через ct-search-*, НЕ {name}-search-*
+   ═══════════════════════════════════════════ */
+
+/* Убираем горизонтальный padding ct-search-bar — module-container даёт его */
+#limitationsContainer .ct-search-bar {
+  padding: 8px 0 4px;
+}
+
+/* .ct-search-input-wrap и .ct-search-icon — shared-классы из style.css (MODULE_CONTRACT §7).
+   Специфика Limitations — через контекстные селекторы ниже. */
+
+/* Убрать border/bg с инпута — перенесены на обёртку */
+#limitationsContainer .ct-search-input {
+  border: none;
+  background: none;
+  padding: 0 12px;
+  height: 40px;
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════
+   DISCLAIMER
+   ═══════════════════════════════════════════ */
+
+/* Disclaimer — внутри module-container, без negative margin */
+.lim-disclaimer {
+  padding: 12px 16px;
+  margin: 8px 0 4px;
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-md);
+  border-left: 3px solid var(--color-primary);
+}
+
+.lim-disclaimer-title {
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-main);
+  margin-bottom: 4px;
+}
+
+.lim-disclaimer-text {
+  font-size: var(--font-2xs);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.lim-disclaimer-source {
+  font-size: var(--font-2xs);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════
+   LEGEND
+   ═══════════════════════════════════════════ */
+
+.lim-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 4px 12px;
+  font-size: var(--font-2xs);
+  color: var(--color-text-secondary);
+}
+
+.lim-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lim-legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.lim-legend-dot.lim-severity--limit {
+  background: var(--lim-color-limit);
+}
+
+.lim-legend-dot.lim-severity--caution {
+  background: var(--lim-color-caution);
+}
+
+.lim-legend-dot.lim-severity--warning {
+  background: var(--lim-color-warning);
+}
+
+.lim-legend-dot.lim-severity--info {
+  background: var(--lim-color-info);
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORY (ACCORDION)
+   ═══════════════════════════════════════════ */
+
+/* Карточка категории — по ширине контейнера, скруглённая (как .krs-block) */
+.lim-category {
+  margin: 8px 0 0;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-card);
+  overflow: hidden;
+}
+
+.lim-category:first-child {
+  margin-top: 0;
+}
+
+.lim-category-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 52px;
+  transition: background-color var(--transition-speed) var(--transition-ease);
+}
+
+@media (hover: hover) {
+  .lim-category-header:hover {
+    background-color: var(--color-bg-hover);
+  }
+}
+
+.lim-cat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.lim-cat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* .collapsible-title из style.css даёт word-break/overflow-wrap/hyphens — не дублируем */
+.lim-cat-title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-main);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lim-cat-count {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  background: var(--color-bg-hover);
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* .collapsible-chevron — shared-класс из style.css, не дублируем.
+   Ограничиваем поворот шеврона через контекстный селектор: */
+
+/* Поворот шеврона при открытой категории */
+.lim-category.open > .lim-category-header > .collapsible-chevron {
+  transform: rotate(180deg);
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORY CONTENT (COLLAPSIBLE)
+   ═══════════════════════════════════════════ */
+
+.lim-category-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-speed) var(--transition-ease);
+}
+
+.lim-category-content--open {
+  max-height: 10000px;
+}
+
+/* Контент внутри карточки — без горизонтального padding,
+   чтобы .lim-item был равен по ширине .lim-category-header.
+   Горизонтальный padding перенесён на сам .lim-item */
+.lim-category-inner {
+  padding: 0 0 12px;
+}
+
+/* ═══════════════════════════════════════════
+   LIMITATION ITEM
+   ═══════════════════════════════════════════ */
+
+/* Матрёшка: padding-left через --accordion-indent,
+   горизонтальный padding = header padding (16px) */
+.lim-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0 10px;
+  padding: 8px 16px 8px var(--accordion-indent);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 4px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--transition-speed) var(--transition-ease);
+}
+
+@media (hover: hover) {
+  .lim-item:hover {
+    background-color: var(--color-bg-hover);
+  }
+}
+
+/* Severity colors */
+.lim-item.lim-severity--limit {
+  border-left-color: var(--lim-color-limit);
+  background: var(--lim-color-limit-bg);
+}
+
+.lim-item.lim-severity--caution {
+  border-left-color: var(--lim-color-caution);
+  background: var(--lim-color-caution-bg);
+}
+
+.lim-item.lim-severity--warning {
+  border-left-color: var(--lim-color-warning);
+  background: var(--lim-color-warning-bg);
+}
+
+.lim-item.lim-severity--info {
+  border-left-color: var(--lim-color-info);
+  background: var(--lim-color-info-bg);
+}
+
+/* Severity badge */
+.lim-item-severity {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: start;
+  font-size: var(--font-2xs);
+  font-weight: var(--font-weight-bold);
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.lim-severity--limit .lim-item-severity {
+  color: var(--lim-color-limit);
+  background: rgba(205, 32, 44, 0.15);
+}
+
+.lim-severity--caution .lim-item-severity {
+  color: var(--lim-color-caution);
+  background: rgba(234, 88, 12, 0.15);
+}
+
+.lim-severity--warning .lim-item-severity {
+  color: var(--lim-color-warning);
+  background: rgba(205, 32, 44, 0.18);
+}
+
+.lim-severity--info .lim-item-severity {
+  color: var(--lim-color-info);
+  background: rgba(99, 110, 114, 0.12);
+}
+
+body.dark-theme #limitationsContainer .lim-severity--limit .lim-item-severity {
+  background: rgba(230, 57, 70, 0.18);
+}
+
+body.dark-theme #limitationsContainer .lim-severity--caution .lim-item-severity {
+  background: rgba(249, 115, 22, 0.18);
+}
+
+body.dark-theme #limitationsContainer .lim-severity--warning .lim-item-severity {
+  background: rgba(230, 57, 70, 0.20);
+}
+
+body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
+  background: rgba(178, 190, 195, 0.14);
+}
+
+/* Item label — hyphens: auto работает через lang="ru" на контейнере + langAttr на элементе */
+.lim-item-label {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-main);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Item value */
+.lim-item-value {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  margin-top: 2px;
+}
+
+/* Item source */
+.lim-item-source {
+  grid-column: 2;
+  grid-row: 3;
+  font-size: var(--font-2xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* Adjust grid when source is present */
+.lim-item:has(.lim-item-source) {
+  grid-template-rows: auto auto auto;
+}
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════ */
+
+.lim-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+}
+
+.lim-empty svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.4;
+  margin-bottom: 12px;
+}
+
+.lim-empty-text {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.lim-empty-sub {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* ═══════════════════════════════════════════
+   DETAIL VIEW
+   ═══════════════════════════════════════════ */
+
+.lim-detail {
+  padding: 20px var(--content-padding-x);
+}
+
+/* Заголовок: severity badge + label */
+.lim-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.lim-detail-header .lim-item-severity {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.lim-detail-title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-main);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* Value — крупно */
+.lim-detail-value {
+  font-size: var(--font-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+/* Source */
+.lim-detail-source {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+/* Description */
+.lim-detail-description {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.lim-detail-description b,
+.lim-detail-description strong {
+  color: var(--color-text-main);
+}
+
+.lim-detail-description i,
+.lim-detail-description em {
+  color: var(--color-text-muted);
+}
+
+/* Секции detail */
+.lim-detail-section {
+  margin-bottom: 20px;
+}
+
+.lim-detail-section-title {
+  font-size: var(--font-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+/* Images — галерея (как .krs-images) */
+.lim-detail-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.lim-detail-img-wrap {
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  transition: border-color var(--transition-speed) var(--transition-ease);
+}
+
+@media (hover: hover) {
+  .lim-detail-img-wrap:hover {
+    border-color: var(--color-primary);
+  }
+}
+
+.lim-detail-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Table inline (контракт §7 п.3: embed HTML-файла) */
+.lim-table-inline {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lim-table-error {
+  color: var(--color-danger);
+  font-size: var(--font-xs);
+}
+
+.lim-table-inline table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-xs);
+  line-height: 1.4;
+}
+
+.lim-table-inline th,
+.lim-table-inline td {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-subtle);
+  text-align: left;
+}
+
+.lim-table-inline th {
+  background: var(--color-bg-hover);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-main);
+  white-space: nowrap;
+}
+
+.lim-table-inline td {
+  color: var(--color-text-secondary);
+}
+
+.lim-table-inline tr:nth-child(even) td {
+  background: var(--color-bg-card);
+}
+
+/* PDF buttons (как .krs-pdfs) */
+.lim-detail-pdfs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.lim-detail-pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+  touch-action: manipulation;
+  transition: background-color var(--transition-speed) var(--transition-ease),
+              border-color var(--transition-speed) var(--transition-ease);
+}
+
+@media (hover: hover) {
+  .lim-detail-pdf-btn:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-primary);
+  }
+}
+
+.lim-detail-pdf-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.lim-detail-pdf-btn span {
+  flex: 1;
+  text-align: left;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE (@560 / @380 — контракт §7)
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 560px) {
+  .lim-item {
+    gap: 0 8px;
+    padding: 6px 12px 6px var(--accordion-indent);
+  }
+
+  .lim-item-severity {
+    font-size: var(--font-2xs);
+    padding: 1px 5px;
+  }
+
+  .lim-item-label {
+    font-size: var(--font-xs);
+  }
+
+  .lim-item-value {
+    font-size: var(--font-xs);
+  }
+
+  .lim-category-header {
+    padding: 10px 12px;
+    min-height: 48px;
+  }
+
+  .lim-cat-title {
+    font-size: var(--font-sm);
+    line-height: 1.4;
+  }
+
+  .lim-detail {
+    padding: 16px var(--content-padding-x);
+  }
+}
+
+@media (max-width: 380px) {
+  .lim-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 6px 0 6px var(--accordion-indent);
+  }
+
+  .lim-item-severity {
+    grid-column: 1;
+    grid-row: 1;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .lim-item-label {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .lim-item-value {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .lim-item-source {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .lim-legend {
+    gap: 8px;
+    font-size: var(--font-2xs);
+  }
+
+  .lim-category-header {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .lim-item {
+    padding: 6px 10px 6px var(--accordion-indent);
+  }
+
+  /* 0.8125rem = 13px — компактный хардкод для 380px, вне общей шкалы — намеренно */
+  .lim-cat-title {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  .lim-cat-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .lim-cat-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .lim-detail {
+    padding: 12px var(--content-padding-x);
+  }
+
+  .lim-detail-value {
+    font-size: var(--font-lg);
+  }
+
+  .lim-detail-images {
+    gap: 6px;
+  }
+}

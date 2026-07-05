@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f8f9fa" rx="8"/>
+  
+  <!-- Title -->
+  <text x="200" y="28" text-anchor="middle" font-size="14" font-weight="600" fill="#212529">Wind Component Diagram</text>
+  
+  <!-- Runway -->
+  <rect x="80" y="140" width="240" height="20" fill="#495057" rx="2"/>
+  <text x="200" y="154" text-anchor="middle" font-size="10" fill="white" font-weight="600">RUNWAY</text>
+  <!-- Runway heading arrow -->
+  <line x1="200" y1="160" x2="200" y2="195" stroke="#495057" stroke-width="2" marker-end="url(#arrowRwy)"/>
+  <defs>
+    <marker id="arrowRwy" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#495057"/>
+    </marker>
+  </defs>
+  <text x="215" y="190" font-size="10" fill="#495057">RWY HDG</text>
+  
+  <!-- Wind arrow -->
+  <line x1="130" y1="50" x2="200" y2="140" stroke="#cd202c" stroke-width="2.5" marker-end="url(#arrowWind)"/>
+  <defs>
+    <marker id="arrowWind" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0,0 10,3.5 0,7" fill="#cd202c"/>
+    </marker>
+  </defs>
+  <text x="115" y="48" font-size="11" fill="#cd202c" font-weight="600">WIND</text>
+  <text x="115" y="62" font-size="9" fill="#cd202c">WS = 20 kt</text>
+  
+  <!-- Wind Angle arc -->
+  <path d="M 200,195 L 200,175 A 20,20 0 0,0 193,176" fill="none" stroke="#868e96" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="185" y="182" font-size="9" fill="#868e96">WA</text>
+  
+  <!-- Headwind component (projection on runway axis) -->
+  <line x1="200" y1="140" x2="200" y2="68" stroke="#28a745" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="210" y="100" font-size="10" fill="#28a745" font-weight="600">HW</text>
+  <text x="210" y="112" font-size="9" fill="#28a745">headwind</text>
+  
+  <!-- Crosswind component (perpendicular) -->
+  <line x1="130" y1="50" x2="200" y2="50" stroke="#ea580c" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="148" y="44" font-size="10" fill="#ea580c" font-weight="600">XW</text>
+  <text x="148" y="32" font-size="9" fill="#ea580c">crosswind</text>
+  
+  <!-- Tailwind component (when wind from behind) -->
+  <rect x="40" y="230" width="320" height="55" fill="#fff5f5" rx="6" stroke="#cd202c" stroke-width="1"/>
+  <text x="200" y="252" text-anchor="middle" font-size="11" fill="#cd202c" font-weight="600">Tailwind Component</text>
+  <text x="200" y="268" text-anchor="middle" font-size="10" fill="#495057">TW = WS × cos(WA − RWY)</text>
+  <text x="200" y="282" text-anchor="middle" font-size="9" fill="#cd202c" font-weight="600">MAX 15 KT (Takeoff &amp; Landing)</text>
+</svg>

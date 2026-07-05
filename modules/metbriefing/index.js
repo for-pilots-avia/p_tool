@@ -45,18 +45,8 @@
   function getNotamCondition(key) { return (_metData && _metData.notamConditions && _metData.notamConditions[key]) || ''; }
   function getNotamSpecific(key) { return (_metData && _metData.notamSpecificMap && _metData.notamSpecificMap[key]) || ''; }
 
-  // Task 24: HTML-escape helper — для защиты от HTML-инъекций через METAR/TAF/NOTAM/airport info.
-  // Экранирует & < > " ' — этого достаточно дляtextContent-эквивалента внутри HTML.
-  // Применяется ко всем внешним данным (METAR/TAF raw, NOTAM id/subject/description, stationInfo).
-  function escapeHtml(s) {
-    if (s === null || s === undefined) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  // HTML-escape — используется app.escapeHtml (SHELL_CONTRACT §3, утилита уже в app.*).
+  // Локальная копия удалена по Module Contract §8 «ДУБЛИРОВАНИЕ JS-УТИЛИТ» (Task 3).
 
   var CACHE_TTL_MS = 30 * 60 * 1000;
   var STATION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours for station cache
@@ -67,6 +57,8 @@
   var METAR_REFRESH_MS = 30 * 60 * 1000;   // 30 min — автообновление METAR + history
   var TAF_REFRESH_MS = 60 * 60 * 1000;     // 1 hour — автообновление TAF
   var WX_MAP_REFRESH_MS = 2 * 60 * 60 * 1000; // 2 часа — автообновление карт погоды (= WX_MAP_STALE_MS)
+  // Task 52: автообновление NOTAM (30 мин) — как METAR. fetchNotam имеет skip-if-loading guard.
+  var NOTAM_REFRESH_MS = 30 * 60 * 1000;   // 30 min — автообновление NOTAM
 
   // ===== API Constants (secrets moved to Worker env — Task 28) =====
   // AVWX_TOKEN, CHECKWX_KEY — теперь живут в Cloudflare Worker env (wrangler secret put),
@@ -279,6 +271,7 @@
     metarRefreshInterval: null,    // автообновление METAR + history (каждые METAR_REFRESH_MS = 30 мин)
     tafRefreshInterval: null,      // автообновление TAF (каждые TAF_REFRESH_MS = 1 час)
     wxMapRefreshInterval: null,    // автообновление карт погоды (каждые WX_MAP_REFRESH_MS = 2 часа)
+    notamRefreshInterval: null,    // Task 52: автообновление NOTAM (каждые NOTAM_REFRESH_MS = 30 мин)
     weatherLoaded: false,
     // AVWX data
     avwxStation: {},    // { ICAO: stationInfo }
@@ -615,6 +608,8 @@
 
   function fetchSigmetData(forceRefresh) {
     if (state.sigmetLoading) return;
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить, данные из кэша уже в state
+    if (!navigator.onLine) return;
     // Check stale cache
     if (!forceRefresh && state.sigmetCache && !isStale(state.sigmetCache.fetchedAt, SIGMET_STALE_MS)) return;
 
@@ -752,6 +747,10 @@
   // ===== Data Status Warnings (for "Брифинг готов" block) =====
   function getDataStatusWarnings() {
     var warnings = [];
+    // Task 58 (E2): индикатор оффлайн режима — данные из кэша
+    if (!navigator.onLine) {
+      warnings.push({ type: 'stale', icon: 'alert-triangle', label: '\u041E\u0444\u0444\u043B\u0430\u0439\u043D \u0440\u0435\u0436\u0438\u043C', detail: '\u041F\u043E\u043A\u0430\u0437\u0430\u043D\u044B \u043A\u044D\u0448\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u0434\u0430\u043D\u043D\u044B\u0435', action: null });
+    }
     var allAirports = getAllRouteAirports();
 
     // Weather status per airport
@@ -985,6 +984,8 @@
   }
 
   function fetchAllWxMaps(forceRefresh) {
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить, blob URLs из IDB уже в state
+    if (!navigator.onLine) return Promise.resolve();
     state.wxMapLoading = true;
     renderCurrentTab();
     var promises = getWxMaps().map(function(mapDef) {
@@ -1041,6 +1042,8 @@
   function preloadAllWindMaps(forceRefresh) {
     var cfg = getWindMaps();
     if (!cfg || !cfg.levels || cfg.levels.length === 0) return Promise.resolve();
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить wind maps
+    if (!navigator.onLine) return Promise.resolve();
     state.windMapLoading = true;
     renderCurrentTab();
     // Fetch in small concurrent batches (5 at a time) to avoid hammering the Worker
@@ -1073,6 +1076,8 @@
   // Fetches last 2 hours of METAR observations via aviationweather.gov
   function fetchMetarHistory(icao) {
     if (!AWC_PROXY_URL) return Promise.resolve();
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить историю METAR
+    if (!navigator.onLine) return Promise.resolve();
     state.metarHistoryLoading[icao] = true;
     renderCurrentTab();
 
@@ -1236,6 +1241,8 @@
     // Filter out ICAOs already in station cache
     var needFetch = icaos.filter(function(icao) { return !state.avwxStation[icao]; });
     if (needFetch.length === 0) return Promise.resolve();
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить station info
+    if (!navigator.onLine) return Promise.resolve();
     state.avwxStationLoading = true;
     renderCurrentTab();
 
@@ -1435,6 +1442,8 @@
   // Task 28: avia-meteo.ru PRIMARY → Worker /wx-metar (CheckWX→AVWX) → AWC proxy (last resort)
   function fetchMetarBatch(icaos, forceRefresh) {
     if (!icaos || icaos.length === 0) return Promise.resolve();
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить, данные из localStorage уже в state
+    if (!navigator.onLine) return Promise.resolve();
 
     var needFetch = icaos;
     if (forceRefresh) {
@@ -1700,6 +1709,8 @@
   // Uses CheckWX /v2/taf/{ICAO1,ICAO2,...} — single batch request
   function fetchTafBatch(icaos, forceRefresh) {
     if (!icaos || icaos.length === 0) return Promise.resolve();
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить, данные из localStorage уже в state
+    if (!navigator.onLine) return Promise.resolve();
 
     var needFetch = icaos;
     if (!forceRefresh) {
@@ -2021,6 +2032,8 @@
   function fetchNotam(icao) {
     // If already loading, skip
     if (state.notamLoading[icao]) return;
+    // Task 58 (E1): при оффлайне — не пытаемся фетчить, данные из localStorage уже в state
+    if (!navigator.onLine) return;
 
     state.notamLoading[icao] = true;
     delete state.notamErrors[icao];
@@ -2290,7 +2303,7 @@
         var stationInfo = state.avwxStation[icao] || (wxData && wxData.station);
         if (stationInfo) {
           var parts = [];
-          if (stationInfo.city) parts.push(escapeHtml(stationInfo.city + (stationInfo.country ? ', ' + (typeof stationInfo.country === 'string' ? stationInfo.country : stationInfo.country.name || '') : '')));
+          if (stationInfo.city) parts.push(app.escapeHtml(stationInfo.city + (stationInfo.country ? ', ' + (typeof stationInfo.country === 'string' ? stationInfo.country : stationInfo.country.name || '') : '')));
           if (stationInfo.elevation) {
             var elevVal = (typeof stationInfo.elevation === 'object' && stationInfo.elevation.feet) ? stationInfo.elevation.feet : (typeof stationInfo.elevation === 'number' ? stationInfo.elevation : null);
             if (elevVal !== null) parts.push(Math.round(elevVal) + ' ft');
@@ -2307,7 +2320,7 @@
         html += '<div class="metbriefing-inline-weather-header">' +
           '<div class="metbriefing-inline-weather-airport">' +
             '<span class="metbriefing-inline-weather-icao">' + icao + '</span>' +
-            (wxData && wxData.airportName ? '<span class="metbriefing-inline-weather-name">' + escapeHtml(wxData.airportName) + '</span>' : '') +
+            (wxData && wxData.airportName ? '<span class="metbriefing-inline-weather-name">' + app.escapeHtml(wxData.airportName) + '</span>' : '') +
             stationLine +
           '</div>' +
           '<div class="metbriefing-inline-weather-actions">' +
@@ -2332,7 +2345,7 @@
         }
         // No cached data — show hint
         if (!wxData && !wxLoading && !wxError) {
-          html += '<div class="metbriefing-inline-loading" style="color:var(--color-text-muted)">' + icon('cloud', 18) + '<span>\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0432\u043A\u043B\u0430\u0434\u043A\u0443 \u00AB\u041F\u043E\u0433\u043E\u0434\u0430\u00BB \u0434\u043B\u044F \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438</span></div>';
+          html += '<div class="metbriefing-inline-loading metbriefing-inline-loading--hint">' + icon('cloud', 18) + '<span>\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u0432\u043A\u043B\u0430\u0434\u043A\u0443 \u00AB\u041F\u043E\u0433\u043E\u0434\u0430\u00BB \u0434\u043B\u044F \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438</span></div>';
         }
         // Data
         if (wxData) {
@@ -2484,7 +2497,7 @@
             (rowRight ? rowRight : '') +
           '</div>' +
           (rawText ? '<div class="metbriefing-sigmet-raw-toggle" data-sigmet-raw-toggle="' + idx + '">Исходный текст</div>' +
-            '<div class="metbriefing-sigmet-raw" data-sigmet-raw="' + idx + '" lang="en">' + rawText.replace(/</g, '&lt;') + '</div>' : '') +
+            '<div class="metbriefing-sigmet-raw" data-sigmet-raw="' + idx + '" lang="en">' + app.escapeHtml(rawText) + '</div>' : '') +
         '</div>';
       });
       cardsHtml += '</div>';
@@ -2616,14 +2629,14 @@
               return (critOrder[a.criticality] !== undefined ? critOrder[a.criticality] : 9) - (critOrder[b.criticality] !== undefined ? critOrder[b.criticality] : 9);
             });
             sortedNotams.forEach(function(notam) {
-              var qcodeBadge = notam.qcode ? '<span class="metbriefing-inline-notam-qcode">' + notam.qcode + '</span>' : '';
-              html += '<div class="metbriefing-inline-notam-item metbriefing-inline-notam-item--' + notam.criticality + '" data-nt-goto-icao="' + icao + '" role="button" tabindex="0" aria-label="\u041F\u0435\u0440\u0435\u0439\u0442\u0438 \u043A NOTAM ' + icao + '">' +
+              var qcodeBadge = notam.qcode ? '<span class="metbriefing-inline-notam-qcode">' + app.escapeHtml(notam.qcode) + '</span>' : '';
+              html += '<div class="metbriefing-inline-notam-item metbriefing-inline-notam-item--' + notam.criticality + '" data-nt-goto-icao="' + app.escapeAttr(icao) + '" role="button" tabindex="0" aria-label="\u041F\u0435\u0440\u0435\u0439\u0442\u0438 \u043A NOTAM ' + app.escapeAttr(icao) + '">' +
                 '<div class="metbriefing-inline-notam-item-header">' +
-                  '<span class="metbriefing-inline-notam-item-id">' + notam.id + '</span>' +
+                  '<span class="metbriefing-inline-notam-item-id">' + app.escapeHtml(notam.id) + '</span>' +
                   qcodeBadge +
                   '<span class="metbriefing-inline-notam-crit metbriefing-inline-notam-crit--' + notam.criticality + '">' + getCriticalityLabel(notam.criticality) + '</span>' +
                 '</div>' +
-                (notam.subject ? '<div class="metbriefing-inline-notam-item-subject">' + notam.subject + '</div>' : '') +
+                (notam.subject ? '<div class="metbriefing-inline-notam-item-subject">' + app.escapeHtml(notam.subject) + '</div>' : '') +
               '</div>';
             });
           }
@@ -2673,8 +2686,8 @@
       html += '<div class="metbriefing-status-section metbriefing-wind-section">' +
         '<div class="metbriefing-section-title">' + icon('wind', 18) +
           '<span>\u0412\u0435\u0442\u0435\u0440 \u043F\u043E \u044D\u0448\u0435\u043B\u043E\u043D\u0430\u043C</span>' +
-          '<span class="metbriefing-wind-area">\u0420\u0430\u0439\u043E\u043D: ' + escapeHtml(windCfg.areaLabel || windCfg.area || 'C') + ' \u00B7 +' + windCfg.hours + '\u0447</span>' +
-          (state.windMapLoading ? ' <span class="metbriefing-wx-maps-refreshing">' + icon('rotate-ccw', 14, 'metbriefing-spin') + '</span>' : '') +
+          '<span class="metbriefing-wind-area">\u0420\u0430\u0439\u043E\u043D: ' + app.escapeHtml(windCfg.areaLabel || windCfg.area || 'C') + ' \u00B7 +' + windCfg.hours + '\u0447</span>' +
+          ' <button class="metbriefing-wind-refresh-icon-btn' + (state.windMapLoading ? ' metbriefing-wind-refresh-icon-btn--loading' : '') + '" data-wind-refresh aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u043A\u0430\u0440\u0442\u044B \u0432\u0435\u0442\u0440\u0430 \u043F\u043E \u044D\u0448\u0435\u043B\u043E\u043D\u0430\u043C">' + icon('rotate-ccw', 16) + '</button>' +
         '</div>' +
         '<div class="metbriefing-wind-controls">' +
           '<label class="metbriefing-wind-label" for="metbriefing-wind-level">\u042D\u0448\u0435\u043B\u043E\u043D:</label>' +
@@ -2684,13 +2697,12 @@
               return '<option value="' + lvl + '"' + sel + '>FL' + lvl + '</option>';
             }).join('') +
           '</select>' +
-          '<button class="metbriefing-wind-refresh-btn" data-wind-refresh aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0432\u0441\u0435 \u0432\u0435\u0442\u0440\u043E\u0432\u044B\u0435 \u043A\u0430\u0440\u0442\u044B">' + icon('rotate-ccw', 16) + '</button>' +
           '<span class="metbriefing-wind-progress">\u041A\u044D\u0448: ' + preloadedCount + '/' + totalLevels + '</span>' +
         '</div>' +
         '<div class="metbriefing-wind-map-container">' +
           (state.windMapLoading && !windImgSrc ? '<div class="metbriefing-wx-map-thumb-loading">' + icon('rotate-ccw', 24, 'metbriefing-spin') + '</div>' : '') +
           (windImgSrc ?
-            '<img class="metbriefing-wind-map-img" src="' + windImgSrc + '" data-full-src="' + windImgSrc + '" alt="\u0412\u0435\u0442\u0435\u0440 FL' + curLevel + ' +' + windCfg.hours + '\u0447 (' + escapeHtml(windCfg.areaLabel || windCfg.area) + ')" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' :
+            '<img class="metbriefing-wind-map-img" src="' + windImgSrc + '" data-full-src="' + windImgSrc + '" alt="\u0412\u0435\u0442\u0435\u0440 FL' + curLevel + ' +' + windCfg.hours + '\u0447 (' + app.escapeHtml(windCfg.areaLabel || windCfg.area) + ')" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' :
             (!state.windMapLoading ? '<div class="metbriefing-wind-map-placeholder">\u041A\u0430\u0440\u0442\u0430 \u043D\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u0430. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u2197 \u0434\u043B\u044F \u043F\u0440\u0435\u0434\u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438.</div>' : '')) +
         '</div>' +
       '</div>';
@@ -2698,11 +2710,16 @@
 
     // Summary
     var dataWarnings = getDataStatusWarnings();
+    // Task 55 (C1): isAnyLoading — управляет spin + красным цветом readiness-refresh-btn
+    var isAnyLoading = state.sigmetLoading || state.wxMapLoading || state.windMapLoading ||
+      Object.keys(state.wxLoading || {}).some(function(k){return state.wxLoading[k];}) ||
+      Object.keys(state.notamLoading || {}).some(function(k){return state.notamLoading[k];}) ||
+      Object.keys(state.metarHistoryLoading || {}).some(function(k){return state.metarHistoryLoading[k];});
     html += '<div class="metbriefing-summary">' +
       '<div class="metbriefing-readiness-indicator metbriefing-readiness-indicator--' + readiness.level + '">' +
         '<span class="metbriefing-readiness-dot"></span>' +
         '<span class="metbriefing-readiness-label">' + readiness.label + '</span>' +
-        '<button class="metbriefing-readiness-refresh-btn" data-mb-refresh-all aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0432\u0441\u0435">' + icon('rotate-ccw', 18) + '</button>' +
+        '<button class="metbriefing-readiness-refresh-btn' + (isAnyLoading ? ' metbriefing-readiness-refresh-btn--loading' : '') + '" data-mb-refresh-all aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u0432\u0441\u0435">' + icon('rotate-ccw', 18) + '</button>' +
       '</div>';
     if (readiness.issues.length > 0) {
       html += '<ul class="metbriefing-readiness-issues">';
@@ -2874,7 +2891,7 @@
             if (spinner) spinner.style.display = 'none';
           });
           img.addEventListener('error', function() {
-            if (spinner) spinner.innerHTML = '<span style="font-size:var(--font-xs);color:var(--color-text-muted)">\u041D\u0435 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u043E</span>';
+            if (spinner) spinner.innerHTML = '<span class="metbriefing-wx-map-error-text">\u041D\u0435 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u043E</span>';
           });
         }
       }
@@ -2894,12 +2911,12 @@
 
     var html = '';
 
-    // Search
-    html += '<div class="metbriefing-wx-search-bar">' +
-      '<div class="metbriefing-wx-search-input-wrap">' +
-        icon('search', 18, 'metbriefing-wx-search-icon') +
-        '<input type="text" class="metbriefing-wx-search-input" id="wxSearchInput" placeholder="ICAO \u043A\u043E\u0434 (\u043D\u0430\u043F\u0440. UUEE)" value="' + state.wxSearchInput + '" maxlength="4" aria-label="\u041F\u043E\u0438\u0441\u043A \u043F\u043E ICAO \u043A\u043E\u0434\u0443">' +
-        (state.wxSearchInput ? '<button class="metbriefing-wx-search-clear" id="wxSearchClear" aria-label="\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C">' + icon('x', 16) + '</button>' : '') +
+    // Search — uses shared .ct-search-* (SHELL_CONTRACT §5 Блок В)
+    html += '<div class="ct-search-bar">' +
+      '<div class="ct-search-input-wrap">' +
+      '<span class="ct-search-icon" aria-hidden="true">' + icon('search', 18) + '</span>' +
+      '<input type="text" class="ct-search-input" id="wxSearchInput" placeholder="ICAO \u043A\u043E\u0434 (\u043D\u0430\u043F\u0440. UUEE)" value="' + state.wxSearchInput + '" maxlength="4" aria-label="\u041F\u043E\u0438\u0441\u043A \u043F\u043E ICAO \u043A\u043E\u0434\u0443">' +
+      (state.wxSearchInput ? '<button class="ct-search-clear visible" id="wxSearchClear" aria-label="\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C">' + icon('x', 16) + '</button>' : '') +
       '</div>' +
       '<button class="metbriefing-wx-search-btn" id="wxSearchBtn"' + (state.wxSearchInput.length !== 4 ? ' disabled' : '') + ' aria-label="\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0430\u044D\u0440\u043E\u043F\u043E\u0440\u0442">' + icon('plus', 18) + '</button>' +
     '</div>';
@@ -2922,7 +2939,7 @@
         if (data && data.station) {
           var wxSt = data.station;
           var wxStParts = [];
-          if (wxSt.city) wxStParts.push(escapeHtml(wxSt.city + (wxSt.country && wxSt.country.name ? ', ' + wxSt.country.name : (wxSt.country && typeof wxSt.country === 'string' ? ', ' + wxSt.country : ''))));
+          if (wxSt.city) wxStParts.push(app.escapeHtml(wxSt.city + (wxSt.country && wxSt.country.name ? ', ' + wxSt.country.name : (wxSt.country && typeof wxSt.country === 'string' ? ', ' + wxSt.country : ''))));
           if (wxSt.elevation) {
             var elevFt = (typeof wxSt.elevation === 'object' && wxSt.elevation.feet) ? wxSt.elevation.feet : (typeof wxSt.elevation === 'number' ? wxSt.elevation : null);
             if (elevFt !== null) wxStParts.push(Math.round(elevFt) + ' ft');
@@ -2944,7 +2961,7 @@
         html += '<div class="metbriefing-wx-card-header">' +
           '<div class="metbriefing-wx-card-airport">' +
             '<span class="metbriefing-wx-card-icao">' + icao + '</span>' +
-            (data && data.airportName ? '<span class="metbriefing-wx-card-name">' + escapeHtml(data.airportName) + '</span>' : '') +
+            (data && data.airportName ? '<span class="metbriefing-wx-card-name">' + app.escapeHtml(data.airportName) + '</span>' : '') +
             wxStationLine +
           '</div>' +
           '<div class="metbriefing-wx-card-actions">' +
@@ -2968,12 +2985,12 @@
         if (data) {
           // METAR (always expanded)
           if (data.metar) {
-            html += '<div class="metbriefing-wx-metar-raw"><span class="metbriefing-wx-metar-label">METAR</span><code class="metbriefing-wx-metar-code" lang="en">' + escapeHtml(data.metar) + '</code></div>';
+            html += '<div class="metbriefing-wx-metar-raw"><span class="metbriefing-wx-metar-label">METAR</span><code class="metbriefing-wx-metar-code" lang="en">' + app.escapeHtml(data.metar) + '</code></div>';
           }
 
           // TAF (always expanded)
           if (data.taf) {
-            html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code" lang="en">' + escapeHtml(data.taf) + '</code></div>';
+            html += '<div class="metbriefing-wx-taf-raw"><span class="metbriefing-wx-taf-label">TAF</span><code class="metbriefing-wx-taf-code" lang="en">' + app.escapeHtml(data.taf) + '</code></div>';
           }
 
           // METAR History — fetched on demand from AWC proxy (last 2 hours)
@@ -2990,7 +3007,7 @@
                 var catClass = h.flightCat ? ' metbriefing-condition--' + h.flightCat.toLowerCase() : '';
                 html += '<div class="metbriefing-wx-metar-history-item' + catClass + '">';
                 html += '<span class="metbriefing-wx-metar-history-label">' + timeLabel + (h.flightCat ? ' <span class="metbriefing-wx-hist-cat">' + h.flightCat + '</span>' : '') + '</span>';
-                html += '<code class="metbriefing-wx-metar-history-code" lang="en">' + escapeHtml(h.raw) + '</code>';
+                html += '<code class="metbriefing-wx-metar-history-code" lang="en">' + app.escapeHtml(h.raw) + '</code>';
                 html += '</div>';
               });
               html += '</div>';
@@ -3006,7 +3023,7 @@
             : '';
           html += '<div class="metbriefing-wx-card-footer">' +
             '<span class="metbriefing-wx-obs-time">\u041D\u0430\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u0435: ' + formatTime(data.observedAt) + '</span>' +
-            (data.cachedAt ? '<span class="metbriefing-wx-cache-time" style="margin-left:auto">\u041A\u044D\u0448: ' + formatRelativeTime(new Date(data.cachedAt).toISOString()) + '</span>' : '') +
+            (data.cachedAt ? '<span class="metbriefing-wx-cache-time">\u041A\u044D\u0448: ' + formatRelativeTime(new Date(data.cachedAt).toISOString()) + '</span>' : '') +
             staleWarning +
           '</div>';
         }
@@ -3042,12 +3059,12 @@
         e.target.value = state.wxSearchInput;
         var searchBtnEl = document.getElementById('wxSearchBtn');
         if (searchBtnEl) searchBtnEl.disabled = state.wxSearchInput.length !== 4;
-        var wrap = searchInput.closest('.metbriefing-wx-search-input-wrap');
+        var wrap = searchInput.closest('.ct-search-input-wrap');
         if (wrap) {
-          var existingClear = wrap.querySelector('.metbriefing-wx-search-clear');
+          var existingClear = wrap.querySelector('.ct-search-clear');
           if (state.wxSearchInput && !existingClear) {
             var btn = document.createElement('button');
-            btn.className = 'metbriefing-wx-search-clear';
+            btn.className = 'ct-search-clear visible';
             btn.id = 'wxSearchClear';
             btn.setAttribute('aria-label', '\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C');
             btn.innerHTML = icon('x', 16);
@@ -3134,12 +3151,12 @@
 
     var html = '';
 
-    // Search
-    html += '<div class="metbriefing-notam-search-bar">' +
-      '<div class="metbriefing-notam-search-input-wrap">' +
-        icon('search', 18, 'metbriefing-notam-search-icon') +
-        '<input type="text" class="metbriefing-notam-search-input" id="notamSearchInput" placeholder="ICAO \u043A\u043E\u0434 (\u043D\u0430\u043F\u0440. UUEE)" value="' + state.notamSearchInput + '" maxlength="4" aria-label="\u041F\u043E\u0438\u0441\u043A NOTAM \u043F\u043E ICAO \u043A\u043E\u0434\u0443">' +
-        (state.notamSearchInput ? '<button class="metbriefing-notam-search-clear" id="notamSearchClear" aria-label="\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C">' + icon('x', 16) + '</button>' : '') +
+    // Search — uses shared .ct-search-* (SHELL_CONTRACT §5 Блок В)
+    html += '<div class="ct-search-bar">' +
+      '<div class="ct-search-input-wrap">' +
+      '<span class="ct-search-icon" aria-hidden="true">' + icon('search', 18) + '</span>' +
+      '<input type="text" class="ct-search-input" id="notamSearchInput" placeholder="ICAO \u043A\u043E\u0434 (\u043D\u0430\u043F\u0440. UUEE)" value="' + state.notamSearchInput + '" maxlength="4" aria-label="\u041F\u043E\u0438\u0441\u043A NOTAM \u043F\u043E ICAO \u043A\u043E\u0434\u0443">' +
+      (state.notamSearchInput ? '<button class="ct-search-clear visible" id="notamSearchClear" aria-label="\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C">' + icon('x', 16) + '</button>' : '') +
       '</div>' +
       '<button class="metbriefing-notam-search-btn" id="notamSearchBtn"' + (state.notamSearchInput.length !== 4 ? ' disabled' : '') + ' aria-label="\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0430\u044D\u0440\u043E\u043F\u043E\u0440\u0442">' + icon('plus', 18) + '</button>' +
     '</div>';
@@ -3259,17 +3276,17 @@
               html += '<div class="metbriefing-notam-card metbriefing-notam-card--' + notam.criticality + ' metbriefing-notam-card--' + notam.status + '">' +
                 '<div class="metbriefing-notam-card-header">' +
                   '<div class="metbriefing-notam-card-id">' +
-                    '<span class="metbriefing-notam-card-identifier">' + escapeHtml(notam.id) + '</span>' +
-                    (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + escapeHtml(notam.qcode) + '</span>' : '') +
-                    '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + escapeHtml(notam.type) + '</span>' +
-                    '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + escapeHtml(getCriticalityLabel(notam.criticality)) + '</span>' +
+                    '<span class="metbriefing-notam-card-identifier">' + app.escapeHtml(notam.id) + '</span>' +
+                    (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + app.escapeHtml(notam.qcode) + '</span>' : '') +
+                    '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + app.escapeHtml(notam.type) + '</span>' +
+                    '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + app.escapeHtml(getCriticalityLabel(notam.criticality)) + '</span>' +
                   '</div>' +
                   '<div class="metbriefing-notam-card-meta">' +
                     '<span class="metbriefing-notam-status-badge metbriefing-notam-status-badge--' + notam.status + '">' + (notam.status === 'active' ? '\u0410\u043A\u0442\u0438\u0432\u0435\u043D' : '\u0418\u0441\u0442\u0451\u043A') + '</span>' +
                   '</div>' +
                 '</div>' +
-                '<div class="metbriefing-notam-card-subject">' + escapeHtml(notam.subject) + '</div>' +
-                '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + escapeHtml(l) + '</p>'; }).join('') + '</div>' +
+                '<div class="metbriefing-notam-card-subject">' + app.escapeHtml(notam.subject) + '</div>' +
+                '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + app.escapeHtml(l) + '</p>'; }).join('') + '</div>' +
                 '<div class="metbriefing-notam-card-dates">' +
                   '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u0421:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveFrom) + '</span></div>' +
                   '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u041F\u043E:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveTo) + '</span></div>' +
@@ -3312,12 +3329,12 @@
         e.target.value = state.notamSearchInput;
         var searchBtnEl = document.getElementById('notamSearchBtn');
         if (searchBtnEl) searchBtnEl.disabled = state.notamSearchInput.length !== 4;
-        var wrap = searchInput.closest('.metbriefing-notam-search-input-wrap');
+        var wrap = searchInput.closest('.ct-search-input-wrap');
         if (wrap) {
-          var existingClear = wrap.querySelector('.metbriefing-notam-search-clear');
+          var existingClear = wrap.querySelector('.ct-search-clear');
           if (state.notamSearchInput && !existingClear) {
             var btn = document.createElement('button');
-            btn.className = 'metbriefing-notam-search-clear';
+            btn.className = 'ct-search-clear visible';
             btn.id = 'notamSearchClear';
             btn.setAttribute('aria-label', '\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C');
             btn.innerHTML = icon('x', 16);
@@ -3413,18 +3430,18 @@
         html += '<div class="metbriefing-notam-card metbriefing-notam-card--' + notam.criticality + ' metbriefing-notam-card--' + notam.status + '">' +
           '<div class="metbriefing-notam-card-header">' +
             '<div class="metbriefing-notam-card-id">' +
-              '<span class="metbriefing-notam-card-identifier">' + escapeHtml(notam.id) + '</span>' +
-              (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + escapeHtml(notam.qcode) + '</span>' : '') +
-              '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + escapeHtml(notam.type) + '</span>' +
-              '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + escapeHtml(getCriticalityLabel(notam.criticality)) + '</span>' +
+              '<span class="metbriefing-notam-card-identifier">' + app.escapeHtml(notam.id) + '</span>' +
+              (notam.qcode ? '<span class="metbriefing-notam-qcode-badge">' + app.escapeHtml(notam.qcode) + '</span>' : '') +
+              '<span class="metbriefing-notam-type-badge metbriefing-notam-type-badge--' + notam.type + '">' + app.escapeHtml(notam.type) + '</span>' +
+              '<span class="metbriefing-notam-criticality-badge metbriefing-notam-criticality-badge--' + notam.criticality + '">' + app.escapeHtml(getCriticalityLabel(notam.criticality)) + '</span>' +
             '</div>' +
             '<div class="metbriefing-notam-card-meta">' +
-              '<span class="metbriefing-notam-card-icao">' + escapeHtml(notam.icao) + '</span>' +
+              '<span class="metbriefing-notam-card-icao">' + app.escapeHtml(notam.icao) + '</span>' +
               '<span class="metbriefing-notam-status-badge metbriefing-notam-status-badge--' + notam.status + '">' + (notam.status === 'active' ? '\u0410\u043A\u0442\u0438\u0432\u0435\u043D' : '\u0418\u0441\u0442\u0451\u043A') + '</span>' +
             '</div>' +
           '</div>' +
-          '<div class="metbriefing-notam-card-subject">' + escapeHtml(notam.subject) + '</div>' +
-          '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + escapeHtml(l) + '</p>'; }).join('') + '</div>' +
+          '<div class="metbriefing-notam-card-subject">' + app.escapeHtml(notam.subject) + '</div>' +
+          '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + app.escapeHtml(l) + '</p>'; }).join('') + '</div>' +
           '<div class="metbriefing-notam-card-dates">' +
             '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u0421:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveFrom) + '</span></div>' +
             '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u041F\u043E:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveTo) + '</span></div>' +
@@ -3952,7 +3969,8 @@
       renderTabSwitcher();
       renderCurrentTab();
 
-      // No auto-refresh — updates only via header refresh icon or per-airport refresh buttons
+      // Task 52: автообновление NOTAM (каждые 30 мин) — добавлено к METAR/TAF/SIGMET/wxMap.
+      // Updates also via header refresh icon or per-airport refresh buttons.
 
       // Tick every 30s to update time displays
       if (state.tickInterval !== null) {
@@ -4006,6 +4024,21 @@
         fetchAllWxMaps(false);
       }, WX_MAP_REFRESH_MS);
 
+      // Task 52: автообновление NOTAM (каждые 30 мин) — как METAR.
+      // fetchNotam имеет skip-if-loading guard + worker кеш 5 мин, безопасен для периодического вызова.
+      if (state.notamRefreshInterval !== null) {
+        clearInterval(state.notamRefreshInterval);
+      }
+      state.notamRefreshInterval = setInterval(function() {
+        var notamIcaos = getAllRouteAirports().concat(state.extraAirports);
+        if (notamIcaos.length === 0) return;
+        notamIcaos.forEach(function(icao) {
+          if (!state.notamLoading[icao]) {
+            fetchNotam(icao);
+          }
+        });
+      }, NOTAM_REFRESH_MS);
+
     });
   }
 
@@ -4034,6 +4067,11 @@
     if (state.wxMapRefreshInterval !== null) {
       clearInterval(state.wxMapRefreshInterval);
       state.wxMapRefreshInterval = null;
+    }
+    // Task 52: очистка интервала автообновления NOTAM.
+    if (state.notamRefreshInterval !== null) {
+      clearInterval(state.notamRefreshInterval);
+      state.notamRefreshInterval = null;
     }
     // Task 24 (#4, #7, #8): §8 — закрываем dropdown + overlay + снимаем document listeners.
     // Вызов closeHeaderMenu() покрывает все 3 условия §8 (attach-on-open / detach-on-close / destroy cleanup).

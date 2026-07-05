@@ -56,35 +56,9 @@ body.dark-theme #checklistsContainer {
 .cl-tab-btn:active { color: var(--color-primary-dark); }
 
 /* ─── Accordion base classes (контракт MODULE_CONTRACT v4.1 §7) ─── */
-/* Унифицированных базовых классов в style.css НЕТ — модуль объявляет всё сам. */
+/* .collapsible-title, .collapsible-chevron, .marquee-inner — промотированы в style.css (shared).
+   Модуль добавляет только контекстные правила через #{name}Container. */
 /* @keyframes marquee — единственное исключение, остаётся в style.css. */
-
-.collapsible-title {
-  flex: 1;
-  min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.marquee-inner {
-  display: inline;
-}
-
-.collapsible-chevron {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-muted);
-  transition: transform var(--transition-speed) var(--transition-ease);
-}
-.collapsible-chevron svg {
-  width: 20px;
-  height: 20px;
-}
 
 /* ─── Accordion: context-specific selectors ─── */
 
@@ -175,22 +149,26 @@ body.dark-theme #checklistsContainer {
   color: var(--color-text-main);
 }
 
-/* ─── Block Note ─── */
+/* ─── Block Note — Матрёшка: горизонталь только от card padding, отступ через --accordion-indent ─── */
 .cl-block-note {
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
-  padding: 0 16px 12px 46px;
+  padding: 0 0 12px var(--accordion-indent);
   line-height: 1.5;
   white-space: pre-line;
-  word-break: break-word;
   overflow-wrap: anywhere;
   hyphens: auto;
 }
 
 /* ─── Block Content (collapsible) ─── */
 .cl-block-content {
+  max-height: 0;
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cl-block-content--open {
+  max-height: 2000px;
 }
 
 /* ─── Status Badges ─── */
@@ -906,16 +884,6 @@ body.dark-theme #checklistsContainer {
   color: var(--color-text-secondary);
 }
 
-/* ─── Responsive: small screens ─── */
-@media (max-width: 360px) {
-  .cl-camera-gallery {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .cl-docs-photos {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 /* ─── Mobile: форматирование заголовков аккордеонов (MODULE_CONTRACT §7) ─── */
 /* ВАЖНО: медиа-запросы расположены ПОСЛЕ базовых правил,
    иначе каскад CSS отдаст приоритет более позднему базовому правилу. */
@@ -952,5 +920,12 @@ body.dark-theme #checklistsContainer {
 
   .cl-block-header .marquee-inner {
     font-size: 0.8125rem;
+  }
+
+  .cl-camera-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cl-docs-photos {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

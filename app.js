@@ -1078,6 +1078,170 @@ window.app.showError = function(container, text) {
 };
 
 /* ═══════════════════════════════════════════
+   SHARED JS-УТИЛИТЫ (SHELL_BUILD §3.1, с v3.1)
+   Промоция из модулей: escapeHtml/langAttr/wrapLongWords/detectLang/renderRichText.
+   Модули ИСПОЛЬЗУЮТ эти утилиты, НЕ дублируют (MODULE_CONTRACT §8 с v4.8).
+   ═══════════════════════════════════════════ */
+
+/**
+ * escapeHtml(str) — санитизация HTML.
+ * Заменяет <, >, &, ", ' на HTML-сущности.
+ * Используется перед вставкой динамического текста в innerHTML.
+ */
+window.app.escapeHtml = function(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+/**
+ * escapeAttr(str) — HTML-escape для значений атрибутов.
+ * Идентична escapeHtml по набору символов, разделена семантически:
+ * escapeHtml — для текстовых узлов, escapeAttr — для value="..." data-*="...".
+ * Использовать в атрибутах HTML-элементов.
+ */
+window.app.escapeAttr = function(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+/**
+ * escapeHtmlWithBreaks(html) — alias для app.renderRichText.
+ * Сохраняет разрешённые теги <b>/<i>/<br>, экранирует остальное,
+ * оборачивает длинные EN-слова. Для полей с разметкой (MODULE_CONTRACT §13).
+ */
+window.app.escapeHtmlWithBreaks = function(html) {
+  return window.app.renderRichText(html);
+};
+
+/**
+ * detectLang(text) — блочный детектор языка.
+ * Считает латиницу vs кириллицу, возвращает "en"/"ru"/"".
+ * "en" — больше латиницы; "ru" — больше кириллицы; "" — нет букв (цифры/символы).
+ *
+ * ПРИОРИТЕТНО использовать везде в динамическом контенте (MODULE_CONTRACT §7 с v4.9, У11).
+ * Применяется в ~20 рендерерах: items-block-title/content, card-title, text-block-title,
+ * block-content/action/result/label, verify, conditional, tail-marker, sub-note, heading,
+ * accordion summary, subsection-title, list-divider-label, list items, image caption.
+ *
+ * Цель: EN-блоки получают lang="en" → EN словарь переноса (hyphens:auto) +
+ * accessibility (screen readers). RU-блоки наследуют lang="ru" от module-container.
+ */
+window.app.detectLang = function(text) {
+  if (!text) return '';
+  var s = String(text);
+  var latin = (s.match(/[A-Za-z]/g) || []).length;
+  var cyril = (s.match(/[А-Яа-яЁё]/g) || []).length;
+  if (latin === 0 && cyril === 0) return '';
+  return latin > cyril ? 'en' : 'ru';
+};
+
+/**
+ * langAttr(text) — возвращает ' lang="en"' или "" (пусто для RU).
+ * RU наследует lang="ru" от module-container с установленным атрибутом.
+ *
+ * Использование в рендерерах:
+ *   html += '<span' + app.langAttr(item.title) + '>' + app.escapeHtml(item.title) + '</span>';
+ *   html += '<div class="card-title"' + app.langAttr(b.title) + '>' + ... + '</div>';
+ */
+window.app.langAttr = function(text) {
+  var lang = window.app.detectLang(text);
+  return lang === 'en' ? ' lang="en"' : '';
+};
+
+/**
+ * wrapLongWords(text, minLen) — обёртка длинных EN-слов в <span lang="en">.
+ * Для применения EN словаря переноса (hyphens:auto с lang="ru" на контейнере
+ * иначе не гидифицирует EN слова).
+ *
+ * ВЫБОРОЧНО по решению разработчика модуля (MODULE_CONTRACT §7 с v4.9, У12).
+ * Применять только в блоках с потенциально длинными EN-словами (технические
+ * термины, METAR, процедуры). Для коротких EN-блоков (заголовки, лейблы) —
+ * не обязательно.
+ *
+ * Параметры:
+ *   text   — строка (HTML уже санитизирован через escapeHtml)
+ *   minLen — минимальная длина EN-слова для обёртки (default 14)
+ *
+ * Возвращает HTML-строку с обёрнутыми словами.
+ * ВНИМАНИЕ: применять ПОСЛЕ escapeHtml, иначе обёртка сломает экранирование.
+ */
+window.app.wrapLongWords = function(text, minLen) {
+  if (!text) return '';
+  var limit = minLen || 14;
+  var s = String(text);
+  // Регэксп: EN-слово (включая дефисы внутри) длиной ≥ limit символов
+  return s.replace(/[A-Za-z][A-Za-z-]{1,}/g, function(word) {
+    if (word.length < limit) return word;
+    return '<span lang="en">' + word + '</span>';
+  });
+};
+
+/**
+ * renderRichText(html) — рендер rich-text с sanitize + wrapLongWords.
+ * Применяет escapeHtml к текстовым узлам, сохраняет разрешённые теги
+ * (<b>, <i>, <br>), оборачивает длинные EN-слова для hyphens.
+ *
+ * Используется в fp/ffs для рендера b.content, table-ячеек, внешних HTML-файлов.
+ * До v3.1 была дублирована в 2 модулях — промоция устраняет дублирование.
+ *
+ * Разрешённые теги (MODULE_CONTRACT §13): <b>, <i>, <em>, <strong>, <br>.
+ * Также: \n → <br> (шаг 0), {{badge:PALETTE}} inline бейджи (шаг 4),
+ * {{link:MODULE:ID:LABEL}} inline ссылки (шаг 5).
+ * Запрещённые (<script>, <img>, <a>, <div>, <table> и др.) — удаляются.
+ */
+window.app.renderRichText = function(html) {
+  if (!html) return '';
+  var s = String(html);
+  // 0. Конвертируем \n → <br> (литеральный \n в JSON → визуальный перенос)
+  s = s.replace(/\\n/g, '\n');
+  s = s.replace(/\n/g, '<br>');
+  // 1. Сохраняем разрешённые теги через плейсхолдеры
+  var allowed = [];
+  // <br> (любой регистр, self-closing или парный)
+  s = s.replace(/<br\s*\/?>/gi, function(m) {
+    allowed.push('<br>');
+    return '\u0000BR' + (allowed.length - 1) + '\u0000';
+  });
+  // <b>...</b>, <i>...</i>, <em>...</em>, <strong>...</strong> (с сохранением содержимого)
+  s = s.replace(/<(b|i|em|strong)\b[^>]*>([\s\S]*?)<\/\1>/gi, function(m, tag, content) {
+    allowed.push('<' + tag.toLowerCase() + '>' + content + '</' + tag.toLowerCase() + '>');
+    return '\u0000TAG' + (allowed.length - 1) + '\u0000';
+  });
+  // 2. EscapeHtml всего остального (удаляет любые другие теги)
+  s = window.app.escapeHtml(s);
+  // 3. Восстанавливаем разрешённые теги
+  s = s.replace(/\u0000(?:BR|TAG)(\d+)\u0000/g, function(m, idx) {
+    return allowed[parseInt(idx, 10)];
+  });
+  // 4. Рендерим inline бейджи {{badge:PALETTE}} и {{badge:PALETTE:LABEL}}
+  var PALETTES = ['success','normal','abnormal','emergency','info'];
+  var PALETTE_ALIASES = { neutral: 'info' };
+  s = s.replace(/\{\{badge:(\w+)(?::([^}]+))?\}\}/g, function(match, type, label) {
+    var palette = PALETTE_ALIASES[type] || type;
+    if (PALETTES.indexOf(palette) < 0) return match;
+    var badgeLabel = label || palette;
+    return '<span class="badge badge--' + palette + '">' + window.app.escapeHtml(badgeLabel) + '</span>';
+  });
+  // 5. Рендерим inline ссылки {{link:MODULE:ID:LABEL}}
+  s = s.replace(/\{\{link:([\w-]+):([\w-]+):([^}]+)\}\}/g, function(match, mod, id, label) {
+    return '<span class="module-link" data-module="' + window.app.escapeAttr(mod) + '" data-id="' + window.app.escapeAttr(id) + '">' + window.app.escapeHtml(label) + '</span>';
+  });
+  // 6. Обёртываем длинные EN-слова для hyphens (по умолчанию minLen=14)
+  s = window.app.wrapLongWords(s, 14);
+  return s;
+};
+
+/* ═══════════════════════════════════════════
    DOMContentLoaded
    ═══════════════════════════════════════════ */
 
@@ -1129,10 +1293,13 @@ function _appInit() {
     });
   });
 
-  // Offline status
-  if (localStorage.getItem('offlineReady') === 'true') {
-    app.updateOfflineStatus(true);
-  }
+  // Offline status — проверяем реальное состояние SW, не localStorage
+  // (localStorage offlineReady — кэш-флаг, но не источник истины для UI)
+  navigator.serviceWorker.ready.then(function(reg) {
+    if (reg.active) {
+      app.updateOfflineStatus(true);
+    }
+  });
 
   // Notes quick button
   initNotesQuickBtn();

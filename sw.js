@@ -1,8 +1,8 @@
-/* Pilot's Tool — Service Worker v44 */
+/* Pilot's Tool — Service Worker v46 */
 
-var CACHE_NAME = 'pilots-tool-v44';
+var CACHE_NAME = 'pilots-tool-v46';
 
-var JSON_MODULE_NAMES = { 
+var JSON_MODULE_NAMES = {
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
   'modules/phonebook/data/phonebook.json':                'Телефонный справочник',
   'modules/faq/data/faq.json':                            'FAQ',
@@ -58,6 +58,7 @@ var STATIC_ASSETS = [
   './modules/phonebook/index.js',
   './modules/notes/index.js',
   './modules/faq/index.js',
+  './modules/limitations/index.js',
   // Модули CSS (подгружаются динамически через registry.ensureCss)
   './modules/worktime/worktime.css',
   './modules/metbriefing/metbriefing.css',
@@ -72,6 +73,7 @@ var STATIC_ASSETS = [
   './modules/phonebook/phonebook.css',
   './modules/notes/notes.css',
   './modules/faq/faq.css',
+  './modules/limitations/limitations.css',
   // JSON данных
   './modules/checklists/data/checklists.json',
   './modules/krs/data/krs.json',

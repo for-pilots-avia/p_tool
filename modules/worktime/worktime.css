@@ -126,7 +126,8 @@ body.dark-theme #worktimeContainer {
 .wt-progress-bar-fill {
   height: 100%;
   border-radius: var(--border-radius-xs);
-  transition: width 0.4s var(--transition-ease-out);
+  width: var(--fill, 0%);
+  transition: width calc(var(--transition-speed) * 1.6) var(--transition-ease-out);
 }
 .wt-progress-bar-fill--ok {
   background: var(--color-success);
@@ -186,7 +187,7 @@ body.dark-theme #worktimeContainer {
   font-family: var(--font-main);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
   min-height: 44px;
 }
 .wt-report-btn svg {
@@ -240,7 +241,7 @@ body.dark-theme #worktimeContainer {
   margin-bottom: 8px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 .wt-segment-card:active {
   transform: scale(0.99);
@@ -267,6 +268,65 @@ body.dark-theme #worktimeContainer {
     background: transparent;
   }
 }
+
+/* ─── Segments inside card — full-width (Task 31) ─── */
+.wt-card--segments {
+  padding: 0;
+}
+.wt-card--segments .app-card-header {
+  padding: 16px 16px 12px;
+}
+.wt-card--segments .wt-timeline-container {
+  margin: 0 0 12px;
+}
+.wt-card--segments .wt-segment-card {
+  border: none;
+  border-radius: 0;
+  padding: 10px 16px;
+  margin-bottom: 2px;
+  background: var(--color-bg-hover);
+}
+.wt-card--segments .wt-segment-card:last-child {
+  margin-bottom: 0;
+}
+.wt-card--segments .wt-segment-card:active {
+  background: var(--color-primary-ghost);
+}
+@media (hover: hover) {
+  .wt-card--segments .wt-segment-card:hover {
+    background: var(--color-bg-hover);
+  }
+}
+.wt-card--segments .wt-segment-card--locked:active {
+  background: transparent;
+}
+@media (hover: hover) {
+  .wt-card--segments .wt-segment-card--locked:hover {
+    background: transparent;
+  }
+}
+.wt-card--segments .wt-delete-segment {
+  border: none;
+  background: transparent;
+}
+.wt-card--segments .wt-shift-block {
+  padding: 0;
+}
+.wt-card--segments .wt-shift-title {
+  padding: 8px 16px 4px;
+}
+.wt-card--segments .wt-shift-divider {
+  margin: 0;
+}
+.wt-card--segments .wt-total-stats {
+  padding: 10px 16px;
+}
+.wt-card--segments .wt-rest-info {
+  margin: 0;
+}
+.wt-card--segments .wt-card-actions {
+  padding: 8px 16px;
+}
 .wt-segment-info {
   flex: 1;
   min-width: 0;
@@ -286,7 +346,7 @@ body.dark-theme #worktimeContainer {
   color: var(--color-text-muted);
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), color var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 .wt-delete-segment svg {
   width: 18px;
@@ -343,6 +403,7 @@ body.dark-theme #worktimeContainer {
   top: 0;
   bottom: 0;
   width: 1px;
+  left: var(--pct, 0%);
   background: var(--color-border);
   opacity: 0.5;
 }
@@ -360,6 +421,8 @@ body.dark-theme #worktimeContainer {
   position: absolute;
   top: 2px;
   bottom: 2px;
+  left: var(--pct, 0%);
+  width: var(--fill, 0%);
   border-radius: var(--border-radius-xs);
   opacity: 0.75;
   min-width: 2px;
@@ -369,6 +432,7 @@ body.dark-theme #worktimeContainer {
   top: 50%;
   width: 10px;
   height: 10px;
+  left: var(--pct, 0%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   border: 2px solid var(--color-text-white);
@@ -563,11 +627,11 @@ body.dark-theme #worktimeContainer {
 
 /* ─── Total stats ─── */
 .wt-total-stats {
-  padding: 12px 0;
+  padding: 10px 16px;
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
   border-top: 1px solid var(--color-border-subtle);
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 /* ─── Info row inside duty card ─── */
@@ -653,7 +717,7 @@ body.dark-theme #worktimeContainer {
   z-index: 1105;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.25s var(--transition-ease), visibility 0.25s var(--transition-ease);
+  transition: opacity var(--transition-speed) var(--transition-ease), visibility var(--transition-speed) var(--transition-ease);
 }
 .wt-settings-overlay.open {
   opacity: 1;
@@ -672,7 +736,7 @@ body.dark-theme #worktimeContainer {
   max-height: 88vh;
   overflow-y: auto;
   transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform var(--transition-speed) cubic-bezier(0.32, 0.72, 0, 1);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -744,7 +808,7 @@ body.dark-theme #worktimeContainer {
   font-size: var(--font-base);
   font-family: var(--font-main);
   box-sizing: border-box;
-  transition: border-color 0.2s var(--transition-ease);
+  transition: border-color var(--transition-speed) var(--transition-ease);
   appearance: auto;
   -webkit-appearance: auto;
 }
@@ -845,7 +909,7 @@ body.dark-theme #worktimeContainer {
 
 /* ─── Раздельный режим (splitMode) ─── */
 .wt-shift-block {
-  padding: 8px 0;
+  padding: 0;
 }
 .wt-shift-block--1 {
   opacity: 0.85;
@@ -861,7 +925,8 @@ body.dark-theme #worktimeContainer {
   font-size: var(--font-sm);
   font-weight: 700;
   color: var(--color-text-main);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  padding: 8px 16px 4px;
 }
 .wt-shift-lock {
   display: inline-flex;
@@ -879,7 +944,39 @@ body.dark-theme #worktimeContainer {
   background: var(--color-border-subtle);
   border: none;
   border-top: 1px dashed var(--color-border);
-  margin: 8px 0;
+  margin: 0;
+}
+
+/* ─── Rest-gap info block (splitMode, Task 31) ─── */
+.wt-rest-info {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  background: var(--color-bg-hover);
+}
+.wt-rest-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--rest-color);
+}
+.wt-rest-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* ─── Card actions (buttons, Task 31) ─── */
+.wt-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 /* ─── Кнопка «Разделить смену» ─── */
@@ -898,8 +995,10 @@ body.dark-theme #worktimeContainer {
   transition: background var(--transition-ease);
   white-space: nowrap;
 }
-.wt-split-btn:hover {
-  background: var(--color-bg-hover);
+@media (hover: hover) {
+  .wt-split-btn:hover {
+    background: var(--color-bg-hover);
+  }
 }
 .wt-split-btn svg {
   width: 16px;
@@ -938,7 +1037,7 @@ body.dark-theme #worktimeContainer {
   color: var(--color-text-secondary);
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease), border-color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), color var(--transition-speed) var(--transition-ease), border-color var(--transition-speed) var(--transition-ease);
 }
 .wt-card-action-btn svg {
   width: 20px;
@@ -974,7 +1073,7 @@ body.dark-theme #worktimeContainer {
   cursor: pointer;
   padding: 0;
   border-radius: var(--border-radius-sm);
-  transition: background 0.15s var(--transition-ease), color 0.15s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease), color var(--transition-speed) var(--transition-ease);
 }
 .wt-ghost-icon-btn svg {
   width: 20px;
@@ -1000,7 +1099,7 @@ body.dark-theme #worktimeContainer {
   z-index: 1105;
   background: var(--color-overlay);
   opacity: 0;
-  transition: opacity 0.15s var(--transition-ease-out);
+  transition: opacity var(--transition-speed) var(--transition-ease-out);
 }
 .wt-header-menu-backdrop.open {
   opacity: 1;
@@ -1018,7 +1117,7 @@ body.dark-theme #worktimeContainer {
   opacity: 0;
   transform: scale(0.95) translateY(-4px);
   transform-origin: top right;
-  transition: opacity 0.15s var(--transition-ease-out), transform 0.15s var(--transition-ease-out);
+  transition: opacity var(--transition-speed) var(--transition-ease-out), transform var(--transition-speed) var(--transition-ease-out);
 }
 .wt-header-menu.open {
   opacity: 1;
@@ -1095,4 +1194,224 @@ body.dark-theme #worktimeContainer {
   flex-shrink: 0;
 }
 
+/* ═══════════════════════════════════════════
+   Task 34: inline style → CSS-класс
+   ═══════════════════════════════════════════ */
+
+/* Position */
+.wt-relative {
+  position: relative;
+}
+
+/* Layout flex/grid */
+.wt-flex-center-gap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wt-flex-center-gap-sm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wt-badge-flex {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wt-duty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.wt-flex-between-baseline {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wt-flex-col-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wt-flex-fill {
+  flex: 1;
+  min-width: 0;
+}
+.wt-flex-wrap-center {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Text/typography */
+.wt-label-xs {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+.wt-value-bold {
+  font-weight: 700;
+  font-size: var(--font-md);
+}
+.wt-text-xs-normal {
+  font-size: var(--font-xs);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.wt-text-right {
+  text-align: right;
+}
+.wt-separator {
+  color: var(--color-border);
+}
+
+/* Spacing */
+.wt-mt-sm {
+  margin-top: 8px;
+}
+.wt-mt-md {
+  margin-top: 10px;
+}
+.wt-py-sm {
+  padding: 8px 0;
+}
+.wt-indent {
+  padding-left: 26px;
+}
+
+/* Progress bar */
+.wt-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+/* Total stats variants */
+.wt-total-stats--center {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.wt-total-stats--center-no-mt {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* Opacity */
+.wt-opacity-muted {
+  opacity: 0.4;
+}
+
+/* Button compact */
+.wt-btn-sm-compact {
+  font-size: var(--font-xs);
+  padding: 6px 12px;
+  min-height: 36px;
+}
+
+/* Timeline header label positioning (use style="--pct:NN%") */
+.wt-timeline-label-pos {
+  position: absolute;
+  left: var(--pct, 0%);
+  transform: translateX(-50%);
+}
+.wt-timeline-label-end {
+  position: absolute;
+  right: 0;
+  transform: translateX(50%);
+}
+
+/* Segment card details */
+.wt-seg-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.wt-segment-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.wt-seg-card-times {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+.wt-seg-card-flow {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Results card */
+.wt-btn-share {
+  color: var(--color-text-white);
+  background: var(--color-primary-ghost);
+}
+.wt-results-border {
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+.wt-warning-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.wt-span-full {
+  grid-column: 1 / -1;
+}
+
+/* Rest-line dynamic color — uses style="--rest-color:NNN" (rule in .wt-rest-line above) */
+
+/* Settings info block */
+.wt-settings-group--info {
+  background: var(--wt-badge-ok-bg);
+  border-color: var(--wt-badge-ok-border);
+  margin-bottom: 12px;
+}
+.wt-settings-info-text {
+  font-size: var(--font-sm);
+  color: var(--wt-badge-ok-text);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+}
+.wt-info-icon-adjust {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+.wt-settings-info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+}
+
+/* Dialog actions center modifier */
+.wt-dialog-actions--center {
+  justify-content: center;
+}
 

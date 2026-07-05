@@ -1,133 +1,466 @@
 [
   {
-    "id": "ffs-recurrent-group",
-    "title": "Повторная квалификация",
+    "id": "id",
+    "title": "Timetable FFS 737",
+    "layout": "divider",
+    "collapsible": true,
     "children": [
       {
-        "id": "ffs-001",
-        "title": "Повторная квалификация B737",
-        "duration": "4 ч",
-        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
-        "images": [
-          { "src": "modules/ffstraining/data/ext_walk1.png", "alt": "Внешний осмотр — вид 1" },
-          { "src": "modules/ffstraining/data/ext_walk1.png", "alt": "Внешний осмотр — вид 2" },
-          { "src": "modules/ffstraining/data/ext_walk1.png", "alt": "Внешний осмотр — вид 3" }
-        ],
-        "children": [
+        "id": "fp-tt001",
+        "title": "Ульяновск",
+        "duration": "FFS",
+        "layout": "child",
+        "{{items:normal}}": "ИЮЛЬ 2026.",
+        "tables": [
           {
-            "id": "ffs-001a",
-            "title": "Отказ двигателя на V1",
-            "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент повторной квалификации. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-            "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-            "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-            "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-            "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
-            "documents": [
-              {"title": "QRH — Engine Failure стр. 22", "src": "modules/docs/AOMB.pdf", "page": 22}
-            ]
-          },
-          {
-            "id": "ffs-001b",
-            "title": "LOFT-сценарий",
-            "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-            "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-            "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+            "src": "modules/ffstraining/data/B737_Ульяновск.html"
           }
         ]
       },
       {
-        "id": "ffs-002",
-        "title": "Повторная квалификация A320",
-        "duration": "4 ч",
-        "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур, включая отказы гидравлической системы и электрики. Сессия OPC/LPC.",
-        "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с требованиями EASA Part-FCL и эксплуатационных спецификаций",
-        "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-        "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus — один пилот читает ECAM, другой пилот управляет."
-      },
-      {
-        "id": "ffs-003",
-        "title": "Повторная квалификация B777",
-        "duration": "6 ч",
-        "{{items:normal}}": "{{badge:emergency:Просрочено}} {{badge:info:Boeing 777-300ER}} Повторная квалификация на дальнемагистральном ВС Boeing 777-300ER. Расширенная программа с учётом специфики ETOPS операций и дальних рейсов. Включает двухдневный цикл.",
-        "{{items:success:Критерии}}": "Выполнение всех обязательных упражнений, успешное завершение LOFT и ETOPS-сценариев, демонстрация компетенций CRM",
-        "{{items:info:Оборудование}}": "FFS Level D\nETOPS сценарии\nРасширенный LOFT",
-        "{{items:emergency:Instructor Notes}}": "Критично: процедура аварийного сброса давления на крейсерском эшелоне, отказ одного из двух двигателей в ETOPS-зоне. Проверить действия при GPWS и TCAS предупреждениях."
+        "id": "fp-tt002",
+        "title": "Санкт-Петербург",
+        "duration": "FFS",
+        "layout": "child",
+        "{{items:normal}}": "ИЮЛЬ 2026.",
+        "tables": [
+          {
+            "src": "modules/ffstraining/data/B737_Санкт-Петербург.html"
+          }
+        ]
       }
     ]
   },
   {
-    "id": "ffs-typerating-group",
-    "title": "Подготовка на тип",
-    "children": [
-      {
-        "id": "ffs-004",
-        "title": "Подготовка на тип A320",
-        "duration": "36 ч",
-        "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Полный курс подготовки на тип Airbus A320 для пилотов, переходящих с другого типа ВС. Включает изучение систем ВС, процедур нормальной и ненормальной эксплуатации, FFS сессии от базового до продвинутого уровня.",
-        "{{items:success:Критерии}}": "Успешная сдача теоретического экзамена, практического экзамена LPC и базовой проверки навыков в соответствии с EASA Part-FCL.725",
-        "{{items:info:Оборудование}}": "FFS Level D\nCPT (Cabine Procedure Trainer)\nVFD (Virtual Flight Deck)\nCBT система",
-        "{{items:emergency:Instructor Notes}}": "Особое внимание — философия Airbus: законы управления (Normal, Alternate, Direct), логика ECAM, ограничения FBW. Контроль уверенного владения FMA."
-      },
-      {
-        "id": "ffs-005",
-        "title": "Подготовка на тип B737 MAX",
-        "duration": "32 ч",
-        "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Boeing 737 MAX 8}} Курс подготовки на тип Boeing 737 MAX с учётом модификаций MCAS и обновлённых процедур. Включает обязательный блок по MCAS, процедурам стабилизатора и обновлённому QRH.",
-        "{{items:success:Критерии}}": "Успешная сдача теоретического и практического экзаменов, включая обязательный блок MCAS, демонстрация навыков при отказе стабилизатора",
-        "{{items:info:Оборудование}}": "FFS Level D\nMCAS модуль\nОбновлённый QRH\nCPT",
-        "{{items:emergency:Instructor Notes}}": "Обязательно: детальный разбор MCAS и процедур runaway stabilizer. Проверить знание различий между NG и MAX. Особое внимание EFATO."
-      },
-      {
-        "id": "ffs-006",
-        "title": "Подготовка на тип SSJ-100",
-        "duration": "34 ч",
-        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Sukhoi Superjet 100}} Полный курс подготовки на тип Sukhoi Superjet 100. Включает изучение систем ВС отечественного производства, цифрового комплекса авионики и интегрированной системы управления полётом.",
-        "{{items:success:Критерии}}": "Сдача теоретического и практического экзаменов в соответствии с требованиями ФАП-128 и РЛЭ SSJ-100",
-        "{{items:info:Оборудование}}": "FFS Level C\nCBT система\nПроцедурный тренажёр\nРуководства РЛЭ и QRH",
-        "{{items:emergency:Instructor Notes}}": "Акцент на отличия от Boeing/Airbus — российская нормативная база, специфика систем САУ и КВС. Проверить уверенность при работе с EICAS."
-      }
-    ]
+    "id": "ffs-sep-instr",
+    "title": "Вступление",
+    "layout": "divider"
   },
   {
-    "id": "ffs-007",
-    "title": "CRM и управление ресурсами экипажа",
-    "duration": "4 ч",
-    "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Специализированная CRM-тренировка, направленная на улучшение коммуникации в экипаже, распределение обязанностей и принятие решений в условиях неопределённости. LOFT-сценарии с моделированием конфликтных ситуаций.",
-    "{{items:success:Критерии}}": "Демонстрация эффективных навыков CRM: структурированная коммуникация, активное управление угрозами и ошибками, конструктивное разрешение конфликтов в экипаже",
-    "{{items:info:Оборудование}}": "FFS Level C+\nLOFT сценарии CRM\nВидеодебрифинг с анализом коммуникации",
-    "{{items:emergency:Instructor Notes}}": "Фокус на принципах TEM (Threat and Error Management). Оценивать не только технические действия, но и качество коммуникации, утвердительность К2, управление рабочей нагрузкой."
-  },
-  {
-    "id": "ffs-special-cases",
-    "title": "Особые случаи",
+    "id": "ffs-instr-notes",
+    "title": "Общая информация для инструктора",
     "layout": "divider",
+    "collapsible": true,
     "children": [
       {
-        "id": "ffs-008",
-        "title": "Отказ двигателя и EFATO",
-        "duration": "3 ч",
-    "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Целевая тренировка по действиям при отказе двигателя на взлёте (EFATO — Engine Failure After Take-Off). Отработка процедур на V1, после V1 и в наборе высоты. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-    "{{items:success:Критерии}}": "Стабильный набор высоты на одном двигателе, точное выполнение процедур QRH, безопасный возврат или уход на запасной аэродром",
-    "{{items:info:Оборудование}}": "FFS Level D\nСпециализированные EFATO сценарии\nМетеорологические установки",
-    "{{items:emergency:Instructor Notes}}": "Важно: различие действий при отказе до V1 и после V1. Контроль скорости принятия решения. Проверить выполнение процедур SEC и ограничения по градиенту набора."
-  },
-  {
-    "id": "ffs-009",
-    "title": "TCAS / GPWS процедуры",
-    "duration": "2 ч",
-    "{{items:normal}}": "{{badge:emergency:Просрочено}} {{badge:info:Boeing 777-300ER}} Специализированная тренировка по действиям при срабатывании TCAS (Traffic Collision Avoidance System) и GPWS (Ground Proximity Warning System). Отработка как разрешённых, так и неразрешённых манёвров уклонения. См. также: {{link:flightprocedures:fp-maneuvers:Маневры}}.",
-    "{{items:success:Критерии}}": "Безошибочное выполнение TCAS RA манёвров, немедленное реагирование на GPWS warnings, правильное восстановление после манёвров уклонения",
-    "{{items:info:Оборудование}}": "FFS Level D\nTCAS II модуль\nGPWS/EGPWS сценарии\nРЛЭ разделы по TCAS/GPWS",
-    "{{items:emergency:Instructor Notes}}": "Критично: приоритет TCAS RA над указаниями диспетчера. При GPWS — немедленное реагирование без подтверждения. Контроль высотомеров при GPWS warnings в горной местности."
+        "id": "ffs-instr-docs",
+        "title": "Общие требования КТС",
+        "layout": "child",
+        "{{items:normal}}": "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.\nТренажерные сессии периодической подготовки проводятся в течение 2-х последовательных дней. Продолжительность ежедневной подготовки на КТС и времени отдыха должны соответствовать требованиям Главы 7 части А РПП. Подготовка на тренажере проводится инструкторами, допущенными к данному виду подготовки. Устройство имитации полета (тренажер) должно быть одобрено уполномоченным органом в области ГА и соответствовать типу и модификациям ВС, эксплуатируемым в Авиапредприятии. Допускаются отклонения в конфигурации, кабине, типах двигателей, пилотажно- навигационном оборудовании ВС, если это не требует дополнительных навыков в эксплуатации и не оказывает влияние на выполнение тренажерной подготовки в полном объеме.\nДокументация (в том числе для проведения тренажерной подготовки) может быть представлена как в бумажном, так и в электронном виде.\nКВС, допущенные к выполнению полетов с правого пилотского сиденья, и пилоты-инструкторы могут проходить тренажерную подготовку, как с левого, так и с правого пилотского сидения.\nВ случае производственной необходимости допускается прохождение периодической тренировки и проверки на тренажере пилотами равной квалификации (двух вторых пилотов или двух КВС, не имеющих допуск к полетам с правого пилотского сидения) при соблюдении следующих условий:\n- в процессе тренировки и проверки на КТС пилоты выполняют функции пилотирующего (PF), занимая пилотское сидение согласно своей квалификации;\n- при выполнении заходов на посадку и посадок в условиях II/III категории ИКАО и взлетов при видимости на ВПП менее 400 м, допускается выполнение функций пилотирующего пилота с пилотского сидения не своей квалификации.\nВ случае если один из тренируемых пилотов не может продолжать подготовку на тренажере, допускается занятие пилотом-инструктором свободного кресла пилота для завершения подготовки другого пилота.",
+        "references": [
+          "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
+        ]
       },
       {
-        "id": "ffs-010",
-        "title": "Полёты в условиях обледенения",
-        "duration": "3 ч",
-    "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Boeing 737-800}} Тренировка по полётам в условиях обледенения. Отработка процедур включения противообледенительных систем, распознавание признаков обледенения, действия при потере характеристик из-за обледенения и stick shaker/pusher.",
-    "{{items:success:Критерии}}": "Своевременное распознавание условий обледенения, корректное использование противообледенительных систем, поддержание безопасного профиля полёта при потере характеристик",
-    "{{items:info:Оборудование}}": "FFS Level D\nМодуль обледенения\nМетеорологические установки\nPOI сценарии",
-    "{{items:emergency:Instructor Notes}}": "Акцент: своевременное включение анти-айс систем, контроль скорости при обледенении, действия при stick shaker — не ретардировать закрылки. Проверить знание различий между ground и flight icing."
+        "id": "ffs-instr-tech",
+        "title": "Технические требования к исправности оборудования тренажера.",
+        "layout": "child",
+        "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+        "references": [
+          "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
+        ]
+      },
+      {
+        "id": "ffs-instr-mel",
+        "title": "MINIMUM EQUIPMENT OF SIMULATOR: Boeing - 737/777",
+        "layout": "child",
+        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+      },
+      {
+        "id": "ffs-instr-ebt",
+        "title": "Подготовка, основанная на сценариях.",
+        "layout": "child",
+        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+      },
+      {
+        "id": "ffs-instr-specials",
+        "title": "Требования по проведению упражнений по эвакуации, аварийному снижению, задымлению.",
+        "layout": "child",
+        "{{items:abnormal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+      },
+      {
+        "id": "ffs-instr-ban",
+        "title": "Отказ в проведении тренировки / проверки!",
+        "layout": "child",
+        "{{items:emergency}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+      }
+    ]
+  },
+  {
+    "id": "ffs-instr-marks",
+    "title": "Оценки нв КТС",
+    "layout": "divider",
+    "collapsible": true,
+    "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+  },
+  {
+    "id": "ffs-instr-brief",
+    "title": "Общий порядок проведения брифинга",
+    "layout": "divider",
+    "collapsible": true,
+    "children": [
+      {
+        "id": "ffs-brief-001",
+        "title": "Общие требования КТС",
+        "layout": "child",
+        "{{items:normal}}": "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.",
+        "references": [
+          "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ffs-sep-anual",
+    "title": "Программы ежегодной подготовки",
+    "layout": "divider"
+  },
+  {
+    "id": "ffs-progr-3-6",
+    "title": "Программа 3-6",
+    "layout": "divider",
+    "collapsible": true,
+    "children": [
+      {
+        "id": "ffs-3-6-day1",
+        "title": "3-6 day 1",
+        "duration": "4 ч",
+        "layout": "group",
+        "children": [
+          {
+            "id": "ffs-0100",
+            "title": "1 LOS ULLI - UMKK. {{badge:info:PF – CPT or FO}}",
+            "duration": "00.00 - 00.35",
+            "layout": "card",
+            "{{items:normal}}": "{{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
+            "children": [
+              {
+                "id": "ffs-0100a",
+                "title": "Отказ двигателя на V1",
+                "duration": "1 ч",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
+                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
+                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
+                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
+                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "documents": [
+                  {
+                    "title": "QRH — Engine Failure стр. 22",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
+                ]
+              },
+              {
+                "id": "ffs-0100b",
+                "title": "LOFT-сценарий",
+                "duration": "1 ч",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
+                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
+                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+              }
+            ]
+          },
+          {
+            "id": "ffs-0150",
+            "title": "Повторная квалификация A320",
+            "duration": "4 ч",
+            "layout": "card",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+          }
+        ]
+      },
+      {
+        "id": "ffs-3-6-day2",
+        "title": "3-6 day 2",
+        "duration": "4 ч",
+        "layout": "group",
+        "children": [
+          {
+            "id": "ffs-day2-0",
+            "title": "{{badge:normal:REFRESH}}",
+            "layout": "divider"
+          },
+          {
+            "id": "ffs-0201",
+            "title": "6 LOSS OF HYD, WHEEL WELL FIRE, RNP APP.",
+            "duration": "00.00 - 00.45 {{badge:normal:PF – CPT}}",
+            "layout": "card",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/Лист1.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-text-3-6-day2",
+                "layout": "text",
+                "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/TO.html"
+                  }
+                ],
+                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW10L via SUGIN1D, sq 4321.\nATC: \"NWS RW 10L, cleared for T/O\"."
+              },
+              {
+                "id": "ffs-day2-1",
+                "title": "1 HYDRAULIC FAILURE",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-day2-1__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "После уборки шасси - LOSS OF HYD SYS A.\nУльяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
+              },
+              {
+                "id": "ffs-0201a",
+                "title": "NNC",
+                "duration": "QRH",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
+                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
+                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
+                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
+                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "documents": [
+                  {
+                    "title": "QRH — Engine Failure стр. 22",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
+                ]
+              },
+              {
+                "id": "ffs-day2-2",
+                "title": "2 FIRE PROTECTION",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-day2-2__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "После уборки механизации - WHEEL WELL FIRE.\nУльяновск:\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\nС.-Петербург:\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR",
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!"
+              },
+              {
+                "id": "ffs-0200b",
+                "title": "NNC",
+                "duration": "QRH",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
+                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
+                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+              },
+              {
+                "id": "ffs-day2-3",
+                "title": "3 LOSS OF HYD SYS B ВНИМАНИЕ: {{badge:emergency:MANUAL REVERTION}}",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-day2-3__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "Ульяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B",
+                "{{items:abnormal}}": "{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+              },
+              {
+                "id": "ffs-day2-4",
+                "title": "4 RNP APP",
+                "layout": "divider"
+              }
+            ]
+          },
+          {
+            "id": "ffs-0202",
+            "title": "7 WINDSHEAR, PARTIAL GEAR UP LANDING",
+            "duration": "00.45 - 01.20 {{badge:normal:PF – F/O}}",
+            "layout": "card",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+          },
+          {
+            "id": "ffs-0203",
+            "title": "8 LVO",
+            "duration": "01.20 - 01.55 {{badge:normal:PF – CPT}}",
+            "layout": "card",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+          },
+          {
+            "id": "ffs-day2-5",
+            "title": "{{badge:emergency:CHECK}}",
+            "layout": "divider"
+          },
+          {
+            "id": "ffs-0204",
+            "title": "1 LANDING GGEARS, WINDSHEAR, FIRE PROTECTION, EGPWS",
+            "duration": "02.00 - 02.45 {{badge:normal:PF – CPT}}",
+            "layout": "card",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+          },
+          {
+            "id": "ffs-0205",
+            "title": "2 ENG FAIL, ONE ILS APP",
+            "duration": "02.45 - 03.15 {{badge:normal:PF – F/O}}",
+            "layout": "card",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+          },
+          {
+            "id": "ffs-0206",
+            "title": "3 WINDSHEAR, HYD SYS FAIL, EGPWS",
+            "duration": "03.15 - 03.40 {{badge:normal:PF – F/O}}",
+            "layout": "card",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+          },
+          {
+            "id": "ffs-0207",
+            "title": "8 LVO",
+            "duration": "03.40 - 04.00 {{badge:normal:PF – CPT}}",
+            "layout": "card",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ffs-sep-special",
+    "title": "Программы специальной подготовки",
+    "layout": "divider"
+  },
+  {
+    "id": "ffs-progr-picus",
+    "title": "Программа PICUS | 8 ч",
+    "layout": "divider",
+    "collapsible": true,
+    "children": [
+      {
+        "id": "ffs-picus-day1",
+        "title": "PICUS day 1",
+        "duration": "4 ч",
+        "layout": "group",
+        "children": [
+          {
+            "id": "ffs-00100",
+            "title": "1 Cockpit preparations; Engine start.",
+            "duration": "00.00 - 00.35",
+            "layout": "card",
+            "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
+            "children": [
+              {
+                "id": "ffs-00100a",
+                "title": "Отказ двигателя на V1",
+                "duration": "1 ч",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
+                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
+                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
+                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
+                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "documents": [
+                  {
+                    "title": "QRH — Engine Failure стр. 22",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
+                ]
+              },
+              {
+                "id": "ffs-00100b",
+                "title": "LOFT-сценарий",
+                "duration": "1 ч",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
+                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
+                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+              }
+            ]
+          },
+          {
+            "id": "ffs-00150",
+            "title": "Повторная квалификация A320",
+            "duration": "4 ч",
+            "layout": "card",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+          }
+        ]
+      },
+      {
+        "id": "ffs-picus-day2",
+        "title": "PICUS day 2",
+        "duration": "4 ч",
+        "layout": "group",
+        "children": [
+          {
+            "id": "ffs-00200",
+            "title": "1 Cockpit preparations; Engine start.",
+            "duration": "00.00 - 00.35",
+            "layout": "card",
+            "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
+            "children": [
+              {
+                "id": "ffs-00200a",
+                "title": "Отказ двигателя на V1",
+                "duration": "1 ч",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
+                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
+                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
+                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
+                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "documents": [
+                  {
+                    "title": "QRH — Engine Failure стр. 22",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
+                ]
+              },
+              {
+                "id": "ffs-00200b",
+                "title": "LOFT-сценарий",
+                "duration": "1 ч",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
+                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
+                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+              }
+            ]
+          },
+          {
+            "id": "ffs-00250",
+            "title": "Повторная квалификация A320",
+            "duration": "4 ч",
+            "layout": "card",
+            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
+            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+          }
+        ]
       }
     ]
   }

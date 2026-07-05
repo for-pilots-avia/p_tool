@@ -11,6 +11,8 @@
 (function() {
   'use strict';
 
+  /* ── Shell-утилиты (MODULE_CONTRACT §8) ── */
+
   /* ── Приватное состояние ── */
   var _currentView = 'list';        /* 'list' | 'draw' | 'text' */
   var _activeCategory = 'all';      /* 'all' | 'Важно' | 'Работа' | 'Личное' */
@@ -157,10 +159,6 @@
       + (m < 10 ? '0' : '') + m;
   }
 
-  function escHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
 
   /* ═══════════════════════════════════════════
      HEADER
@@ -269,7 +267,7 @@
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    /* Left: decorative pen icon */
+    /* §6 exception: headerLeft = decorative icon (draw sub-view: no menu needed, close via right X-btn) */
     left.innerHTML = '<span class="notes-header-icon-muted" aria-hidden="true">'
       + (window.ICONS['edit-3'] || '') + '</span>';
     left.onclick = null;
@@ -293,7 +291,7 @@
     var right  = document.getElementById('headerRight');
     if (!left || !center || !right) return;
 
-    /* Left: semi-transparent non-clickable "T" icon (decorative) */
+    /* §6 exception: headerLeft = decorative icon (text sub-view: no menu needed, close via right X-btn) */
     left.innerHTML = '<span class="notes-header-icon-muted" aria-hidden="true">'
       + (window.ICONS['type'] || '') + '</span>';
     left.onclick = null;
@@ -320,6 +318,7 @@
     // params — всегда объект (контракт MODULE_CONTRACT §5)
     var container = document.getElementById('notesContainer');
     if (!container) { console.error('Контейнер notesContainer не найден!'); return; }
+    container.setAttribute('lang', 'ru');
 
     /* Делегирование: init() вызывается строго один раз (контракт MODULE_CONTRACT §5) */
     container.addEventListener('click', function(e) {
@@ -514,18 +513,18 @@
     var html = '<div class="notes-text-item" data-id="' + note.id + '">';
 
     /* Accent bar */
-    html += '<div class="notes-text-item-accent" style="background:' + borderColor + '"></div>';
+    html += '<div class="notes-text-item-accent" style="--cat-color:' + borderColor + '"></div>';
 
     /* Body: title + preview */
     html += '<div class="notes-text-item-body">';
-    html += '<div class="notes-text-item-title">' + escHtml(note.title || 'Без заголовка') + '</div>';
-    html += '<div class="notes-text-item-preview">' + escHtml(note.body || '') + '</div>';
+    html += '<div class="notes-text-item-title"' + window.app.langAttr(note.title || 'Без заголовка') + '>' + window.app.escapeHtml(note.title || 'Без заголовка') + '</div>';
+    html += '<div class="notes-text-item-preview"' + window.app.langAttr(note.body || '') + '>' + window.app.escapeHtml(note.body || '') + '</div>';
     html += '</div>';
 
     /* Meta: category badge + date */
     html += '<div class="notes-text-item-meta">';
     if (note.category) {
-      html += '<span class="notes-text-item-cat" style="background:' + borderColor + '">' + escHtml(note.category) + '</span>';
+      html += '<span class="notes-text-item-cat" style="--cat-color:' + borderColor + '">' + window.app.escapeHtml(note.category) + '</span>';
     }
     html += '<span class="notes-text-item-date">' + formatDate(note.ts) + '</span>';
     html += '</div>';
@@ -544,7 +543,7 @@
     var html = '<div class="notes-thumb" data-id="' + note.id + '">';
 
     /* Accent top bar */
-    html += '<div class="notes-thumb-accent" style="background:' + borderColor + '"></div>';
+    html += '<div class="notes-thumb-accent" style="--cat-color:' + borderColor + '"></div>';
 
     /* Image */
     html += '<div class="notes-thumb-img">';
@@ -555,9 +554,9 @@
     /* Caption */
     html += '<div class="notes-thumb-caption">';
     if (note.category) {
-      html += '<span class="notes-thumb-cat-label" style="background:' + borderColor + '">' + escHtml(note.category) + '</span>';
+      html += '<span class="notes-thumb-cat-label" style="--cat-color:' + borderColor + '">' + window.app.escapeHtml(note.category) + '</span>';
     } else {
-      html += '<span class="notes-thumb-cat-dot" style="background:transparent"></span>';
+      html += '<span class="notes-thumb-cat-dot"></span>';
     }
     html += '<span class="notes-thumb-date">' + formatDate(note.ts) + '</span>';
     html += '<button class="notes-thumb-del" data-id="' + note.id + '" aria-label="Удалить">'
@@ -726,7 +725,7 @@
     html += '</div>';
     html += '<div class="notes-draw-actions">';
     html += '<button class="notes-tool-clear" id="notesDrawClear">Очистить</button>';
-    html += '<button class="btn-primary" id="notesDrawSaveBtn" style="padding:6px 16px;font-size:var(--font-sm);min-height:32px;border-radius:16px">Сохранить</button>';
+    html += '<button class="btn-primary notes-save-btn" id="notesDrawSaveBtn">Сохранить</button>';
     html += '</div>';
     html += '</div>';
 
@@ -744,8 +743,8 @@
     if (!container) return;
     container.classList.add('notes-fullscreen');
 
-    var title = existingNote ? escHtml(existingNote.title || '') : '';
-    var body = existingNote ? escHtml(existingNote.body || '') : '';
+    var title = existingNote ? window.app.escapeAttr(existingNote.title || '') : '';
+    var body = existingNote ? window.app.escapeHtml(existingNote.body || '') : '';
     var cat = existingNote ? (existingNote.category || '') : '';
 
     var html = '<div class="notes-text-editor">';
@@ -767,7 +766,7 @@
       html += '<button class="' + pillClass + '"' + pillStyle + ' data-cat="' + catKeys[c] + '">' + catKeys[c] + '</button>';
     }
     html += '</div>';
-    html += '<button class="btn-primary" id="notesTextSaveBtn" style="flex-shrink:0;padding:6px 16px;font-size:var(--font-sm);min-height:32px;border-radius:16px">Сохранить</button>';
+    html += '<button class="btn-primary notes-save-btn" id="notesTextSaveBtn">Сохранить</button>';
     html += '</div>';
 
     html += '</div>';

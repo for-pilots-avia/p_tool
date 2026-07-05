@@ -117,7 +117,7 @@
     if (!left || !center || !right) return;
 
     // Левая кнопка: Боковое меню
-    left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню">'
+    left.innerHTML = '<button class="icon-btn" aria-label="Меню">'
       + (window.ICONS.menu || '') + '</button>';
     left.onclick = function() { app.toggleMenu(); };
 
@@ -219,7 +219,7 @@
 
   function renderDivider(entry) {
     return '<div class="list-divider krs-divider">'
-      + '<span class="list-divider-label">' + restoreInlineTags(escapeHtml(entry.label || '')) + '</span>'
+      + '<span class="list-divider-label">' + window.app.renderRichText(entry.label || '') + '</span>'
       + '</div>';
   }
 
@@ -237,7 +237,7 @@
 
     // Заголовок аккордеона
     html += '<div class="krs-block-header" data-block-id="' + inst.id + '">';
-    var addres = inst.addres ? restoreInlineTags(escapeHtml(inst.addres)) : '';
+    var addres = inst.addres ? window.app.renderRichText(inst.addres) : '';
     if (addres) {
       // Бейдж даты + маркер адресата в вертикальном стеке
       html += '<div class="krs-badge-stack">';
@@ -249,25 +249,24 @@
     } else if (ageLabel) {
       html += '<span class="krs-age-badge krs-age-badge--' + ageCat + '">' + ageLabel + '</span>';
     }
-    html += '<span class="collapsible-title"><span class="marquee-inner">' + escapeHtml(inst.title) + '</span></span>';
+    html += '<span class="collapsible-title"' + window.app.langAttr(inst.title) + '><span class="marquee-inner">' + window.app.escapeHtml(inst.title) + '</span></span>';
     html += '<span class="collapsible-chevron">'
       + (window.ICONS['chevron-down'] || '') + '</span>';
     html += '</div>';
 
     // Контент (сворачиваемый)
-    html += '<div class="krs-block-content" id="krs-content-' + inst.id + '"'
-      + ' style="max-height:' + (isOpen ? '5000px' : '0') + ';">';
+    html += '<div class="krs-block-content' + (isOpen ? ' krs-block-content--open' : '') + '" id="krs-content-' + inst.id + '">';
     html += '<div class="krs-block-inner">';
 
     // Мета: дата + автор
     html += '<div class="krs-meta">';
     html += '<span class="krs-meta-date">' + formatDate(inst.date) + '</span>';
     html += '<span class="krs-meta-sep">·</span>';
-    html += '<span class="krs-meta-author">' + escapeHtml(inst.name) + '</span>';
+    html += '<span class="krs-meta-author">' + window.app.escapeHtml(inst.name) + '</span>';
     html += '</div>';
 
     // Текст указания
-    html += '<div class="krs-text">' + formatText(inst.text) + '</div>';
+    html += '<div class="krs-text"' + window.app.langAttr(inst.text) + '>' + window.app.renderRichText(inst.text) + '</div>';
 
     // Изображения
     var images = getImages(inst);
@@ -275,7 +274,7 @@
       html += '<div class="krs-images">';
       for (var i = 0; i < images.length; i++) {
         html += '<div class="krs-img-wrap">';
-        html += '<img src="' + escapeHtml(images[i]) + '" data-full-src="' + escapeHtml(images[i]) + '" alt="Вложение ' + (i + 1) + '" loading="lazy" class="krs-img">';
+        html += '<img src="' + window.app.escapeAttr(images[i]) + '" data-full-src="' + window.app.escapeAttr(images[i]) + '" alt="Вложение ' + (i + 1) + '" loading="lazy" class="krs-img">';
         html += '</div>';
       }
       html += '</div>';
@@ -286,7 +285,7 @@
     if (pdfs.length > 0) {
       html += '<div class="krs-pdfs">';
       for (var j = 0; j < pdfs.length; j++) {
-        html += '<button class="krs-pdf-btn" data-pdf="' + escapeHtml(pdfs[j]) + '">';
+        html += '<button class="krs-pdf-btn" data-pdf="' + window.app.escapeAttr(pdfs[j]) + '">';
         html += (window.ICONS['file-text'] || '');
         html += '<span>' + (j + 1) + '. PDF</span>';
         html += (window.ICONS['download'] || '');
@@ -405,11 +404,11 @@
 
   function renderSearchBar() {
     var isOpen = _searchQuery.trim().length > 0 ? ' krs-search-bar--open' : '';
-    return '<div class="krs-search-bar' + isOpen + '" id="krsSearchBar">'
-      + '<div class="krs-search-input-wrap">'
-      + '<span class="krs-search-icon">' + (window.ICONS['search'] || '') + '</span>'
-      + '<input type="text" class="krs-search-input" id="krsSearchInput" placeholder="Поиск по указаниям…" value="' + escapeAttr(_searchQuery) + '">'
-      + (_searchQuery ? '<button class="krs-search-clear" aria-label="Очистить">' + (window.ICONS['x'] || '') + '</button>' : '')
+    return '<div class="ct-search-bar krs-search' + isOpen + '" id="krsSearchBar">'
+      + '<div class="ct-search-input-wrap">'
+      + '<span class="ct-search-icon">' + (window.ICONS['search'] || '') + '</span>'
+      + '<input type="text" class="ct-search-input" id="krsSearchInput" placeholder="Поиск по указаниям…" value="' + window.app.escapeAttr(_searchQuery) + '">'
+      + (_searchQuery ? '<button class="ct-search-clear visible" aria-label="Очистить">' + (window.ICONS['x'] || '') + '</button>' : '')
       + '</div>'
       + '</div>';
   }
@@ -419,69 +418,25 @@
      ═══════════════════════════════════════════ */
 
   function toggleBlock(blockId) {
-    _openBlocks[blockId] = !_openBlocks[blockId];
+    var wasOpen = _openBlocks[blockId];
+    _openBlocks = {};
+    if (!wasOpen) {
+      _openBlocks[blockId] = true;
+    }
     renderAll();
-  }
-
-  /* ═══════════════════════════════════════════
-     TEXT FORMATTING
-     ═══════════════════════════════════════════ */
-
-  /**
-   * Форматирование текста: перевод \n в <br>, поддержка <pre>, <b> тегов из JSON
-   */
-  function formatText(str) {
-    if (!str) return '';
-    // Разбить на блоки по <pre> тегам
-    var parts = str.split(/(<pre>[\s\S]*?<\/pre>)/gi);
-    var result = '';
-    for (var i = 0; i < parts.length; i++) {
-      var part = parts[i];
-      if (part.match(/^<pre>/i)) {
-        // Пропускаем <pre> блоки как есть (с HTML)
-        result += part;
-      } else {
-        // Обычный текст: экранируем HTML, восстанавливаем разрешённые теги (§13: <b>, <i>), <p>→абзац, \n→<br>
-        var escaped = escapeHtml(part);
-        escaped = restoreInlineTags(escaped);
-        // <p> не входит в §13, но встречается в данных — конвертируем в абзацный отступ
-        escaped = escaped.replace(/&lt;p&gt;/g, '\n\n').replace(/&lt;\/p&gt;/g, '\n\n');
-        escaped = escaped.replace(/\n/g, '<br>');
-        result += escaped;
+    // Прокрутить к открываемому блоку с поправкой на хедер
+    if (!wasOpen) {
+      var blockEl = document.querySelector('.krs-block[data-block-id="' + blockId + '"]');
+      if (blockEl) {
+        setTimeout(function() {
+          var rect = blockEl.getBoundingClientRect();
+          var headerEl = document.getElementById('appHeader');
+          var headerH = headerEl ? headerEl.offsetHeight : 56;
+          var y = window.pageYOffset + rect.top - headerH - 8;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }, 50);
       }
     }
-    return result;
-  }
-
-  /* ═══════════════════════════════════════════
-     HTML ESCAPE
-     ═══════════════════════════════════════════ */
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  // Восстановить разрешённые inline-теги после escapeHtml (MODULE_CONTRACT §13: <b>, <i>)
-  function restoreInlineTags(str) {
-    return str
-      .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
-      .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
-  }
-
-  function escapeAttr(str) {
-    if (!str) return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
   }
 
   /* ═══════════════════════════════════════════
@@ -513,7 +468,7 @@
         }
 
         // Кнопка очистки поиска
-        var clearBtn = e.target.closest('.krs-search-clear');
+        var clearBtn = e.target.closest('.ct-search-clear');
         if (clearBtn) {
           _searchQuery = '';
           renderAll();
@@ -557,7 +512,7 @@
 
       // Обработчик ввода в поиск
     container.addEventListener('input', function(e) {
-      var input = e.target.closest('.krs-search-input');
+      var input = e.target.closest('.ct-search-input');
       if (input) {
         _searchQuery = input.value;
         renderAll();

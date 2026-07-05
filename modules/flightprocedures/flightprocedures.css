@@ -78,6 +78,9 @@
 /* Adjacent sibling — сворачивание */
 .divider-list-toggle.is-open + .divider-list-items {
   max-height: none;
+  border-left: 2px solid var(--color-border);
+  margin-left: 0;
+  padding-left: calc(var(--content-padding-x) - 2px);
 }
 
 .divider-list-toggle:not(.is-open) + .divider-list-items {
@@ -252,79 +255,28 @@ body.dark-theme .items-block-title {
   font-weight: 600;
 }
 
-/* ─── Search bar ─── */
-.flightprocedures-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* ─── Search — contextual overrides для shared .ct-search-* (SHELL_CONTRACT §5 Блок В) ─── */
+#flightproceduresContainer .ct-search-bar {
   padding: 16px 0 12px;
 }
-.flightprocedures-search-input-wrap {
-  position: relative;
-  flex: 1;
+#flightproceduresContainer .ct-search-input {
+  background: var(--color-bg-card);
 }
-.flightprocedures-search-input-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
+body.dark-theme #flightproceduresContainer .ct-search-input {
+  background: var(--color-bg-card);
 }
-.flightprocedures-search-input-icon svg {
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-  fill: none;
-}
-.flightprocedures-search-input {
-  width: 100%;
-  height: 44px;
-  padding: 0 12px 0 40px;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
-  color: var(--color-text-main);
-  font-size: var(--font-base);
-  font-family: var(--font-main);
-  box-sizing: border-box;
-  transition: border-color 0.2s var(--transition-ease);
-}
-.flightprocedures-search-input:focus {
-  border-color: var(--color-primary);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--color-primary-ghost);
-}
-body.dark-theme .flightprocedures-search-input {
-  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
-  border-color: var(--color-border);
-  color: var(--color-text-main);
-}
-.flightprocedures-search-clear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+#flightproceduresContainer .ct-search-clear {
   min-width: 44px;
   min-height: 44px;
   width: 44px;
   height: 44px;
-  background: transparent;
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: 0;
-  border-radius: var(--border-radius-sm);
-  transition: color 0.15s var(--transition-ease), background 0.15s var(--transition-ease);
 }
-.flightprocedures-search-clear svg {
+#flightproceduresContainer .ct-search-clear svg {
   width: 20px;
   height: 20px;
-  stroke: currentColor;
-  fill: none;
 }
 @media (hover: hover) {
-  .flightprocedures-search-clear:hover {
+  #flightproceduresContainer .ct-search-clear:hover {
     color: var(--color-danger);
     background: var(--color-bg-hover);
   }
@@ -351,13 +303,8 @@ body.dark-theme .flightprocedures-search-input {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-main) 100%);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-
-body.dark-theme .flightprocedures-card-header {
-  background: linear-gradient(135deg, var(--color-bg-main) 0%, var(--color-bg-card) 100%);
 }
 
 /* ─── Card Info ─── */
@@ -697,11 +644,11 @@ body.dark-theme .flightprocedures-card-header {
   line-height: 1.35;
 }
 
-[data-block="heading"][data-level="2"] h2 { font-size: 18px; }
-[data-block="heading"][data-level="3"] h3 { font-size: 16px; }
-[data-block="heading"][data-level="4"] h4 { font-size: 15px; color: var(--color-danger); }
-[data-block="heading"][data-level="5"] h5 { font-size: 14px; }
-[data-block="heading"][data-level="6"] h6 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+[data-block="heading"][data-level="2"] h2 { font-size: 1.125rem; }
+[data-block="heading"][data-level="3"] h3 { font-size: 1rem; }
+[data-block="heading"][data-level="4"] h4 { font-size: 0.9375rem; color: var(--color-danger); }
+[data-block="heading"][data-level="5"] h5 { font-size: 0.875rem; }
+[data-block="heading"][data-level="6"] h6 { font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; }
 
 /* ─── data-block: procedure / checklist ─── */
 [data-block="procedure"],
@@ -975,7 +922,7 @@ body.dark-theme .flightprocedures-card-header {
 
 .flightprocedures-block-accordion > summary::before {
   content: '\25B8';
-  font-size: 12px;
+  font-size: var(--font-xs);
   transition: transform 0.2s;
 }
 
@@ -1503,6 +1450,7 @@ body.dark-theme .flightprocedures-card--group.open .flightprocedures-card-header
   /* Smart Divider + divider-list: синхронно с module-container */
   .divider-list-toggle { padding: 14px 12px 6px; }
   .divider-list-items  { padding: 0 12px; }
+  .divider-list-toggle.is-open + .divider-list-items { padding-left: 10px; }
   .list-divider        { padding: 18px 12px 6px; }
   /* Chevron: 16px на узких (desktop = 20px) */
   .flightprocedures-card-chevron { width: 16px; height: 16px; }
@@ -1527,6 +1475,7 @@ body.dark-theme .flightprocedures-card--group.open .flightprocedures-card-header
   /* Smart Divider + divider-list: синхронно с module-container */
   .divider-list-toggle { padding: 14px 10px 6px; }
   .divider-list-items  { padding: 0 10px; }
+  .divider-list-toggle.is-open + .divider-list-items { padding-left: 8px; }
   .list-divider        { padding: 18px 10px 6px; }
 }
 
@@ -1552,7 +1501,7 @@ body.dark-theme .flightprocedures-card--group.open .flightprocedures-card-header
 
 @media (max-width: 380px) {
   .flightprocedures-card-header {
-    padding: 10px 10px;
+    padding: 10px 4px;
     gap: 6px;
   }
 

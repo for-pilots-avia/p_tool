@@ -435,58 +435,159 @@
             },
             {
               "id": "Preflight_pf_1",
-              "type": "checkbox",
-              "label": "Прибытие в брифинг."
+              "type": "select",
+              "label": "Прибытие в брифинг.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_2",
-              "type": "checkbox",
-              "label": "Проверка личных документов."
+              "type": "select",
+              "label": "Проверка личных документов.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_3",
-              "type": "checkbox",
-              "label": "Ознакомление с документацией."
+              "type": "select",
+              "label": "Ознакомление с документацией.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_4",
-              "type": "checkbox",
-              "label": "Анализ погодных условий."
+              "type": "select",
+              "label": "Оценка погодных условий.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_5",
-              "type": "checkbox",
-              "label": "Анализ NOTAM и листов предупреждений."
+              "type": "select",
+              "label": "Анализ NOTAM и листов предупреждений.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_6",
-              "type": "checkbox",
-              "label": "Расчет взлетно-посадочных характеристик (Топливо, центровка)."
+              "type": "select",
+              "label": "Расчет заправки топливом.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_7",
-              "type": "checkbox",
-              "label": "Принятие решения."
+              "type": "select",
+              "label": "Расчет весовых и центровочных данных.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Preflight_pf_8",
-              "type": "checkbox",
-              "label": "Прохождение служб (доктор, граница/таможня)."
+              "id": "Preflight_1_001",
+              "type": "select",
+              "label": "Preflight_pf_8 | Расчет взлетно-посадочных характеристик (Топливо, центровка).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_9",
-              "type": "checkbox",
-              "label": "Принятие ВС (охрана, техник, экипаж)."
+              "type": "select",
+              "label": "Принятие решения.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Preflight_pf_10",
-              "type": "checkbox",
-              "label": "Взаимодействие с представителем АК."
+              "id": "Preflight_1_002",
+              "type": "select",
+              "label": "Preflight_pf_10 | Взаимодействие с ЦУП, Flight Dispatch, центровка.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Preflight_pf_11",
-              "type": "checkbox",
-              "label": "Взаимодействие с САБ."
+              "id": "Preflight_1_003",
+              "type": "select",
+              "label": "Preflight_pf_11 | Взаимодействие со службами (доктор, граница/таможня).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_12",
+              "type": "select",
+              "label": "Взаимодействие с представителем АК.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_13",
+              "type": "select",
+              "label": "Знание и соблюдение правил авиационной безопасности.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "div_10",
@@ -494,29 +595,88 @@
               "label": "На борту ВС"
             },
             {
-              "id": "Preflight_pf_12",
-              "type": "checkbox",
-              "label": "Осмотр ВС."
-            },
-            {
-              "id": "Preflight_pf_13",
-              "type": "checkbox",
-              "label": "Подготовка кабины к полету."
-            },
-            {
-              "id": "Preflight_pf_14",
-              "type": "checkbox",
-              "label": "Бриффинг с БП."
+              "id": "Preflight_1_004",
+              "type": "select",
+              "label": "Preflight_pf_14 | Принятие ВС (охрана, техник, экипаж).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_15",
-              "type": "checkbox",
-              "label": "SP: Cold/Hot weather."
+              "type": "select",
+              "label": "Осмотр ВС.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Preflight_pf_16",
-              "type": "checkbox",
-              "label": "SP: Turbulance."
+              "type": "select",
+              "label": "Подготовка кабины к полету.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_17",
+              "type": "select",
+              "label": "Бриффинг с БП.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_18",
+              "type": "select",
+              "label": "Предполетный бриффинг.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_19",
+              "type": "select",
+              "label": "SP: Cold/Hot weather.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_20",
+              "type": "select",
+              "label": "SP: Turbulance.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             }
           ]
         },
@@ -612,74 +772,196 @@
           "subname": "Стандартные процедуры.",
           "items": [
             {
-              "id": "Takeoff_and_Climb_to_3_1",
-              "type": "checkbox",
-              "label": "Запуск двигателей и взаимодействие с техническим персоналом."
+              "id": "Takeoff_and_Climb_to_1",
+              "type": "select",
+              "label": "Запуск двигателей и взаимодействие с техническим персоналом.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_1",
-              "type": "checkbox",
-              "label": "Буксировка."
+              "id": "Takeoff_and_Climb_to_2",
+              "type": "select",
+              "label": "Процедуры после запуска двигателя.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_3_2",
-              "type": "checkbox",
-              "label": "Руление."
+              "id": "Takeoff_and_Climb_to_3",
+              "type": "select",
+              "label": "Буксировка.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_2",
-              "type": "checkbox",
-              "label": "Разбег."
+              "id": "Takeoff_and_Climb_to_4",
+              "type": "select",
+              "label": "Руление.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_3_3",
-              "type": "checkbox",
-              "label": "Набор высоты."
+              "id": "Takeoff_and_Climb_to_5",
+              "type": "select",
+              "label": "Разбег.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_3_4",
-              "type": "checkbox",
-              "label": "Выполнение SID и процедур ограничения шума на взлете."
+              "id": "Takeoff_and_Climb_to_6",
+              "type": "select",
+              "label": "Набор высоты.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_3_5",
-              "type": "checkbox",
-              "label": "Эксплуатация двигателей и систем ВС."
+              "id": "Takeoff_and_Climb_to_7",
+              "type": "select",
+              "label": "Выполнение SID и процедур ограничения шума на взлете.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_3",
-              "type": "checkbox",
-              "label": "Использование локатора."
+              "id": "Takeoff_and_Climb_to_8",
+              "type": "select",
+              "label": "Эксплуатация двигателей и систем ВС.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_3_6",
-              "type": "checkbox",
-              "label": "Использование TERRAIN."
+              "id": "Takeoff_and_Climb_to_9",
+              "type": "select",
+              "label": "Точность навигации.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_4",
-              "type": "checkbox",
-              "label": "SP: Cold weather."
+              "id": "Takeoff_and_Climb_to_10",
+              "type": "select",
+              "label": "Использование локатора.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_5",
-              "type": "checkbox",
-              "label": "SP: Turbulance."
+              "id": "Takeoff_and_Climb_to_11",
+              "type": "select",
+              "label": "Использование TERRAIN.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_6",
-              "type": "checkbox",
-              "label": "Изменение маршрута."
+              "id": "Takeoff_and_Climb_to_12",
+              "type": "select",
+              "label": "SP: Cold weather.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_4_7",
-              "type": "checkbox",
-              "label": "Использование карт контрольных проверок."
+              "id": "Takeoff_and_Climb_to_13",
+              "type": "select",
+              "label": "SP: Turbulance.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Takeoff_and_Climb_to_5_1",
-              "type": "checkbox",
-              "label": "Ведение радиосвязи."
+              "id": "Takeoff_and_Climb_to_14",
+              "type": "select",
+              "label": "Изменение маршрута.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Takeoff_and_Climb_to_15",
+              "type": "select",
+              "label": "Использование карт контрольных проверок.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Takeoff_and_Climb_to_16",
+              "type": "select",
+              "label": "Ведение радиосвязи.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             }
           ]
         },
@@ -722,73 +1004,195 @@
           "items": [
             {
               "id": "Cruise_crs_1",
-              "type": "checkbox",
-              "label": "Сличение высотомеров (RVSM)."
+              "type": "select",
+              "label": "Сличение высотомеров (RVSM).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_2",
-              "type": "checkbox",
-              "label": "Проверка систем."
+              "type": "select",
+              "label": "Проверка систем.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_3",
-              "type": "checkbox",
-              "label": "Брифинг на эшелоне."
+              "type": "select",
+              "label": "Брифинг на эшелоне.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_4",
-              "type": "checkbox",
-              "label": "Контроль за расходом топлива."
+              "type": "select",
+              "label": "Контроль за расходом топлива.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_5",
-              "type": "checkbox",
-              "label": "Анализ погоды на основных и запасных аэродромах."
+              "type": "select",
+              "label": "Анализ погоды на основных и запасных аэродромах.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Cruise_crs_6",
-              "type": "checkbox",
-              "label": "Уточнение плана полета, маршрута и запасных."
+              "id": "Cruise_1_001",
+              "type": "select",
+              "label": "Cruise_crs_6 | Уточнение плана полета, маршрута и запасных.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Cruise_crs_7",
-              "type": "checkbox",
-              "label": "Навигация (Настройка р/средств, карты, PBN)."
+              "id": "Cruise_1_002",
+              "type": "select",
+              "label": "Cruise_crs_7 | Комплексное использование технических средств навигации. (Настройка р/средств, карты, PBN).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_8",
-              "type": "checkbox",
-              "label": "Программирование навигационного комплекса ВС (FMS)."
+              "type": "select",
+              "label": "Программирование навигационного комплекса ВС (FMS).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_9",
-              "type": "checkbox",
-              "label": "SP: Turbulance."
+              "type": "select",
+              "label": "SP: Turbulance.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_10",
-              "type": "checkbox",
-              "label": "Взаимодействие с БП."
+              "type": "select",
+              "label": "Взаимодействие с БП.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_11",
-              "type": "checkbox",
-              "label": "Взаимодействие с пассажирами."
+              "type": "select",
+              "label": "Взаимодействие с пассажирами.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_12",
-              "type": "checkbox",
-              "label": "Брифинг перед снижением."
+              "type": "select",
+              "label": "Предпосадочный брифинг.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
               "id": "Cruise_crs_13",
-              "type": "checkbox",
-              "label": "Ведение радиосвязи."
+              "type": "select",
+              "label": "Ведение радиосвязи.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Cruise_crs_14",
-              "type": "checkbox",
-              "label": "Запонение документации (бумажная, EFB)."
+              "id": "Cruise_1_003",
+              "type": "select",
+              "label": "Cruise_crs_14 | Запонение документации (бумажная, EFB).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Cruise_1_004",
+              "type": "select",
+              "label": "Cruise_crs_15 | Знание систем, ограничений ВС.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Cruise_crs_15",
+              "type": "select",
+              "label": "Знание и использование нормативно-летной документации.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             }
           ]
         },
@@ -892,7 +1296,7 @@
                 "В пределах ½ точки",
                 "В пределах 1 точки",
                 "В пределах курсовой шкалы",
-                ""
+                "Уклонение за пределы курсовой шкалы."
               ]
             },
             {
@@ -980,7 +1384,7 @@
                 "Устан. ± 50 ft",
                 "Устан. ± 80 ft",
                 "Устан. ± 100 ft",
-                "Более от устан. на ± 1 00 ft"
+                "Более от устан. на ± 100 ft"
               ]
             },
             {
@@ -999,9 +1403,9 @@
               "type": "radio",
               "label": "Зона приземления:",
               "options": [
-                "150 – 600 м от входного порога ВПП",
-                "100-150 м и 600 – 750 м от входного порога ВПП",
-                "750 – 900 м от входного порога ВПП",
+                "150–600 м от входного порога ВПП",
+                "100-150 м и 600–750 м от входного порога ВПП",
+                "750–900 м от входного порога ВПП",
                 "Менее 100 м и более 900 м от входного порога ВПП"
               ]
             },
@@ -1022,74 +1426,171 @@
           "subname": "Стандартные процедуры.",
           "items": [
             {
-              "id": "Approach_and_Landing_lg_4_1",
-              "type": "checkbox",
-              "label": "STAR (RNAV, conventional)."
+              "id": "Approach_and_Landing_2_001",
+              "type": "select",
+              "label": "Approach_and_Landing_lg_1 | STAR (RNAV, conventional).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_5_1",
-              "type": "checkbox",
-              "label": "Заход (ILS, NDB, RNP, VIS)."
+              "id": "Approach_and_Landing_2_002",
+              "type": "select",
+              "label": "Approach_and_Landing_lg_2",
+              "options": [
+                "Заход (ILS",
+                "NDB",
+                "RNP",
+                "VIS)."
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_5_2",
-              "type": "checkbox",
-              "label": "Использование режимов АП."
+              "id": "Approach_and_Landing_lg_3",
+              "type": "select",
+              "label": "Использование режимов АП.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_5_3",
-              "type": "checkbox",
-              "label": "Критерии стабилизированного захода."
+              "id": "Approach_and_Landing_lg_4",
+              "type": "select",
+              "label": "Действия при отказах автоматики.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_6_1",
-              "type": "checkbox",
-              "label": "Посадка."
+              "id": "Approach_and_Landing_lg_5",
+              "type": "select",
+              "label": "Критерии стабилизированного захода.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_4_2",
-              "type": "checkbox",
-              "label": "Пробег."
+              "id": "Approach_and_Landing_lg_6",
+              "type": "select",
+              "label": "Посадка.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_5_4",
-              "type": "checkbox",
-              "label": "Освобождение ВПП."
+              "id": "Approach_and_Landing_lg_7",
+              "type": "select",
+              "label": "Пробег.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_3_1",
-              "type": "checkbox",
-              "label": "Буксировка."
+              "id": "Approach_and_Landing_lg_8",
+              "type": "select",
+              "label": "Освобождение ВПП.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_4_3",
-              "type": "checkbox",
-              "label": "Уход на второй круг."
+              "id": "Approach_and_Landing_lg_9",
+              "type": "select",
+              "label": "Буксировка.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_5_5",
-              "type": "checkbox",
-              "label": "Использование TERRAIN."
+              "id": "Approach_and_Landing_lg_10",
+              "type": "select",
+              "label": "Уход на второй круг.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_6_2",
-              "type": "checkbox",
-              "label": "Использование локатора."
+              "id": "Approach_and_Landing_lg_11",
+              "type": "select",
+              "label": "Использование TERRAIN.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_4_4",
-              "type": "checkbox",
-              "label": "SP: Cold weather."
+              "id": "Approach_and_Landing_lg_12",
+              "type": "select",
+              "label": "Использование локатора.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_4_5",
-              "type": "checkbox",
-              "label": "SP: Turbulance."
+              "id": "Approach_and_Landing_lg_13",
+              "type": "select",
+              "label": "SP: Cold weather.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Approach_and_Landing_lg_6_3",
-              "type": "checkbox",
-              "label": "Ведение радиосвязи."
+              "id": "Approach_and_Landing_lg_14",
+              "type": "select",
+              "label": "SP: Turbulance.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             }
           ]
         },
@@ -1131,29 +1632,117 @@
           "subname": "Стандартные процедуры.",
           "items": [
             {
+              "id": "Postflght_pst_1",
+              "type": "select",
+              "label": "Взаимодействие с пассажирами.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Postflght_pst_2",
+              "type": "select",
+              "label": "Security procedure.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Postflght_pst_3",
+              "type": "select",
+              "label": "SP: Cold/Hot weather.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
               "id": "Postflght_pst_4",
-              "type": "checkbox",
-              "label": "Взаимодействие с пассажирами."
+              "type": "select",
+              "label": "Оформление полетной документации.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Postflght_pst_4_1",
-              "type": "checkbox",
-              "label": "Security procedure."
+              "id": "Postflght_1_001",
+              "type": "select",
+              "label": "Postflght_pst_5 | Сдача ВС (техникам, экипажу, под охрану).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             },
             {
-              "id": "Postflght_pst_4_2",
-              "type": "checkbox",
-              "label": "SP: Cold/Hot weather."
-            },
-            {
-              "id": "Postflght_pst_5",
-              "type": "checkbox",
-              "label": "Оформление полетной документации."
+              "id": "div_2",
+              "type": "divider",
+              "label": "За весь полет:"
             },
             {
               "id": "Postflght_pst_6",
-              "type": "checkbox",
-              "label": "Сдача ВС (техникам, экипажу, под охрану)."
+              "type": "select",
+              "label": "Ведение радиосвязи.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Postflght_pst_7",
+              "type": "select",
+              "label": "Стандартные фразы и выражения.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Postflght_pst_8",
+              "type": "select",
+              "label": "Выполнение КВС полёта с правого пилотского сидения.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Postflght_pst_9",
+              "type": "select",
+              "label": "Проверка навыков пилота-инструктора/",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             }
           ]
         },

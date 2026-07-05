@@ -296,12 +296,11 @@
     right.onclick = null;
 
     var headerMenuBtn = document.getElementById('wtHeaderMenuBtn');
-    if (headerMenuBtn && !headerMenuBtn.dataset.bound) {
+    if (headerMenuBtn) {
       headerMenuBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         wtToggleHeaderMenu();
       });
-      headerMenuBtn.dataset.bound = 'true';
     }
   }
 
@@ -340,19 +339,19 @@
   function wtRenderDutyCard(results, night, pilotMax, cabinMax, reportMin, landings) {
     var actualDuty = (results && _wtFinalized) ? results.duty : 0;
 
-    var html = '<div class="app-card wt-card--duty" style="position:relative;">';
+    var html = '<div class="app-card wt-card--duty wt-relative">';
     html += '<div class="app-card-header">';
-    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<div class="wt-flex-center-gap">';
     html += '<div class="wt-card-icon wt-card-icon--duty">' + window.ICONS.clock + '</div>';
     html += '<h2 class="ct-heading-md">Нормы рабочего времени</h2>';
     html += '</div>';
     if (night) {
-      html += '<span class="badge-danger" style="display:flex;align-items:center;gap:4px;">'
+      html += '<span class="badge-danger wt-badge-flex">'
         + window.ICONS.moon + ' Ночь</span>';
     }
     html += '</div>';
 
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px;">';
+    html += '<div class="wt-duty-grid">';
 
     // В раздельном режиме показываем только «Максимум» (без «Окончание»)
     var hideEnd = !!_wtSettings.splitMode;
@@ -360,13 +359,13 @@
     // ЛЭ
     html += '<div class="wt-sub-card">';
     html += '<div class="wt-sub-card-label">' + window.ICONS.plane + ' Лётный экипаж (ЛЭ)</div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">';
-    html += '<div><span style="font-size:var(--font-xs);color:var(--color-text-muted);">Максимум</span>';
-    html += '<div class="ct-mono-time" style="font-weight:700;font-size:var(--font-md);">' + wtFmtMin(pilotMax) + '</div></div>';
+    html += '<div class="wt-flex-between-baseline">';
+    html += '<div><span class="wt-label-xs">Максимум</span>';
+    html += '<div class="ct-mono-time wt-value-bold">' + wtFmtMin(pilotMax) + '</div></div>';
     if (!hideEnd) {
-      html += '<div style="text-align:right;"><span style="font-size:var(--font-xs);color:var(--color-text-muted);">Окончание</span>';
+      html += '<div class="wt-text-right"><span class="wt-label-xs">Окончание</span>';
       var pilotEnd = reportMin !== null ? wtFormatTime(reportMin + pilotMax) : '--:--';
-      html += '<div class="ct-mono-time" style="font-weight:700;font-size:var(--font-md);">' + pilotEnd + '</div></div>';
+      html += '<div class="ct-mono-time wt-value-bold">' + pilotEnd + '</div></div>';
     }
     html += '</div>';
     if (_wtFinalized && actualDuty > 0) {
@@ -377,13 +376,13 @@
     // КЭ
     html += '<div class="wt-sub-card">';
     html += '<div class="wt-sub-card-label">' + window.ICONS.users + ' Кабинный экипаж (КЭ)</div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">';
-    html += '<div><span style="font-size:var(--font-xs);color:var(--color-text-muted);">Максимум</span>';
-    html += '<div class="ct-mono-time" style="font-weight:700;font-size:var(--font-md);">' + wtFmtMin(cabinMax) + '</div></div>';
+    html += '<div class="wt-flex-between-baseline">';
+    html += '<div><span class="wt-label-xs">Максимум</span>';
+    html += '<div class="ct-mono-time wt-value-bold">' + wtFmtMin(cabinMax) + '</div></div>';
     if (!hideEnd) {
-      html += '<div style="text-align:right;"><span style="font-size:var(--font-xs);color:var(--color-text-muted);">Окончание</span>';
+      html += '<div class="wt-text-right"><span class="wt-label-xs">Окончание</span>';
       var cabinEnd = reportMin !== null ? wtFormatTime(reportMin + cabinMax) : '--:--';
-      html += '<div class="ct-mono-time" style="font-weight:700;font-size:var(--font-md);">' + cabinEnd + '</div></div>';
+      html += '<div class="ct-mono-time wt-value-bold">' + cabinEnd + '</div></div>';
     }
     html += '</div>';
     if (_wtFinalized && actualDuty > 0) {
@@ -421,7 +420,7 @@
 
     // Settings button + report-time reminder — bottom of the card
     var reportIsDefault = (_wtSettings.reportTime === WT_DEFAULT_SETTINGS.reportTime);
-    html += '<div style="margin-top:8px;">';
+    html += '<div class="wt-mt-sm">';
     if (reportIsDefault) {
       html += '<button class="wt-report-btn" id="wtFlightSettingsBtn" aria-label="Ввести время явки">'
         + window.ICONS.settings + ' Нажмите чтобы ввести время явки</button>';
@@ -446,13 +445,13 @@
                   :             'wt-progress-bar-fill--ok';
     var dotClass  = exceeded ? 'wt-status-dot--danger' : 'wt-status-dot--ok';
 
-    return '<div style="margin-top:10px;">'
-      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">'
-      + '<span class="ct-heading-sm" style="font-size:var(--font-xs);text-transform:none;letter-spacing:normal;">' + label + '</span>'
+    return '<div class="wt-mt-md">'
+      + '<div class="wt-progress-header">'
+      + '<span class="ct-heading-sm wt-text-xs-normal">' + label + '</span>'
       + '<span class="wt-status-dot ' + dotClass + '"></span>'
       + '</div>'
       + '<div class="wt-progress-bar">'
-      + '<div class="wt-progress-bar-fill ' + fillClass + '" style="width:' + pct + '%"></div>'
+      + '<div class="wt-progress-bar-fill ' + fillClass + '" style="--fill:' + pct + '%"></div>'
       + '</div>'
       + '<div class="wt-progress-label">'
       + '<span>' + wtFmtMin(actual) + '</span>'
@@ -467,7 +466,7 @@
     var splitMode = !!_wtSettings.splitMode;
     var html = '<div class="app-card wt-card--segments">';
     html += '<div class="app-card-header">';
-    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<div class="wt-flex-center-gap">';
     html += '<div class="wt-card-icon wt-card-icon--segments">' + window.ICONS.plane + '</div>';
     html += '<h2 class="ct-heading-md">' + (splitMode ? 'Смены (раздельный режим)' : 'Сегменты полёта') + '</h2>';
     html += '</div>';
@@ -502,7 +501,7 @@
         + '<span class="wt-shift-duty-label">рабочее время: <strong class="ct-mono-time">' + wtFmtMin(duty1) + '</strong></span>'
         + '</div>';
       if (segs1.length === 0) {
-        html += '<div class="ct-empty-text" style="padding:8px 0;">Нет сегментов</div>';
+        html += '<div class="ct-empty-text wt-py-sm">Нет сегментов</div>';
       } else {
         for (var i1 = 0; i1 < segs1.length; i1++) {
           var origIdx1 = _wtSegments.indexOf(segs1[i1]);
@@ -560,13 +559,11 @@
               text: 'Время отдыха соблюдено! Это не разделенная полетная смена.' });
           }
           if (restLines.length > 0) {
-            html += '<div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;'
-              + 'padding:10px 12px;border:1px solid var(--color-border-subtle);'
-              + 'border-radius:var(--border-radius-md);background:var(--color-bg-hover);">';
+            html += '<div class="wt-rest-info">';
             for (var ri = 0; ri < restLines.length; ri++) {
               var rl = restLines[ri];
-              html += '<div style="display:flex;align-items:center;gap:8px;color:' + rl.color + ';">'
-                + '<span style="display:inline-flex;flex-shrink:0;">' + rl.icon + '</span>'
+              html += '<div class="wt-rest-line" style="--rest-color:' + rl.color + ';">'
+                + '<span class="wt-rest-icon">' + rl.icon + '</span>'
                 + '<span>' + rl.text + '</span></div>';
             }
             html += '</div>';
@@ -589,18 +586,18 @@
         var duty1Val = (results && results.duty1 !== undefined) ? results.duty1 : 0;
         var duty2Val = (results && results.duty2 !== undefined) ? results.duty2 : 0;
         var segs2Count = _wtSegments.filter(function(s) { return s.shift === 2; }).length;
-        html += '<div class="wt-total-stats" style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:8px;">'
+        html += '<div class="wt-total-stats wt-total-stats--center">'
           + '<span><strong>Итого:</strong></span>'
           + '<span>Полётное <strong class="ct-mono-time">' + wtFmtMin(totalFlight) + '</strong></span>'
-          + '<span style="color:var(--color-border);">|</span>'
+          + '<span class="wt-separator">|</span>'
           + '<span>Лётное <strong class="ct-mono-time">' + wtFmtMin(totalAir) + '</strong></span>'
-          + '<span style="color:var(--color-border);">|</span>';
+          + '<span class="wt-separator">|</span>';
         if (segs2Count > 0) {
           // Сегмент смены 2 добавлен — показываем рабочее за обе смены + итого
           html += '<span>Раб. смены 1 <strong class="ct-mono-time">' + wtFmtMin(duty1Val) + '</strong></span>'
-            + '<span style="color:var(--color-border);">|</span>'
+            + '<span class="wt-separator">|</span>'
             + '<span>Раб. смены 2 <strong class="ct-mono-time">' + wtFmtMin(duty2Val) + '</strong></span>'
-            + '<span style="color:var(--color-border);">|</span>'
+            + '<span class="wt-separator">|</span>'
             + '<span>Итого рабочее <strong class="ct-mono-time">' + wtFmtMin(duty1Val + duty2Val) + '</strong></span>';
         } else {
           // Смены 2 ещё нет — показываем рабочее смены 1 и остаток до максимума
@@ -611,7 +608,7 @@
           var remainVal = pilotMaxSpl - duty1Val;
           if (remainVal < 0) remainVal = 0;
           html += '<span>Раб. смены 1 <strong class="ct-mono-time">' + wtFmtMin(duty1Val) + '</strong></span>'
-            + '<span style="color:var(--color-border);">|</span>'
+            + '<span class="wt-separator">|</span>'
             + '<span>Осталось <strong class="ct-mono-time">' + wtFmtMin(remainVal) + '</strong></span>';
         }
         html += '</div>';
@@ -620,7 +617,7 @@
       // ─── Обычный режим ───
       if (_wtSegments.length === 0) {
         html += '<div class="ct-empty-state">'
-          + '<div class="ct-empty-icon" style="opacity:0.4;">' + window.ICONS.routes + '</div>'
+          + '<div class="ct-empty-icon wt-opacity-muted">' + window.ICONS.routes + '</div>'
           + '<div class="ct-empty-title">Нет сегментов</div>'
           + '<div class="ct-empty-text">Нажмите + чтобы добавить первый сегмент полёта — запуск двигателей, взлёт, посадка, выключение.</div>'
           + '</div>';
@@ -639,12 +636,12 @@
           }
           // Рабочее время (до engineStop последнего сегмента, БЕЗ послеполётных работ)
           var dutyToStop2 = (results && results.dutyToStop !== undefined) ? results.dutyToStop : 0;
-          html += '<div class="wt-total-stats" style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">'
+          html += '<div class="wt-total-stats wt-total-stats--center-no-mt">'
             + '<span><strong>Итого:</strong></span>'
             + '<span>Полётное <strong class="ct-mono-time">' + wtFmtMin(totalFlight2) + '</strong></span>'
-            + '<span style="color:var(--color-border);">|</span>'
+            + '<span class="wt-separator">|</span>'
             + '<span>Лётное <strong class="ct-mono-time">' + wtFmtMin(totalAir2) + '</strong></span>'
-            + '<span style="color:var(--color-border);">|</span>'
+            + '<span class="wt-separator">|</span>'
             + '<span>Рабочее <strong class="ct-mono-time">' + wtFmtMin(dutyToStop2) + '</strong></span>'
             + '</div>';
         }
@@ -653,13 +650,13 @@
 
     // Кнопки внизу: «Разделить смену» (только при 1 сегменте, не splitMode, не finalized) + «Завершить рейс»
     if (!_wtFinalized) {
-      var showSplitBtn = (_wtSegments.length === 1 && !splitMode);
-      html += '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;flex-wrap:wrap;">';
+      var showSplitBtn = (_wtSegments.length === 1 && !splitMode && !((_wtSettings.pilotExtra || 0) > 0 || (_wtSettings.cabinExtra || 0) > 0));
+      html += '<div class="wt-card-actions">';
       if (showSplitBtn) {
         html += '<button class="wt-split-btn" id="wtSplitBtn">'
           + window.ICONS.split + ' Разделить смену</button>';
       }
-      html += '<button class="btn-primary" id="wtFinalizeBtn" style="font-size:var(--font-xs);padding:6px 12px;min-height:36px;">'
+      html += '<button class="btn-primary wt-btn-sm-compact" id="wtFinalizeBtn">'
         + window.ICONS.flag + ' Завершить рейс</button>';
       html += '</div>';
     }
@@ -747,14 +744,14 @@
       var pct = timelinePct(gridMin);
       if (pct > 100.05) break;
       var clampedPct = Math.min(pct, 100);
-      html += '<span style="position:absolute;left:' + clampedPct.toFixed(2) + '%;transform:translateX(-50%);">'
+      html += '<span class="wt-timeline-label-pos" style="--pct:' + clampedPct.toFixed(2) + '%;">'
         + fmtLabel(gridMin) + '</span>';
       lastLabelPct = clampedPct;
       gridMin += step;
     }
     // Метка «Конец» справа — если последняя метка сетки не у правого края (≥98%)
     if (lastLabelPct < 98) {
-      html += '<span style="position:absolute;right:0;transform:translateX(50%);">'
+      html += '<span class="wt-timeline-label-end">'
         + fmtLabel(timelineEnd) + '</span>';
     }
     html += '</div>';
@@ -774,7 +771,7 @@
       var gClass = 'wt-timeline-gridline';
       if (isMidnight) gClass += ' wt-timeline-gridline--midnight';
       if (isEdge) gClass += ' wt-timeline-gridline--edge';
-      html += '<div class="' + gClass + '" style="left:' + gClamped.toFixed(2) + '%;"></div>';
+      html += '<div class="' + gClass + '" style="--pct:' + gClamped.toFixed(2) + '%;"></div>';
       _gridPcts.push(gClamped);
       gridMin += step;
     }
@@ -787,13 +784,13 @@
         var _midNum = parseFloat(midPct);
         var _alreadyDrawn = _gridPcts.some(function(p){ return Math.abs(p - _midNum) < 1; });
         if (!_alreadyDrawn) {
-          html += '<div class="wt-timeline-gridline wt-timeline-gridline--midnight" style="left:' + midPct + '%;"></div>';
+          html += '<div class="wt-timeline-gridline wt-timeline-gridline--midnight" style="--pct:' + midPct + '%;"></div>';
         }
       }
     }
 
     /* ── Маркер «Время явки» (левый край шкалы) ── */
-    html += '<div class="wt-timeline-marker wt-timeline-marker--report" style="left:0%;"'
+    html += '<div class="wt-timeline-marker wt-timeline-marker--report" style="--pct:0%;"'
       + ' title="Явка: ' + _wtSettings.reportTime + '"></div>';
 
     /* ── Маркер «Явка 2» (раздельный режим, до finalize) ──
@@ -803,7 +800,7 @@
       var _r2Min = wtParseTime(_wtSettings.reportTime2);
       if (_r2Min !== null) {
         var _r2Pct = Math.min(timelinePct(_r2Min), 100);
-        html += '<div class="wt-timeline-marker wt-timeline-marker--report2" style="left:' + _r2Pct.toFixed(2) + '%;"'
+        html += '<div class="wt-timeline-marker wt-timeline-marker--report2" style="--pct:' + _r2Pct.toFixed(2) + '%;"'
           + ' title="Явка 2: ' + _wtSettings.reportTime2 + '"></div>';
       }
     }
@@ -818,12 +815,12 @@
       var esPct = timelinePct(seg.engineStop);
 
       html += '<div class="wt-timeline-segment wt-segment-color-' + colorIdx + '"'
-        + ' style="left:' + sPct.toFixed(3) + '%;width:' + wPct.toFixed(3) + '%;"'
+        + ' style="--pct:' + sPct.toFixed(3) + '%;--fill:' + wPct.toFixed(3) + '%;"'
         + ' title="Сег. ' + (s + 1) + ': ' + wtFormatTime(seg.engineStart) + '–' + wtFormatTime(seg.engineStop) + '">'
         + '</div>';
-      html += '<div class="wt-timeline-marker wt-timeline-marker--engine-start" style="left:' + sPct.toFixed(3) + '%;"'
+      html += '<div class="wt-timeline-marker wt-timeline-marker--engine-start" style="--pct:' + sPct.toFixed(3) + '%;"'
         + ' title="Запуск: ' + wtFormatTime(seg.engineStart) + '"></div>';
-      html += '<div class="wt-timeline-marker wt-timeline-marker--engine-stop" style="left:' + esPct.toFixed(3) + '%;"'
+      html += '<div class="wt-timeline-marker wt-timeline-marker--engine-stop" style="--pct:' + esPct.toFixed(3) + '%;"'
         + ' title="Выключение: ' + wtFormatTime(seg.engineStop) + '"></div>';
     }
 
@@ -840,11 +837,11 @@
       var seg1EndAbs = reportMin + results.duty1;
       var seg1EndMin = seg1EndAbs % 1440;
       var seg1EndPct = Math.min(timelinePct(seg1EndAbs), 100);
-      html += '<div class="wt-timeline-marker wt-timeline-marker--seg-end" style="left:' + seg1EndPct.toFixed(2) + '%;"'
+      html += '<div class="wt-timeline-marker wt-timeline-marker--seg-end" style="--pct:' + seg1EndPct.toFixed(2) + '%;"'
         + ' title="Конец сегмента: ' + wtFormatTime(seg1EndMin) + '"></div>';
     } else if (_wtFinalized) {
       var endMin = (reportMin + timelineDuration) % 1440;
-      html += '<div class="wt-timeline-marker wt-timeline-marker--shift-end" style="left:100%;"'
+      html += '<div class="wt-timeline-marker wt-timeline-marker--shift-end" style="--pct:100%;"'
         + ' title="Конец смены: ' + wtFormatTime(endMin) + '"></div>';
     }
 
@@ -862,15 +859,15 @@
     var lockedAttr = locked ? ' data-locked="1"' : '';
     var html = '<div class="wt-segment-card' + lockedClass + '" data-idx="' + idx + '"' + lockedAttr + '>'
       + '<div class="wt-segment-info">'
-      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
-      + '<span class="wt-segment-color-' + colorIdx + '" style="width:12px;height:12px;border-radius:3px;display:inline-block;flex-shrink:0;"></span>'
+      + '<div class="wt-seg-card-header">'
+      + '<span class="wt-segment-color-' + colorIdx + ' wt-segment-color-dot"></span>'
       + '<strong class="ct-heading-md">Сегмент ' + (idx + 1) + '</strong>'
       + '</div>'
-      + '<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:var(--font-sm);color:var(--color-text-secondary);">'
+      + '<div class="wt-seg-card-times">'
       + '<span>Полётное: <strong class="ct-mono-time">' + wtFmtMin(seg.flightTime) + '</strong></span>'
       + '<span>Лётное: <strong class="ct-mono-time">' + wtFmtMin(seg.airTime) + '</strong></span>'
       + '</div>'
-      + '<div style="font-size:var(--font-xs);color:var(--color-text-muted);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+      + '<div class="wt-seg-card-flow">'
       + '<span class="ct-mono-time">' + wtFormatTime(seg.engineStart) + '</span>'
       + '<span>→</span>'
       + window.ICONS['plane-takeoff']
@@ -897,21 +894,20 @@
 
     var html = '<div class="app-card wt-card--results' + (allOk ? ' wt-card--all-ok' : '') + '">';
     html += '<div class="app-card-header">';
-    html += '<div style="display:flex;align-items:center;gap:10px;">';
+    html += '<div class="wt-flex-center-gap">';
     html += '<div class="wt-card-icon wt-card-icon--results">' + window.ICONS.gauge + '</div>';
     html += '<h2 class="ct-heading-lg">Итоги рейса</h2>';
     html += '</div>';
-    html += '<div style="display:flex;align-items:center;gap:8px;">';
+    html += '<div class="wt-flex-center-gap-sm">';
     if (allOk) {
       html += '<span class="wt-checkmark-circle">' + window.ICONS['check-circle'] + '</span>';
     }
-    html += '<button class="icon-btn" id="wtShareBtn" aria-label="Поделиться"'
-      + ' style="color:var(--color-text-white);background:var(--color-primary-ghost);">'
+    html += '<button class="icon-btn wt-btn-share" id="wtShareBtn" aria-label="Поделиться">'
       + window.ICONS.share + '</button>';
     html += '</div>';
     html += '</div>';
 
-    html += '<div class="wt-results-grid" style="margin-bottom:16px;border:1px solid var(--color-border-subtle);border-radius:var(--border-radius-md);overflow:hidden;">';
+    html += '<div class="wt-results-grid wt-results-border">';
     // Строка 1 — Рабочее время (полное) — на всю ширину
     var dutyLabel = results.splitMode ? 'Рабочее время (полное за обе смены)' : 'Фактическое рабочее время';
     html += wtResultItemFull(window.ICONS.timer, dutyLabel, wtFmtMin(results.duty));
@@ -924,15 +920,15 @@
     html += '</div>';
 
     if (!allOk) {
-      html += '<div class="wt-warning-block" style="display:flex;flex-direction:column;gap:6px;">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'
+      html += '<div class="wt-warning-block wt-flex-col-gap">';
+      html += '<div class="wt-warning-header">'
         + window.ICONS['alert-triangle'] + ' <strong>Нарушения FTL</strong></div>';
       for (var i = 0; i < results.warnings.length; i++) {
-        html += '<div style="padding-left:26px;">' + results.warnings[i] + '</div>';
+        html += '<div class="wt-indent">' + results.warnings[i] + '</div>';
       }
       html += '</div>';
     } else {
-      html += '<div class="wt-ok-block" style="display:flex;align-items:center;gap:10px;">'
+      html += '<div class="wt-ok-block wt-flex-center-gap">'
         + window.ICONS['check-circle'] + ' <span>Нарушений не обнаружено.</span></div>';
     }
 
@@ -949,7 +945,7 @@
 
   // Полноширинный пункт (занимает всю строку сетки)
   function wtResultItemFull(icon, label, value) {
-    return '<div class="wt-result-item" style="grid-column:1 / -1;">'
+    return '<div class="wt-result-item wt-span-full">'
       + '<div class="wt-result-item-label">' + icon + ' ' + label + '</div>'
       + '<div class="wt-result-item-value">' + value + '</div>'
       + '</div>';
@@ -1020,7 +1016,11 @@
 
       + wtSettingsGroup(window.ICONS.timer, 'Продление КВС',
           '<label class="wt-field-label">Продление</label>'
-          + wtSelect('wtExtension', [['0','Без продления'],['2','+2 часа'],['3','+3 часа']], String(s.extension)))
+          + wtSelect('wtExtension',
+              (s.pilotExtra > 0 || s.cabinExtra > 0)
+                ? [['0','Без продления'],['3','+3 часа']]
+                : [['0','Без продления'],['2','+2 часа']],
+              String(s.extension)))
 
       + wtSettingsGroup(window.ICONS.moon, 'Отдых',
           '<label class="wt-field-label">Тип отдыха</label>'
@@ -1028,7 +1028,7 @@
 
       + wtSettingsGroup(window.ICONS.clock, 'Начало смены',
           '<div class="wt-field-row">'
-          + '<div style="flex:1;min-width:0;">'
+          + '<div class="wt-flex-fill">'
           + '<label class="wt-field-label">Явка (UTC, HH:MM)</label>'
           + '<input id="wtReportTime" type="time" class="wt-field-input" value="' + s.reportTime + '">'
           + '</div>'
@@ -1040,7 +1040,7 @@
 
       + (s.splitMode ? wtSettingsGroup(window.ICONS.split, 'Смена 2 (раздельная)',
           '<div class="wt-field-row">'
-          + '<div style="flex:1;min-width:0;">'
+          + '<div class="wt-flex-fill">'
           + '<label class="wt-field-label">Явка 2 (UTC, HH:MM)</label>'
           + '<input id="wtReportTime2" type="time" class="wt-field-input" value="' + (s.reportTime2 || '') + '">'
           + '</div>'
@@ -1048,11 +1048,11 @@
 
       + wtSettingsGroup(window.ICONS.timer, 'Послеполётные работы (мин)',
           '<div class="wt-field-row">'
-          + '<div style="flex:1;min-width:0;">'
+          + '<div class="wt-flex-fill">'
           + '<label class="wt-field-label">Смена 1</label>'
           + wtSelect('wtPostflight1', [['10','10'],['20','20'],['30','30'],['40','40']], String(s.postflight1 || 30))
           + '</div>'
-          + '<div style="flex:1;min-width:0;">'
+          + '<div class="wt-flex-fill">'
           + '<label class="wt-field-label">Смена 2</label>'
           + wtSelect('wtPostflight2', [['10','10'],['20','20'],['30','30'],['40','40']], String(s.postflight2 || 30))
           + '</div>'
@@ -1061,10 +1061,10 @@
       + '</div>'
 
       // Объединённая рамка-предупреждение: Посадки + UTC-info
-      + '<div class="wt-settings-group" style="background:var(--wt-badge-ok-bg);border-color:var(--wt-badge-ok-border);margin-bottom:12px;">'
-      + '<div style="font-size:var(--font-sm);color:var(--wt-badge-ok-text);display:flex;align-items:flex-start;gap:8px;text-align:left;">'
-      + '<span class="wt-info-inline-icon" style="margin-top:1px;flex-shrink:0;">' + window.ICONS['plane-landing'] + '</span>'
-      + '<div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;">'
+      + '<div class="wt-settings-group wt-settings-group--info">'
+      + '<div class="wt-settings-info-text">'
+      + '<span class="wt-info-inline-icon wt-info-icon-adjust">' + window.ICONS['plane-landing'] + '</span>'
+      + '<div class="wt-settings-info-content">'
       + '<div><strong>Посадки</strong> определяются автоматически по количеству сегментов.</div>'
       + '<div>Явка хранится в UTC. День/ночь рассчитывается по местному времени.</div>'
       + '<div>День/ночь и макс. рабочее время рассчитываются по Явке 1.</div>'
@@ -1234,6 +1234,10 @@
     var pilotExtra = parseInt(wtVal('wtPilotExtra'), 10) || 0;
     var cabinExtra = parseInt(wtVal('wtCabinExtra'), 10) || 0;
     var extension  = parseInt(wtVal('wtExtension'), 10) || 0;
+    // Task 32: сбросить продление если оно недопустимо при текущих доп. членах
+    var _hasExtra = (pilotExtra > 0 || cabinExtra > 0);
+    if (!_hasExtra && extension === 3) extension = 0;
+    if (_hasExtra && extension === 2) extension = 0;
     var restType   = wtVal('wtRestType')   || 'nonbase';
     var reportTime = wtVal('wtReportTime') || '';
     var tzOffset   = parseInt(wtVal('wtTzOffset'), 10);
@@ -1262,6 +1266,10 @@
     var pilotExtra = parseInt(wtVal('wtPilotExtra'), 10) || 0;
     var cabinExtra = parseInt(wtVal('wtCabinExtra'), 10) || 0;
     var extension  = parseInt(wtVal('wtExtension'), 10) || 0;
+    // Task 32: сбросить продление если оно недопустимо при текущих доп. членах
+    var _hasExtra = (pilotExtra > 0 || cabinExtra > 0);
+    if (!_hasExtra && extension === 3) extension = 0;
+    if (_hasExtra && extension === 2) extension = 0;
     var restType   = wtVal('wtRestType')   || 'nonbase';
     var reportTime = wtVal('wtReportTime') || '';
     var tzOffset   = parseInt(wtVal('wtTzOffset'), 10);
@@ -1281,6 +1289,8 @@
 
     // Update main screen without closing the sheet (Task 28 убрал wtRenderFlightSettingsSummary)
     wtRenderAll();
+    // Task 33: перерисовать содержимое sheet — обновить опции продления при смене доп. членов
+    wtRenderFlightSettingsContent();
   }
 
   /* ─── Автосохранение сегмента при закрытии (тихое) ─── */
@@ -1700,7 +1710,7 @@
       + '<button class="icon-btn" id="wtCloseSettingsBtn" aria-label="Закрыть"></button>'
       + '</div>'
       + '<div id="wtSettingsContent" class="wt-settings-content"></div>'
-      + '<div class="wt-dialog-actions" style="justify-content:center;">'
+      + '<div class="wt-dialog-actions wt-dialog-actions--center">'
       + '<button class="btn-primary" id="wtSaveSegmentBtn">Сохранить</button>'
       + '</div>';
 
@@ -1713,111 +1723,108 @@
   function init() {
     var container = document.getElementById('worktimeContainer');
     if (!container) { console.error('Контейнер worktimeContainer не найден!'); return; }
+    container.setAttribute('lang', 'ru');
 
     // Create bottom-sheet DOM if host app doesn't provide it
     wtEnsureSheetDOM();
 
-    if (!container.dataset.delegated) {
-      container.addEventListener('click', function(e) {
-        var delBtn = e.target.closest('.wt-delete-segment');
-        if (delBtn) {
-          if (_wtFinalized) {
-            app.showToast('Рейс завершён — удаление недоступно');
-            return;
-          }
-          var idx = parseInt(delBtn.dataset.idx, 10);
-          wtDeleteSegment(idx);
+    container.addEventListener('click', function(e) {
+      var delBtn = e.target.closest('.wt-delete-segment');
+      if (delBtn) {
+        if (_wtFinalized) {
+          app.showToast('Рейс завершён — удаление недоступно');
           return;
         }
-        if (e.target.closest('#wtFinalizeBtn')) {
-          wtFinalize();
+        var idx = parseInt(delBtn.dataset.idx, 10);
+        wtDeleteSegment(idx);
+        return;
+      }
+      if (e.target.closest('#wtFinalizeBtn')) {
+        wtFinalize();
+        return;
+      }
+      // «Разделить смену» — только при 1 сегменте и не splitMode
+      if (e.target.closest('#wtSplitBtn')) {
+        wtSplitShift();
+        return;
+      }
+      // «Добавить сегмент смены 2» — открывает segment sheet с shift=2
+      if (e.target.closest('#wtAddSegment2Btn')) {
+        if (_wtFinalized) {
+          app.showToast('Рейс завершён — добавление недоступно');
           return;
         }
-        // «Разделить смену» — только при 1 сегменте и не splitMode
-        if (e.target.closest('#wtSplitBtn')) {
-          wtSplitShift();
+        wtOpenSegmentSheet(2);
+        return;
+      }
+      // Gear icon in Duty card → open Flight Settings
+      if (e.target.closest('#wtFlightSettingsBtn')) {
+        wtOpenFlightSettings();
+        return;
+      }
+      // Plus icon in Segments card → open Add Segment (в splitMode если смены 2 нет — для shift 2)
+      if (e.target.closest('#wtAddSegmentBtn')) {
+        if (_wtFinalized) {
+          app.showToast('Рейс завершён — добавление недоступно');
           return;
         }
-        // «Добавить сегмент смены 2» — открывает segment sheet с shift=2
-        if (e.target.closest('#wtAddSegment2Btn')) {
-          if (_wtFinalized) {
-            app.showToast('Рейс завершён — добавление недоступно');
-            return;
-          }
-          wtOpenSegmentSheet(2);
-          return;
-        }
-        // Gear icon in Duty card → open Flight Settings
-        if (e.target.closest('#wtFlightSettingsBtn')) {
-          wtOpenFlightSettings();
-          return;
-        }
-        // Plus icon in Segments card → open Add Segment (в splitMode если смены 2 нет — для shift 2)
-        if (e.target.closest('#wtAddSegmentBtn')) {
-          if (_wtFinalized) {
-            app.showToast('Рейс завершён — добавление недоступно');
-            return;
-          }
-          // В раздельном режиме: если смены 2 ещё нет — добавляем в shift 2;
-          // если уже есть сегмент смены 2 — добавление недоступно (1 смена = 1 сегмент)
-          if (_wtSettings.splitMode) {
-            var segs2Check = _wtSegments.filter(function(s) { return s.shift === 2; });
-            if (segs2Check.length === 0) {
-              if (!_wtSettings.reportTime2) {
-                app.showToast('Сначала укажите время явки 2 в данных рейса');
-                return;
-              }
-              wtOpenSegmentSheet(2);
-              return;
-            } else {
-              app.showToast('Смена 2 уже содержит сегмент — добавление недоступно');
+        // В раздельном режиме: если смены 2 ещё нет — добавляем в shift 2;
+        // если уже есть сегмент смены 2 — добавление недоступно (1 смена = 1 сегмент)
+        if (_wtSettings.splitMode) {
+          var segs2Check = _wtSegments.filter(function(s) { return s.shift === 2; });
+          if (segs2Check.length === 0) {
+            if (!_wtSettings.reportTime2) {
+              app.showToast('Сначала укажите время явки 2 в данных рейса');
               return;
             }
+            wtOpenSegmentSheet(2);
+            return;
           } else {
-            // Обычный режим — проверяем что явка задана
-            if (wtParseTime(_wtSettings.reportTime) === null) {
-              app.showToast('Сначала введите время явки в данных рейса');
-              return;
-            }
-          }
-          wtOpenSegmentSheet();
-          return;
-        }
-        // Segment card click → open Edit Segment (или toast если locked в splitMode)
-        var segCard = e.target.closest('.wt-segment-card[data-idx]');
-        if (segCard && !e.target.closest('.wt-delete-segment')) {
-          if (segCard.dataset.locked === '1') {
-            app.showToast('Сегмент заблокирован в раздельном режиме');
+            app.showToast('Смена 2 уже содержит сегмент — добавление недоступно');
             return;
           }
-          if (_wtFinalized) {
-            app.showToast('Рейс завершён — редактирование недоступно');
+        } else {
+          // Обычный режим — проверяем что явка задана
+          if (wtParseTime(_wtSettings.reportTime) === null) {
+            app.showToast('Сначала введите время явки в данных рейса');
             return;
           }
-          var segIdx = parseInt(segCard.dataset.idx, 10);
-          if (!isNaN(segIdx)) wtOpenEditSegmentSheet(segIdx);
+        }
+        wtOpenSegmentSheet();
+        return;
+      }
+      // Segment card click → open Edit Segment (или toast если locked в splitMode)
+      var segCard = e.target.closest('.wt-segment-card[data-idx]');
+      if (segCard && !e.target.closest('.wt-delete-segment')) {
+        if (segCard.dataset.locked === '1') {
+          app.showToast('Сегмент заблокирован в раздельном режиме');
           return;
         }
-        if (e.target.closest('#wtShareBtn')) {
-          wtShareResults();
+        if (_wtFinalized) {
+          app.showToast('Рейс завершён — редактирование недоступно');
           return;
         }
-      });
-      container.dataset.delegated = 'true';
-    }
+        var segIdx = parseInt(segCard.dataset.idx, 10);
+        if (!isNaN(segIdx)) wtOpenEditSegmentSheet(segIdx);
+        return;
+      }
+      if (e.target.closest('#wtShareBtn')) {
+        wtShareResults();
+        return;
+      }
+    });
 
     // Bottom-sheet overlay click → close
     var fsOverlay = document.getElementById('wtSettingsOverlay');
-    if (fsOverlay && !fsOverlay.dataset.delegated) {
+    if (fsOverlay) {
       fsOverlay.addEventListener('click', function(e) {
         if (e.target === fsOverlay) wtCloseSheet();
       });
-      fsOverlay.dataset.delegated = 'true';
     }
 
     // Bottom-sheet panel: unified click handler for both modes
     var fsSheet = document.getElementById('wtSettingsSheet');
-    if (fsSheet && !fsSheet.dataset.delegated) {
+    if (fsSheet) {
       fsSheet.addEventListener('click', function(e) {
         // Save button — dispatch by current sheet mode
         if (e.target.closest('#wtSaveSegmentBtn')) {
@@ -1831,17 +1838,15 @@
           return;
         }
       });
-      fsSheet.dataset.delegated = 'true';
     }
 
     // Auto-save on change in settings mode (dropdowns, time, number inputs)
-    if (fsSheet && !fsSheet.dataset.changeDelegated) {
+    if (fsSheet) {
       fsSheet.addEventListener('change', function() {
         if (_wtSheetMode === 'settings') {
           wtAutoSaveSetting();
         }
       });
-      fsSheet.dataset.changeDelegated = 'true';
     }
 
     _wtSettings  = wtLoadSettings();
