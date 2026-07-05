@@ -87,7 +87,7 @@
   --font-hero: clamp(1.75rem, 5vw, 2.75rem);
 
   /* Content padding */
-  --content-padding-x: 16px;
+  --content-padding-x: 8px;
 
   /* Accordion nesting indent (MODULE_CONTRACT §7, SHELL_CONTRACT §4) */
   --accordion-indent: 12px;
@@ -133,7 +133,7 @@ body.dark-theme {
 @media (min-width: 1024px) {
   :root {
     --header-height: var(--header-height-desktop);
-    --content-padding-x: 24px;
+    --content-padding-x: 12px;
   }
 }
 
