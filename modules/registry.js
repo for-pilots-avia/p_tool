@@ -99,6 +99,8 @@ window.ModuleRegistry = {
     this.ensureCss(id);
 
     if (typeof mod.init === 'function') {
+      // MODULE_CONTRACT §5: init(params) всегда получает объект (пустой {} если навигация без параметров)
+      params = params || {};
       mod.init(params);
     } else {
       // Fallback: show "in development" stub
@@ -130,6 +132,9 @@ window.ModuleRegistry = {
     if (mod && typeof mod.destroy === 'function') {
       mod.destroy();
     }
+    // Сбросить флаг _initialized, чтобы модуль мог быть повторно init() после destroy()
+    // SHELL_CONTRACT §2: «Shell вызывает destroy() для всех модулей при переходе на 'main' через сайд-меню»
+    delete this._initialized[id];
   },
 
   /**
@@ -177,7 +182,7 @@ window.ModuleRegistry = {
   _showStub: function(mod) {
     var container = document.getElementById(mod.containerId);
     if (container) {
-      container.innerHTML = '<div class="module-container" style="padding-top:16px;padding-bottom:32px;">'
+      container.innerHTML = '<div class="module-container">'
         + '<div class="ct-empty-state">'
         + '<div class="ct-empty-title">' + mod.title + '</div>'
         + '<div class="ct-empty-text">Модуль в разработке</div>'

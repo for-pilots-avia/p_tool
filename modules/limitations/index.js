@@ -103,6 +103,8 @@
     if (!left || !center || !right) return;
 
     if (_viewMode === 'detail' && _activeItem) {
+      /* §6 редкий случай: detail mode — back button (arrow-left) вместо гамбургера.
+         Обоснование: внутри item-детали гамбургер не нужен, кнопка «Назад» возвращает к списку. */
       // Detail mode: arrow-left → возврат к списку Limitations
       left.innerHTML = '<button class="icon-btn" aria-label="Назад">'
         + (window.ICONS['arrow-left'] || '') + '</button>';
@@ -153,7 +155,6 @@
     return '<div class="lim-disclaimer">'
       + '<div class="lim-disclaimer-title"' + window.app.langAttr(meta.aircraft) + '>' + window.app.escapeHtml(meta.aircraft || '') + '</div>'
       + '<div class="lim-disclaimer-text"' + window.app.langAttr(meta.disclaimer) + '>' + window.app.escapeHtml(meta.disclaimer || '') + '</div>'
-      + '<div class="lim-disclaimer-source"' + window.app.langAttr(meta.source) + '>' + window.app.escapeHtml(meta.source || '') + '</div>'
       + '</div>';
   }
 
@@ -227,19 +228,6 @@
   }
 
   /* ═══════════════════════════════════════════
-     LEGEND (color codes)
-     ═══════════════════════════════════════════ */
-
-  function renderLegend() {
-    return '<div class="lim-legend">'
-      + '<div class="lim-legend-item"><span class="lim-legend-dot lim-severity--warning"></span><span>Prohibited</span></div>'
-      + '<div class="lim-legend-item"><span class="lim-legend-dot lim-severity--limit"></span><span>Limit</span></div>'
-      + '<div class="lim-legend-item"><span class="lim-legend-dot lim-severity--caution"></span><span>Caution</span></div>'
-      + '<div class="lim-legend-item"><span class="lim-legend-dot lim-severity--info"></span><span>Info</span></div>'
-      + '</div>';
-  }
-
-  /* ═══════════════════════════════════════════
      DETAIL VIEW
      ═══════════════════════════════════════════ */
 
@@ -286,7 +274,7 @@
         html += '<div class="lim-detail-images">';
         for (var i = 0; i < item.detail.pics.length; i++) {
           html += '<div class="lim-detail-img-wrap">';
-          html += '<img src="' + window.app.escapeAttr(item.detail.pics[i]) + '" data-full-src="' + window.app.escapeAttr(item.detail.pics[i]) + '" alt="Image ' + (i + 1) + '" loading="lazy" class="lim-detail-img">';
+          html += '<img src="' + window.app.escapeAttr(item.detail.pics[i]) + '" data-full-src="' + window.app.escapeAttr(item.detail.pics[i]) + '" alt="Image ' + (i + 1) + '" loading="lazy" class="lim-detail-img ct-img-dark-invert">';
           html += '</div>';
         }
         html += '</div>';
@@ -343,6 +331,10 @@
             return r.text();
           })
           .then(function(html) {
+            /* ИСКЛЮЧЕНИЕ MODULE_CONTRACT §7 ЗАПРЕЩЕНО п.3 / §13: tailwind-table.html — trusted build-time asset.
+               app.renderRichText() удалил бы <table>/<thead>/<tbody>/<tr>/<th>/<td> (запрещены вне §13 whitelist).
+               Прямое присваивание innerHTML — осознанное исключение, требует Issue к Shell-разработчику
+               на app.sanitizeHtml(tablesWhitelist). Источник .html-файла — data-table-src, без пользовательского ввода. */
             el.innerHTML = html;
             el.removeAttribute('data-table-src');
           })
@@ -410,9 +402,6 @@
     if (!isSearching) {
       html += renderDisclaimer();
     }
-
-    // Легенда
-    html += renderLegend();
 
     // Категории
     for (var i = 0; i < filteredCategories.length; i++) {
@@ -574,7 +563,10 @@
   /* ─── DESTROY (контракт MODULE_CONTRACT §5: очистка при уходе) ─── */
 
   function destroy() {
-    // Нет динамических элементов для очистки
+    // MODULE_CONTRACT §5: очистка при уходе. Снять scroll-lock если destroy() вызван из detail view.
+    document.body.classList.remove('lim-detail-open');
+    _viewMode = 'list';
+    _activeItem = null;
   }
 
   window.ModuleRegistry.register('limitations', {

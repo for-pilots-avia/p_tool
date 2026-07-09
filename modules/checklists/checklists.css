@@ -30,7 +30,7 @@ body.dark-theme #checklistsContainer {
   flex: 1;
   min-width: 0;
   padding: 10px 16px;
-  font-size: var(--font-sm);
+  font-size: var(--font-md);  /* табы 18px по запросу пользователя (карта §7 рекомендует font-lg=20px) */
   font-weight: 600;
   color: var(--color-text-secondary);
   background: none;
@@ -164,6 +164,7 @@ body.dark-theme #checklistsContainer {
 .cl-block-content {
   max-height: 0;
   overflow: hidden;
+  /* custom animation: accordion — Material standard ease, §7 осознанное исключение (не покрывается var(--transition-*)) */
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -362,6 +363,7 @@ body.dark-theme #checklistsContainer {
   height: 100%;
   background-color: var(--color-primary);
   border-radius: 2px;
+  /* custom animation: progress fill — Material standard ease, §7 осознанное исключение */
   transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -671,7 +673,7 @@ body.dark-theme #checklistsContainer {
   border: 1.5px solid var(--color-border);
   border-radius: var(--border-radius-md);
   padding: 10px 12px;
-  font-size: 16px; /* >=16px prevents iOS auto-zoom */
+  font-size: var(--font-base); /* >=16px prevents iOS auto-zoom — var(--font-base)=1rem=16px, §7 ШКАЛА ШРИФТОВ */
   font-family: inherit;
   color: var(--color-text-main);
   background: var(--color-bg-card);

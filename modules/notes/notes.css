@@ -6,11 +6,24 @@
 #notesContainer {
   --color-danger-ghost: rgba(205, 32, 44, 0.08);
   --notes-img-bg: #ffffff;
+  /* Canvas для рисования: themed — white-on-black в светлой, black-on-white в тёмной.
+     Значения хардкод-HEX осознанно (canvas drawing surface, не текст);
+     в SHELL_CONTRACT §4 нет подходящей переменной (--color-bg-main меняется,
+     --color-text-main тоже не подходит — нужны конкретные canvas-значения). */
+  --notes-canvas-bg: #ffffff;      /* light: белый фон */
+  --notes-canvas-stroke: #1a1a1a;  /* light: чёрные линии */
 }
 body.dark-theme #notesContainer {
   --color-danger-ghost: rgba(230, 57, 70, 0.12);
   --notes-img-bg: #2a2a2a;
+  --notes-canvas-bg: #1a1a1a;      /* dark: чёрный фон */
+  --notes-canvas-stroke: #e8e8e8;  /* dark: белые линии (соответствует --color-text-main dark) */
 }
+
+/* ─── Category color mapping via data-cat (MODULE_CONTRACT §7 — no inline styles) ─── */
+#notesContainer [data-cat="Важно"] { --cat-color: var(--color-danger); --pill-border: var(--color-danger); }
+#notesContainer [data-cat="Работа"] { --cat-color: var(--color-warning); --pill-border: var(--color-warning); }
+#notesContainer [data-cat="Личное"] { --cat-color: var(--color-success); --pill-border: var(--color-success); }
 
 /* Fullscreen editor mode — remove module-container spacing */
 #notesContainer.notes-fullscreen {
@@ -214,32 +227,29 @@ body.dark-theme #notesContainer {
   cursor: pointer;
   border-radius: var(--border-radius-xs);
   flex-shrink: 0;
-  opacity: 0;
   transition: all var(--transition-speed) var(--transition-ease);
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Touch: always visible; hover devices: hidden until hover (MODULE_CONTRACT §7 — no hover:none) */
+.notes-text-item-del {
+  opacity: 0.5;
+}
 @media (hover: hover) {
+  .notes-text-item-del {
+    opacity: 0;
+  }
   .notes-text-item:hover .notes-text-item-del {
     opacity: 1;
+  }
+  .notes-text-item-del:hover {
+    color: var(--color-danger) !important;
+    background: var(--color-danger-ghost);
   }
 }
 
 .notes-text-item-del:focus-visible {
   opacity: 1;
-}
-
-@media (hover: none) {
-  .notes-text-item-del {
-    opacity: 0.5;
-  }
-}
-
-@media (hover: hover) {
-  .notes-text-item-del:hover {
-    color: var(--color-danger) !important;
-    background: var(--color-danger-ghost);
-  }
 }
 
 .notes-text-item-del svg {
@@ -399,33 +409,29 @@ body.dark-theme #notesContainer {
   cursor: pointer;
   border-radius: var(--border-radius-xs);
   flex-shrink: 0;
-  opacity: 0;
   transition: all var(--transition-speed) var(--transition-ease);
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Touch: always visible; hover devices: hidden until hover (MODULE_CONTRACT §7 — no hover:none) */
+.notes-thumb-del {
+  opacity: 0.6;
+}
 @media (hover: hover) {
+  .notes-thumb-del {
+    opacity: 0;
+  }
   .notes-thumb:hover .notes-thumb-del {
     opacity: 1;
+  }
+  .notes-thumb-del:hover {
+    color: var(--color-danger) !important;
+    background: var(--color-danger-ghost);
   }
 }
 
 .notes-thumb-del:focus-visible {
   opacity: 1;
-}
-
-/* Always visible on touch (no hover) */
-@media (hover: none) {
-  .notes-thumb-del {
-    opacity: 0.6;
-  }
-}
-
-@media (hover: hover) {
-  .notes-thumb-del:hover {
-    color: var(--color-danger) !important;
-    background: var(--color-danger-ghost);
-  }
 }
 
 .notes-thumb-del svg {
@@ -852,10 +858,11 @@ body.dark-theme #notesContainer {
   color: var(--color-primary);
 }
 
-/* Canvas — always white (drawing surface, not themed) */
+/* Canvas — themed drawing surface (light: white bg + black ink; dark: black bg + white ink).
+   Цвета через CSS-переменные #notesContainer — см. выше. */
 .notes-canvas {
   display: block;
   touch-action: none;
-  background: #ffffff;
+  background: var(--notes-canvas-bg);
   cursor: crosshair;
 }

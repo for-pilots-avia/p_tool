@@ -107,6 +107,18 @@
     return svg;
   }
 
+  /* ─── renderRuText: langAttr + escapeHtml + wrapLongWords для русского текста (§7 v5.3) ───
+     Возвращает строку вида 'lang="ru">экранированный_контент' (или 'lang="en">...').
+     Использование: '<tag class="..."' + renderRuText(text) + '</tag>'
+     Для EN-доминирующего текста wrapLongWords не применяется (только для ru, minLen=8). */
+  function renderRuText(text) {
+    var str = (text === null || text === undefined) ? '' : String(text);
+    var lang = app.detectLang(str);
+    var attr = app.langAttr(str);
+    var content = (lang === 'ru') ? app.wrapLongWords(app.escapeHtml(str), 8) : app.escapeHtml(str);
+    return attr + '>' + content;
+  }
+
   /* ═══════════════════════════════════════════
      PILOT DATA: save / load from localStorage
      ═══════════════════════════════════════════ */
@@ -372,7 +384,7 @@
     /* Checklist items */
     html += '<div class="checkride-items">';
     mainSection.sections.forEach(function(sec, secIdx) {
-      html += '<h3 class="checkride-subname">' + app.escapeHtml(sec.subname) + '</h3>';
+      html += '<h3 class="checkride-subname"' + renderRuText(sec.subname) + '</h3>';
 
       var groups = sec.groups || [{ items: sec.items || [] }];
 
@@ -422,7 +434,7 @@
           compCheckboxes.forEach(function(item) {
             html += '<label class="checkride-competency-check">'
               + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
-              + '<span>' + app.escapeHtml(item.label) + '</span>'
+              + '<span' + renderRuText(item.label) + '</span>'
             + '</label>';
           });
           html += '</div>';
@@ -436,15 +448,15 @@
 
           group.items.forEach(function(item) {
             if (item.type === 'divider') {
-              html += '<div class="checkride-divider">' + app.escapeHtml(item.label) + '</div>';
+              html += '<div class="checkride-divider"' + renderRuText(item.label) + '</div>';
             } else if (item.type === 'checkbox') {
               html += '<div class="checkride-check-item">'
                 + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
-                + '<label for="c_' + item.id + '">' + app.escapeHtml(item.label) + '</label>'
+                + '<label for="c_' + item.id + '"' + renderRuText(item.label) + '</label>'
               + '</div>';
             } else if (item.type === 'radio') {
               html += '<div class="checkride-radio-group">'
-                + '<p class="checkride-radio-label"><b>' + app.escapeHtml(item.label) + '</b></p>';
+                + '<p class="checkride-radio-label"><b' + renderRuText(item.label) + '</b></p>';
               item.options.forEach(function(opt) {
                 html += '<label class="checkride-radio-option">'
                   + '<input type="radio" name="r_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.ok === opt ? ' checked' : '') + '>'
@@ -456,7 +468,7 @@
               /* \u041E\u0446\u0435\u043D\u043E\u0447\u043D\u044B\u0439 dropdown (MK \u043F\u0443\u043D\u043A\u0442\u044B) \u2014 options \u0431\u0435\u0440\u0443\u0442\u0441\u044F \u0438\u0437 item.options (data-driven, default 5/4/3/2/na) */
               var gVal = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
               html += '<div class="checkride-grade-item">'
-                + '<span class="checkride-grade-label">' + app.escapeHtml(item.label) + '</span>'
+                + '<span class="checkride-grade-label"' + renderRuText(item.label) + '</span>'
                 + '<select class="checkride-grade-select" data-cr-grade="' + item.id + '">'
                 + '<option value=""' + (gVal === '' ? ' selected' : '') + '>\u2014</option>';
               (item.options || []).forEach(function(opt) {
@@ -474,14 +486,14 @@
       if (sec.subname !== '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
         html += '<div class="checkride-detail-item">'
           + '<b class="checkride-comment-label">\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0438:</b>'
-          + '<textarea id="sec_n_' + _sectionIndex + '_' + secIdx + '" class="checkride-textarea" placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u0435\u043A\u0441\u0442...">' + app.escapeHtml(sec.note || '') + '</textarea>'
+          + '<textarea id="sec_n_' + _sectionIndex + '_' + secIdx + '" class="checkride-textarea"' + app.langAttr(sec.note || '') + ' placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u0435\u043A\u0441\u0442...">' + app.escapeHtml(sec.note || '') + '</textarea>'
           + '<div class="checkride-photo-row">'
           + '<input type="file" accept="image/*" capture="environment" class="checkride-file-input-hidden" data-cr-file="' + _sectionIndex + '_' + secIdx + '">'
           + '<button type="button" class="checkride-photo-btn" data-cr-photo="' + _sectionIndex + '_' + secIdx + '">'
           + icon('camera', 18) + ' <span>\u0424\u043E\u0442\u043E!</span></button>'
           + '</div>'
           + '<div id="sec_p_' + _sectionIndex + '_' + secIdx + '">'
-          + (sec.img ? '<img src="' + sec.img + '" class="checkride-attached-img" data-cr-img-view="' + _sectionIndex + '_' + secIdx + '">' : '')
+          + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" class="checkride-attached-img ct-img-dark-invert" data-cr-img-view="' + _sectionIndex + '_' + secIdx + '">' : '')
           + '</div>'
         + '</div>';
       }
@@ -542,7 +554,7 @@
       + '<p><b>\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439:</b> <span id="r_instructor"></span></p>'
       + '<p><b>\u041F\u043E\u0434\u043F\u0438\u0441\u044C:</b></p>';
     if (_viewingHistory && _pilotData.signature) {
-      sigHtml += '<img src="' + _pilotData.signature + '" class="checkride-signature-img" alt="\u041F\u043E\u0434\u043F\u0438\u0441\u044C \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0430">';
+      sigHtml += '<img src="' + app.escapeAttr(_pilotData.signature) + '" class="checkride-signature-img ct-img-dark-invert" alt="\u041F\u043E\u0434\u043F\u0438\u0441\u044C \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0430">';
     } else {
       sigHtml += '<canvas id="checkride-signature"></canvas>';
     }
@@ -837,18 +849,18 @@
               } else {
                 gradeRes = '<span class="checkride-grade-na">\u2014 \u043D\u0435 \u043E\u0446\u0435\u043D\u0435\u043D\u043E</span>';
               }
-              sHtml += '<div class="checkride-report-item-row"><p>' + app.escapeHtml(item.label) + '</p><div class="checkride-flex-row">' + gradeRes + '</div></div>';
+              sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + gradeRes + '</div></div>';
             } else if (item.type === 'checkbox') {
               var res = item.ok
                 ? '<span class="checkride-icon-ok">\u2713 OK</span>'
                 : '<span class="checkride-icon-fail">\u2717 \u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435</span>';
-              sHtml += '<div class="checkride-report-item-row"><p>' + app.escapeHtml(item.label) + '</p><div class="checkride-flex-row">' + res + '</div></div>';
+              sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + res + '</div></div>';
             } else if (item.type === 'radio') {
               var scoreValue = item.ok || '2 (\u043D/\u0434)';
               var scoreIndex = item.ok ? item.options.indexOf(item.ok) : -1;
               var actualScore = scoreIndex >= 0 ? (5 - scoreIndex) : 2;
               sHtml += '<div class="checkride-report-item-row checkride-report-radio-item">'
-                + '<p class="checkride-radio-label-bold">' + app.escapeHtml(item.label) + '</p>'
+                + '<p class="checkride-radio-label-bold"' + renderRuText(item.label) + '</p>'
                 + '<div class="checkride-radio-score-indent"><b>\u041E\u0446\u0435\u043D\u043A\u0430:</b> ' + actualScore + ' - ' + scoreValue + '</div>'
               + '</div>';
             }
@@ -856,8 +868,8 @@
         });
         if (sec.note || sec.img) {
           sHtml += '<div class="checkride-report-comment">'
-            + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> ' + app.escapeHtml(sec.note) + '</p>' : '')
-            + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img" data-cr-report-img="1">' : '')
+            + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> <span' + renderRuText(sec.note) + '</span></p>' : '')
+            + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">' : '')
           + '</div>';
         }
         dataEl.innerHTML += sHtml + '</div>';

@@ -95,7 +95,7 @@
     if (_data.sections) {
       for (var i = 0; i < _data.sections.length; i++) {
         var s = _data.sections[i];
-        html += '<button class="faq-toc-pill' + (i === 0 ? ' faq-toc-pill--active' : '') + '" data-section="' + s.id + '"' + window.app.langAttr(s.title) + '>' + window.app.escapeHtml(s.title) + '</button>';
+        html += '<button class="faq-toc-pill' + (i === 0 ? ' faq-toc-pill--active' : '') + '" data-section="' + window.app.escapeAttr(s.id) + '"' + window.app.langAttr(s.title) + '>' + window.app.wrapLongWords(window.app.escapeHtml(s.title)) + '</button>';
       }
     }
     if (_data.links && _data.links.length > 0) {
@@ -107,8 +107,8 @@
     if (_data.sections) {
       for (var j = 0; j < _data.sections.length; j++) {
         var sec = _data.sections[j];
-        html += '<section id="' + sec.id + '" class="faq-section">';
-        html += '<h2 class="faq-section-title"' + window.app.langAttr(sec.title) + '>' + window.app.escapeHtml(sec.title) + '</h2>';
+        html += '<section id="' + window.app.escapeAttr(sec.id) + '" class="faq-section">';
+        html += '<h2 class="faq-section-title"' + window.app.langAttr(sec.title) + '>' + window.app.wrapLongWords(window.app.escapeHtml(sec.title)) + '</h2>';
         var paragraphs = sec.content.split('\n\n');
         for (var k = 0; k < paragraphs.length; k++) {
           html += '<p class="faq-paragraph"' + window.app.langAttr(paragraphs[k]) + '>' + window.app.renderRichText(paragraphs[k]) + '</p>';

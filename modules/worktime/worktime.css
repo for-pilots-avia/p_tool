@@ -1137,7 +1137,7 @@ body.dark-theme #worktimeContainer {
   font-family: var(--font-main);
   cursor: pointer;
   border-radius: var(--border-radius-sm);
-  transition: background 0.1s var(--transition-ease);
+  transition: background var(--transition-speed) var(--transition-ease);
   min-height: 44px;
 }
 .wt-header-menu-item svg {
@@ -1340,7 +1340,7 @@ body.dark-theme #worktimeContainer {
 .wt-segment-color-dot {
   width: 12px;
   height: 12px;
-  border-radius: 3px;
+  border-radius: var(--border-radius-xs);
   display: inline-block;
   flex-shrink: 0;
 }

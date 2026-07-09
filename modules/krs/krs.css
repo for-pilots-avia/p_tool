@@ -43,10 +43,9 @@ body.dark-theme #krsContainer {
 
 /* Marquee убран: при переполнении заголовок переносится в 2 строки */
 
-/* Поворот шеврона при открытом блоке */
-.krs-block.open > .krs-block-header > .collapsible-chevron {
-  transform: rotate(180deg);
-}
+/* Шеврон убран из заголовка KRS-аккордеона (HTML + CSS rotation rule удалены).
+   Контракт не нарушает: .collapsible-chevron — shared-класс, в KRS больше не используется.
+   Limitations и Checklists сохраняют свой шеврон — правка изолирована внутри #krsContainer/.krs-*. */
 
 /* ─── Touch-action (перенесено из style.css по MODULE_CONTRACT §7) ─── */
 .krs-block-header {
@@ -201,25 +200,51 @@ body.dark-theme #krsContainer {
 /* ─── Badge Stack (date badge + addres marker) ─── */
 /* Обёртка над бейджем даты и маркером адресата для вертикальной упаковки.
    Маркер addres рендерится только если в JSON есть поле inst.addres.
-   Без addres — бейдж остаётся однострочным (старый путь renderBlock). */
+   Без addres — бейдж остаётся однострочным (старый путь renderBlock).
+   Вариант A: badge-stack перенесён ВПРАВО заголовка (order:2, center) —
+   освобождает левую+центральную часть под title, длинный addres не сжимает заголовок.
+   align-items:flex-end — бейдж даты (узкий) прижат к правому краю колонки,
+   консистентно с addres (который задаёт ширину колонки). */
 .krs-badge-stack {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  align-self: flex-start;
+  align-self: center;
   flex-shrink: 0;
+  order: 2;
+  align-items: flex-end;
+}
+
+/* Override базового align-self:flex-start (.krs-age-badge стр. ниже) —
+   внутри badge-stack бейдж должен быть прижат ВПРАВО (flex-end), а не влево.
+   Специфичность 0,2,0 > 0,1,0 базового правила. */
+.krs-badge-stack .krs-age-badge {
+  align-self: flex-end;
+}
+
+/* Standalone age-badge (без addres — карточка без badge-stack) тоже ВПРАВО.
+   Контекстный селектор через > гарантирует что не заденет .krs-age-badge
+   ВНУТРИ .krs-badge-stack. */
+.krs-block-header > .krs-age-badge {
+  order: 2;
+  align-self: center;
 }
 
 .krs-addres-marker {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   line-height: 1.2;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   opacity: 0.7;
-  text-align: center;
+  text-align: right;
   padding: 0 4px;
   white-space: nowrap;
+  /* Защита от экстремально длинных addres (превентивно): ellipsis вместо
+     повторного сжатия title. «Инструкторам» (12 символов) помещается без обрезки. */
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ─── Block Title (marquee on open) ─── */
@@ -228,6 +253,7 @@ body.dark-theme #krsContainer {
 .krs-block-header .collapsible-title {
   flex: 1;
   min-width: 0;
+  order: 1;
   font-size: var(--font-base);
   font-weight: 600;
   color: var(--color-text-main);
@@ -255,6 +281,7 @@ body.dark-theme #krsContainer {
 .krs-block-content {
   max-height: 0;
   overflow: hidden;
+  /* custom animation: accordion — Material standard ease, §7 осознанное исключение (не покрывается var(--transition-*)) */
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -343,6 +370,42 @@ body.dark-theme #krsContainer {
   object-fit: contain;
   max-height: 400px;
   background: var(--color-bg-main);
+}
+
+/* E17-C: Fallback-плейсхолдер для отсутствующих изображений (#17).
+   Применяется к .krs-img-wrap когда <img> упал с 404 — JS заменяет
+   содержимое wrap на .krs-img-placeholder (см. handleImgError в index.js). */
+.krs-img-wrap--missing {
+  cursor: default;
+  border-color: var(--color-border-subtle);
+  background: var(--color-bg-main);
+}
+
+@media (hover: hover) {
+  /* Override: hover-эффект только для валидных изображений */
+  .krs-img-wrap--missing:hover { border-color: var(--color-border-subtle); }
+}
+
+.krs-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.krs-img-placeholder svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.6;
+}
+
+.krs-img-placeholder-text {
+  font-size: var(--font-sm);
+  line-height: 1.4;
 }
 
 /* ─── PDF Buttons ─── */
@@ -538,7 +601,7 @@ body.dark-theme #krsContainer {
   }
 
   .krs-addres-marker {
-    font-size: 0.625rem;
+    font-size: var(--font-xs);
   }
 }
 

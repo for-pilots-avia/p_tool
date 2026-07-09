@@ -682,7 +682,7 @@ body.dark-theme .metbriefing-status-badge--warn {
     margin-left: 0;
     width: 100%;
     text-align: right;
-    font-size: var(--font-2xs);
+    font-size: var(--font-xs);
   }
 }
 
@@ -727,7 +727,7 @@ body.dark-theme .metbriefing-status-badge--warn {
 }
 /* Flight rules badge */
 .metbriefing-inline-weather-fr {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 800;
   letter-spacing: 0.04em;
   padding: 2px 6px;
@@ -896,7 +896,7 @@ body.dark-theme .metbriefing-status-badge--warn {
   padding: 8px;
   background: var(--color-bg-card);
   border-radius: var(--border-radius-sm);
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-mono); /* §4: моноширинный — для METAR/кодов */
   font-size: var(--font-xs);
   color: var(--color-text-secondary);
   line-height: 1.6;
@@ -1112,7 +1112,7 @@ body.dark-theme .metbriefing-inline-notam-item--medium {
   color: var(--color-text-main);
 }
 .metbriefing-inline-notam-crit {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
@@ -1140,13 +1140,13 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 }
 /* .metbriefing-inline-notam-item-desc and .metbriefing-inline-notam-item-dates removed — not used in briefing NOTAM */
 .metbriefing-inline-notam-qcode {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
   background: var(--color-primary-ghost);
   color: var(--color-primary);
-  font-family: monospace;
+  font-family: var(--font-mono); /* §4: моноширинный — коды (NOTAM Q-code) */
   letter-spacing: 0.02em;
 }
 
@@ -1579,7 +1579,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   letter-spacing: 0.05em;
 }
 .metbriefing-wx-metar-code {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-mono); /* §4: моноширинный — коды (METAR/TAF) */
   font-size: var(--font-xs);
   color: var(--color-text-secondary);
   line-height: 1.6;
@@ -1705,7 +1705,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   margin-top: 4px;
 }
 .metbriefing-wx-taf-code {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--font-mono); /* §4: моноширинный — коды (METAR/TAF) */
   font-size: var(--font-xs);
   color: var(--color-text-secondary);
   line-height: 1.6;
@@ -1825,7 +1825,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-text-white);
 }
 .metbriefing-nt-filter-count {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   background: rgba(255, 255, 255, 0.2);
   padding: 1px 5px;
   border-radius: 4px;
@@ -1867,7 +1867,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   background: var(--color-bg-card);
   padding: 1px 5px;
   border-radius: 3px;
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
 }
 .metbriefing-notam-airport-chip-remove {
   display: inline-flex;
@@ -1897,7 +1897,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
 
 /* ── NOTAM Airport Chip FIR label ── */
 .metbriefing-notam-airport-chip-fir {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 700;
   color: var(--mb-color-warning-text);
   background: var(--mb-color-warning-bg);
@@ -2105,7 +2105,7 @@ body.dark-theme .metbriefing-inline-notam-crit--medium {
   color: var(--color-text-main);
 }
 .metbriefing-notam-type-badge {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2129,7 +2129,7 @@ body.dark-theme .metbriefing-notam-type-badge--R {
 }
 
 .metbriefing-notam-criticality-badge {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2151,13 +2151,13 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   color: var(--mb-color-ok-text);
 }
 .metbriefing-notam-qcode-badge {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 3px;
   background: var(--color-primary-ghost);
   color: var(--color-primary);
-  font-family: monospace;
+  font-family: var(--font-mono); /* §4: моноширинный — коды (NOTAM Q-code) */
   letter-spacing: 0.02em;
 }
 
@@ -2172,7 +2172,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   color: var(--color-text-secondary);
 }
 .metbriefing-notam-status-badge {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2222,6 +2222,58 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 .metbriefing-notam-date-value {
   color: var(--color-text-secondary);
+}
+
+/* ── Task 24 (A): NOTAM Schedule chips ── */
+.metbriefing-notam-card-schedule {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  padding: 8px 0 4px;
+  margin-bottom: 8px;
+  border-top: 1px dashed var(--color-border);
+}
+.metbriefing-notam-schedule-icon {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.metbriefing-notam-schedule-icon svg {
+  width: 14px; height: 14px;
+}
+.metbriefing-notam-schedule-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  align-self: center;
+  flex-shrink: 0;
+}
+.metbriefing-notam-schedule-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.metbriefing-notam-schedule-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--color-bg-hover);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+.metbriefing-schedule-day {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.metbriefing-schedule-time {
+  color: var(--color-text-main);
+}
+body.dark-theme .metbriefing-notam-schedule-chip {
+  background: rgba(255,255,255,0.06);
 }
 
 /* ── NOTAM No Results ── */
@@ -2359,7 +2411,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 
 /* Station Info (now inline in header) */
 .metbriefing-wx-card-station, .metbriefing-inline-weather-station {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   color: var(--color-text-muted);
   font-weight: 400;
   margin-left: 4px;
@@ -2418,7 +2470,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   margin-bottom: 0;
 }
 .metbriefing-wx-metar-history-label {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 600;
   color: var(--color-text-muted);
   display: flex;
@@ -2426,7 +2478,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   gap: 6px;
 }
 .metbriefing-wx-hist-cat {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
@@ -2436,9 +2488,9 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 .metbriefing-wx-metar-history-code {
   display: block;
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   color: var(--color-text-secondary);
-  font-family: 'Roboto Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  font-family: var(--font-mono); /* §4: моноширинный — коды (METAR history / SIGMET raw) */
   overflow-wrap: break-word;
   word-break: normal;
   line-height: 1.5;
@@ -2474,7 +2526,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   color: var(--color-text-muted);
   opacity: 0.6;
 }
@@ -2502,35 +2554,129 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   .metbriefing-sigmet-refresh:hover { color: var(--color-primary); }
 }
 
-/* FIR dropdown */
+/* ── SIGMET FIR combobox (Task 24 B2-B) — replaces native <select> ── */
 .metbriefing-sigmet-filter {
   padding: 0 0 8px;
 }
-.metbriefing-sigmet-fir-select {
+.metbriefing-sigmet-fir-combobox {
+  position: relative;
   width: 100%;
-  padding: 8px 10px;
+}
+.metbriefing-sigmet-fir-input-wrap {
+  cursor: text;
+}
+.metbriefing-sigmet-fir-input-wrap .ct-search-input {
   font-size: var(--font-sm);
+  cursor: text;
+}
+.metbriefing-sigmet-fir-chevron {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  margin: 0 -4px 0 4px;
+  border-radius: var(--border-radius-sm);
+  transition: color var(--transition-speed) var(--transition-ease),
+              background var(--transition-speed) var(--transition-ease);
+}
+.metbriefing-sigmet-fir-chevron:hover {
+  color: var(--color-text-main);
+}
+.metbriefing-sigmet-fir-chevron svg {
+  width: 16px;
+  height: 16px;
+}
+.metbriefing-sigmet-fir-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
-  background: var(--color-bg-card);
+  box-shadow: 0 8px 24px var(--color-shadow-lg);
+  z-index: 50;
+  padding: 4px 0;
+}
+.metbriefing-sigmet-fir-dropdown[hidden] { display: none; }
+.metbriefing-sigmet-fir-option {
+  padding: 8px 12px;
+  font-size: var(--font-sm);
   color: var(--color-text-main);
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px;
+  transition: background var(--transition-speed) var(--transition-ease);
+  word-break: break-word;
 }
-.metbriefing-sigmet-fir-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-ghost);
-}
-.metbriefing-sigmet-fir-select option:disabled {
-  color: var(--color-text-muted);
+.metbriefing-sigmet-fir-option[hidden] { display: none; }
+.metbriefing-sigmet-fir-option--indent {
+  padding-left: 24px;
   font-size: var(--font-xs);
+  color: var(--color-text-secondary);
+}
+.metbriefing-sigmet-fir-option--active {
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+.metbriefing-sigmet-fir-option--highlighted {
+  background: var(--color-bg-hover);
+}
+.metbriefing-sigmet-fir-option--active.metbriefing-sigmet-fir-option--highlighted {
+  background: var(--color-primary-ghost);
+}
+.metbriefing-sigmet-fir-group {
+  padding: 8px 12px 4px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--color-bg-hover);
+  /* Task 26 (правка 3d): sticky УБРАН по запросу пользователя */
+}
+/* Task 26 (правка 3b): clickable country group */
+.metbriefing-sigmet-fir-group--clickable {
+  cursor: pointer;
+  transition: background var(--transition-speed) var(--transition-ease),
+              color var(--transition-speed) var(--transition-ease);
+}
+.metbriefing-sigmet-fir-group--clickable:hover {
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+}
+.metbriefing-sigmet-fir-group--active {
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+}
+.metbriefing-sigmet-fir-group[hidden] { display: none; }
+/* Task 26 (правка 2): informational header «Поиск по FIR» (non-clickable) */
+.metbriefing-sigmet-fir-search-header {
+  padding: 6px 12px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   text-align: center;
+  background: var(--color-bg-hover);
+}
+/* Task 26 (правка 3b): non-clickable FIR info rows (только счётчик SIGMET) */
+.metbriefing-sigmet-fir-option--info {
+  cursor: default;
+  color: var(--color-text-secondary);
+}
+.metbriefing-sigmet-fir-option--info.metbriefing-sigmet-fir-option--active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+.metbriefing-sigmet-fir-separator {
+  height: 1px;
+  background: var(--color-border);
+  margin: 4px 8px;
 }
 
 /* Route FIR list */
@@ -2645,7 +2791,7 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 }
 .metbriefing-sigmet-tag {
   display: inline-block;
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   color: var(--color-text-muted);
   background: var(--color-bg-hover);
   border-radius: 3px;
@@ -2697,8 +2843,8 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
   background: var(--color-bg-main);
   border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
-  font-size: var(--font-2xs);
-  font-family: 'Roboto Mono', 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: var(--font-xs);
+  font-family: var(--font-mono); /* §4: моноширинный — коды (METAR history / SIGMET raw) */
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: normal;
@@ -2714,9 +2860,20 @@ body.dark-theme .metbriefing-notam-criticality-badge--medium {
 body.dark-theme .metbriefing-sigmet-card {
   background: rgba(255,255,255,0.03);
 }
-body.dark-theme .metbriefing-sigmet-fir-select {
-  background-color: var(--color-bg-card);
-  color: var(--color-text-main);
+body.dark-theme .metbriefing-sigmet-fir-dropdown {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+body.dark-theme .metbriefing-sigmet-fir-option--highlighted {
+  background: rgba(255,255,255,0.06);
+}
+body.dark-theme .metbriefing-sigmet-fir-group,
+body.dark-theme .metbriefing-sigmet-fir-search-header {
+  background: rgba(255,255,255,0.04);
+}
+body.dark-theme .metbriefing-sigmet-fir-group--clickable:hover {
+  background: var(--color-primary-ghost);
 }
 body.dark-theme .metbriefing-sigmet-raw {
   background: rgba(0,0,0,0.3);
@@ -2792,22 +2949,20 @@ body.dark-theme .metbriefing-sigmet-raw {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Task 49 — Compact mobile styles для .metbriefing-sigmet-fir-select
-   ВНИМАНИЕ: размещено ПОСЛЕ base-стиля (L2513), т.к. base имеет ту же
-   специфичность (.class) и идёт позже @media блоков L2292/L2319 — без этого
-   compact-правила проигрывали бы base-стилю (padding 8px 30px 8px 10px).
+   Task 24 (B2-B) — Compact mobile styles для SIGMET FIR combobox dropdown.
+   Base-стиль .ct-search-input-wrap уже адаптивен (40px height от shell),
+   здесь только подстраиваем dropdown и опции под маленькие экраны.
    ═══════════════════════════════════════════════════════════════════ */
 @media (max-width: 560px) {
-  .metbriefing-sigmet-fir-select {
-    padding: 6px 26px 6px 8px;
-    background-position: right 8px center;
+  .metbriefing-sigmet-fir-dropdown {
+    max-height: 280px;
+  }
+  .metbriefing-sigmet-fir-option {
+    padding: 10px 12px;
   }
 }
 @media (max-width: 380px) {
-  .metbriefing-sigmet-fir-select {
-    padding: 5px 22px 5px 6px;
-    font-size: var(--font-xs);
-    background-position: right 6px center;
-    background-size: 10px;
+  .metbriefing-sigmet-fir-option--indent {
+    padding-left: 16px;
   }
 }

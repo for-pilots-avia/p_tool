@@ -762,7 +762,7 @@ body.dark-theme #checkrideContainer {
 
 #checkrideContainer .checkride-competency-count .ring-text {
   position: relative;
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   font-weight: 700;
   color: var(--color-text-secondary);
   line-height: 1;
@@ -1049,16 +1049,8 @@ body.dark-theme #checkrideContainer {
     width: 100%;
   }
 
-  /* Test screen nav: Назад / Далее — в колонку на самых узких */
-  .checkride-nav-controls {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .checkride-nav-btn,
-  .checkride-finish-btn {
-    flex: none;
-    width: 100%;
-  }
+  /* Task 29: кнопки Назад/Далее/Завершить ВСЕГДА горизонтально (display:flex row из базового CSS).
+     Ранее здесь было flex-direction:column — удалено по требованию пользователя. */
 
   /* Task 48: компактные dropdown-строки на мобильном */
   .checkride-grade-item {

@@ -25,10 +25,20 @@
           }
         },
         {
+          "id": "lim_Runway_Slope",
           "label": "Runway Slope",
           "value": "±2%",
           "source": "FCOM L.10.2",
-          "severity": "limit"
+          "severity": "limit",
+"detail": {
+            "description": "The maximum allowable tailwind component for both takeoff and landing is <b>15 knots</b>.\n\nThis limitation applies to all runways and all weather conditions. Operations with a reported tailwind component exceeding this value are <b>prohibited</b>.\n\nThe tailwind component is calculated as:\n<b>TW = WS × cos(WA − RWY)</b>\nwhere WS = wind speed, WA = wind angle, RWY = runway heading.",
+            "pics": [
+              "modules/limitations/data/tailwind-component.svg"
+            ],
+            "tables": [
+              "modules/limitations/data/tailwind-table.html"
+            ]
+          }
         },
         {
           "label": "Maximum Zero Fuel Weight",

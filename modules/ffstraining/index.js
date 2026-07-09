@@ -96,8 +96,9 @@
   var ALLOWED_ATTRS = {
     'a':        ['href', 'title'],
     'img':      ['src', 'alt', 'width', 'height'],
-    'td':       ['colspan', 'rowspan'],
-    'th':       ['colspan', 'rowspan'],
+    'td':       ['colspan', 'rowspan', 'style'],
+    'th':       ['colspan', 'rowspan', 'style'],
+    'table':    ['style'],
     'col':      ['span'],
     'colgroup': ['span']
   };
@@ -210,6 +211,16 @@
   }
   function _renderRichText(html) {
     return _restoreRichText(window.app.renderRichText(_prepareRichText(html)));
+  }
+
+  /* _renderPlainText: plain-text рендер для полей без rich-text маркеров.
+     escapeHtml + detectLang + wrapLongWords(8) per MODULE_CONTRACT §7 v5.7. */
+  function _renderPlainText(text) {
+    var t = String(text || '');
+    var escaped = window.app.escapeHtml(t);
+    return (window.app.detectLang(t) === 'ru')
+      ? window.app.wrapLongWords(escaped, 8)
+      : escaped;
   }
 
   /* ─── sanitizeHtml(html) ───
@@ -519,12 +530,18 @@
       var isStr = typeof im === 'string';
       var src  = resolveDataUrl(isStr ? im : im.src);
       var full = isStr ? src : resolveDataUrl(im.fullSrc || im.src);
-      var alt  = isStr ? (b.alt || '') : (im.alt || im.title || b.alt || '');
-      html += '<img class="' + CSS_PREFIX + '-image-thumb"'
+      var alt  = isStr ? (b.alt || '') : (im.alt || im.caption || im.title || b.alt || '');
+      var caption = isStr ? '' : (im.caption || '');
+      html += '<div class="image-item">';
+      html += '<img class="' + CSS_PREFIX + '-image-thumb ct-img-dark-invert"'
         + ' src="' + window.app.escapeAttr(src) + '"'
         + ' data-full-src="' + window.app.escapeAttr(full) + '"'
         + ' alt="' + window.app.escapeAttr(alt) + '"'
         + ' loading="lazy">';
+      if (caption) {
+        html += '<figcaption class="block-image-item-caption"' + window.app.langAttr(caption) + '>' + window.app.escapeHtml(caption) + '</figcaption>';
+      }
+      html += '</div>';
     }
     html += '</div>';
     if (b.title) {
@@ -546,7 +563,7 @@
       + ' role="button" tabindex="0"'
       + ' aria-label="Открыть PDF, стр. ' + page + '">'
       + '<span class="' + CSS_PREFIX + '-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>'
-      + '<span class="' + CSS_PREFIX + '-ref-text">' + _renderRichText(label) + '</span>'
+      + '<span class="' + CSS_PREFIX + '-ref-text"' + window.app.langAttr(label) + '>' + _renderRichText(label) + '</span>'
       + '<span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
       + '</div>';
   }
@@ -663,7 +680,7 @@
           + ' role="button" tabindex="0"'
           + ' aria-label="Открыть PDF, стр. ' + page + '">'
           + '<span class="' + CSS_PREFIX + '-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>'
-          + '<span class="' + CSS_PREFIX + '-ref-text">' + _renderRichText(label) + '</span>'
+          + '<span class="' + CSS_PREFIX + '-ref-text"' + window.app.langAttr(label) + '>' + _renderRichText(label) + '</span>'
           + '<span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
           + '</li>';
       } else if (it && it.text) {
@@ -854,7 +871,7 @@
 
     html += '</div>';
 
-    app.hideSkeleton(container, html);
+    window.app.hideSkeleton(container, html);
 
     bindSearchInput(container);
     loadTableFiles(container);
@@ -898,13 +915,13 @@
 
     // refCode
     if (item.refCode) {
-      html += '<div class="' + CSS_PREFIX + '-card-ref">' + _renderRichText(item.refCode) + '</div>';
+      html += '<div class="' + CSS_PREFIX + '-card-ref"' + window.app.langAttr(item.refCode) + '>' + _renderRichText(item.refCode) + '</div>';
     }
 
     // duration (FFS-style — оставлено)
     if (item.duration) {
       html += '<div class="' + CSS_PREFIX + '-card-meta">';
-      html += '<span class="' + CSS_PREFIX + '-card-duration">' + _renderRichText(item.duration) + '</span>';
+      html += '<span class="' + CSS_PREFIX + '-card-duration"' + window.app.langAttr(item.duration) + '>' + _renderRichText(item.duration) + '</span>';
       html += '</div>';
     }
 
@@ -999,7 +1016,7 @@
       + ' data-id="' + id + '"'
       + ' role="button" tabindex="0"'
       + ' aria-expanded="' + (isOpen ? 'true' : 'false') + '">';
-    html += '<span class="divider-list-label">' + _renderRichText(item.title || '') + '</span>';
+    html += '<span class="divider-list-label"' + window.app.langAttr(item.title || '') + '>' + _renderRichText(item.title || '') + '</span>';
     if (hasChildren) {
       html += '<span class="divider-list-count">' + item.children.length + '</span>';
     }
@@ -1236,7 +1253,7 @@
           var targetModule = moduleLink.dataset.module;
           var targetId = moduleLink.dataset.id;
           if (targetModule) {
-            app.navigateTo(targetModule, targetId ? { openId: targetId } : {});
+            window.app.navigateTo(targetModule, targetId ? { openId: targetId } : {});
           }
           return;
         }
@@ -1245,7 +1262,7 @@
         var imgThumb = e.target.closest('.' + CSS_PREFIX + '-image-thumb');
         if (imgThumb) {
           var gallery = imgThumb.closest('.' + CSS_PREFIX + '-image-gallery');
-          app.openPhotoSwipe(imgThumb, gallery);
+          window.app.openPhotoSwipe(imgThumb, gallery);
           return;
         }
 
@@ -1255,7 +1272,7 @@
           var pdfSrc = refLink.dataset.pdfSrc;
           var pdfPage = parseInt(refLink.dataset.pdfPage, 10) || 1;
           if (pdfSrc) {
-            app.openPDFModal(pdfSrc, pdfPage);
+            window.app.openPDFModal(pdfSrc, pdfPage);
           }
           return;
         }
@@ -1279,7 +1296,7 @@
       return;
     }
 
-    app.showSkeleton(container, 'blocks');
+    window.app.showSkeleton(container, 'blocks');
 
     fetch(DATA_URL)
       .then(function(r) {
@@ -1296,7 +1313,7 @@
         if (params && params.openId) openAndScrollTo(params.openId);
       })
       .catch(function(err) {
-        app.showError(container, 'Не удалось загрузить процедуры');
+        window.app.showError(container, 'Не удалось загрузить процедуры');
         console.error(MODULE_ID + ' fetch error:', err);
       });
   }

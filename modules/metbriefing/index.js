@@ -162,6 +162,62 @@
     return text;
   }
 
+  // Task 28: Структурный парсинг полей NOTAM по маркерам ICAO Annex 15.
+  // Каждое поле = "X)content" до следующего "X)". Маркеры: A-G + Q.
+  // Возвращает { A, B, C, D, E, F, G, Q } (присутствуют только найденные).
+  // D) — Schedule, E) — Description (источник schedule, а не E).
+  function parseNotamFields(text) {
+    var fields = {};
+    if (!text) return fields;
+    // Маркер поля: (начало строки | пробел)(буква A-G или Q)")
+    var re = /(?:^|\s)([A-GQ])\)\s*/g;
+    var marks = [], m;
+    while ((m = re.exec(text)) !== null) {
+      // start = позиция маркера (буквы), до ")
+      var markerLetterIdx = m.index + (m[0].length - m[0].indexOf(m[1]) - 1);
+      marks.push({ letter: m[1], start: markerLetterIdx });
+    }
+    for (var i = 0; i < marks.length; i++) {
+      var contentStart = marks[i].start + 2; // после "X)"
+      var end = i + 1 < marks.length ? marks[i + 1].start : text.length;
+      fields[marks[i].letter] = text.slice(contentStart, end).trim();
+    }
+    return fields;
+  }
+
+  // Task 24 (A) + Task 28: Parse NOTAM Schedule field.
+  // Источник: поле D) (через parseNotamFields). Ранее парсился E) — неверно.
+  // Форматы D): "DD HHMM-HHMM", "DAILY HHMM-HHMM", "DLY HHMM-HHMM", "DD HHMM-HHMM DD HHMM-HHMM"
+  // Возвращает: { raw, entries: [{day, from, to}, ...], rawStart, rawEnd } | null
+  function parseSchedule(text) {
+    if (!text) return null;
+    // Task 28: расширена поддержка DAILY/DLY (группа 2) + DD (группа 1) + HHMM-HHMM (группы 3,4)
+    var re = /(?:(\d{2})|(DAILY|DLY))\s+(\d{4})\s*-\s*(\d{4})/gi;
+    var entries = [];
+    var match;
+    var firstIndex = -1;
+    var lastIndex = -1;
+    while ((match = re.exec(text)) !== null) {
+      if (firstIndex === -1) firstIndex = match.index;
+      lastIndex = re.lastIndex;
+      var day = match[1] || (match[2] ? 'DLY' : '');
+      entries.push({
+        day: day,
+        from: match[3].slice(0,2) + ':' + match[3].slice(2),
+        to:   match[4].slice(0,2) + ':' + match[4].slice(2)
+      });
+    }
+    if (entries.length === 0) return null;
+    var rawStart = firstIndex;
+    var beforeText = text.substring(0, firstIndex);
+    var schedPrefix = beforeText.match(/SCHEDULE\s*:\s*$/i);
+    if (schedPrefix) {
+      rawStart = firstIndex - schedPrefix[0].length;
+    }
+    var raw = text.substring(rawStart, lastIndex).trim();
+    return { raw: raw, entries: entries, rawStart: rawStart, rawEnd: lastIndex };
+  }
+
   // Parse date from NOTAM date string
   function parseNotamDate(dateStr) {
     if (!dateStr) return '';
@@ -600,6 +656,23 @@
     if (c === 'high') return '\u0412\u044B\u0441\u043E\u043A\u0430\u044F';
     if (c === 'medium') return '\u0421\u0440\u0435\u0434\u043D\u044F\u044F';
     return '\u041D\u0438\u0437\u043A\u0430\u044F';
+  }
+
+  // Task 24 (A): Render NOTAM schedule block (chips: day + time range)
+  // schedule = { raw, entries: [{day, from, to}, ...] } | null
+  function renderNotamSchedule(schedule) {
+    if (!schedule || !schedule.entries || schedule.entries.length === 0) return '';
+    var chipsHtml = schedule.entries.map(function(e) {
+      return '<span class="metbriefing-notam-schedule-chip">' +
+        '<span class="metbriefing-schedule-day">' + app.escapeHtml(e.day) + '</span>' +
+        '<span class="metbriefing-schedule-time">' + app.escapeHtml(e.from) + '\u2013' + app.escapeHtml(e.to) + '</span>' +
+      '</span>';
+    }).join('');
+    return '<div class="metbriefing-notam-card-schedule">' +
+      '<span class="metbriefing-notam-schedule-icon">' + icon('clock', 14) + '</span>' +
+      '<span class="metbriefing-notam-schedule-label">\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435:</span>' +
+      '<div class="metbriefing-notam-schedule-chips">' + chipsHtml + '</div>' +
+    '</div>';
   }
 
   // Checklist removed — replaced by Weather Maps block
@@ -1988,13 +2061,21 @@
         } catch(e) { /* keep active */ }
       }
 
+      // Task 28: структурный парсинг полей NOTAM (ICAO Annex 15).
+      // D) — Schedule (источник schedule, ранее ошибочно E), E) — Description.
+      var fields = parseNotamFields(text);
+      var desc = fields.E || parseDescription(text);  // E напрямую, fallback на старый
+      var sched = parseSchedule(fields.D || '');      // D напрямую — источник schedule
+      // desc НЕ вырезаем: schedule в D), не в E) — артефактов не возникает
+
       return {
         id: n.id || n.number || '',
         type: parseNotamType(text),
         icao: n.location || code,
         qcode: extractQCode(text),
         subject: parseSubject(text),
-        description: parseDescription(text),
+        description: desc,
+        schedule: sched,          // Task 24 (A) + Task 28: { raw, entries } | null
         fullText: text,
         criticality: classifyNotam(text),
         status: status,
@@ -2330,7 +2411,6 @@
             '<button class="metbriefing-inline-weather-refresh" data-wx-refresh="' + icao + '" aria-label="\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C \u043F\u043E\u0433\u043E\u0434\u0443"' + (wxLoading ? ' disabled' : '') + '>' +
               icon('rotate-ccw', 14, wxLoading ? 'metbriefing-spin' : '') +
             '</button>' +
-            icon('chevron-right', 14, 'metbriefing-inline-weather-chevron') +
           '</div>' +
         '</div>';
 
@@ -2504,34 +2584,66 @@
       return cardsHtml;
     }
 
-    // Build FIR dropdown options: countries with clickable headers
+    // Task 26: Build FIR combobox options (div-based, NOT <option>)
     var firOptionsHtml = '';
-    firOptionsHtml += '<option value="route"' + (state.sigmetFirFilter === 'route' ? ' selected' : '') + '>FIR маршрута (' + routeSigmets.length + ')</option>';
-    firOptionsHtml += '<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</option>';
-    // Countries with clickable country headers + indented FIRs
+    // Task 26 (правка 2): первая строка — informational header «Поиск по FIR» (non-clickable)
+    firOptionsHtml += '<div class="metbriefing-sigmet-fir-search-header" role="heading">Поиск по FIR</div>';
+    firOptionsHtml += '<div class="metbriefing-sigmet-fir-separator"></div>';
+    // Task 26 (правка 3a): Россия первой в сортировке, далее по алфавиту
     if (state.firsData && state.firsData.length > 0) {
       var countryMap = {};
       state.firsData.forEach(function(f) {
         if (!countryMap[f.country]) countryMap[f.country] = [];
         countryMap[f.country].push(f);
       });
-      var countryNames = Object.keys(countryMap).sort();
+      var countryNames = Object.keys(countryMap).sort(function(a, b) {
+        if (a === '\u0420\u043E\u0441\u0441\u0438\u044F') return -1;
+        if (b === '\u0420\u043E\u0441\u0441\u0438\u044F') return 1;
+        return a.localeCompare(b, 'ru');
+      });
       countryNames.forEach(function(cn) {
         var countryFirs = countryMap[cn];
         var countryCount = 0;
         countryFirs.forEach(function(f) {
           countryCount += allSigmets.filter(function(s) { return s.firId === f.firId; }).length;
         });
-        // Clickable country option
-        firOptionsHtml += '<option value="__country__' + cn + '"' + (state.sigmetFirFilter === '__country__' + cn ? ' selected' : '') + '>' + cn + ' (' + countryCount + ')</option>';
-        // Indented FIRs under country
+        // Task 26 (правка 3b): country group — CLICKABLE (data-value=__country__X)
+        var countrySearchStr = (cn + ' ' + cn.toLowerCase()).toLowerCase();
+        firOptionsHtml += '<div class="metbriefing-sigmet-fir-group metbriefing-sigmet-fir-group--clickable' + (state.sigmetFirFilter === '__country__' + cn ? ' metbriefing-sigmet-fir-group--active' : '') + '" data-value="__country__' + app.escapeAttr(cn) + '" data-country="' + app.escapeAttr(cn) + '" data-search="' + app.escapeAttr(countrySearchStr) + '" role="option">' + app.escapeHtml(cn) + ' (' + countryCount + ')</div>';
+        // Task 26 (правка 3b): Indented FIRs under country — NON-CLICKABLE (info only, shows SIGMET count)
         countryFirs.forEach(function(f) {
           var fCount = allSigmets.filter(function(s) { return s.firId === f.firId; }).length;
-          firOptionsHtml += '<option value="' + f.firId + '"' + (state.sigmetFirFilter === f.firId ? ' selected' : '') + '>\u00A0\u00A0' + f.firId + ' \u2014 ' + f.nameRu + ' (' + fCount + ')</option>';
+          var searchStr = (f.firId + ' ' + f.nameRu + ' ' + cn).toLowerCase();
+          firOptionsHtml += '<div class="metbriefing-sigmet-fir-option metbriefing-sigmet-fir-option--indent metbriefing-sigmet-fir-option--info' + (state.sigmetFirFilter === f.firId ? ' metbriefing-sigmet-fir-option--active' : '') + '" data-country="' + app.escapeAttr(cn) + '" data-search="' + app.escapeAttr(searchStr) + '">' + app.escapeHtml(f.firId) + ' \u2014 ' + app.escapeHtml(f.nameRu) + ' (' + fCount + ')</div>';
         });
       });
     }
-    firOptionsHtml += '<option value="all"' + (state.sigmetFirFilter === 'all' ? ' selected' : '') + '>Показать все (' + allSigmets.length + ')</option>';
+    firOptionsHtml += '<div class="metbriefing-sigmet-fir-separator"></div>';
+    firOptionsHtml += '<div class="metbriefing-sigmet-fir-option' + (state.sigmetFirFilter === 'all' ? ' metbriefing-sigmet-fir-option--active' : '') + '" data-value="all" data-search="показать все all" role="option">Показать все (' + allSigmets.length + ')</div>';
+
+    // Task 27 (правка 3): combobox input label — всегда «Поиск по FIR» (не «FIR маршрута (N)»)
+    var currentFirLabel = 'Поиск по FIR';
+    if (state.sigmetFirFilter === 'all') {
+      currentFirLabel = 'Показать все (' + allSigmets.length + ')';
+    } else if (state.sigmetFirFilter && state.sigmetFirFilter.indexOf('__country__') === 0) {
+      var cnLbl = state.sigmetFirFilter.substring('__country__'.length);
+      var cnCnt = 0;
+      if (state.firsData) {
+        state.firsData.forEach(function(f) {
+          if (f.country === cnLbl) cnCnt += allSigmets.filter(function(s) { return s.firId === f.firId; }).length;
+        });
+      }
+      currentFirLabel = cnLbl + ' (' + cnCnt + ')';
+    } else if (state.sigmetFirFilter && state.sigmetFirFilter !== 'route') {
+      var fLbl = state.sigmetFirFilter;
+      var fCnt = allSigmets.filter(function(s) { return s.firId === state.sigmetFirFilter; }).length;
+      if (state.firsData) {
+        for (var fi2 = 0; fi2 < state.firsData.length; fi2++) {
+          if (state.firsData[fi2].firId === state.sigmetFirFilter) { fLbl = state.firsData[fi2].firId + ' \u2014 ' + state.firsData[fi2].nameRu; break; }
+        }
+      }
+      currentFirLabel = fLbl + ' (' + fCnt + ')';
+    }
 
     // Render SIGMET section
     html += '<div class="metbriefing-status-section metbriefing-status-section--full-bleed">' +
@@ -2550,26 +2662,36 @@
       html += '<div class="metbriefing-sigmet-empty">' + icon('rotate-ccw', 14, 'metbriefing-spin') + '<span>Загрузка SIGMET...</span></div>';
     }
     else {
-      // Route SIGMET display (above dropdown, when filter = 'route')
-      if (state.sigmetFirFilter === 'route') {
-        // Show route FIR list
-        if (routeFirIds.length > 0) {
-          html += '<div class="metbriefing-sigmet-route-firs">FIR: ' + routeFirIds.join(', ') + '</div>';
-        }
-        // Route SIGMET cards or "not found" message
-        if (routeSigmets.length === 0) {
-          var routeEmptyMsg = routeFirIds.length > 0 ? 'SIGMET по маршруту не обнаружены (AWC: только US/Intl)' : 'Добавьте аэропорты для проверки SIGMET';
-          html += '<div class="metbriefing-sigmet-empty metbriefing-sigmet-empty--ok">' + icon('check-circle', 14) + '<span>' + routeEmptyMsg + '</span></div>';
-        } else {
-          html += renderSigmetCards(routeSigmets, 0);
-        }
+      // Task 27 (правка 2): Route SIGMET display — ВСЕГДА (FIR МАРШРУТА + route cards),
+      // независимо от выбранного фильтра. Не пропадает после поиска по FIR.
+      if (routeFirIds.length > 0) {
+        html += '<div class="metbriefing-sigmet-route-firs">FIR МАРШРУТА: ' + routeFirIds.join(', ') + '</div>';
+      }
+      if (routeSigmets.length === 0) {
+        var routeEmptyMsg = routeFirIds.length > 0 ? 'SIGMET по маршруту не обнаружены (AWC: только US/Intl)' : 'Добавьте аэропорты для проверки SIGMET';
+        html += '<div class="metbriefing-sigmet-empty metbriefing-sigmet-empty--ok">' + icon('check-circle', 14) + '<span>' + routeEmptyMsg + '</span></div>';
+      } else {
+        html += renderSigmetCards(routeSigmets, 0);
       }
 
-      // FIR filter dropdown (always shown)
+      // Task 24 (B2-B): FIR filter combobox (custom, searchable) — replaces <select>
       html += '<div class="metbriefing-sigmet-filter">' +
-        '<select class="metbriefing-sigmet-fir-select" data-sigmet-fir-select aria-label="Фильтр по FIR">' + firOptionsHtml + '</select></div>';
+        '<div class="metbriefing-sigmet-fir-combobox" data-sigmet-fir-combobox>' +
+          '<div class="ct-search-input-wrap metbriefing-sigmet-fir-input-wrap">' +
+            '<span class="ct-search-icon">' + icon('search', 18) + '</span>' +
+            '<input type="text" class="ct-search-input" data-sigmet-fir-input ' +
+                   'data-label="' + app.escapeAttr(currentFirLabel) + '" ' +
+                   'placeholder="' + app.escapeAttr(currentFirLabel) + '" ' +
+                   'value="' + app.escapeAttr(currentFirLabel) + '" ' +
+                   'aria-label="Фильтр по FIR" aria-expanded="false" ' +
+                   'aria-autocomplete="list" role="combobox" autocomplete="off">' +
+            '<span class="metbriefing-sigmet-fir-chevron" data-sigmet-fir-chevron>' + icon('chevron-down', 16) + '</span>' +
+          '</div>' +
+          '<div class="metbriefing-sigmet-fir-dropdown" data-sigmet-fir-dropdown hidden>' + firOptionsHtml + '</div>' +
+        '</div></div>';
 
-      // Non-route SIGMET display (below dropdown, when filter !== 'route')
+      // Task 27 (правка 2): Filtered SIGMET display — ДОПОЛНИТЕЛЬНО под combobox,
+      // только если выбран не route-фильтр (страна/все/отдельный FIR).
       if (state.sigmetFirFilter !== 'route') {
         if (filteredSigmets.length === 0) {
           html += '<div class="metbriefing-sigmet-empty metbriefing-sigmet-empty--ok">' + icon('check-circle', 14) + '<span>SIGMET не обнаружены (' + firFilterLabel + ')</span></div>';
@@ -2597,11 +2719,11 @@
         var lowCount = activeNotams.filter(function(n) { return n.criticality === 'low'; }).length;
 
         html += '<div class="metbriefing-inline-notam ' + (isExpanded ? 'metbriefing-inline-notam--expanded' : '') + '">' +
-          '<div class="metbriefing-inline-notam-header" data-notam-toggle="' + icao + '" role="button" tabindex="0" aria-expanded="' + isExpanded + '" aria-label="' + (isExpanded ? '\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C' : '\u0420\u0430\u0437\u0432\u0435\u0440\u043D\u0443\u0442\u044C') + ' NOTAM ' + icao + '">' +
+          '<div class="metbriefing-inline-notam-header" data-notam-toggle="' + app.escapeAttr(icao) + '" role="button" tabindex="0" aria-expanded="' + isExpanded + '" aria-label="' + (isExpanded ? '\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C' : '\u0420\u0430\u0437\u0432\u0435\u0440\u043D\u0443\u0442\u044C') + ' NOTAM ' + app.escapeAttr(icao) + '">' +
             '<div class="metbriefing-inline-notam-airport">' +
               icon(isExpanded ? 'chevron-down' : 'chevron-right', 14, 'metbriefing-inline-notam-chevron') +
-              '<span class="metbriefing-inline-notam-icao">' + icao + '</span>' +
-              (ntData && ntData.airportName ? '<span class="metbriefing-inline-notam-name">' + ntData.airportName + '</span>' : '') +
+              '<span class="metbriefing-inline-notam-icao"' + app.langAttr(icao) + '>' + app.escapeHtml(icao) + '</span>' +
+              (ntData && ntData.airportName ? '<span class="metbriefing-inline-notam-name"' + app.langAttr(ntData.airportName) + '>' + app.escapeHtml(ntData.airportName) + '</span>' : '') +
             '</div>' +
             '<div class="metbriefing-inline-notam-actions">' +
               (ntLoading ? icon('rotate-ccw', 14, 'metbriefing-spin') :
@@ -2615,11 +2737,11 @@
           '</div>';
 
         if (ntLoading && !ntData) html += '<div class="metbriefing-inline-loading">' + icon('rotate-ccw', 18, 'metbriefing-spin') + '<span>\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430 NOTAM...</span></div>';
-        if (ntError && !ntData) html += '<div class="metbriefing-inline-error">' + icon('alert-triangle', 14) + '<span>' + ntError + '</span><button class="metbriefing-inline-retry" data-nt-retry="' + icao + '">\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C</button></div>';
+        if (ntError && !ntData) html += '<div class="metbriefing-inline-error">' + icon('alert-triangle', 14) + '<span>' + app.escapeHtml(ntError) + '</span><button class="metbriefing-inline-retry" data-nt-retry="' + app.escapeAttr(icao) + '">\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C</button></div>';
 
         if (isExpanded && ntData) {
           html += '<div class="metbriefing-inline-notam-details">';
-          if (ntData.message) html += '<div class="metbriefing-inline-notam-message">' + ntData.message + '</div>';
+          if (ntData.message) html += '<div class="metbriefing-inline-notam-message"' + app.langAttr(ntData.message) + '>' + app.renderRichText(ntData.message) + '</div>';
           if (activeNotams.length === 0) {
             html += '<div class="metbriefing-inline-notam-empty">\u041D\u0435\u0442 \u0430\u043A\u0442\u0438\u0432\u043D\u044B\u0445 NOTAM</div>';
           } else {
@@ -2664,10 +2786,10 @@
       var imgSrc = (cached && cached.blobUrl) ? cached.blobUrl : map.url;
       var isMapStale = !cached || !cached.blobUrl || isStale(cached.fetchedAt, WX_MAP_STALE_MS);
       html += '<div class="metbriefing-wx-map-thumb' + (map.full ? ' metbriefing-wx-map-thumb--full' : '') + '" data-wx-map-idx="' + idx + '">' +
-        '<img src="' + imgSrc + '" data-full-src="' + (cached && cached.blobUrl ? cached.blobUrl : map.url) + '" data-wx-map-url="' + map.url + '" alt="' + map.label + '" loading="lazy" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' +
+        '<img class="ct-img-dark-invert" src="' + app.escapeAttr(imgSrc) + '" data-full-src="' + app.escapeAttr(cached && cached.blobUrl ? cached.blobUrl : map.url) + '" data-wx-map-url="' + app.escapeAttr(map.url) + '" alt="' + app.escapeAttr(map.label) + '" loading="lazy" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' +
         (state.wxMapLoading ? '<div class="metbriefing-wx-map-thumb-loading">' + icon('rotate-ccw', 24, 'metbriefing-spin') + '</div>' :
          isMapStale ? '<div class="metbriefing-wx-map-thumb-loading metbriefing-wx-map-thumb-loading--stale">' + icon('alert-triangle', 20) + '</div>' : '') +
-        '<div class="metbriefing-wx-map-label">' + map.label + '</div>' +
+        '<div class="metbriefing-wx-map-label"' + app.langAttr(map.label) + '>' + app.escapeHtml(map.label) + '</div>' +
       '</div>';
     });
     html += '</div></div>';
@@ -2702,7 +2824,7 @@
         '<div class="metbriefing-wind-map-container">' +
           (state.windMapLoading && !windImgSrc ? '<div class="metbriefing-wx-map-thumb-loading">' + icon('rotate-ccw', 24, 'metbriefing-spin') + '</div>' : '') +
           (windImgSrc ?
-            '<img class="metbriefing-wind-map-img" src="' + windImgSrc + '" data-full-src="' + windImgSrc + '" alt="\u0412\u0435\u0442\u0435\u0440 FL' + curLevel + ' +' + windCfg.hours + '\u0447 (' + app.escapeHtml(windCfg.areaLabel || windCfg.area) + ')" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' :
+            '<img class="metbriefing-wind-map-img ct-img-dark-invert" src="' + app.escapeAttr(windImgSrc) + '" data-full-src="' + app.escapeAttr(windImgSrc) + '" alt="\u0412\u0435\u0442\u0435\u0440 FL' + curLevel + ' +' + windCfg.hours + '\u0447 (' + app.escapeHtml(windCfg.areaLabel || windCfg.area) + ')" onerror="this.style.display=\'none\';" onload="this.style.display=\'\';">' :
             (!state.windMapLoading ? '<div class="metbriefing-wind-map-placeholder">\u041A\u0430\u0440\u0442\u0430 \u043D\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u0430. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u2197 \u0434\u043B\u044F \u043F\u0440\u0435\u0434\u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438.</div>' : '')) +
         '</div>' +
       '</div>';
@@ -3236,12 +3358,12 @@
         var activeCount = allAirportNotams.filter(function(n) { return n.status === 'active'; }).length;
         var isExpanded = !!state.expandedNotamTab[icao];
 
-        html += '<div class="metbriefing-notam-group' + (isExpanded ? ' metbriefing-notam-group--expanded' : '') + '" data-nt-group-icao="' + icao + '">' +
-          '<div class="metbriefing-notam-group-header" data-nt-group-toggle="' + icao + '" role="button" tabindex="0" aria-expanded="' + isExpanded + '">' +
+        html += '<div class="metbriefing-notam-group' + (isExpanded ? ' metbriefing-notam-group--expanded' : '') + '" data-nt-group-icao="' + app.escapeAttr(icao) + '">' +
+          '<div class="metbriefing-notam-group-header" data-nt-group-toggle="' + app.escapeAttr(icao) + '" role="button" tabindex="0" aria-expanded="' + isExpanded + '">' +
             '<div class="metbriefing-notam-group-airport">' +
               icon(isExpanded ? 'chevron-down' : 'chevron-right', 16, 'metbriefing-notam-group-chevron') +
-              '<span class="metbriefing-notam-group-icao">' + icao + '</span>' +
-              (d && d.airportName ? '<span class="metbriefing-notam-group-name">' + d.airportName + '</span>' : '') +
+              '<span class="metbriefing-notam-group-icao"' + app.langAttr(icao) + '>' + app.escapeHtml(icao) + '</span>' +
+              (d && d.airportName ? '<span class="metbriefing-notam-group-name"' + app.langAttr(d.airportName) + '>' + app.escapeHtml(d.airportName) + '</span>' : '') +
             '</div>' +
             '<div class="metbriefing-notam-group-badges">' +
               (isLoading ? icon('rotate-ccw', 14, 'metbriefing-spin') :
@@ -3287,6 +3409,7 @@
                 '</div>' +
                 '<div class="metbriefing-notam-card-subject">' + app.escapeHtml(notam.subject) + '</div>' +
                 '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + app.escapeHtml(l) + '</p>'; }).join('') + '</div>' +
+                renderNotamSchedule(notam.schedule) +
                 '<div class="metbriefing-notam-card-dates">' +
                   '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u0421:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveFrom) + '</span></div>' +
                   '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u041F\u043E:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveTo) + '</span></div>' +
@@ -3442,6 +3565,7 @@
           '</div>' +
           '<div class="metbriefing-notam-card-subject">' + app.escapeHtml(notam.subject) + '</div>' +
           '<div class="metbriefing-notam-card-description">' + notam.description.split('\n').map(function(l) { return '<p>' + app.escapeHtml(l) + '</p>'; }).join('') + '</div>' +
+          renderNotamSchedule(notam.schedule) +
           '<div class="metbriefing-notam-card-dates">' +
             '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u0421:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveFrom) + '</span></div>' +
             '<div class="metbriefing-notam-date-item">' + icon('clock', 14) + '<span class="metbriefing-notam-date-label">\u041F\u043E:</span><span class="metbriefing-notam-date-value">' + formatNotamDate(notam.effectiveTo) + '</span></div>' +
@@ -3897,6 +4021,67 @@
           return;
         }
 
+        // Task 24 (B2-B): SIGMET FIR combobox — chevron click (toggle dropdown)
+        var firChevron = e.target.closest('[data-sigmet-fir-chevron]');
+        if (firChevron) {
+          var firCb = firChevron.closest('[data-sigmet-fir-combobox]');
+          if (firCb) {
+            var firDd = firCb.querySelector('[data-sigmet-fir-dropdown]');
+            var firInp = firCb.querySelector('[data-sigmet-fir-input]');
+            if (firDd && firInp) {
+              if (firDd.hasAttribute('hidden')) {
+                firDd.removeAttribute('hidden');
+                firInp.setAttribute('aria-expanded', 'true');
+                setTimeout(function() { firInp.select(); }, 0);
+              } else {
+                firDd.setAttribute('hidden', '');
+                firInp.setAttribute('aria-expanded', 'false');
+                firInp.value = firInp.getAttribute('data-label') || '';
+                var clr = firCb.querySelector('[data-sigmet-fir-clear]');
+                if (clr) clr.remove();
+              }
+            }
+          }
+          return;
+        }
+
+        // Task 26 (правка 3c): SIGMET FIR combobox — option/group click (любой [data-value])
+        var firOpt = e.target.closest('[data-sigmet-fir-combobox] [data-value]');
+        if (firOpt) {
+          var optVal = firOpt.getAttribute('data-value');
+          if (optVal) {
+            state.sigmetFirFilter = optVal;
+            renderCurrentTab();
+          }
+          return;
+        }
+
+        // Task 26 (правка 3e): SIGMET FIR combobox — clear button (reset к route + clear search)
+        var firClearBtn = e.target.closest('[data-sigmet-fir-clear]');
+        if (firClearBtn) {
+          var firCbClr = firClearBtn.closest('[data-sigmet-fir-combobox]');
+          if (firCbClr) {
+            var firInpClr = firCbClr.querySelector('[data-sigmet-fir-input]');
+            if (firInpClr) {
+              firInpClr.value = '';
+              firInpClr.focus();
+              var ddClr = firCbClr.querySelector('[data-sigmet-fir-dropdown]');
+              if (ddClr) {
+                ddClr.querySelectorAll('.metbriefing-sigmet-fir-option, .metbriefing-sigmet-fir-group, .metbriefing-sigmet-fir-search-header').forEach(function(el) {
+                  el.removeAttribute('hidden');
+                });
+              }
+              firClearBtn.remove();
+              // Task 26: если фильтр не route — сбросить на route (компенсация убранной «FIR маршрута» option)
+              if (state.sigmetFirFilter !== 'route') {
+                state.sigmetFirFilter = 'route';
+                renderCurrentTab();
+              }
+            }
+          }
+          return;
+        }
+
         // SIGMET raw text toggle
         var sigmetRawToggle = e.target.closest('[data-sigmet-raw-toggle]');
         if (sigmetRawToggle) {
@@ -3910,12 +4095,142 @@
         }
     });
 
-    // SIGMET FIR filter dropdown (change event doesn't bubble to click)
-    container.addEventListener('change', function(e) {
-      var firSelect = e.target.closest('[data-sigmet-fir-select]');
-      if (firSelect) {
-        state.sigmetFirFilter = firSelect.value;
-        renderCurrentTab();
+    // Task 24 (B2-B): SIGMET FIR combobox — input (filter options live)
+    container.addEventListener('input', function(e) {
+      var firInput = e.target.closest('[data-sigmet-fir-input]');
+      if (!firInput) return;
+      var firCb = firInput.closest('[data-sigmet-fir-combobox]');
+      if (!firCb) return;
+      var query = firInput.value.toLowerCase().trim();
+      var dd = firCb.querySelector('[data-sigmet-fir-dropdown]');
+      if (!dd) return;
+      var groupVisible = {};
+      dd.querySelectorAll('.metbriefing-sigmet-fir-option').forEach(function(opt) {
+        var search = opt.getAttribute('data-search') || '';
+        var match = !query || search.indexOf(query) !== -1;
+        if (match) {
+          opt.removeAttribute('hidden');
+          var c = opt.getAttribute('data-country');
+          if (c) groupVisible[c] = true;
+        } else {
+          opt.setAttribute('hidden', '');
+        }
+      });
+      dd.querySelectorAll('.metbriefing-sigmet-fir-group').forEach(function(g) {
+        var c = g.getAttribute('data-country');
+        if (groupVisible[c]) g.removeAttribute('hidden');
+        else g.setAttribute('hidden', '');
+      });
+      // Show/hide clear button
+      var wrap = firInput.closest('.ct-search-input-wrap');
+      var existingClear = wrap && wrap.querySelector('[data-sigmet-fir-clear]');
+      var hasSearch = firInput.value && firInput.value !== firInput.getAttribute('data-label');
+      if (hasSearch) {
+        if (!existingClear) {
+          var btn = document.createElement('button');
+          btn.className = 'ct-search-clear visible';
+          btn.setAttribute('data-sigmet-fir-clear', '');
+          btn.setAttribute('aria-label', '\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C');
+          btn.innerHTML = icon('x', 16);
+          var chev = wrap.querySelector('[data-sigmet-fir-chevron]');
+          if (chev) wrap.insertBefore(btn, chev);
+          else wrap.appendChild(btn);
+        }
+      } else if (existingClear) {
+        existingClear.remove();
+      }
+    });
+
+    // Task 24 (B2-B): SIGMET FIR combobox — focus (open dropdown + select text)
+    container.addEventListener('focusin', function(e) {
+      var firInput = e.target.closest('[data-sigmet-fir-input]');
+      if (!firInput) return;
+      var firCb = firInput.closest('[data-sigmet-fir-combobox]');
+      if (!firCb) return;
+      var dd = firCb.querySelector('[data-sigmet-fir-dropdown]');
+      if (dd && dd.hasAttribute('hidden')) {
+        dd.removeAttribute('hidden');
+        firInput.setAttribute('aria-expanded', 'true');
+      }
+      setTimeout(function() { firInput.select(); }, 0);
+    });
+
+    // Task 24 (B2-B): SIGMET FIR combobox — blur (close dropdown + revert input)
+    container.addEventListener('focusout', function(e) {
+      var firInput = e.target.closest('[data-sigmet-fir-input]');
+      if (!firInput) return;
+      var firCb = firInput.closest('[data-sigmet-fir-combobox]');
+      if (!firCb) return;
+      // Delay to allow click on option/clear to register
+      setTimeout(function() {
+        var activeEl = document.activeElement;
+        if (activeEl && firCb.contains(activeEl)) return;
+        var dd = firCb.querySelector('[data-sigmet-fir-dropdown]');
+        if (dd) dd.setAttribute('hidden', '');
+        firInput.setAttribute('aria-expanded', 'false');
+        firInput.value = firInput.getAttribute('data-label') || '';
+        var clr = firCb.querySelector('[data-sigmet-fir-clear]');
+        if (clr) clr.remove();
+        if (dd) {
+          dd.querySelectorAll('.metbriefing-sigmet-fir-option, .metbriefing-sigmet-fir-group').forEach(function(el) {
+            el.removeAttribute('hidden');
+          });
+        }
+      }, 150);
+    });
+
+    // Task 24 (B2-B): SIGMET FIR combobox — keyboard (Esc, ArrowDown/Up, Enter)
+    container.addEventListener('keydown', function(e) {
+      var firInput = e.target.closest('[data-sigmet-fir-input]');
+      if (!firInput) return;
+      var firCb = firInput.closest('[data-sigmet-fir-combobox]');
+      if (!firCb) return;
+      var dd = firCb.querySelector('[data-sigmet-fir-dropdown]');
+      if (!dd) return;
+
+      if (e.key === 'Escape') {
+        if (!dd.hasAttribute('hidden')) {
+          dd.setAttribute('hidden', '');
+          firInput.setAttribute('aria-expanded', 'false');
+          firInput.value = firInput.getAttribute('data-label') || '';
+          var clr = firCb.querySelector('[data-sigmet-fir-clear]');
+          if (clr) clr.remove();
+          firInput.blur();
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        var opts = Array.from(dd.querySelectorAll('.metbriefing-sigmet-fir-option:not([hidden])'));
+        if (opts.length === 0) return;
+        var currentIdx = -1;
+        for (var i = 0; i < opts.length; i++) {
+          if (opts[i].classList.contains('metbriefing-sigmet-fir-option--highlighted')) { currentIdx = i; break; }
+        }
+        var newIdx;
+        if (e.key === 'ArrowDown') {
+          newIdx = currentIdx === -1 ? 0 : Math.min(currentIdx + 1, opts.length - 1);
+        } else {
+          newIdx = currentIdx === -1 ? opts.length - 1 : Math.max(currentIdx - 1, 0);
+        }
+        opts.forEach(function(o) { o.classList.remove('metbriefing-sigmet-fir-option--highlighted'); });
+        opts[newIdx].classList.add('metbriefing-sigmet-fir-option--highlighted');
+        opts[newIdx].scrollIntoView({ block: 'nearest' });
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        var highlighted = dd.querySelector('.metbriefing-sigmet-fir-option--highlighted:not([hidden])');
+        if (highlighted) {
+          e.preventDefault();
+          var val = highlighted.getAttribute('data-value');
+          if (val) {
+            state.sigmetFirFilter = val;
+            renderCurrentTab();
+          }
+        }
+        return;
       }
     });
 

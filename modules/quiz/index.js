@@ -207,11 +207,10 @@
       var row = document.createElement('div');
       row.className = 'history-row' + (hasErrors ? ' history-row-clickable' : '');
 
-      var gradeColor = Number(item.grade) >= 4 ? 'var(--color-success)' : Number(item.grade) >= 3 ? 'var(--color-warning)' : 'var(--color-danger)';
       var dateStr = new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
       row.innerHTML =
-        '<div class="history-grade" style="--grade-color:' + gradeColor + '">' + window.app.escapeHtml(item.grade) + '</div>' +
+        '<div class="history-grade" data-grade="' + window.app.escapeAttr(String(item.grade)) + '">' + window.app.escapeHtml(item.grade) + '</div>' +
         '<div class="history-info">' +
           '<div class="history-test-name"' + window.app.langAttr(item.testName) + '>' + window.app.escapeHtml(item.testName) + '</div>' +
           '<div class="history-meta">' +
@@ -722,7 +721,7 @@
       S.shuffledAnswers.forEach(function (ans, idx) {
         var btn = document.createElement('button');
         btn.className = isMulti ? 'answer-btn answer-multi' : 'answer-btn';
-        btn.innerHTML = '<span class="answer-letter">' + LETTERS[idx] + '</span><span' + window.app.langAttr(ans.text) + '>' + window.app.escapeHtml(ans.text) + '</span>';
+        btn.innerHTML = '<span class="answer-letter">' + LETTERS[idx] + '</span><span' + window.app.langAttr(ans.text) + '>' + window.app.wrapLongWords(window.app.escapeHtml(ans.text)) + '</span>';
         if (isMulti) {
           btn.addEventListener('click', function () { toggleMultiAnswer(idx, btn); });
         } else {
@@ -1277,7 +1276,7 @@
      MODULE CONTRACT IMPLEMENTATION — init / destroy
      ═══════════════════════════════════════════════════════════════ */
 
-  function init() {
+  function init(params) {
     container = document.getElementById('quizContainer');
     if (!container) {
       console.error('Quiz module: container #quizContainer not found');

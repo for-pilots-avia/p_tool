@@ -23,7 +23,7 @@
 }
 
 .divider-list-label {
-  font-size: var(--font-xs);
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--color-text-main);
   text-transform: uppercase;
@@ -37,6 +37,7 @@
 
 /* ВЕРХНИЙ УРОВЕНЬ (depth=1) — ЖИРНЫЙ */
 .divider-list[data-depth="1"] > .divider-list-toggle > .divider-list-label {
+  font-size: var(--font-md);
   font-weight: 700;
 }
 
@@ -120,7 +121,7 @@
 }
 
 .list-divider-label {
-  font-size: var(--font-xs);
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
@@ -184,9 +185,9 @@
   border: 1px solid rgba(220, 53, 69, 0.3);
 }
 .badge--info {
-  background: transparent;
-  color: inherit;
-  border: 1px solid transparent;
+  background: rgba(128, 128, 128, 0.12);
+  color: var(--color-text-muted);
+  border: 1px solid rgba(128, 128, 128, 0.3);
 }
 
 /* ─── Items blocks (палитра фон + левая граница) ───
@@ -222,7 +223,7 @@
 }
 
 .items-block-title {
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -314,7 +315,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 
 .flightprocedures-card-title {
-  font-size: var(--font-base);
+  font-size: var(--font-md);
   font-weight: 600;
   color: var(--color-text-main);
   line-height: 1.4;
@@ -452,7 +453,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 
 .flightprocedures-text-block-title {
-  font-size: var(--font-base);
+  font-size: var(--font-md);
   font-weight: 700;
   color: var(--color-text-main);
   margin-bottom: 6px;
@@ -473,7 +474,8 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 
 .flightprocedures-table-inline table {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   border-collapse: collapse;
   font-size: var(--font-sm);
 }
@@ -481,7 +483,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 .flightprocedures-table-inline th,
 .flightprocedures-table-inline td {
   border: 1px solid var(--color-border);
-  padding: 8px 10px;
+  padding: 2px 6px;
   text-align: left;
   vertical-align: top;
 }
@@ -510,7 +512,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 
 .flightprocedures-notes-title {
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -541,7 +543,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 
 .flightprocedures-criteria-title {
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -634,9 +636,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 
 [data-block="heading"] h2,
 [data-block="heading"] h3,
-[data-block="heading"] h4,
-[data-block="heading"] h5,
-[data-block="heading"] h6 {
+[data-block="heading"] h4 {
   font-size: var(--font-base);
   font-weight: 700;
   color: var(--color-text-main);
@@ -644,11 +644,11 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
   line-height: 1.35;
 }
 
-[data-block="heading"][data-level="2"] h2 { font-size: 1.125rem; }
-[data-block="heading"][data-level="3"] h3 { font-size: 1rem; }
-[data-block="heading"][data-level="4"] h4 { font-size: 0.9375rem; color: var(--color-danger); }
-[data-block="heading"][data-level="5"] h5 { font-size: 0.875rem; }
-[data-block="heading"][data-level="6"] h6 { font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; }
+[data-block="heading"][data-level="2"] h2 { font-size: var(--font-md); }
+[data-block="heading"][data-level="3"] h3 { font-size: var(--font-base); }
+[data-block="heading"][data-level="4"] h4 { font-size: var(--font-sm); color: var(--color-danger); }
+[data-block="heading"][data-level="5"] h5 { font-size: var(--font-sm); }
+[data-block="heading"][data-level="6"] h6 { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 0.04em; }
 
 /* ─── data-block: procedure / checklist ─── */
 [data-block="procedure"],
@@ -844,7 +844,8 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 [data-block="table-file"] table,
 .flightprocedures-table-inline table,
 .flightprocedures-table-file table {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   border-collapse: collapse;
   font-size: var(--font-sm);
 }
@@ -858,7 +859,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 .flightprocedures-table-file th,
 .flightprocedures-table-file td {
   border: 1px solid var(--color-border);
-  padding: 8px 10px;
+  padding: 2px 6px;
   text-align: left;
   vertical-align: top;
 }
@@ -946,7 +947,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 
 .flightprocedures-block-card > .block-card-title,
 [data-block="sub-section"] > .block-subsection-title {
-  font-size: var(--font-base);
+  font-size: var(--font-md);
   font-weight: 700;
   color: var(--color-text-main);
   margin: 0 0 8px;
@@ -961,10 +962,11 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 /* ─── References ─── */
 .flightprocedures-refs {
   margin-top: 4px;
+  padding-left: var(--accordion-indent);
 }
 
 .flightprocedures-refs-title {
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1080,6 +1082,23 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
   }
 }
 
+/* Image item wrapper (img + optional caption) — flex column */
+.image-item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Per-image caption (под миниатюрой) */
+.block-image-item-caption {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: 4px;
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 /* Multi-image grid (Variant 1): fixed square thumbnails */
 .flightprocedures-image-gallery[data-count]:not([data-count="1"]) {
   display: grid;
@@ -1088,7 +1107,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
   padding: 8px;
 }
 
-.flightprocedures-image-gallery[data-count]:not([data-count="1"]) .flightprocedures-image-thumb {
+.flightprocedures-image-gallery[data-count]:not([data-count="1"]) .image-item .flightprocedures-image-thumb {
   width: 100%;
   max-height: none;
   aspect-ratio: 1 / 1;
@@ -1121,7 +1140,8 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
   border: 1px solid var(--color-border-subtle);
 }
 .flightprocedures-table-wrap table {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   border-collapse: collapse;
   font-size: var(--font-sm);
   line-height: 1.5;
@@ -1211,11 +1231,14 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 
 /* ─── Inline badges in content ─── */
-.flightprocedures-card-content .badge {
+.flightprocedures-card[data-depth] .flightprocedures-card-content .badge {
   vertical-align: middle;
   margin: 0 2px;
   position: relative;
   top: -1px;
+  padding: 1px 5px;
+  font-size: var(--font-xs);
+  border-radius: 6px;
 }
 
 .flightprocedures-description .badge {
@@ -1258,7 +1281,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 
 .module-link::after {
   content: ' →';
-  font-size: 0.9em;
+  font-size: var(--font-sm);
 }
 
 /* ─── Nested accordion (depth 2+) ─── */
@@ -1291,23 +1314,23 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
    Это разделяет оформление и типографику: GROUP/CARD/CHILD всегда
    выглядят одинаково (chrome), но размер шрифта уменьшается с глубиной. */
 .flightprocedures-card[data-depth="2"] .flightprocedures-card-title {
-  font-size: var(--font-sm);
+  font-size: var(--font-base);
   font-weight: 600;
 }
 
 .flightprocedures-card[data-depth="2"] .badge {
   padding: 2px 7px;
-  font-size: 0.6rem;
+  font-size: var(--font-xs);
 }
 
 .flightprocedures-card[data-depth="3"] .flightprocedures-card-title {
-  font-size: var(--font-xs);
+  font-size: var(--font-base);
   font-weight: 500;
 }
 
 .flightprocedures-card[data-depth="3"] .badge {
   padding: 1px 6px;
-  font-size: 0.55rem;
+  font-size: var(--font-xs);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1490,7 +1513,7 @@ body.dark-theme .flightprocedures-card--group.open .flightprocedures-card-header
   }
 
   .flightprocedures-card-title {
-    font-size: var(--font-sm);
+    font-size: var(--font-base);
     line-height: 1.4;
     word-break: break-word;
     overflow-wrap: break-word;

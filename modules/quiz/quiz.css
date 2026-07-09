@@ -28,6 +28,13 @@ body.dark-theme #quizContainer {
   --color-toggle-shadow: rgba(0, 0, 0, 0.35);
 }
 
+/* ─── Grade color mapping via data-grade (MODULE_CONTRACT §7 — no inline styles) ─── */
+#quizContainer [data-grade="5"],
+#quizContainer [data-grade="4"] { --grade-color: var(--color-success); }
+#quizContainer [data-grade="3"] { --grade-color: var(--color-warning); }
+#quizContainer [data-grade="2"],
+#quizContainer [data-grade="1"] { --grade-color: var(--color-danger); }
+
 /* ─── Quiz badges ─── */
 .quiz-badge {
   display: inline-flex;
@@ -56,8 +63,8 @@ body.dark-theme #quizContainer {
   z-index: 9999;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.25s var(--transition-ease),
-              visibility 0.25s var(--transition-ease);
+  transition: opacity var(--transition-speed) var(--transition-ease),
+              visibility var(--transition-speed) var(--transition-ease);
 }
 .quiz-overlay-visible {
   opacity: 1;
@@ -392,6 +399,9 @@ body.dark-theme #quizContainer {
 }
 
 /* ─── Grade display ─── */
+/* 4rem (64px) — display-элемент финальной оценки. Больше --font-hero (clamp 28-44px),
+   намеренный хардкод по MODULE_CONTRACT §7 «ШКАЛА ШРИФТОВ»: в шкале нет токена
+   для display-цифр. Альтернатива — clamp(3rem, 8vw, 4rem) для адаптивности на узких экранах. */
 .grade-display {
   font-size: 4rem;
   font-weight: 800;
@@ -750,7 +760,7 @@ body.dark-theme #quizContainer {
   }
 }
 .animate-fade-in {
-  animation: fadeIn 0.25s var(--transition-ease-out) both;
+  animation: fadeIn var(--transition-speed) var(--transition-ease-out) both;
 }
 
 /* ─── Screen hidden helper ─── */

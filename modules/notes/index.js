@@ -23,6 +23,17 @@
   var _drawCategory = '';
   var _drawHasContent = false;
   var _drawPoints = [];
+  /* Canvas colors — читаются из CSS-переменных #notesContainer при initCanvas.
+     Light theme: bg=#ffffff, stroke=#1a1a1a (white canvas, black ink).
+     Dark theme: bg=#1a1a1a, stroke=#e8e8e8 (black canvas, white ink). */
+  var _canvasBg = '#ffffff';
+  var _canvasInk = '#1a1a1a';
+  /* MutationObserver на body.class — обновляет canvas при переключении темы.
+     Без этого canvas bitmap остаётся старым (CSS vars обновляются, но ctx.fillStyle/
+     strokeStyle — нет), и линии рисуются цветом контрастным к старому bg, но
+     невидимым на новом. Сценарий: пользователь открыл canvas в светлой теме,
+     переключил на тёмную — рисует чёрным по чёрному (невидимо). */
+  var _themeObserver = null;
   var _editingTextId = null;        /* null = новая, number = редактирование */
   var _textCategory = '';
   var _cachedDrawNotes = [];
@@ -447,11 +458,8 @@
     for (var t = 0; t < CATEGORY_TABS.length; t++) {
       var tabClass = 'notes-category-tab';
       if (CATEGORY_TABS[t].key === _activeCategory) tabClass += ' notes-category-tab--active';
-      var tabStyle = '';
-      if (CAT_COLORS[CATEGORY_TABS[t].key]) {
-        tabStyle = ' style="--pill-border:' + CAT_COLORS[CATEGORY_TABS[t].key] + '"';
-      }
-      html += '<button class="' + tabClass + '" data-cat-key="' + CATEGORY_TABS[t].key + '"' + tabStyle + '>' + CATEGORY_TABS[t].label + '</button>';
+      var tabDataCat = CAT_COLORS[CATEGORY_TABS[t].key] ? ' data-cat="' + CATEGORY_TABS[t].key + '"' : '';
+      html += '<button class="' + tabClass + '" data-cat-key="' + CATEGORY_TABS[t].key + '"' + tabDataCat + '>' + CATEGORY_TABS[t].label + '</button>';
     }
     html += '</div>';
 
@@ -509,28 +517,28 @@
 
   /* ── Render text note as list item ── */
   function renderTextNoteItem(note) {
-    var borderColor = getCategoryBorderColor(note.category);
-    var html = '<div class="notes-text-item" data-id="' + note.id + '">';
+    var catAttr = note.category ? ' data-cat="' + window.app.escapeAttr(note.category) + '"' : '';
+    var html = '<div class="notes-text-item"' + catAttr + ' data-id="' + window.app.escapeAttr(String(note.id)) + '">';
 
-    /* Accent bar */
-    html += '<div class="notes-text-item-accent" style="--cat-color:' + borderColor + '"></div>';
+    /* Accent bar — color via data-cat CSS rule */
+    html += '<div class="notes-text-item-accent"></div>';
 
     /* Body: title + preview */
     html += '<div class="notes-text-item-body">';
-    html += '<div class="notes-text-item-title"' + window.app.langAttr(note.title || 'Без заголовка') + '>' + window.app.escapeHtml(note.title || 'Без заголовка') + '</div>';
-    html += '<div class="notes-text-item-preview"' + window.app.langAttr(note.body || '') + '>' + window.app.escapeHtml(note.body || '') + '</div>';
+    html += '<div class="notes-text-item-title"' + window.app.langAttr(note.title || 'Без заголовка') + '>' + window.app.wrapLongWords(window.app.escapeHtml(note.title || 'Без заголовка')) + '</div>';
+    html += '<div class="notes-text-item-preview"' + window.app.langAttr(note.body || '') + '>' + window.app.wrapLongWords(window.app.escapeHtml(note.body || '')) + '</div>';
     html += '</div>';
 
     /* Meta: category badge + date */
     html += '<div class="notes-text-item-meta">';
     if (note.category) {
-      html += '<span class="notes-text-item-cat" style="--cat-color:' + borderColor + '">' + window.app.escapeHtml(note.category) + '</span>';
+      html += '<span class="notes-text-item-cat">' + window.app.escapeHtml(note.category) + '</span>';
     }
     html += '<span class="notes-text-item-date">' + formatDate(note.ts) + '</span>';
     html += '</div>';
 
     /* Delete button */
-    html += '<button class="notes-text-item-del" data-id="' + note.id + '" aria-label="Удалить заметку">'
+    html += '<button class="notes-text-item-del" data-id="' + window.app.escapeAttr(String(note.id)) + '" aria-label="Удалить заметку">'
       + (window.ICONS.trash || window.ICONS.close || '') + '</button>';
 
     html += '</div>';
@@ -539,27 +547,27 @@
 
   /* ── Render draw note as thumbnail card ── */
   function renderDrawNoteCard(note) {
-    var borderColor = getCategoryBorderColor(note.category);
-    var html = '<div class="notes-thumb" data-id="' + note.id + '">';
+    var catAttr = note.category ? ' data-cat="' + window.app.escapeAttr(note.category) + '"' : '';
+    var html = '<div class="notes-thumb"' + catAttr + ' data-id="' + window.app.escapeAttr(String(note.id)) + '">';
 
-    /* Accent top bar */
-    html += '<div class="notes-thumb-accent" style="--cat-color:' + borderColor + '"></div>';
+    /* Accent top bar — color via data-cat CSS rule */
+    html += '<div class="notes-thumb-accent"></div>';
 
     /* Image */
     html += '<div class="notes-thumb-img">';
-    html += '<img src="' + note.data + '" data-full-src="' + note.data + '" alt="Заметка от ' + formatDate(note.ts) + '" loading="lazy">';
+    html += '<img src="' + note.data + '" data-full-src="' + window.app.escapeAttr(note.data) + '" alt="Заметка от ' + formatDate(note.ts) + '" loading="lazy">';
     html += '<div class="notes-thumb-type-badge notes-thumb-type-badge--draw">' + (window.ICONS['pen-line'] || window.ICONS['edit-3'] || '') + '</div>';
     html += '</div>';
 
     /* Caption */
     html += '<div class="notes-thumb-caption">';
     if (note.category) {
-      html += '<span class="notes-thumb-cat-label" style="--cat-color:' + borderColor + '">' + window.app.escapeHtml(note.category) + '</span>';
+      html += '<span class="notes-thumb-cat-label">' + window.app.escapeHtml(note.category) + '</span>';
     } else {
       html += '<span class="notes-thumb-cat-dot"></span>';
     }
     html += '<span class="notes-thumb-date">' + formatDate(note.ts) + '</span>';
-    html += '<button class="notes-thumb-del" data-id="' + note.id + '" aria-label="Удалить">'
+    html += '<button class="notes-thumb-del" data-id="' + window.app.escapeAttr(String(note.id)) + '" aria-label="Удалить">'
       + (window.ICONS.trash || window.ICONS.close || '') + '</button>';
     html += '</div>';
 
@@ -716,11 +724,7 @@
     var catKeys = ['Важно', 'Работа', 'Личное'];
     for (var c = 0; c < catKeys.length; c++) {
       var catPillClass = 'notes-draw-cat-pill';
-      var catStyle = '';
-      if (CAT_COLORS[catKeys[c]]) {
-        catStyle = ' style="--pill-border:' + CAT_COLORS[catKeys[c]] + '"';
-      }
-      html += '<button class="' + catPillClass + '"' + catStyle + ' data-cat="' + catKeys[c] + '">' + catKeys[c] + '</button>';
+      html += '<button class="' + catPillClass + '" data-cat="' + catKeys[c] + '">' + catKeys[c] + '</button>';
     }
     html += '</div>';
     html += '<div class="notes-draw-actions">';
@@ -758,12 +762,8 @@
     var catKeys = ['Важно', 'Работа', 'Личное'];
     for (var c = 0; c < catKeys.length; c++) {
       var pillClass = 'notes-category-pill';
-      var pillStyle = '';
-      if (CAT_COLORS[catKeys[c]]) {
-        pillStyle = ' style="--pill-border:' + CAT_COLORS[catKeys[c]] + '"';
-      }
       if (catKeys[c] === cat) pillClass += ' notes-category-pill--selected';
-      html += '<button class="' + pillClass + '"' + pillStyle + ' data-cat="' + catKeys[c] + '">' + catKeys[c] + '</button>';
+      html += '<button class="' + pillClass + '" data-cat="' + catKeys[c] + '">' + catKeys[c] + '</button>';
     }
     html += '</div>';
     html += '<button class="btn-primary notes-save-btn" id="notesTextSaveBtn">Сохранить</button>';
@@ -780,6 +780,29 @@
   /* ═══════════════════════════════════════════
      CANVAS DRAWING
      ═══════════════════════════════════════════ */
+
+  /* applyCanvasTheme — перечитывает CSS-переменные canvas и применяет к ctx.
+     Вызывается: (1) из initCanvas() при первом открытии draw view,
+                 (2) из MutationObserver при переключении темы.
+     При смене темы canvas bitmap перерисовывается новым bg (рисунок теряется —
+     обоснование см. в анализе Task 7-analysis-20260708-0620). */
+  function applyCanvasTheme() {
+    var containerEl = document.getElementById('notesContainer');
+    var cs = containerEl ? getComputedStyle(containerEl) : null;
+    var bg = cs ? (cs.getPropertyValue('--notes-canvas-bg').trim() || '#ffffff') : '#ffffff';
+    var ink = cs ? (cs.getPropertyValue('--notes-canvas-stroke').trim() || '#1a1a1a') : '#1a1a1a';
+    _canvasBg = bg;
+    _canvasInk = ink;
+    if (!_drawCtx) return;
+    var canvas = document.getElementById('notesDrawCanvas');
+    if (!canvas) return;
+    _drawCtx.globalCompositeOperation = 'source-over';
+    _drawCtx.fillStyle = bg;
+    _drawCtx.fillRect(0, 0, canvas.width, canvas.height);
+    _drawCtx.strokeStyle = ink;
+    _drawCtx.lineWidth = _drawEraser ? 30 : _drawStrokeWidth;
+    _drawHasContent = false;  /* bitmap сброшен, рисуем заново */
+  }
 
   function initCanvas() {
     var canvas = document.getElementById('notesDrawCanvas');
@@ -813,13 +836,26 @@
 
       _drawCtx = c.getContext('2d');
       _drawCtx.scale(dpr, dpr);
-      _drawCtx.fillStyle = '#ffffff';
-      _drawCtx.fillRect(0, 0, w, h);
       _drawCtx.lineCap = 'round';
       _drawCtx.lineJoin = 'round';
-      _drawCtx.strokeStyle = '#1a1a1a';
-      _drawCtx.lineWidth = _drawStrokeWidth;
+      /* Читаем themed-цвета из CSS-переменных и заливаем canvas bg.
+         Используем applyCanvasTheme() — общий хелпер для init и theme-change. */
+      applyCanvasTheme();
     }, 50);
+
+    /* MutationObserver на body.class — обновляет canvas при переключении темы.
+       Без этого _drawCtx.fillStyle/strokeStyle остаются старыми, и линии
+       рисуются цветом невидимым на новом bg. */
+    if (_themeObserver) { _themeObserver.disconnect(); _themeObserver = null; }
+    _themeObserver = new MutationObserver(function(mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        if (mutations[i].attributeName === 'class') {
+          applyCanvasTheme();
+          break;
+        }
+      }
+    });
+    _themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     /* Pointer events */
     canvas.addEventListener('pointerdown', onDrawStart, { passive: false });
@@ -844,7 +880,7 @@
           strokeBtn.classList.add('notes-stroke-active');
           if (_drawCtx) {
             _drawCtx.globalCompositeOperation = 'source-over';
-            _drawCtx.strokeStyle = '#1a1a1a';
+            _drawCtx.strokeStyle = _canvasInk;
             _drawCtx.lineWidth = _drawStrokeWidth;
           }
           return;
@@ -865,7 +901,7 @@
           } else {
             if (_drawCtx) {
               _drawCtx.globalCompositeOperation = 'source-over';
-              _drawCtx.strokeStyle = '#1a1a1a';
+              _drawCtx.strokeStyle = _canvasInk;
               _drawCtx.lineWidth = _drawStrokeWidth;
             }
           }
@@ -877,7 +913,7 @@
         if (clearBtn) {
           if (_drawCtx) {
             _drawCtx.globalCompositeOperation = 'source-over';
-            _drawCtx.fillStyle = '#ffffff';
+            _drawCtx.fillStyle = _canvasBg;
             _drawCtx.fillRect(0, 0, canvas.width, canvas.height);
           }
           _drawHasContent = false;
@@ -924,7 +960,7 @@
       _drawCtx.globalCompositeOperation = 'destination-out';
     } else {
       _drawCtx.globalCompositeOperation = 'source-over';
-      _drawCtx.strokeStyle = '#1a1a1a';
+      _drawCtx.strokeStyle = _canvasInk;
     }
     _drawCtx.lineWidth = _drawEraser ? 30 : _drawStrokeWidth;
     _drawCtx.beginPath();
@@ -1053,6 +1089,8 @@
     _cachedDrawNotes = [];
     _cachedTextNotes = [];
     _hideMenuOverlay();
+    /* Отключаем MutationObserver — canvas уже не нужен, очищаем ресурсы. */
+    if (_themeObserver) { _themeObserver.disconnect(); _themeObserver = null; }
   }
 
   /* ═══════════════════════════════════════════

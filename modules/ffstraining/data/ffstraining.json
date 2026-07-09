@@ -1,12 +1,12 @@
 [
   {
-    "id": "id",
+    "id": "ffs-auto-1",
     "title": "Timetable FFS 737",
     "layout": "divider",
     "collapsible": true,
     "children": [
       {
-        "id": "fp-tt001",
+        "id": "ffs-tt001",
         "title": "Ульяновск",
         "duration": "FFS",
         "layout": "child",
@@ -18,7 +18,7 @@
         ]
       },
       {
-        "id": "fp-tt002",
+        "id": "ffs-tt002",
         "title": "Санкт-Петербург",
         "duration": "FFS",
         "layout": "child",
@@ -112,7 +112,7 @@
   },
   {
     "id": "ffs-sep-anual",
-    "title": "Программы ежегодной подготовки",
+    "title": "Ежегодная подготовка",
     "layout": "divider"
   },
   {
@@ -170,7 +170,7 @@
             "layout": "card",
             "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
             "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:info:FFS settings}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
             "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
           }
         ]
@@ -183,7 +183,7 @@
         "children": [
           {
             "id": "ffs-day2-0",
-            "title": "{{badge:normal:REFRESH}}",
+            "title": "{{badge:info:REFRESH}}",
             "layout": "divider"
           },
           {
@@ -191,108 +191,428 @@
             "title": "6 LOSS OF HYD, WHEEL WELL FIRE, RNP APP.",
             "duration": "00.00 - 00.45 {{badge:normal:PF – CPT}}",
             "layout": "card",
+            "{{items:info:FFS settings}}": "{{badge:success:Reposition}}: URSS RW20 взлёт\n<b>NIGHT, 200/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>",
             "tables": [
               {
-                "src": "modules/ffstraining/data/Лист1.html"
+                "src": "modules/ffstraining/data/tables/perf_R2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-6.html"
               }
             ],
             "children": [
               {
-                "id": "ffs-text-3-6-day2",
-                "layout": "text",
-                "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками",
-                "tables": [
-                  {
-                    "src": "modules/ffstraining/data/TO.html"
-                  }
-                ],
-                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW10L via SUGIN1D, sq 4321.\nATC: \"NWS RW 10L, cleared for T/O\"."
-              },
-              {
-                "id": "ffs-day2-1",
-                "title": "1 HYDRAULIC FAILURE",
-                "layout": "divider"
-              },
-              {
-                "id": "ffs-day2-1__after",
-                "layout": "text",
-                "{{items:success:SYS}}": "После уборки шасси - LOSS OF HYD SYS A.\nУльяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
-              },
-              {
-                "id": "ffs-0201a",
-                "title": "NNC",
-                "duration": "QRH",
+                "id": "ffs-navig",
+                "title": "Схемы Сочи",
                 "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
-                "documents": [
+                "images": [
                   {
-                    "title": "QRH — Engine Failure стр. 22",
-                    "src": "modules/docs/AOMB.pdf",
-                    "page": 22
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY.jpg",
+                    "caption": "Заход RNP Y",
+                    "alt": "Заход RNP Y"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY_L.jpg",
+                    "caption": "Минимумы RNP Y",
+                    "alt": "Минимумы RNP Y"
                   }
                 ]
               },
               {
-                "id": "ffs-day2-2",
+                "id": "ffs-refr1-1",
+                "title": "1 HYDRAULIC FAILURE",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-1__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "• <u>После уборки шасси</u> - {{badge:emergency:LOSS OF HYD SYS A.}}\nУльяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A",
+                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде."
+              },
+              {
+                "id": "ffs-sysa",
+                "title": "QRH",
+                "duration": "LOSS OF SYSTEM A",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH_sysa_1.png",
+                    "caption": "1",
+                    "alt": "1"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_sysa_2.png",
+                    "caption": "2",
+                    "alt": "2"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_sysa_3.png",
+                    "caption": "3",
+                    "alt": "3"
+                  }
+                ]
+              },
+              {
+                "id": "ffs-0201a",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
+                "layout": "child",
+                "{{items:normal}}": "RESERVED.",
+                "{{items:abnormal}}": "RESERVED",
+                "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
+                "children": [
+                  {
+                    "id": "ffs-text-3-6-day2",
+                    "layout": "text",
+                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками",
+                    "{{items:success:Критерии}}": "RESERVED",
+                    "references": [
+                      "FCOM Vol. 1 — Takeoff Performance"
+                    ],
+                    "documents": [
+                      {
+                        "title": "QRH — Engine Failure стр. 22",
+                        "src": "modules/docs/AOMB.pdf",
+                        "page": 22
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr1-2",
                 "title": "2 FIRE PROTECTION",
                 "layout": "divider"
               },
               {
-                "id": "ffs-day2-2__after",
+                "id": "ffs-refr1-2__after",
                 "layout": "text",
-                "{{items:success:SYS}}": "После уборки механизации - WHEEL WELL FIRE.\nУльяновск:\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\nС.-Петербург:\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR",
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!"
+                "{{items:success:SYS}}": "• <u>После уборки механизации</u> - {{badge:emergency:WHEEL WELL FIRE.}}\nУльяновск:\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\nС.-Петербург:\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR",
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+              },
+              {
+                "id": "ffs-fire",
+                "title": "QRH",
+                "duration": "WHEEL WELL FIRE",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH_wwf.png",
+                    "caption": "Wheel well fire",
+                    "alt": "Wheel well fire"
+                  }
+                ]
               },
               {
                 "id": "ffs-0200b",
-                "title": "NNC",
-                "duration": "QRH",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
                 "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
               },
               {
-                "id": "ffs-day2-3",
-                "title": "3 LOSS OF HYD SYS B ВНИМАНИЕ: {{badge:emergency:MANUAL REVERTION}}",
+                "id": "ffs-refr1-3",
+                "title": "3 LOSS OF HYD SYS B - ВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}",
                 "layout": "divider"
               },
               {
-                "id": "ffs-day2-3__after",
+                "id": "ffs-refr1-3__after",
                 "layout": "text",
                 "{{items:success:SYS}}": "Ульяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B",
-                "{{items:abnormal}}": "{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
               },
               {
-                "id": "ffs-day2-4",
+                "id": "ffs-fire-2",
+                "title": "QRH",
+                "duration": "MANUAL REVERSION or LOSS OF SYSTEM A AND SYSTEM B",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_1.png",
+                    "caption": "1",
+                    "alt": "1"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_2.png",
+                    "caption": "2",
+                    "alt": "2"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_3.png",
+                    "caption": "Inoperative Items",
+                    "alt": "Inoperative Items"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_4.png",
+                    "caption": "4",
+                    "alt": "4"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_5.png",
+                    "caption": "Alternate Flap Extention",
+                    "alt": "Alternate Flap Extention"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_6.png",
+                    "caption": "Manual Gear Extention",
+                    "alt": "Manual Gear Extention"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_mr_7.png",
+                    "caption": "7",
+                    "alt": "7"
+                  }
+                ]
+              },
+              {
+                "id": "ffs-0200b-2",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              },
+              {
+                "id": "ffs-refr1-4",
                 "title": "4 RNP APP",
                 "layout": "divider"
+              },
+              {
+                "id": "ffs-text-3-6-day2-2",
+                "layout": "text",
+                "{{items:success}}": "• <u>По окончанию всех необходимых NNC</u> – Reposition 8 nm RNP Y APP RW02",
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+              },
+              {
+                "id": "ffs-0200b-3",
+                "title": "INFO",
+                "duration": "РПП",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
               }
-            ]
+            ],
+            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 20, cleared for T/O\".",
+            "{{items:success:Weather}}": "Смена погоды: 020/10KT vis 8000 km +30/+25 OVC 5000 ft"
           },
           {
             "id": "ffs-0202",
             "title": "7 WINDSHEAR, PARTIAL GEAR UP LANDING",
             "duration": "00.45 - 01.20 {{badge:normal:PF – F/O}}",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "{{items:info:FFS settings}}": "Reposition: UUEE RW24C взлёт\nNIGHT, 150/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-7.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-2",
+                "title": "Схемы Шереметьево",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/SVO_EMGAS3H.jpg",
+                    "caption": "SID RW24C",
+                    "alt": "SID RW24C"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/SVO_24C_ILS.jpg",
+                    "caption": "Заход ILS 24C",
+                    "alt": "Заход ILS 24C"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/SVO_24C_ILS_L.jpg",
+                    "caption": "Минимумы ILS 24C",
+                    "alt": "Минимумы ILS 24C"
+                  }
+                ]
+              },
+              {
+                "id": "ffs-text-3-6-day2-3",
+                "layout": "text",
+                "{{items:success}}": "• <u>После взлёта</u> – сдвиг ветра"
+              },
+              {
+                "id": "ffs-refr2-1",
+                "title": "1 WINDSHEAR",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr2-1__after",
+                "layout": "text",
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения!"
+              },
+              {
+                "id": "ffs-0200b-4",
+                "title": "Maneuver",
+                "duration": "Windshear escape",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_WS.html"
+                  }
+                ],
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              },
+              {
+                "id": "ffs-0200c",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              },
+              {
+                "id": "ffs-refr2-2",
+                "title": "2 GEAR FAIL",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr2-2__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "После уборки механизации активировать отказ – GEAR DOWN LOCK FAIL – LEFT GEAR.\nУльяновск:\n• ATA 32 -> PARTIAL OR GEAR UP LANDING –> LEFT\nС.-Петербург:\n• ATA 32 -> 10 MAIN GEAR -> DOWN LOCK FAIL -> LEFT MAIN",
+                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\".",
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC !"
+              },
+              {
+                "id": "ffs-fire-3",
+                "title": "QRH",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  }
+                ]
+              },
+              {
+                "id": "ffs-0200b-5",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
+                "layout": "child",
+                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              },
+              {
+                "id": "ffs-refr2-3",
+                "title": "3 ILS APP",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-text-3-6-day2-4",
+                "layout": "text",
+                "{{items:success}}": "Полёт в зону ожидания, обработка отказа. Принятие решение о возврате а а/д вылета. Если экипаж принимает решение продолжать полёт – указание компании через диспетчера: вернуться на аэродром вылета.\nILS APP RW24C – Partial Gear Up Landing.\nОбратить внимание, что экипаж должен провести брифинг с проводниками и вероятной эвакуации после посадки."
+              }
+            ],
+            "{{items:success:SYS}}": "Перед взлётом активировать отказ GEAR UP LOCK FAIL – LEFT GEAR.\nУльяновск:\n• ATA 32 -> GEAR UP LOCK FAIL –> LEFT\nС.-Петербург:\n• ATA 32 -> 10 MAIN GEAR -> UP LOCK FAIL -> LEFT MAIN",
+            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
           },
           {
             "id": "ffs-0203",
             "title": "8 LVO",
-            "duration": "01.20 - 01.55 {{badge:normal:PF – CPT}}",
+            "duration": "01.20 - 01.50 {{badge:normal:PF – CPT}}",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "{{items:info:FFS settings}}": "Reposition: UUEE RW24C взлёт\nNIGHT, CAT IIIA 150/15KT 15/15 Q1010, RW WET, Для взлёта RVR 125M.",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-8.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-3",
+                "title": "Схемы Шереметьево",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/SVO_EMGAS3H.jpg",
+                    "caption": "SID RW24C",
+                    "alt": "SID RW24C"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/SVO_24C_ILS.jpg",
+                    "caption": "Заход ILS 24C",
+                    "alt": "Заход ILS 24C"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/SVO_24C_ILS_L.jpg",
+                    "caption": "Минимумы ILS 24C",
+                    "alt": "Минимумы ILS 24C"
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr3-1",
+                "title": "1 RTO",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr3-1__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "Первый взлёт LVO, до 80kt пропадает видимость, если экипаж продолжает – ENG FAIL до V1.\nВторой взлёт стандартный, без отказов, после взлёта reposition 6nm final.",
+                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+              },
+              {
+                "id": "ffs-refr3-2",
+                "title": "2 AUTOLAND FAIL",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr3-2__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "Первый заход, в процессе захода отказ OB DU справа, если экипаж продолжат – на DA отсутствует визуальный контакт – GA, reposition 6nm final.\nВторой заход, \"уходят\" FD слева, на выравнивании NO FLARE, отказ обоих кнопок TO/GA – экипаж выполняет GA. Reposition 6 nm."
+              },
+              {
+                "id": "ffs-refr3-3",
+                "title": "3 AUTOLAND",
+                "layout": "divider"
+              }
+            ],
+            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
           },
           {
             "id": "ffs-day2-5",
@@ -304,40 +624,201 @@
             "title": "1 LANDING GGEARS, WINDSHEAR, FIRE PROTECTION, EGPWS",
             "duration": "02.00 - 02.45 {{badge:normal:PF – CPT}}",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "{{items:info:FFS settings}}": "Reposition: URSS RW20 взлёт\nDAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_C2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_C2-1.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-4",
+                "title": "Схемы Сочи",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_ILS.jpg",
+                    "caption": "Заход ILS",
+                    "alt": "Заход ILS"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_ILS_L.jpg",
+                    "caption": "Минимумы ILS",
+                    "alt": "Минимумы ILS"
+                  }
+                ]
+              }
+            ],
+            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
           },
           {
             "id": "ffs-0205",
             "title": "2 ENG FAIL, ONE ILS APP",
             "duration": "02.45 - 03.15 {{badge:normal:PF – F/O}}",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "{{items:info:FFS settings}}": "Reposition: URSS RW20 взлёт\nDAY, 170/10 CAT II 30/30 Q1010, RW WET",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_C2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_C2-2.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-5",
+                "title": "Схемы Сочи",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_ILS.jpg",
+                    "caption": "Заход ILS",
+                    "alt": "Заход ILS"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_ILS_L.jpg",
+                    "caption": "Минимумы ILS",
+                    "alt": "Минимумы ILS"
+                  }
+                ]
+              }
+            ],
+            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
           },
           {
             "id": "ffs-0206",
             "title": "3 WINDSHEAR, HYD SYS FAIL, EGPWS",
             "duration": "03.15 - 03.40 {{badge:normal:PF – F/O}}",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "{{items:info:FFS settings}}": "Reposition: URSS RW20 взлёт\nDAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_C2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_C2-3.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-6",
+                "title": "Схемы Сочи",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_ILS.jpg",
+                    "caption": "Заход ILS",
+                    "alt": "Заход ILS"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_ILS_L.jpg",
+                    "caption": "Минимумы ILS",
+                    "alt": "Минимумы ILS"
+                  }
+                ]
+              }
+            ],
+            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
           },
           {
             "id": "ffs-0207",
-            "title": "8 LVO",
+            "title": "4 LVO",
             "duration": "03.40 - 04.00 {{badge:normal:PF – CPT}}",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "{{items:info:FFS settings}}": "Reposition: UUEE RW24C взлёт\nNIGHT, CAT IIIA 150/15KT 15/15 Q1010, RW WET, Для взлёта RVR 125M.",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_C2.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_C2-4.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-7",
+                "title": "Схемы Шереметьево",
+                "layout": "child",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/SVO_EMGAS3H.jpg",
+                    "caption": "SID RW24C",
+                    "alt": "SID RW24C"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/SVO_24C_ILS.jpg",
+                    "caption": "Заход ILS 24C",
+                    "alt": "Заход ILS 24C"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/SVO_24C_ILS_L.jpg",
+                    "caption": "Минимумы ILS 24C",
+                    "alt": "Минимумы ILS 24C"
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr3-1-2",
+                "title": "1 RTO",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr3-1-2__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "Первый взлёт LVO, до 80kt пропадает видимость, если экипаж продолжает – ENG FAIL до V1.\nВторой взлёт стандартный, без отказов, после взлёта reposition 6nm final.",
+                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+              },
+              {
+                "id": "ffs-refr3-2-2",
+                "title": "2 AUTOLAND FAIL",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr3-2-2__after",
+                "layout": "text",
+                "{{items:success:SYS}}": "Первый заход, в процессе захода отказ OB DU справа, если экипаж продолжат – на DA отсутствует визуальный контакт – GA, reposition 6nm final.\nВторой заход, \"уходят\" FD слева, на выравнивании NO FLARE, отказ обоих кнопок TO/GA – экипаж выполняет GA. Reposition 6 nm."
+              },
+              {
+                "id": "ffs-refr3-3-2",
+                "title": "3 AUTOLAND",
+                "layout": "divider"
+              }
+            ],
+            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
           }
         ]
       }
@@ -345,7 +826,7 @@
   },
   {
     "id": "ffs-sep-special",
-    "title": "Программы специальной подготовки",
+    "title": "Специальная подготовка",
     "layout": "divider"
   },
   {
@@ -403,7 +884,7 @@
             "layout": "card",
             "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
             "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:info:FFS settings}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
             "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
           }
         ]
@@ -457,7 +938,7 @@
             "layout": "card",
             "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
             "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
+            "{{items:info:FFS settings}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
             "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
           }
         ]

@@ -30,6 +30,9 @@ body.dark-theme #phonebookContainer {
   align-items: center;
 }
 .pb-divider-label {
+  /* ИСКЛЮЧЕНИЕ из шкалы v6.0/v3.14 (Task 43): по шкале divider = --font-md (18px),
+     но в phonebook divider — декоративная метка-разделитель (uppercase + letter-spacing),
+     не заголовок секции. --font-xs (12px) согласован с пользователем как осознанное исключение. */
   font-size: var(--font-xs);
   font-weight: 700;
   text-transform: uppercase;

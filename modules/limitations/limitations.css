@@ -4,7 +4,10 @@
 
 /* ─── Scroll lock при открытом detail view ─── */
 /* position:fixed на body «схлопывает» html — скролл невозможен.
-   Вместо этого: делаем .screen scrollable-контейнером, а body блокируем */
+   Вместо этого: делаем .screen scrollable-контейнером, а body блокируем.
+   §7 осознанное исключение: body overflow:hidden — единственный надёжный способ блокировки
+   прокрутки на iOS Safari (position:fixed ломает layout). Стилизация через класс-состояние
+   body.lim-detail-open, НЕ через селектор по тегу body. */
 body.lim-detail-open {
   overflow: hidden;
   touch-action: none;
@@ -75,77 +78,32 @@ body.dark-theme #limitationsContainer {
    DISCLAIMER
    ═══════════════════════════════════════════ */
 
-/* Disclaimer — внутри module-container, без negative margin */
+/* Disclaimer — внутри module-container, без negative margin.
+   Красная левая линия убрана по запросу пользователя (пункт 1). */
 .lim-disclaimer {
   padding: 12px 16px;
   margin: 8px 0 4px;
   background: var(--color-bg-card);
   border-radius: var(--border-radius-md);
-  border-left: 3px solid var(--color-primary);
 }
 
 .lim-disclaimer-title {
   font-size: var(--font-sm);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   color: var(--color-text-main);
   margin-bottom: 4px;
 }
 
 .lim-disclaimer-text {
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   color: var(--color-text-secondary);
   line-height: 1.4;
 }
 
-.lim-disclaimer-source {
-  font-size: var(--font-2xs);
-  color: var(--color-text-muted);
-  margin-top: 4px;
-  font-style: italic;
-}
+/* .lim-disclaimer-source удалён — строка source больше не рендерится (пункт 1). */
 
-/* ═══════════════════════════════════════════
-   LEGEND
-   ═══════════════════════════════════════════ */
-
-.lim-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 8px 4px 12px;
-  font-size: var(--font-2xs);
-  color: var(--color-text-secondary);
-}
-
-.lim-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.lim-legend-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.lim-legend-dot.lim-severity--limit {
-  background: var(--lim-color-limit);
-}
-
-.lim-legend-dot.lim-severity--caution {
-  background: var(--lim-color-caution);
-}
-
-.lim-legend-dot.lim-severity--warning {
-  background: var(--lim-color-warning);
-}
-
-.lim-legend-dot.lim-severity--info {
-  background: var(--lim-color-info);
-}
+/* LEGEND блок (.lim-legend*) удалён по запросу пользователя (пункт 2).
+   .lim-severity--* классы ОСТАВЛЕНЫ — используются в .lim-item (border-left, bg). */
 
 /* ═══════════════════════════════════════════
    CATEGORY (ACCORDION)
@@ -201,7 +159,7 @@ body.dark-theme #limitationsContainer {
   flex: 1;
   min-width: 0;
   font-size: var(--font-base);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--color-text-main);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -301,8 +259,8 @@ body.dark-theme #limitationsContainer {
   grid-column: 1;
   grid-row: 1 / 3;
   align-self: start;
-  font-size: var(--font-2xs);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-xs);
+  font-weight: 700;
   padding: 2px 6px;
   border-radius: 3px;
   text-transform: uppercase;
@@ -353,7 +311,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
   grid-column: 2;
   grid-row: 1;
   font-size: var(--font-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--color-text-main);
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -374,7 +332,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
 .lim-item-source {
   grid-column: 2;
   grid-row: 3;
-  font-size: var(--font-2xs);
+  font-size: var(--font-xs);
   color: var(--color-text-muted);
   font-style: italic;
   margin-top: 2px;
@@ -407,7 +365,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
 
 .lim-empty-text {
   font-size: var(--font-lg);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--color-text-secondary);
   margin-bottom: 4px;
 }
@@ -440,7 +398,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
 
 .lim-detail-title {
   font-size: var(--font-lg);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   color: var(--color-text-main);
   line-height: 1.3;
   overflow-wrap: anywhere;
@@ -449,7 +407,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
 /* Value — крупно */
 .lim-detail-value {
   font-size: var(--font-xl);
-  font-weight: var(--font-weight-bold);
+  font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 12px;
   line-height: 1.3;
@@ -490,7 +448,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
 
 .lim-detail-section-title {
   font-size: var(--font-xs);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -555,7 +513,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
 
 .lim-table-inline th {
   background: var(--color-bg-hover);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--color-text-main);
   white-space: nowrap;
 }
@@ -623,7 +581,7 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
   }
 
   .lim-item-severity {
-    font-size: var(--font-2xs);
+    font-size: var(--font-xs);
     padding: 1px 5px;
   }
 
@@ -677,11 +635,6 @@ body.dark-theme #limitationsContainer .lim-severity--info .lim-item-severity {
   .lim-item-source {
     grid-column: 1;
     grid-row: 4;
-  }
-
-  .lim-legend {
-    gap: 8px;
-    font-size: var(--font-2xs);
   }
 
   .lim-category-header {

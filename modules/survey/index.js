@@ -243,13 +243,13 @@
       /* ─── Auto-expand when searching ─── */
       var effectiveExpanded = _searchQ ? true : isExpanded;
 
-      html += '<div class="survey-category' + (effectiveExpanded ? ' open' : '') + '" data-category="' + cat.id + '">';
+      html += '<div class="survey-category' + (effectiveExpanded ? ' open' : '') + '" data-category="' + app.escapeAttr(cat.id) + '">';
 
       /* Header */
-      html += '<div class="survey-category-header" data-cat-toggle="' + cat.id + '" role="button" tabindex="0" aria-expanded="' + effectiveExpanded + '">' +
+      html += '<div class="survey-category-header" data-cat-toggle="' + app.escapeAttr(cat.id) + '" role="button" tabindex="0" aria-expanded="' + effectiveExpanded + '">' +
         '<span class="survey-category-icon">' + icon(cat.icon || 'checklist', 20) + '</span>' +
         '<div class="survey-category-info">' +
-          '<div class="survey-category-title"' + app.langAttr(cat.title) + '>' + cat.title + '</div>' +
+          '<div class="survey-category-title"' + app.langAttr(cat.title) + '>' + app.renderRichText(cat.title) + '</div>' +
           '<div class="survey-category-meta">' + prog.done + '/' + prog.total + ' \u043E\u0442\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043E' + (prog.pct === 100 ? ' \u2713' : '') + '</div>' +
         '</div>' +
         '<div class="survey-category-progress">' +
@@ -266,11 +266,11 @@
         var isMastered = !!_mastered[fqItem.id];
         var isOpen = !!_openQ[fqItem.id];
 
-        html += '<div class="survey-question' + (isMastered ? ' survey-question--mastered' : '') + (isOpen ? ' open' : '') + '" data-question="' + fqItem.id + '">';
+        html += '<div class="survey-question' + (isMastered ? ' survey-question--mastered' : '') + (isOpen ? ' open' : '') + '" data-question="' + app.escapeAttr(fqItem.id) + '">';
 
         /* Question header */
-        html += '<div class="survey-question-header" data-q-toggle="' + fqItem.id + '">' +
-          '<span class="survey-question-checkbox" data-q-check="' + fqItem.id + '" role="checkbox" aria-checked="' + isMastered + '" aria-label="\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u043E\u0442\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u043E\u0435">' +
+        html += '<div class="survey-question-header" data-q-toggle="' + app.escapeAttr(fqItem.id) + '">' +
+          '<span class="survey-question-checkbox" data-q-check="' + app.escapeAttr(fqItem.id) + '" role="checkbox" aria-checked="' + isMastered + '" aria-label="\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u043E\u0442\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u043E\u0435">' +
             icon('check-square', 14) +
           '</span>' +
           '<span class="survey-question-text"' + app.langAttr(fqItem.q) + '>' + app.renderRichText(fqItem.q) + '</span>' +
@@ -279,13 +279,13 @@
 
         /* Question image — под header, не внутри flex-строки */
         if (fqItem.qimg) {
-          html += '<img class="survey-question-img" src="modules/survey/data/' + fqItem.qimg + '" data-full-src="modules/survey/data/' + fqItem.qimg + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">';
+          html += '<img class="survey-question-img ct-img-dark-invert" src="modules/survey/data/' + app.escapeAttr(fqItem.qimg) + '" data-full-src="modules/survey/data/' + app.escapeAttr(fqItem.qimg) + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">';
         }
 
         /* Answer */
         html += '<div class="survey-answer">' +
           '<div class="survey-answer-text"' + app.langAttr(fqItem.a) + '>' + app.renderRichText(fqItem.a) + '</div>' +
-          (fqItem.img ? '<img class="survey-answer-img" src="modules/survey/data/' + fqItem.img + '" data-full-src="modules/survey/data/' + fqItem.img + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">' : '') +
+          (fqItem.img ? '<img class="survey-answer-img ct-img-dark-invert" src="modules/survey/data/' + app.escapeAttr(fqItem.img) + '" data-full-src="modules/survey/data/' + app.escapeAttr(fqItem.img) + '" data-survey-img="1" alt="\u0418\u043B\u043B\u044E\u0441\u0442\u0440\u0430\u0446\u0438\u044F">' : '') +
           (fqItem.ref ? '<div class="survey-answer-ref"' + app.langAttr(fqItem.ref) + '>' + app.renderRichText(fqItem.ref) + '</div>' : '') +
         '</div>';
 

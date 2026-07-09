@@ -22,9 +22,9 @@
     + '<path d="m 547.4046,537.29402 -107.07617,-47.47717 -78.7919,146.47212 185.86807,0 z" fill="currentColor"/>'
     + '<path d="m 336.89094,470.86885 57.57869,0 -18.18274,45.45686 -21.2132,-10e-6 z" fill="currentColor"/>'
     + '<path d="m 336.38588,628.95773 57.57869,0 -18.18274,-109.09647 -21.2132,2e-5 z" fill="currentColor"/>'
-    + '<path d="m 242.33925,582.96075 19.50421,12.69551 19.99181,-12.36998 25.11167,-0.65106 -45.10348,27.99524 -47.54152,-26.36761 z" fill="var(--color-bg-card, #fff)" stroke="currentColor" stroke-width="0.3"/>'
-    + '<path d="m 334.614,242.56037 39.62979,12.64208 40.6205,-12.31793 51.02336,-0.64832 -91.64386,27.87744 -96.59762,-26.25665 z" fill="var(--color-bg-card, #fff)" stroke="currentColor" stroke-width="0.4"/>'
-    + '<circle cx="374.624" cy="262.603" r="22.14" fill="var(--color-bg-card, #fff)" stroke="var(--color-bg-card, #fff)" stroke-width="1"/>'
+    + '<path d="m 242.33925,582.96075 19.50421,12.69551 19.99181,-12.36998 25.11167,-0.65106 -45.10348,27.99524 -47.54152,-26.36761 z" fill="var(--color-bg-card)" stroke="currentColor" stroke-width="0.3"/>'
+    + '<path d="m 334.614,242.56037 39.62979,12.64208 40.6205,-12.31793 51.02336,-0.64832 -91.64386,27.87744 -96.59762,-26.25665 z" fill="var(--color-bg-card)" stroke="currentColor" stroke-width="0.4"/>'
+    + '<circle cx="374.624" cy="262.603" r="22.14" fill="var(--color-bg-card)" stroke="var(--color-bg-card)" stroke-width="1"/>'
     + '</g></svg>';
 
   /* ─── Helpers ─── */
@@ -119,9 +119,9 @@
         if (isDivider(entry)) {
           html += '<div class="pb-divider">';
           if (entry.label) {
-            var divLabelLang = window.app.detectLang(entry.label);
+            // §13 v6.0: поля с <b>/<i>/<br>/\n → renderRichText (sanitize + разрешённые теги + wrapLongWords)
             var divLabelAttr = window.app.langAttr(entry.label);
-            var divLabelContent = (divLabelLang === 'ru') ? window.app.wrapLongWords(entry.label, 8) : window.app.escapeHtml(entry.label);
+            var divLabelContent = window.app.renderRichText(entry.label);
             html += '<span class="pb-divider-label"' + divLabelAttr + '>' + divLabelContent + '</span>';
           }
           html += '</div>';

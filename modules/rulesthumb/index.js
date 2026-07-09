@@ -559,7 +559,7 @@
   function renderCategory(filtered) {
     var cat = filtered.cat;
     var html = '<div class="rt-accordion-item">';
-    html += '<div class="rt-accordion-header" data-rt-cat="' + cat.id + '">';
+    html += '<div class="rt-accordion-header" data-rt-cat="' + window.app.escapeAttr(cat.id) + '">';
     html += '<span class="rt-accordion-title">' + _t(cat.title);
     if (cat.subtitle) {
       html += ' <span class="rt-accordion-subtitle">— ' + _t(cat.subtitle) + '</span>';
@@ -606,9 +606,15 @@
   function renderRule(rule) {
     var html = '<div class="rt-rule-card">';
     if (rule.num) {
-      html += '<div class="rt-rule-num">' + window.app.escapeHtml(rule.num) + '</div>';
+      html += '<div class="rt-rule-header">'
+        + '<div class="rt-rule-num">' + window.app.escapeHtml(rule.num) + '</div>'
+        + '<div class="rt-rule-title">' + _t(rule.title) + '</div>'
+        + '</div>';
+    } else {
+      html += '<div class="rt-rule-header">'
+        + '<div class="rt-rule-title">' + _t(rule.title) + '</div>'
+        + '</div>';
     }
-    html += '<div class="rt-rule-title">' + _t(rule.title) + '</div>';
 
     if (rule.tip) {
       html += '<div class="rt-tip">💡 ' + _t(rule.tip) + '</div>';
@@ -638,22 +644,22 @@
     var calc = _calcs[calcId];
     if (!calc) return '';
 
-    var html = '<div class="rt-calc" data-calc-id="' + calcId + '">';
+    var html = '<div class="rt-calc" data-calc-id="' + window.app.escapeAttr(calcId) + '">';
     html += '<button class="rt-calc-toggle">🧮 Calculate</button>';
     html += '<div class="rt-calc-body">';
 
     for (var i = 0; i < calc.inputs.length; i++) {
       var inp = calc.inputs[i];
       html += '<div class="rt-calc-input-row">';
-      html += '<label class="rt-calc-label" for="rt-' + calcId + '-' + inp.id + '">' + window.app.escapeHtml(inp.label);
+      html += '<label class="rt-calc-label" for="rt-' + window.app.escapeAttr(calcId) + '-' + window.app.escapeAttr(inp.id) + '">' + window.app.escapeHtml(inp.label);
       if (inp.unit) html += ' <span class="rt-calc-unit">(' + window.app.escapeHtml(inp.unit) + ')</span>';
       html += '</label>';
-      html += '<input type="number" class="rt-calc-field" id="rt-' + calcId + '-' + inp.id + '" data-calc-field="' + inp.id + '">';
+      html += '<input type="number" class="rt-calc-field" id="rt-' + window.app.escapeAttr(calcId) + '-' + window.app.escapeAttr(inp.id) + '" data-calc-field="' + window.app.escapeAttr(inp.id) + '">';
       html += '</div>';
     }
 
-    html += '<button class="rt-calc-btn" data-calc-run="' + calcId + '">Calculate</button>';
-    html += '<div class="rt-calc-result" data-calc-result="' + calcId + '"></div>';
+    html += '<button class="rt-calc-btn" data-calc-run="' + window.app.escapeAttr(calcId) + '">Calculate</button>';
+    html += '<div class="rt-calc-result" data-calc-result="' + window.app.escapeAttr(calcId) + '"></div>';
     html += '</div></div>';
     return html;
   }

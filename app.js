@@ -892,6 +892,8 @@ window.app.openPDFModal = function(url, startPage) {
     if (!currentPdf) return;
     if (rendering) { pendingPage = num; return; }
     rendering = true;
+    // Сброс CSS transform (после pinch-zoom debounce)
+    canvas.style.transform = '';
     currentPdf.getPage(num).then(function(page) {
       var baseViewport = page.getViewport({ scale: 1.5 });
       var wrapWidth = baseWrapWidth - 32;
@@ -928,6 +930,7 @@ window.app.openPDFModal = function(url, startPage) {
   // Pinch-to-zoom
   var pinchStartDist = 0;
   var pinchStartZoom = 1;
+  var pinchDebounceTimer = null;
   canvasWrap.addEventListener('touchstart', function(e) {
     if (e.touches.length === 2) {
       var dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -943,7 +946,9 @@ window.app.openPDFModal = function(url, startPage) {
       var dist = Math.sqrt(dx * dx + dy * dy);
       var ratio = dist / pinchStartDist;
       zoomLevel = pinchStartZoom * ratio;
-      if (currentPdf) renderPage(currentPage);
+      // DEBOUNCE: НЕ перерисовываем canvas во время pinch — масштаб через CSS transform
+      // (быстро, без мигания). Перерисовка только после touchend + 300ms.
+      canvas.style.transform = 'scale(' + ratio + ')';
     }
   }, { passive: true });
   canvasWrap.addEventListener('touchend', function(e) {
@@ -957,7 +962,12 @@ window.app.openPDFModal = function(url, startPage) {
       }
       zoomLevel = best;
       pinchStartDist = 0;
-      if (currentPdf) renderPage(currentPage);
+      // DEBOUNCE 300ms: перерисовать canvas один раз после завершения жеста
+      if (pinchDebounceTimer) clearTimeout(pinchDebounceTimer);
+      pinchDebounceTimer = setTimeout(function() {
+        pinchDebounceTimer = null;
+        if (currentPdf) renderPage(currentPage);
+      }, 300);
     }
   }, { passive: true });
 
@@ -1212,8 +1222,8 @@ window.app.renderRichText = function(html) {
     allowed.push('<br>');
     return '\u0000BR' + (allowed.length - 1) + '\u0000';
   });
-  // <b>...</b>, <i>...</i>, <em>...</em>, <strong>...</strong> (с сохранением содержимого)
-  s = s.replace(/<(b|i|em|strong)\b[^>]*>([\s\S]*?)<\/\1>/gi, function(m, tag, content) {
+  // Парные теги: <b> <i> <em> <strong> <s> <p> <u> <mark> <small> <del> <ins> <sub> <sup>
+  s = s.replace(/<(b|i|em|strong|s|p|u|mark|small|del|ins|sub|sup)\b[^>]*>([\s\S]*?)<\/\1>/gi, function(m, tag, content) {
     allowed.push('<' + tag.toLowerCase() + '>' + content + '</' + tag.toLowerCase() + '>');
     return '\u0000TAG' + (allowed.length - 1) + '\u0000';
   });

@@ -250,8 +250,7 @@
       html += '<span class="krs-age-badge krs-age-badge--' + ageCat + '">' + ageLabel + '</span>';
     }
     html += '<span class="collapsible-title"' + window.app.langAttr(inst.title) + '><span class="marquee-inner">' + window.app.escapeHtml(inst.title) + '</span></span>';
-    html += '<span class="collapsible-chevron">'
-      + (window.ICONS['chevron-down'] || '') + '</span>';
+    // Шеврон убран (вариант A): визуально не отображался, место освобождено под title.
     html += '</div>';
 
     // Контент (сворачиваемый)
@@ -274,7 +273,7 @@
       html += '<div class="krs-images">';
       for (var i = 0; i < images.length; i++) {
         html += '<div class="krs-img-wrap">';
-        html += '<img src="' + window.app.escapeAttr(images[i]) + '" data-full-src="' + window.app.escapeAttr(images[i]) + '" alt="Вложение ' + (i + 1) + '" loading="lazy" class="krs-img">';
+        html += '<img src="' + window.app.escapeAttr(images[i]) + '" data-full-src="' + window.app.escapeAttr(images[i]) + '" alt="Вложение ' + (i + 1) + '" loading="lazy" class="krs-img ct-img-dark-invert">';
         html += '</div>';
       }
       html += '</div>';
@@ -440,6 +439,33 @@
   }
 
   /* ═══════════════════════════════════════════
+     IMAGE ERROR HANDLER (E17-C — fallback-плейсхолдер для #17)
+     ═══════════════════════════════════════════ */
+
+  /**
+   * Обработчик ошибки загрузки <img> (404 и др.).
+   * error event не bubble — слушаем в capture фазе (см. init()).
+   * Заменяет битый <img> на <div class="krs-img-placeholder">.
+   * Существующий click-handler на .krs-img-wrap безопасен: после
+   * замены querySelector('img[data-full-src]') вернёт null → PhotoSwipe
+   * не откроется.
+   */
+  function handleImgError(e) {
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG' || !img.classList || !img.classList.contains('krs-img')) return;
+    // Защита от повторной обработки (на случай если error всплывёт дважды)
+    if (img.getAttribute('data-fallback')) return;
+    img.setAttribute('data-fallback', '1');
+    var wrap = img.closest('.krs-img-wrap');
+    if (!wrap) return;
+    wrap.classList.add('krs-img-wrap--missing');
+    wrap.innerHTML = '<div class="krs-img-placeholder" role="img" aria-label="Вложение недоступно">'
+      + (window.ICONS['alert-triangle'] || '')
+      + '<span class="krs-img-placeholder-text">Вложение недоступно</span>'
+      + '</div>';
+  }
+
+  /* ═══════════════════════════════════════════
      INIT
      ═══════════════════════════════════════════ */
 
@@ -503,9 +529,21 @@
         var pdfBtn = e.target.closest('.krs-pdf-btn');
         if (pdfBtn) {
           var pdfUrl = pdfBtn.getAttribute('data-pdf');
-          if (pdfUrl && window.app && window.app.openPDFModal) {
-            window.app.openPDFModal(pdfUrl);
-          }
+          if (!pdfUrl) return;
+          // E17-C: проверка доступности PDF перед открытием модалки (#17).
+          // HEAD-запрос → если 404, показываем toast вместо битой модалки.
+          fetch(pdfUrl, { method: 'HEAD' })
+            .then(function(r) {
+              if (!r.ok) throw new Error('HTTP ' + r.status);
+              if (window.app && window.app.openPDFModal) {
+                window.app.openPDFModal(pdfUrl);
+              }
+            })
+            .catch(function() {
+              if (window.app && window.app.showToast) {
+                window.app.showToast('PDF-вложение недоступно');
+              }
+            });
           return;
         }
       });
@@ -524,6 +562,10 @@
         }
       }
     });
+
+    // E17-C: fallback-плейсхолдер для отсутствующих изображений (#17).
+    // error event не bubble — слушаем в capture фазе.
+    container.addEventListener('error', handleImgError, true);
 
     // Начальное состояние (контракт: init() вызывается строго ОДИН раз)
     _openBlocks = {};
