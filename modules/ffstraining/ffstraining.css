@@ -89,10 +89,23 @@
   overflow: hidden;
 }
 
+/* detail-view: все divider-list-items всегда visible (подпэкран — без аккордеона) */
+.ffstraining-detail-view-body .divider-list-items {
+  max-height: none;
+  overflow: visible;
+}
+.ffstraining-detail-view-body .divider-list-toggle {
+  pointer-events: none;
+}
+.ffstraining-detail-view-body .divider-list-toggle:not(.is-open) + .divider-list-items {
+  max-height: none;
+  overflow: visible;
+}
+
 .divider-list-items {
   padding: 0 var(--content-padding-x);
   transition: max-height 0.35s var(--transition-ease-out);
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ─── List Divider (разделитель-лейбел с линией справа) ───
@@ -218,8 +231,8 @@
   border-left-color: var(--color-danger);
 }
 .items-block--info {
-  background: transparent;
-  border-left-color: transparent;
+  background: rgba(128, 128, 128, 0.08);
+  border-left-color: var(--color-text-muted);
 }
 
 .items-block-title {
@@ -238,7 +251,7 @@
 .items-block--normal    .items-block-title { color: var(--color-success); }
 .items-block--abnormal  .items-block-title { color: var(--color-warning); }
 .items-block--emergency .items-block-title { color: var(--color-danger); }
-.items-block--info      .items-block-title { color: var(--color-text-main); }
+.items-block--info      .items-block-title { color: var(--color-text-muted); }
 
 body.dark-theme .items-block-title {
   border-bottom-color: rgba(255, 255, 255, 0.08);
@@ -289,7 +302,7 @@ body.dark-theme #ffstrainingContainer .ct-search-input {
   border-radius: var(--border-radius-md);
   margin-bottom: 10px;
   border: 1px solid var(--color-border-subtle);
-  overflow: hidden;
+  overflow: visible;
   transition: box-shadow var(--transition-speed) var(--transition-ease);
 }
 
@@ -422,6 +435,7 @@ body.dark-theme #ffstrainingContainer .ct-search-input {
 
 .ffstraining-card.open > .ffstraining-card-body {
   max-height: 3000px;
+  overflow: visible;
 }
 
 .ffstraining-card-content {
@@ -1567,4 +1581,40 @@ body.dark-theme .ffstraining-card--group.open .ffstraining-card-header {
     font-size: 0.8125rem;
     line-height: 1.35;
   }
+}
+
+/* ─── DETAIL card: кликабельный заголовок (= CARD chrome, без chevron/badge) ─── */
+.ffstraining-detail-card {
+  margin-bottom: 8px;
+}
+.ffstraining-detail-card-header {
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .ffstraining-detail-card-header:hover {
+    opacity: 0.85;
+  }
+}
+
+/* ─── DETAIL view: подпэкран ─── */
+.ffstraining-detail-view {
+  display: none;
+  padding: 16px var(--content-padding-x);
+}
+.ffstraining-detail-view-body {
+  max-width: 720px;
+  margin: 16px auto 0;
+}
+@media (min-width: 768px) { .ffstraining-detail-view-body { max-width: 768px; } }
+@media (min-width: 900px) { .ffstraining-detail-view-body { max-width: 900px; } }
+@media (min-width: 1100px) { .ffstraining-detail-view-body { max-width: 1100px; } }
+
+/* ─── STICKY card-header: прилипает к верху при скролле (opt-in via STICKY: true) ─── */
+.ffstraining-sticky-card {
+  position: sticky;
+  top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  z-index: 100;
+}
+.ffstraining-sticky-card > .ffstraining-card-header {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }

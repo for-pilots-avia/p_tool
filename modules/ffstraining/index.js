@@ -742,8 +742,64 @@
   */
   function renderItemBody(item, ctx) {
     var html = '';
-    var keys = Object.keys(item);
     var itemsRegex = /^\{\{items:(\w+)(?::([^}]+))?\}\}$/;
+
+    // blocks[] priority — точный порядок элементов (interleave fields + children)
+    if (item.blocks && item.blocks.length) {
+      for (var bi = 0; bi < item.blocks.length; bi++) {
+        var block = item.blocks[bi];
+        if (block.type === 'items') {
+          var im = block.key.match(itemsRegex);
+          if (im && item[block.key]) {
+            html += renderItemsBlock(im[1], im[2], item[block.key]);
+          }
+        } else if (block.type === 'table-file') {
+          if (item.tables && item.tables[block.index]) {
+            html += renderBlockTableFile({ src: item.tables[block.index].src }, ctx);
+          }
+        } else if (block.type === 'image') {
+          if (item.image) {
+            html += renderBlockImage({ src: item.image, alt: item.title || '' }, ctx);
+          }
+        } else if (block.type === 'images') {
+          // Рендерим ВСЕ изображения ОДНОЙ галереей при первом вхождении (grid + PhotoSwipe ←/→).
+          // Последующие blocks {type:'images', index:N>0} пропускаем — галерея уже отрисована.
+          // Восстанавливает поведение fallback-ветки (см. ниже, ключ 'images') для пути blocks[].
+          if (block.index === 0 && item.images && item.images.length) {
+            html += renderBlockImage({ images: item.images, alt: item.title || '' }, ctx);
+          }
+        } else if (block.type === 'references') {
+          if (item.references && item.references.length) {
+            var textRefs = [];
+            for (var ri = 0; ri < item.references.length; ri++) {
+              var ref = item.references[ri];
+              if (typeof ref === 'string') textRefs.push(ref);
+              else if (ref && ref.text) textRefs.push({ text: ref.text });
+            }
+            if (textRefs.length) html += renderBlockReferenceList({ items: textRefs }, ctx);
+          }
+        } else if (block.type === 'documents') {
+          if (item.documents && item.documents.length) {
+            var docRefs = [];
+            for (var di = 0; di < item.documents.length; di++) {
+              var doc = item.documents[di];
+              if (doc && (doc.src || doc.file)) {
+                docRefs.push({ src: doc.src || doc.file, page: doc.page || 1, title: doc.title || 'Открыть PDF' });
+              }
+            }
+            if (docRefs.length) html += renderBlockReferenceList({ items: docRefs }, ctx);
+          }
+        } else if (block.type === 'child-ref') {
+          if (item.children && item.children[block.index]) {
+            html += renderItem(item.children[block.index], (ctx.depth || 0) + 1);
+          }
+        }
+      }
+      return html;
+    }
+
+    // Fallback: flat keys iteration (для JSON без blocks[])
+    var keys = Object.keys(item);
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
       var val = item[key];
@@ -821,8 +877,18 @@
         continue;
       }
 
-      // 7. Пропускаемые ключи (header/meta/children)
-      // id, title, refCode, duration, category, children, layout
+      // 7. children — interleave в позиции ключа (а не всегда последним)
+      if (key === 'children' && val && val.length) {
+        html += '<div class="' + CSS_PREFIX + '-nested">';
+        for (var c = 0; c < val.length; c++) {
+          html += renderItem(val[c], ctx.depth + 1);
+        }
+        html += '</div>';
+        continue;
+      }
+
+      // 8. Пропускаемые ключи (header/meta)
+      // id, title, refCode, duration, category, layout
     }
     return html;
   }
@@ -897,6 +963,10 @@
     if (item.layout === 'divider') {
       return renderDividerList(item, depth);
     }
+    // DETAIL: компактный кликабельный заголовок → подпэкран при клике
+    if (item.layout === 'detail') {
+      return renderDetailCard(item, depth);
+    }
     var hasChildren = item.children && item.children.length > 0;
 
     // Layout-based modifier class (group/card/child) для chrome (border, bg).
@@ -905,8 +975,14 @@
     if (item.layout === 'group' || item.layout === 'card' || item.layout === 'child') {
       layoutMod = ' ' + CSS_PREFIX + '-card--' + item.layout;
     }
+    if (item.sticky) {
+      layoutMod += ' ' + CSS_PREFIX + '-sticky-card';
+    }
 
-    var html = '<div class="' + CSS_PREFIX + '-card' + layoutMod + '" data-depth="' + depth + '" data-id="' + window.app.escapeAttr(item.id || '') + '">';
+    // detail-view: все cards развёрнуты (open) — без аккордеона
+    var openClass = (_detailOpen ? ' open' : '');
+
+    var html = '<div class="' + CSS_PREFIX + '-card' + layoutMod + openClass + '" data-depth="' + depth + '" data-id="' + window.app.escapeAttr(item.id || '') + '">';
 
     // Card header (accordion toggle) — без badge, только title/refCode/duration
     html += '<div class="' + CSS_PREFIX + '-card-header ' + CSS_PREFIX + '-card-header--no-badge">';
@@ -942,14 +1018,7 @@
     // Body: Variant B — итерация по ключам item ({{items:...}}, image, tableFile, documents, references, blocks)
     html += renderItemBody(item, { depth: depth });
 
-    // Nested children (recursive accordion)
-    if (hasChildren) {
-      html += '<div class="' + CSS_PREFIX + '-nested">';
-      for (var ch = 0; ch < item.children.length; ch++) {
-        html += renderItem(item.children[ch], depth + 1);
-      }
-      html += '</div>';
-    }
+    // children уже отрендерены в renderItemBody (interleave в позиции ключа)
 
     html += '</div>'; // card-content
     html += '</div>'; // card-body
@@ -969,17 +1038,123 @@
     // Body: Variant B
     html += renderItemBody(item, { depth: depth });
 
-    // Вложенные дети (рекурсия — могут быть как аккордеонами, так и text-блоками)
-    if (item.children && item.children.length > 0) {
-      html += '<div class="' + CSS_PREFIX + '-nested">';
-      for (var ch = 0; ch < item.children.length; ch++) {
-        html += renderItem(item.children[ch], depth + 1);
-      }
-      html += '</div>';
-    }
+    // children уже отрендерены в renderItemBody (interleave в позиции ключа)
 
     html += '</div>';
     return html;
+  }
+
+  /* ─── DETAIL card: компактный кликабельный заголовок → подпэкран ───
+     layout: "detail" → клик открывает подпэкран с полным контентом.
+     В списке модуля — только header (title + chevron), без body. */
+  function renderDetailCard(item, depth) {
+    var id = window.app.escapeAttr(item.id || '');
+    var html = '<div class="' + CSS_PREFIX + '-card ' + CSS_PREFIX + '-card--card ' + CSS_PREFIX + '-detail-card" data-detail-id="' + id + '" data-depth="' + depth + '">';
+    html += '<div class="' + CSS_PREFIX + '-card-header ' + CSS_PREFIX + '-detail-card-header ' + CSS_PREFIX + '-card-header--no-badge">';
+    html += '<div class="' + CSS_PREFIX + '-card-info">';
+    html += '<div class="collapsible-title ' + CSS_PREFIX + '-card-title"' + window.app.langAttr(item.title) + '>' + _renderRichText(item.title) + '</div>';
+    if (item.refCode) {
+      html += '<div class="' + CSS_PREFIX + '-card-ref"' + window.app.langAttr(item.refCode) + '>' + _renderRichText(item.refCode) + '</div>';
+    }
+    if (item.duration) {
+      html += '<div class="' + CSS_PREFIX + '-card-meta">';
+      html += '<span class="' + CSS_PREFIX + '-card-duration"' + window.app.langAttr(item.duration) + '>' + _renderRichText(item.duration) + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  var _detailOpen = false;
+  var _detailScrollPos = 0;
+
+  function findItemById(items, id) {
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === id) return items[i];
+      if (items[i].children) {
+        var found = findItemById(items[i].children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  function openDetail(id) {
+    var item = findItemById(_data, id);
+    if (!item) return;
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+
+    // Сохранить позицию скролла для восстановления при возврате
+    _detailScrollPos = window.scrollY || document.documentElement.scrollTop || 0;
+
+    // Скрыть module-container
+    var moduleContainer = container.querySelector('.module-container');
+    if (moduleContainer) moduleContainer.style.display = 'none';
+
+    // Создать/показать detail-view
+    var detailView = container.querySelector('.' + CSS_PREFIX + '-detail-view');
+    if (!detailView) {
+      detailView = document.createElement('div');
+      detailView.className = CSS_PREFIX + '-detail-view';
+      container.appendChild(detailView);
+    }
+
+    // Рендер body через blocks[] (точный порядок)
+    detailView.innerHTML = '<div class="' + CSS_PREFIX + '-detail-view-body">' + renderItemBody(item, { depth: 0 }) + '</div>';
+    detailView.style.display = 'block';
+
+    // Header: стрелка назад + title
+    window.app.resetHeader();
+    var left = document.getElementById('headerLeft');
+    if (left) {
+      left.innerHTML = '<button class="icon-btn" aria-label="Назад" id="' + CSS_PREFIX + 'DetailBack">' + (window.ICONS['arrow-left'] || '') + '</button>';
+      var backBtn = document.getElementById(CSS_PREFIX + 'DetailBack');
+      if (backBtn) backBtn.addEventListener('click', closeDetail);
+    }
+    var center = document.getElementById('headerCenter');
+    if (center) {
+      center.innerHTML = '<div class="hc-module"' + window.app.langAttr(item.title) + '>' + _renderRichText(item.title) + '</div>';
+    }
+
+    // Загрузить таблицы
+    loadTableFiles(detailView);
+
+    _detailOpen = true;
+    // Прокрутка наверх
+    detailView.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+
+  function closeDetail() {
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+
+    var detailView = container.querySelector('.' + CSS_PREFIX + '-detail-view');
+    if (detailView) detailView.style.display = 'none';
+
+    var moduleContainer = container.querySelector('.module-container');
+    if (moduleContainer) moduleContainer.style.display = '';
+
+    // Восстановить header модуля
+    window.app.resetHeader();
+    var left = document.getElementById('headerLeft');
+    if (left) {
+      left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню" onclick="window.app.toggleMenu()">'
+        + (window.ICONS.menu || '') + '</button>';
+    }
+    var center = document.getElementById('headerCenter');
+    if (center) {
+      var mod = window.ModuleRegistry.get(MODULE_ID);
+      center.innerHTML = '<div class="hc-module">' + window.app.escapeHtml(mod ? mod.title : '') + '</div>';
+    }
+
+    _detailOpen = false;
+
+    // Восстановить позицию скролла модуля
+    window.scrollTo(0, _detailScrollPos);
   }
 
   /* ─── Divider-List (data-driven сворачиваемая группа любой глубины) ───
@@ -1030,11 +1205,7 @@
     if (bodyHtml) {
       html += '<div class="divider-list-body" data-depth="' + depth + '">' + bodyHtml + '</div>';
     }
-    if (hasChildren) {
-      for (var ch = 0; ch < item.children.length; ch++) {
-        html += renderItem(item.children[ch], depth + 1);
-      }
-    }
+    // children уже отрендерены в renderItemBody (interleave в позиции ключа)
     html += '</div>';
 
     html += '</div>';
@@ -1190,6 +1361,29 @@
   function openAndScrollTo(id) {
     var container = document.getElementById(CONTAINER_ID);
     if (!container) return;
+    // Если DETAIL — открыть подпэкран
+    var detailEl = container.querySelector('[data-detail-id="' + id + '"]');
+    if (detailEl) {
+      // Раскрыть предков
+      var el = detailEl.parentElement;
+      while (el && el !== container) {
+        if (el.classList.contains(CSS_PREFIX + '-card')) el.classList.add('open');
+        if (el.classList.contains('divider-list-items')) {
+          el.classList.add('open');
+          var divId = el.dataset.id;
+          var divToggle = container.querySelector('.divider-list-toggle[data-id="' + divId + '"]');
+          if (divToggle) {
+            divToggle.classList.add('is-open');
+            divToggle.setAttribute('aria-expanded', 'true');
+          }
+        }
+        el = el.parentElement;
+      }
+      setTimeout(function() {
+        detailEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+      return;
+    }
     var target = container.querySelector('[data-id="' + id + '"]');
     if (!target) return;
 
@@ -1273,6 +1467,17 @@
           var pdfPage = parseInt(refLink.dataset.pdfPage, 10) || 1;
           if (pdfSrc) {
             window.app.openPDFModal(pdfSrc, pdfPage);
+          }
+          return;
+        }
+
+        // DETAIL card click → openDetail (подпэкран)
+        var detailCard = e.target.closest('.' + CSS_PREFIX + '-detail-card-header');
+        if (detailCard) {
+          var detailWrapper = detailCard.closest('.' + CSS_PREFIX + '-detail-card');
+          if (detailWrapper) {
+            var detailId = detailWrapper.getAttribute('data-detail-id');
+            if (detailId) openDetail(detailId);
           }
           return;
         }
