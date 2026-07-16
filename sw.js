@@ -22,6 +22,7 @@ var JSON_MODULE_NAMES = {
   'modules/quiz/data/tb_2024.json':                        'Quiz test5',
   'modules/quiz/data/afl-first_aid.json':                  'Quiz test6',
   'modules/quiz/data/kpk_meteorology.json':                'Quiz test7',
+  'modules/quiz/data/kpk_asp.json':                        'Quiz test8',
 };
 
 var STATIC_ASSETS = [
@@ -91,6 +92,7 @@ var STATIC_ASSETS = [
   './modules/quiz/data/afl-first_aid.json',
   './modules/quiz/data/tb_2024.json',
   './modules/quiz/data/kpk_meteorology.json',
+  './modules/quiz/data/kpk_asp.json',
   './modules/phonebook/data/phonebook.json',
   './modules/faq/data/faq.json',
   './modules/aviation_sayings.json',

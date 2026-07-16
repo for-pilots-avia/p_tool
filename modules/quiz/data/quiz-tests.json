@@ -5,6 +5,7 @@
     "test-instructor.json",
     "tb_2024.json",
     "afl-first_aid.json",
-    "kpk_meteorology.json"
+    "kpk_meteorology.json",
+    "kpk_asp.json"
   ]
 }
