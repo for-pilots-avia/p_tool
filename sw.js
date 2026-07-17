@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v49 */
+/* Pilot's Tool — Service Worker v50 */
 
-var CACHE_NAME = 'pilots-tool-v49';
+var CACHE_NAME = 'pilots-tool-v50';
 
 var JSON_MODULE_NAMES = {
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
@@ -22,7 +22,6 @@ var JSON_MODULE_NAMES = {
   'modules/quiz/data/tb_2024.json':                        'Quiz test5',
   'modules/quiz/data/afl-first_aid.json':                  'Quiz test6',
   'modules/quiz/data/kpk_meteorology.json':                'Quiz test7',
-  'modules/quiz/data/kpk_asp.json':                        'Quiz test8',
 };
 
 var STATIC_ASSETS = [
@@ -92,7 +91,6 @@ var STATIC_ASSETS = [
   './modules/quiz/data/afl-first_aid.json',
   './modules/quiz/data/tb_2024.json',
   './modules/quiz/data/kpk_meteorology.json',
-  './modules/quiz/data/kpk_asp.json',
   './modules/phonebook/data/phonebook.json',
   './modules/faq/data/faq.json',
   './modules/aviation_sayings.json',
@@ -104,7 +102,10 @@ var STATIC_ASSETS = [
   './modules/flightprocedures/data/ext_walk1.png',
   './modules/flightprocedures/data/sop_after_loadsheet_clean.html',
   // Медиа — ffstraining
-  './modules/ffstraining/data/ext_walk1.png',
+  './modules/ffstraining/data/tables/man_WS.html',
+  './modules/ffstraining/data/B737_С7Тренинг.html',
+  './modules/ffstraining/data/B737_Санкт-Петербург.html',
+  './modules/ffstraining/data/B737_Ульяновск.html',
   // Медиа — krs
   './modules/krs/data/krs001.webp',
   './modules/krs/data/krs009_1.webp',

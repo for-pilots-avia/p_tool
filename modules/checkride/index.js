@@ -23,10 +23,13 @@
   var _swipeTracking  = false;
   var SWIPE_THRESHOLD = 50;   // минимальная дистанция свайпа (px)
 
-  /* ─── Данные регистрации пилота (сохраняются в памяти) ─── */
+  /* ─── Данные регистрации экипажа (сохраняются в памяти) ───
+     LINE: используется только cpt.{fio,license} + instructor + route + ac_number + flight_time
+     FFS:  используются cpt.{fio,license} + fo.{fio,license} + instructor (route/ac_number/flight_time НЕ показываются в FFS)
+     Backward compat (loadPilotFromCache/viewSavedReport): старая запись {fio, license, ...} → мигрирует в cpt.{fio,license} */
   var _pilotData = {
-    fio: '',
-    license: '',
+    cpt: { fio: '', license: '' },  // Captain (используется в LINE как «проверяемый» и в FFS как CPT)
+    fo:  { fio: '', license: '' },  // First Officer (только FFS; в LINE не используется)
     instructor: '',
     route: '',
     ac_number: '',
@@ -126,6 +129,7 @@
     try {
       // Task 41: НЕ сохраняем signature в автозаполнение пилота — она одноразовая,
       // для каждой новой проверки инструктор расписывается заново.
+      // FFS-crew: сохраняем cpt.{fio,license} + fo.{fio,license} + instructor + route + ac_number + flight_time.
       var toSave = {};
       for (var k in _pilotData) {
         if (k !== 'signature') toSave[k] = _pilotData[k];
@@ -139,10 +143,27 @@
       var raw = localStorage.getItem(STORAGE_PILOT);
       if (raw) {
         var saved = JSON.parse(raw);
+        /* Backward compat: старая запись {fio, license, ...} (LINE-only) → мигрирует в cpt.{fio,license} */
+        if (saved.fio !== undefined || saved.license !== undefined) {
+          if (saved.cpt === undefined) saved.cpt = { fio: '', license: '' };
+          if (saved.cpt.fio === undefined && saved.fio !== undefined) saved.cpt.fio = saved.fio;
+          if (saved.cpt.license === undefined && saved.license !== undefined) saved.cpt.license = saved.license;
+        }
         for (var key in _pilotData) {
           // Task 41: НЕ восстанавливаем signature из автозаполнения
           if (key === 'signature') continue;
-          if (saved[key] !== undefined) _pilotData[key] = saved[key];
+          if (saved[key] !== undefined) {
+            /* Глубокое слияние для cpt/fo (под-объекты) */
+            if (key === 'cpt' || key === 'fo') {
+              if (typeof saved[key] === 'object' && saved[key] !== null) {
+                for (var subKey in _pilotData[key]) {
+                  if (saved[key][subKey] !== undefined) _pilotData[key][subKey] = saved[key][subKey];
+                }
+              }
+            } else {
+              _pilotData[key] = saved[key];
+            }
+          }
         }
       }
     } catch(e) {}
@@ -174,6 +195,37 @@
           _sectionIndex = state.sectionIndex || 0;
           _currentMode = state.currentMode || 'line';
           _screen = 'test';
+          /* FFS-crew migration: старая запись item.ok (один пилот) → мигрирует в item.okCpt (если mode='ffs' и okCpt undefined).
+             Выполняется здесь (а не в cleanupLegacyStateOnce) т.к. зависит от _currentMode. */
+          if (_currentMode === 'ffs' && _data && _data.checklists) {
+            _data.checklists.forEach(function(cl) {
+              cl.sections.forEach(function(sec) {
+                var groups = sec.groups || [{ items: sec.items || [] }];
+                groups.forEach(function(group) {
+                  (group.items || []).forEach(function(item) {
+                    if (item && item.okCpt === undefined && item.ok !== undefined) {
+                      item.okCpt = item.ok;
+                      item.okFo = (item.type === 'checkbox' || item.type === 'radio') ? false : '';
+                      delete item.ok;
+                    }
+                  });
+                });
+                /* FFS PF migration: для секций «Техника пилотирования.» если sec.pf undefined —
+                   вывести из okCpt/okFo radio-items.PF = Pilot Flying (один пилот на упражнение). */
+                if (sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.' && sec.pf === undefined) {
+                  var items2 = sec.items || [];
+                  var hasCpt = false, hasFo = false;
+                  for (var pi = 0; pi < items2.length; pi++) {
+                    if (items2[pi].type === 'radio') {
+                      if (items2[pi].okCpt) hasCpt = true;
+                      if (items2[pi].okFo)  hasFo  = true;
+                    }
+                  }
+                  sec.pf = hasCpt ? 'cpt' : (hasFo ? 'fo' : null);
+                }
+              });
+            });
+          }
         }
       }
     } catch(e) {}  // corrupted data — ignore
@@ -192,7 +244,7 @@
        → c_{stageIdx}_{compCode}_{N} (e.g. c_4_ПП_1, c_4_НК_1, c_4_РС_1, c_4_CRM_1) via expandCompetencies.
        Old c1..c12 keys remained as orphans.
      Both old key sets are cleaned up once per browser via flag in localStorage. */
-  var STORAGE_LEGACY_CLEANED = 'checkride_legacy_v13_cleaned';
+  var STORAGE_LEGACY_CLEANED = 'checkride_legacy_v15_cleaned';
 
   function cleanupLegacyStateOnce() {
     try {
@@ -238,6 +290,25 @@
         }
       });
       /* If state still has 'test' screen but items are cleaned — keep state but resave */
+      /* FFS PF migration v15: для FFS-записей — секции «Техника пилотирования.» без sec.pf
+         вывести pf из okCpt/okFo radio-items. Сохраняем прежние оценки, не теряем данные. */
+      if (state.currentMode === 'ffs') {
+        state.data.checklists.forEach(function(cl) {
+          cl.sections.forEach(function(sec) {
+            if (sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.' && sec.pf === undefined) {
+              var items3 = sec.items || [];
+              var hasCpt2 = false, hasFo2 = false;
+              for (var pj = 0; pj < items3.length; pj++) {
+                if (items3[pj].type === 'radio') {
+                  if (items3[pj].okCpt) hasCpt2 = true;
+                  if (items3[pj].okFo)  hasFo2  = true;
+                }
+              }
+              sec.pf = hasCpt2 ? 'cpt' : (hasFo2 ? 'fo' : null);
+            }
+          });
+        });
+      }
       try {
         localStorage.setItem(STORAGE_STATE, JSON.stringify(state));
       } catch(e) {}
@@ -258,9 +329,28 @@
     }, 500);
   }
 
-  /** Прочитать значения из DOM-полей формы в _pilotData */
+  /** Прочитать значения из DOM-полей формы в _pilotData.
+   *  LINE: cr_fio, cr_license, cr_instructor, cr_route, cr_ac_number (flight_time только в report screen)
+   *  FFS:  cr_cpt_fio, cr_cpt_license, cr_fo_fio, cr_fo_license, cr_instructor (route/ac_number скрыты, не читаются) */
   function readPilotFromDOM() {
-    var fields = ['fio', 'license', 'instructor', 'route', 'ac_number', 'flight_time'];
+    /* LINE-mode поля (один пилот) */
+    var fioEl = document.getElementById('cr_fio');
+    if (fioEl) _pilotData.cpt.fio = fioEl.value;
+    var licEl = document.getElementById('cr_license');
+    if (licEl) _pilotData.cpt.license = licEl.value;
+
+    /* FFS-mode поля (двух пилотов) */
+    var cptFioEl = document.getElementById('cr_cpt_fio');
+    if (cptFioEl) _pilotData.cpt.fio = cptFioEl.value;
+    var cptLicEl = document.getElementById('cr_cpt_license');
+    if (cptLicEl) _pilotData.cpt.license = cptLicEl.value;
+    var foFioEl = document.getElementById('cr_fo_fio');
+    if (foFioEl) _pilotData.fo.fio = foFioEl.value;
+    var foLicEl = document.getElementById('cr_fo_license');
+    if (foLicEl) _pilotData.fo.license = foLicEl.value;
+
+    /* Общие поля (LINE + FFS) */
+    var fields = ['instructor', 'route', 'ac_number'];
     fields.forEach(function(f) {
       var el = document.getElementById('cr_' + f);
       if (el) _pilotData[f] = el.value;
@@ -293,12 +383,10 @@
   }
 
   /* ═══════════════════════════════════════════
-     SCREEN: START — Регистрация пилота
+     SCREEN: START — Экипаж / пилот (заголовок убран по требованию пользователя)
      ═══════════════════════════════════════════ */
   function renderStartScreen(container) {
     var html = '<div class="module-container checkride-start" lang="ru">';
-
-    html += '<h2 class="checkride-start-title">\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F \u043F\u0438\u043B\u043E\u0442\u0430</h2>';
 
     /* Mode selector */
     html += '<div class="checkride-mode-selector">'
@@ -308,19 +396,60 @@
 
     /* Input fields */
     html += '<div class="checkride-fields">';
-    var fields = [
-      { id: 'cr_fio',         ph: '\u0424\u0418\u041E \u043F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u043E\u0433\u043E', val: _pilotData.fio, ffs: true },
-      { id: 'cr_license',     ph: '\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438', val: _pilotData.license, ffs: true },
-      { id: 'cr_instructor',  ph: '\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)', val: _pilotData.instructor, ffs: true },
-      { id: 'cr_route',       ph: '\u041C\u0430\u0440\u0448\u0440\u0443\u0442 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.route, ffs: false },
-      { id: 'cr_ac_number',   ph: '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.ac_number, ffs: false }
-    ];
-    for (var i = 0; i < fields.length; i++) {
-      /* Для FFS — скрыть поля route, ac_number */
-      if (_currentMode === 'ffs' && !fields[i].ffs) continue;
-      var escVal = app.escapeAttr(fields[i].val || '');
-      html += '<label class="checkride-label" for="' + fields[i].id + '">' + fields[i].ph + '</label>';
-      html += '<input type="text" id="' + fields[i].id + '" class="checkride-input" placeholder="' + fields[i].ph + '" value="' + escVal + '">';
+
+    if (_currentMode === 'ffs') {
+      /* FFS-crew: 2 пилота (CPT + F/O), в каждой строке ФИО + Лицензия; на узких — столбиком */
+      var cptFioEsc = app.escapeAttr(_pilotData.cpt.fio || '');
+      var cptLicEsc = app.escapeAttr(_pilotData.cpt.license || '');
+      var foFioEsc  = app.escapeAttr(_pilotData.fo.fio || '');
+      var foLicEsc  = app.escapeAttr(_pilotData.fo.license || '');
+      var instrEsc  = app.escapeAttr(_pilotData.instructor || '');
+
+      html += '<div class="checkride-crew-section">';
+      html += '<div class="checkride-crew-role">CPT</div>';
+      html += '<div class="checkride-crew-row">'
+        + '<div class="checkride-crew-field">'
+        + '<label class="checkride-label" for="cr_cpt_fio">\u0424\u0418\u041E</label>'
+        + '<input type="text" id="cr_cpt_fio" class="checkride-input" placeholder="\u0424\u0418\u041E" value="' + cptFioEsc + '">'
+        + '</div>'
+        + '<div class="checkride-crew-field">'
+        + '<label class="checkride-label" for="cr_cpt_license">\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438</label>'
+        + '<input type="text" id="cr_cpt_license" class="checkride-input" placeholder="\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438" value="' + cptLicEsc + '">'
+        + '</div>'
+        + '</div>';
+      html += '</div>';
+
+      html += '<div class="checkride-crew-section">';
+      html += '<div class="checkride-crew-role">F/O</div>';
+      html += '<div class="checkride-crew-row">'
+        + '<div class="checkride-crew-field">'
+        + '<label class="checkride-label" for="cr_fo_fio">\u0424\u0418\u041E</label>'
+        + '<input type="text" id="cr_fo_fio" class="checkride-input" placeholder="\u0424\u0418\u041E" value="' + foFioEsc + '">'
+        + '</div>'
+        + '<div class="checkride-crew-field">'
+        + '<label class="checkride-label" for="cr_fo_license">\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438</label>'
+        + '<input type="text" id="cr_fo_license" class="checkride-input" placeholder="\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438" value="' + foLicEsc + '">'
+        + '</div>'
+        + '</div>';
+      html += '</div>';
+
+      /* Instructor — один общий для экипажа */
+      html += '<label class="checkride-label" for="cr_instructor">\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)</label>';
+      html += '<input type="text" id="cr_instructor" class="checkride-input" placeholder="\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)" value="' + instrEsc + '">';
+    } else {
+      /* LINE — один пилот (как раньше), поля cr_fio/cr_license/cr_instructor/cr_route/cr_ac_number */
+      var fields = [
+        { id: 'cr_fio',         ph: '\u0424\u0418\u041E \u043F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u043E\u0433\u043E', val: _pilotData.cpt.fio },
+        { id: 'cr_license',     ph: '\u041D\u043E\u043C\u0435\u0440 \u043B\u0438\u0446\u0435\u043D\u0437\u0438\u0438', val: _pilotData.cpt.license },
+        { id: 'cr_instructor',  ph: '\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 (\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440)', val: _pilotData.instructor },
+        { id: 'cr_route',       ph: '\u041C\u0430\u0440\u0448\u0440\u0443\u0442 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.route },
+        { id: 'cr_ac_number',   ph: '\u041D\u043E\u043C\u0435\u0440 \u0412\u0421 (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)', val: _pilotData.ac_number }
+      ];
+      for (var i = 0; i < fields.length; i++) {
+        var escVal = app.escapeAttr(fields[i].val || '');
+        html += '<label class="checkride-label" for="' + fields[i].id + '">' + fields[i].ph + '</label>';
+        html += '<input type="text" id="' + fields[i].id + '" class="checkride-input" placeholder="' + fields[i].ph + '" value="' + escVal + '">';
+      }
     }
     html += '</div>';
 
@@ -338,29 +467,59 @@
 
   /* ═══════════════════════════════════════════
      Task 44: обновление кольца прогресса компетенции
+     FFS-crew: кольцо имеет 2 концентрических сектора — внешний (CPT, r=11, stroke=primary)
+       и внутренний (F/O, r=8, stroke=info). Текст показывает «cpt/total · fo/total».
+     LINE: одно кольцо (как раньше) — только CPT (cpt = проверяемый).
      ═══════════════════════════════════════════ */
   function updateCompetencyRing(compCode) {
     var items = document.querySelector('#checkrideContainer .checkride-competency-items[data-competency="' + compCode + '"]');
     if (!items) return;
-    var checkboxes = items.querySelectorAll('input[type="checkbox"]');
-    var total = checkboxes.length;
-    var checked = 0;
-    for (var i = 0; i < checkboxes.length; i++) {
-      if (checkboxes[i].checked) checked++;
-    }
     var toggle = document.querySelector('#checkrideContainer .checkride-competency-toggle[data-competency="' + compCode + '"]');
     if (!toggle) return;
     var countEl = toggle.querySelector('.checkride-competency-count');
     if (!countEl) return;
-    var fill = countEl.querySelector('.ring-fill');
-    var text = countEl.querySelector('.ring-text');
-    var circumference = 2 * Math.PI * 11;
-    var progress = total > 0 ? checked / total : 0;
-    var offset = circumference * (1 - progress);
-    if (fill) fill.style.strokeDashoffset = offset;
-    if (text) text.textContent = checked + '/' + total;
-    countEl.setAttribute('data-checked', checked);
-    countEl.setAttribute('data-total', total);
+
+    if (_currentMode === 'ffs') {
+      /* FFS: 2 кольца. Чекбоксы CPT имеют id="c_cpt_*", F/O — id="c_fo_*". */
+      var cptCheckboxes = items.querySelectorAll('input[type="checkbox"][id^="c_cpt_"]');
+      var foCheckboxes  = items.querySelectorAll('input[type="checkbox"][id^="c_fo_"]');
+      var cptTotal = cptCheckboxes.length;
+      var foTotal  = foCheckboxes.length;
+      var cptChecked = 0;
+      var foChecked  = 0;
+      for (var i = 0; i < cptCheckboxes.length; i++) if (cptCheckboxes[i].checked) cptChecked++;
+      for (var j = 0; j < foCheckboxes.length;  j++) if (foCheckboxes[j].checked)  foChecked++;
+
+      var cptFill = countEl.querySelector('.ring-fill-cpt');
+      var foFill  = countEl.querySelector('.ring-fill-fo');
+      var text    = countEl.querySelector('.ring-text');
+      var cptCirc = 2 * Math.PI * 11;  /* r=11 — внешний круг */
+      var foCirc  = 2 * Math.PI * 8;   /* r=8  — внутренний круг */
+      var cptProgress = cptTotal > 0 ? cptChecked / cptTotal : 0;
+      var foProgress  = foTotal  > 0 ? foChecked  / foTotal  : 0;
+      if (cptFill) cptFill.style.strokeDashoffset = cptCirc * (1 - cptProgress);
+      if (foFill)  foFill.style.strokeDashoffset  = foCirc  * (1 - foProgress);
+      if (text) text.textContent = cptChecked + '/' + cptTotal + ' \u00B7 ' + foChecked + '/' + foTotal;
+      countEl.setAttribute('data-checked', cptChecked + foChecked);
+      countEl.setAttribute('data-total', cptTotal + foTotal);
+    } else {
+      /* LINE: одно кольцо, как раньше */
+      var checkboxes = items.querySelectorAll('input[type="checkbox"]');
+      var total = checkboxes.length;
+      var checked = 0;
+      for (var k = 0; k < checkboxes.length; k++) {
+        if (checkboxes[k].checked) checked++;
+      }
+      var fill = countEl.querySelector('.ring-fill-cpt') || countEl.querySelector('.ring-fill');
+      var text = countEl.querySelector('.ring-text');
+      var circumference = 2 * Math.PI * 11;
+      var progress = total > 0 ? checked / total : 0;
+      var offset = circumference * (1 - progress);
+      if (fill) fill.style.strokeDashoffset = offset;
+      if (text) text.textContent = checked + '/' + total;
+      countEl.setAttribute('data-checked', checked);
+      countEl.setAttribute('data-total', total);
+    }
   }
 
   /* ═══════════════════════════════════════════
@@ -407,78 +566,244 @@
             if (group.items[ci].type === 'checkbox') compCheckboxes.push(group.items[ci]);
           }
 
-          /* Task 44: считаем прогресс для кольца */
-          var compChecked = 0;
-          for (var ci2 = 0; ci2 < compCheckboxes.length; ci2++) {
-            if (compCheckboxes[ci2].ok) compChecked++;
-          }
+          /* Task 44 + FFS-crew: считаем прогресс для кольца. FFS — 2 концентрических кольца. */
           var compTotal = compCheckboxes.length;
-          var compCircumference = 2 * Math.PI * 11; /* r=11 → 69.115 */
-          var compOffset = compTotal > 0 ? compCircumference * (1 - compChecked / compTotal) : compCircumference;
+          var cptCirc = 2 * Math.PI * 11;  /* r=11 — внешний круг (CPT) */
+          var foCirc  = 2 * Math.PI * 8;   /* r=8  — внутренний круг (F/O) */
+          if (_currentMode === 'ffs') {
+            var cptChecked = 0;
+            var foChecked  = 0;
+            for (var ci2 = 0; ci2 < compCheckboxes.length; ci2++) {
+              if (compCheckboxes[ci2].okCpt) cptChecked++;
+              if (compCheckboxes[ci2].okFo)  foChecked++;
+            }
+            var cptOffset = compTotal > 0 ? cptCirc * (1 - cptChecked / compTotal) : cptCirc;
+            var foOffset  = compTotal > 0 ? foCirc  * (1 - foChecked  / compTotal) : foCirc;
 
-          /* Заголовок-аккордеон (ЗАКРЫТ — нет is-open) */
-          html += '<div class="list-divider checkride-competency-toggle" data-competency="' + compCode + '">';
-          html += '<span class="list-divider-label">' + compCode + ' \u2014 ' + compLabel + '</span>';
-          html += '<span class="checkride-competency-count" data-total="' + compTotal + '" data-checked="' + compChecked + '">'
-            + '<svg class="checkride-progress-ring" viewBox="0 0 28 28" aria-hidden="true">'
-            + '<circle class="ring-track" cx="14" cy="14" r="11" fill="none" stroke="var(--color-border)" stroke-width="2.5"/>'
-            + '<circle class="ring-fill" cx="14" cy="14" r="11" fill="none" stroke="var(--color-danger)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + compCircumference + '" stroke-dashoffset="' + compOffset + '" transform="rotate(-90 14 14)"/>'
-            + '</svg>'
-            + '<span class="ring-text">' + compChecked + '/' + compTotal + '</span>'
-            + '</span>';
-          html += '<span class="checkride-competency-chevron">' + icon('chevron-down', 16) + '</span>';
-          html += '</div>';
+            /* Заголовок-аккордеон (ЗАКРЫТ — нет is-open) — FFS: 2 кольца */
+            html += '<div class="list-divider checkride-competency-toggle" data-competency="' + compCode + '">';
+            html += '<span class="list-divider-label">' + compCode + ' \u2014 ' + compLabel + '</span>';
+            html += '<span class="checkride-competency-count" data-total="' + (compTotal * 2) + '" data-checked="' + (cptChecked + foChecked) + '">'
+              + '<svg class="checkride-progress-ring" viewBox="0 0 28 28" aria-hidden="true">'
+              + '<circle class="ring-track" cx="14" cy="14" r="11" fill="none" stroke="var(--color-border)" stroke-width="2.5"/>'
+              + '<circle class="ring-track" cx="14" cy="14" r="8" fill="none" stroke="var(--color-border-subtle)" stroke-width="2"/>'
+              + '<circle class="ring-fill-cpt" cx="14" cy="14" r="11" fill="none" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + cptCirc + '" stroke-dashoffset="' + cptOffset + '" transform="rotate(-90 14 14)"/>'
+              + '<circle class="ring-fill-fo" cx="14" cy="14" r="8" fill="none" stroke="var(--color-info)" stroke-width="2" stroke-linecap="round" stroke-dasharray="' + foCirc + '" stroke-dashoffset="' + foOffset + '" transform="rotate(-90 14 14)"/>'
+              + '</svg>'
+              + '</span>';
+            html += '<span class="checkride-competency-chevron">' + icon('chevron-down', 16) + '</span>';
+            html += '</div>';
 
-          /* Контейнер чекбоксов (ЗАКРЫТ — нет .open) */
-          html += '<div class="checkride-competency-items" data-competency="' + compCode + '">';
-          compCheckboxes.forEach(function(item) {
-            html += '<label class="checkride-competency-check">'
-              + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
-              + '<span' + renderRuText(item.label) + '</span>'
-            + '</label>';
-          });
-          html += '</div>';
+            /* Контейнер чекбоксов (ЗАКРЫТ — нет .open) — FFS: маркер CPT/F/O над items, 2 чекбокса в строке без лейблов */
+            html += '<div class="checkride-competency-items" data-competency="' + compCode + '">';
+            html += '<div class="checkride-crew-marker checkride-crew-marker-comp">'
+              + '<span class="checkride-crew-marker-label">CPT</span>'
+              + '<span class="checkride-crew-marker-label">F/O</span>'
+              + '</div>';
+            compCheckboxes.forEach(function(item) {
+              html += '<div class="checkride-competency-crew">';
+              html += '<div class="checkride-crew-grade-row">';
+              html += '<label class="checkride-crew-grade"><input type="checkbox" id="c_cpt_' + item.id + '"' + (item.okCpt ? ' checked' : '') + '></label>';
+              html += '<label class="checkride-crew-grade"><input type="checkbox" id="c_fo_' + item.id + '"' + (item.okFo ? ' checked' : '') + '></label>';
+              html += '</div>';
+              html += '<span class="checkride-crew-item-label"' + renderRuText(item.label) + '</span>';
+              html += '</div>';
+            });
+            html += '</div>';
+          } else {
+            /* LINE — одно кольцо, как раньше */
+            var compCheckedLine = 0;
+            for (var ci3 = 0; ci3 < compCheckboxes.length; ci3++) {
+              if (compCheckboxes[ci3].ok) compCheckedLine++;
+            }
+            var compOffsetLine = compTotal > 0 ? cptCirc * (1 - compCheckedLine / compTotal) : cptCirc;
+
+            html += '<div class="list-divider checkride-competency-toggle" data-competency="' + compCode + '">';
+            html += '<span class="list-divider-label">' + compCode + ' \u2014 ' + compLabel + '</span>';
+            html += '<span class="checkride-competency-count" data-total="' + compTotal + '" data-checked="' + compCheckedLine + '">'
+              + '<svg class="checkride-progress-ring" viewBox="0 0 28 28" aria-hidden="true">'
+              + '<circle class="ring-track" cx="14" cy="14" r="11" fill="none" stroke="var(--color-border)" stroke-width="2.5"/>'
+              + '<circle class="ring-fill-cpt" cx="14" cy="14" r="11" fill="none" stroke="var(--color-danger)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + cptCirc + '" stroke-dashoffset="' + compOffsetLine + '" transform="rotate(-90 14 14)"/>'
+              + '</svg>'
+              + '<span class="ring-text">' + compCheckedLine + '/' + compTotal + '</span>'
+              + '</span>';
+            html += '<span class="checkride-competency-chevron">' + icon('chevron-down', 16) + '</span>';
+            html += '</div>';
+
+            /* Контейнер чекбоксов (ЗАКРЫТ — нет .open) — LINE */
+            html += '<div class="checkride-competency-items" data-competency="' + compCode + '">';
+            compCheckboxes.forEach(function(item) {
+              html += '<label class="checkride-competency-check">'
+                + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
+                + '<span' + renderRuText(item.label) + '</span>'
+              + '</label>';
+            });
+            html += '</div>';
+          }
         });
       } else {
         /* Обычные секции — без аккордеона */
+        var isPilotingSection = (sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.');
+        /* FFS: PF-селектор для блока «Техника пилотирования.» — один на весь subname.
+           PF = Pilot Flying; второй пилот — PM (Pilot Monitoring) — по технике пилотирования не оценивается. */
+        if (_currentMode === 'ffs' && isPilotingSection) {
+          var pfVal = sec.pf || '';
+          html += '<div class="checkride-pf-row">'
+            + '<label for="cr_pf_' + _sectionIndex + '_' + secIdx + '">PF:</label>'
+            + '<select id="cr_pf_' + _sectionIndex + '_' + secIdx + '" class="checkride-pf-select" data-cr-pf="' + _sectionIndex + '_' + secIdx + '">'
+            + '<option value=""' + (pfVal === '' ? ' selected' : '') + '>\u2014</option>'
+            + '<option value="cpt"' + (pfVal === 'cpt' ? ' selected' : '') + '>CPT</option>'
+            + '<option value="fo"' + (pfVal === 'fo' ? ' selected' : '') + '>F/O</option>'
+            + '</select>'
+            + '</div>';
+        }
         groups.forEach(function(group) {
           if (group.topitem) {
             html += '<h4 class="checkride-topitem">' + getCompetencyLabel(group.topitem) + '</h4>';
+          }
+
+          /* FFS: маркер CPT/F/O над блоком items (кроме «Техника пилотирования.» — там PF-селектор вместо маркера).
+             Обёртка .checkride-crew-group[-wide] — единый источник ширины для marker+items (Вариант D аудита):
+             marker-label + crew-grade + radio-col получают flex:0 0 40px/80px из ОДНОГО класса-предка.
+             Смешанные группы (checkbox+select) — структурно невозможен рассинхрон. */
+          var needCrewGroup = (_currentMode === 'ffs' && !isPilotingSection && group.items.length > 0);
+          if (needCrewGroup) {
+            var hasSelect = group.items.some(function(it) { return it.type === 'select'; });
+            var groupClass = hasSelect ? 'checkride-crew-group checkride-crew-group-wide' : 'checkride-crew-group';
+            html += '<div class="' + groupClass + '">';
+            html += '<div class="checkride-crew-marker">'
+              + '<span class="checkride-crew-marker-spacer"></span>'
+              + '<div class="checkride-crew-grade-row checkride-crew-marker-row">'
+              + '<span class="checkride-crew-marker-label">CPT</span>'
+              + '<span class="checkride-crew-marker-label">F/O</span>'
+              + '</div>'
+              + '</div>';
           }
 
           group.items.forEach(function(item) {
             if (item.type === 'divider') {
               html += '<div class="checkride-divider"' + renderRuText(item.label) + '</div>';
             } else if (item.type === 'checkbox') {
-              html += '<div class="checkride-check-item">'
-                + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
-                + '<label for="c_' + item.id + '"' + renderRuText(item.label) + '</label>'
-              + '</div>';
+              if (_currentMode === 'ffs') {
+                /* FFS-crew: 2 чекбокса (CPT+F/O) в одной строке, БЕЗ лейблов (маркер наверху) */
+                html += '<div class="checkride-check-item">'
+                  + '<span class="checkride-check-item-label"' + renderRuText(item.label) + '</span>'
+                  + '<div class="checkride-crew-grade-row">'
+                  + '<label class="checkride-crew-grade"><input type="checkbox" id="c_cpt_' + item.id + '"' + (item.okCpt ? ' checked' : '') + '></label>'
+                  + '<label class="checkride-crew-grade"><input type="checkbox" id="c_fo_' + item.id + '"' + (item.okFo ? ' checked' : '') + '></label>'
+                  + '</div>'
+                + '</div>';
+              } else {
+                html += '<div class="checkride-check-item">'
+                  + '<input type="checkbox" id="c_' + item.id + '"' + (item.ok ? ' checked' : '') + '>'
+                  + '<label for="c_' + item.id + '"' + renderRuText(item.label) + '</label>'
+                + '</div>';
+              }
             } else if (item.type === 'radio') {
-              html += '<div class="checkride-radio-group">'
-                + '<p class="checkride-radio-label"><b' + renderRuText(item.label) + '</b></p>';
-              item.options.forEach(function(opt) {
-                html += '<label class="checkride-radio-option">'
-                  + '<input type="radio" name="r_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.ok === opt ? ' checked' : '') + '>'
-                  + '<span>' + app.escapeHtml(opt) + '</span>'
-                + '</label>';
-              });
-              html += '</div>';
+              if (_currentMode === 'ffs') {
+                /* FFS-crew, «Техника пилотирования.»: radio только для выбранного PF.
+                   PF=null → radio НЕ рендерится (только PF-селектор). */
+                if (isPilotingSection) {
+                  if (sec.pf === 'cpt') {
+                    html += '<div class="checkride-radio-group">'
+                      + '<p class="checkride-radio-label"><b' + renderRuText(item.label) + '</b></p>';
+                    item.options.forEach(function(opt) {
+                      html += '<label class="checkride-radio-option">'
+                        + '<input type="radio" name="r_cpt_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.okCpt === opt ? ' checked' : '') + '>'
+                        + '<span>' + app.escapeHtml(opt) + '</span>'
+                      + '</label>';
+                    });
+                    html += '</div>';
+                  } else if (sec.pf === 'fo') {
+                    html += '<div class="checkride-radio-group">'
+                      + '<p class="checkride-radio-label"><b' + renderRuText(item.label) + '</b></p>';
+                    item.options.forEach(function(opt) {
+                      html += '<label class="checkride-radio-option">'
+                        + '<input type="radio" name="r_fo_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.okFo === opt ? ' checked' : '') + '>'
+                        + '<span>' + app.escapeHtml(opt) + '</span>'
+                      + '</label>';
+                    });
+                    html += '</div>';
+                  }
+                  /* sec.pf === null → radio не рендерится; только PF-селектор */
+                } else {
+                  /* FFS-crew, обычный radio (не «Техника пилотирования.»): 2 колонки radio (CPT+F/O), маркер наверху */
+                  html += '<div class="checkride-radio-group">'
+                    + '<p class="checkride-radio-label"><b' + renderRuText(item.label) + '</b></p>';
+                  html += '<div class="checkride-crew-grade-row"><div class="checkride-crew-radio-col">';
+                  item.options.forEach(function(opt) {
+                    html += '<label class="checkride-radio-option">'
+                      + '<input type="radio" name="r_cpt_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.okCpt === opt ? ' checked' : '') + '>'
+                      + '<span>' + app.escapeHtml(opt) + '</span>'
+                    + '</label>';
+                  });
+                  html += '</div><div class="checkride-crew-radio-col">';
+                  item.options.forEach(function(opt) {
+                    html += '<label class="checkride-radio-option">'
+                      + '<input type="radio" name="r_fo_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.okFo === opt ? ' checked' : '') + '>'
+                      + '<span>' + app.escapeHtml(opt) + '</span>'
+                    + '</label>';
+                  });
+                  html += '</div></div>';
+                  html += '</div>';
+                }
+              } else {
+                html += '<div class="checkride-radio-group">'
+                  + '<p class="checkride-radio-label"><b' + renderRuText(item.label) + '</b></p>';
+                item.options.forEach(function(opt) {
+                  html += '<label class="checkride-radio-option">'
+                    + '<input type="radio" name="r_' + item.id + '" value="' + app.escapeAttr(opt) + '"' + (item.ok === opt ? ' checked' : '') + '>'
+                    + '<span>' + app.escapeHtml(opt) + '</span>'
+                  + '</label>';
+                });
+                html += '</div>';
+              }
             } else if (item.type === 'select') {
-              /* \u041E\u0446\u0435\u043D\u043E\u0447\u043D\u044B\u0439 dropdown (MK \u043F\u0443\u043D\u043A\u0442\u044B) \u2014 options \u0431\u0435\u0440\u0443\u0442\u0441\u044F \u0438\u0437 item.options (data-driven, default 5/4/3/2/na) */
-              var gVal = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
-              html += '<div class="checkride-grade-item">'
-                + '<span class="checkride-grade-label"' + renderRuText(item.label) + '</span>'
-                + '<select class="checkride-grade-select" data-cr-grade="' + item.id + '">'
-                + '<option value=""' + (gVal === '' ? ' selected' : '') + '>\u2014</option>';
-              (item.options || []).forEach(function(opt) {
-                var optLabel = opt === 'na' ? '\u2717 \u043D/\u043F' : opt;
-                html += '<option value="' + app.escapeAttr(opt) + '"' + (gVal === opt ? ' selected' : '') + '>' + app.escapeHtml(optLabel) + '</option>';
-              });
-              html += '</select>'
-              + '</div>';
+              /* Оценочный dropdown — options берутся из item.options (data-driven, default 5/4/3/2/na) */
+              if (_currentMode === 'ffs') {
+                /* FFS-crew: 2 select в одной строке (CPT+F/O), БЕЗ лейблов (маркер наверху) */
+                var cptGVal = (item.okCpt === false || item.okCpt === null || item.okCpt === undefined) ? '' : String(item.okCpt);
+                var foGVal  = (item.okFo  === false || item.okFo  === null || item.okFo  === undefined) ? '' : String(item.okFo);
+                html += '<div class="checkride-grade-item">'
+                  + '<span class="checkride-grade-label"' + renderRuText(item.label) + '</span>'
+                  + '<div class="checkride-crew-grade-row">'
+                  + '<div class="checkride-crew-grade">'
+                  + '<select class="checkride-grade-select" data-cr-grade="cpt_' + item.id + '">'
+                  + '<option value=""' + (cptGVal === '' ? ' selected' : '') + '>\u2014</option>';
+                (item.options || []).forEach(function(opt) {
+                  var optLabel = opt === 'na' ? '\u2717 \u043D/\u043F' : opt;
+                  html += '<option value="' + app.escapeAttr(opt) + '"' + (cptGVal === opt ? ' selected' : '') + '>' + app.escapeHtml(optLabel) + '</option>';
+                });
+                html += '</select></div>';
+                html += '<div class="checkride-crew-grade">'
+                  + '<select class="checkride-grade-select" data-cr-grade="fo_' + item.id + '">'
+                  + '<option value=""' + (foGVal === '' ? ' selected' : '') + '>\u2014</option>';
+                (item.options || []).forEach(function(opt) {
+                  var optLabel = opt === 'na' ? '\u2717 \u043D/\u043F' : opt;
+                  html += '<option value="' + app.escapeAttr(opt) + '"' + (foGVal === opt ? ' selected' : '') + '>' + app.escapeHtml(optLabel) + '</option>';
+                });
+                html += '</select></div>'
+                  + '</div>'
+                + '</div>';
+              } else {
+                var gVal = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
+                html += '<div class="checkride-grade-item">'
+                  + '<span class="checkride-grade-label"' + renderRuText(item.label) + '</span>'
+                  + '<select class="checkride-grade-select" data-cr-grade="' + item.id + '">'
+                  + '<option value=""' + (gVal === '' ? ' selected' : '') + '>\u2014</option>';
+                (item.options || []).forEach(function(opt) {
+                  var optLabel = opt === 'na' ? '\u2717 \u043D/\u043F' : opt;
+                  html += '<option value="' + app.escapeAttr(opt) + '"' + (gVal === opt ? ' selected' : '') + '>' + app.escapeHtml(optLabel) + '</option>';
+                });
+                html += '</select>'
+                + '</div>';
+              }
             }
           });
+
+          if (needCrewGroup) {
+            html += '</div>';
+          }
         });
       }
 
@@ -531,18 +856,27 @@
 
     html += '<h2 class="checkride-report-main-title">\u041E\u0422\u0427\u0415\u0422 \u041F\u041E \u041F\u0420\u041E\u0412\u0415\u0420\u041A\u0415</h2>';
 
-    /* Meta */
-    html += '<div class="checkride-report-meta">'
-      + '<p><b>\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u044B\u0439:</b> <span id="r_fio"></span></p>'
-      + '<p><b>\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F:</b> <span id="r_license"></span></p>'
-      + '<p><b>\u0414\u0430\u0442\u0430:</b> <span id="r_date"></span></p>'
-      + '<p><b>\u0420\u0435\u0436\u0438\u043C:</b> <span id="r_mode"></span></p>'
-      + '<p><b>\u041C\u0430\u0440\u0448\u0440\u0443\u0442:</b> <span id="r_route"></span></p>'
-      + '<p><b>\u041D\u043E\u043C\u0435\u0440 \u0412\u0421:</b> <span id="r_ac_number"></span></p>'
-      + '<p><b>\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F:</b> <input type="time" id="r_flight_time" class="checkride-input checkride-report-input" value="' + app.escapeAttr(_pilotData.flight_time || '') + '"></p>'
-    + '</div>';
+    /* Meta — FFS: 2 пилота + instructor, без route/ac_number/flight_time;
+       LINE: проверяемый + instructor + route + ac_number + flight_time */
+    html += '<div class="checkride-report-meta">';
+    if (_currentMode === 'ffs') {
+      html += '<p><b>CPT:</b> <span id="r_cpt_fio"></span> <span class="checkride-meta-sep">\u2014</span> <b>\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F:</b> <span id="r_cpt_license"></span></p>';
+      html += '<p><b>F/O:</b> <span id="r_fo_fio"></span> <span class="checkride-meta-sep">\u2014</span> <b>\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F:</b> <span id="r_fo_license"></span></p>';
+      html += '<p><b>\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439:</b> <span id="r_instructor"></span></p>';
+      html += '<p><b>\u0414\u0430\u0442\u0430:</b> <span id="r_date"></span></p>';
+      html += '<p><b>\u0420\u0435\u0436\u0438\u043C:</b> <span id="r_mode"></span></p>';
+    } else {
+      html += '<p><b>\u041F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u044B\u0439:</b> <span id="r_fio"></span></p>'
+        + '<p><b>\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F:</b> <span id="r_license"></span></p>'
+        + '<p><b>\u0414\u0430\u0442\u0430:</b> <span id="r_date"></span></p>'
+        + '<p><b>\u0420\u0435\u0436\u0438\u043C:</b> <span id="r_mode"></span></p>'
+        + '<p><b>\u041C\u0430\u0440\u0448\u0440\u0443\u0442:</b> <span id="r_route"></span></p>'
+        + '<p><b>\u041D\u043E\u043C\u0435\u0440 \u0412\u0421:</b> <span id="r_ac_number"></span></p>'
+        + '<p><b>\u041F\u043E\u043B\u0451\u0442\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F:</b> <input type="time" id="r_flight_time" class="checkride-input checkride-report-input" value="' + app.escapeAttr(_pilotData.flight_time || '') + '"></p>';
+    }
+    html += '</div>';
 
-    /* Ratings */
+    /* Ratings — для FFS два блока (CPT и F/O) рендерятся в buildReport; для LINE — один */
     html += '<div id="checkride-report-data"></div>';
 
     /* Competencies */
@@ -634,10 +968,17 @@
     /* 1. Сохраняем данные из DOM в _pilotData ДО смены экрана */
     readPilotFromDOM();
 
-    /* 2. Валидация */
-    if (!_pilotData.fio || !_pilotData.instructor) {
-      app.showToast('\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u0424\u0418\u041E \u043F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u043E\u0433\u043E \u0438 \u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0430');
-      return;
+    /* 2. Валидация — FFS: cpt.fio + fo.fio + instructor; LINE: cpt.fio + instructor */
+    if (_currentMode === 'ffs') {
+      if (!_pilotData.cpt.fio || !_pilotData.fo.fio || !_pilotData.instructor) {
+        app.showToast('\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u0424\u0418\u041E CPT, F/O \u0438 \u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0430');
+        return;
+      }
+    } else {
+      if (!_pilotData.cpt.fio || !_pilotData.instructor) {
+        app.showToast('\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u0424\u0418\u041E \u043F\u0440\u043E\u0432\u0435\u0440\u044F\u0435\u043C\u043E\u0433\u043E \u0438 \u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0442\u043E\u0440\u0430');
+        return;
+      }
     }
 
     var dataToUse = _currentMode === 'ffs' ? _dataFfs : _dataLine;
@@ -656,15 +997,31 @@
     /* 4. Deep clone */
     _data = JSON.parse(JSON.stringify(dataToUse));
 
-    /* 5. Initialize state */
+    /* 5. Initialize state — FFS: okCpt/okFo (2 пилота) + sec.pf=null для «Техника пилотирования.»; LINE: ok (как раньше) */
+    var isFfs = (_currentMode === 'ffs');
     _data.checklists.forEach(function(mainSec) {
       mainSec.sections.forEach(function(sec) {
         sec.note = '';
         sec.img = null;
+        /* FFS: PF для «Техника пилотирования.» — null (пользователь выберет на экране) */
+        if (isFfs && sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.') {
+          sec.pf = null;
+        }
         var groups = sec.groups || [{ items: sec.items || [] }];
         groups.forEach(function(group) {
           group.items.forEach(function(item) {
-            if (item.type !== 'divider') item.ok = (item.type === 'radio' || item.type === 'select') ? null : false;
+            if (item.type === 'divider') return;
+            if (isFfs) {
+              if (item.type === 'checkbox') {
+                item.okCpt = false;
+                item.okFo  = false;
+              } else if (item.type === 'radio' || item.type === 'select') {
+                item.okCpt = null;
+                item.okFo  = null;
+              }
+            } else {
+              item.ok = (item.type === 'radio' || item.type === 'select') ? null : false;
+            }
           });
         });
       });
@@ -681,24 +1038,63 @@
      ═══════════════════════════════════════════ */
   function saveState() {
     if (!_data) return;
+    var isFfs = (_currentMode === 'ffs');
     var mainSection = _data.checklists[_sectionIndex];
     mainSection.sections.forEach(function(sec, secIdx) {
+      /* FFS: читаем PF-селектор для «Техника пилотирования.» */
+      if (isFfs && sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.') {
+        var pfEl = document.querySelector('[data-cr-pf="' + _sectionIndex + '_' + secIdx + '"]');
+        if (pfEl) sec.pf = pfEl.value || null;
+      }
       var groups = sec.groups || [{ items: sec.items || [] }];
       groups.forEach(function(group) {
         group.items.forEach(function(item) {
-          if (item.type === 'checkbox') {
-            var cb = document.getElementById('c_' + item.id);
-            if (cb) item.ok = cb.checked;
-          } else if (item.type === 'select') {
-            var gradeSel = document.querySelector('[data-cr-grade="' + item.id + '"]');
-            if (gradeSel) {
-              item.ok = gradeSel.value || '';
-            } else {
-              item.ok = '';
+          if (isFfs) {
+            if (item.type === 'checkbox') {
+              var cbCpt = document.getElementById('c_cpt_' + item.id);
+              var cbFo  = document.getElementById('c_fo_' + item.id);
+              if (cbCpt) item.okCpt = cbCpt.checked;
+              if (cbFo)  item.okFo  = cbFo.checked;
+            } else if (item.type === 'select') {
+              var cptSel = document.querySelector('[data-cr-grade="cpt_' + item.id + '"]');
+              var foSel  = document.querySelector('[data-cr-grade="fo_' + item.id + '"]');
+              item.okCpt = cptSel ? (cptSel.value || '') : '';
+              item.okFo  = foSel  ? (foSel.value  || '') : '';
+            } else if (item.type === 'radio') {
+              /* FFS radio: для «Техника пилотирования.» — radio только для выбранного PF.
+                 Читаем okCpt только если PF=CPT, okFo только если PF=F/O.
+                 Если PF=null — оба поля не трогаем (сохраняются прежние значения в кеше). */
+              if (sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.') {
+                if (sec.pf === 'cpt') {
+                  var cptR = document.querySelector('input[name="r_cpt_' + item.id + '"]:checked');
+                  item.okCpt = cptR ? cptR.value : null;
+                } else if (sec.pf === 'fo') {
+                  var foR = document.querySelector('input[name="r_fo_' + item.id + '"]:checked');
+                  item.okFo = foR ? foR.value : null;
+                }
+              } else {
+                /* Обычный radio (не «Техника пилотирования.»): 2 колонки (CPT+F/O) */
+                var cptSel2 = document.querySelector('input[name="r_cpt_' + item.id + '"]:checked');
+                var foSel2  = document.querySelector('input[name="r_fo_' + item.id + '"]:checked');
+                item.okCpt = cptSel2 ? cptSel2.value : null;
+                item.okFo  = foSel2  ? foSel2.value  : null;
+              }
             }
-          } else if (item.type === 'radio') {
-            var selected = document.querySelector('input[name="r_' + item.id + '"]:checked');
-            item.ok = selected ? selected.value : null;
+          } else {
+            if (item.type === 'checkbox') {
+              var cb = document.getElementById('c_' + item.id);
+              if (cb) item.ok = cb.checked;
+            } else if (item.type === 'select') {
+              var gradeSel = document.querySelector('[data-cr-grade="' + item.id + '"]');
+              if (gradeSel) {
+                item.ok = gradeSel.value || '';
+              } else {
+                item.ok = '';
+              }
+            } else if (item.type === 'radio') {
+              var selected = document.querySelector('input[name="r_' + item.id + '"]:checked');
+              item.ok = selected ? selected.value : null;
+            }
           }
         });
       });
@@ -709,8 +1105,10 @@
 
   /* ═══════════════════════════════════════════
      CORE LOGIC: Competency calculation
+     FFS-crew: pilotKey='cpt'|'fo' выбирает item.okCpt или item.okFo.
+     LINE: pilotKey опциональный (по умолчанию читает item.ok).
      ═══════════════════════════════════════════ */
-  function calculateCompetencies() {
+  function calculateCompetencies(pilotKey) {
     var competencyMap = {};
 
     _data.checklists.forEach(function(mainSec) {
@@ -728,18 +1126,19 @@
           }
           group.items.forEach(function(item) {
             if (item.type !== 'checkbox') return;
+            var isOk = pilotKey ? item['ok' + pilotKey] : item.ok;
             competencyMap[compCode].total++;
-            if (item.ok) competencyMap[compCode].checked++;
+            if (isOk) competencyMap[compCode].checked++;
 
             var existingItem = null;
             for (var k = 0; k < competencyMap[compCode].items.length; k++) {
               if (competencyMap[compCode].items[k].label === item.label) { existingItem = competencyMap[compCode].items[k]; break; }
             }
             if (!existingItem) {
-              competencyMap[compCode].items.push({ label: item.label, checked: item.ok ? 1 : 0, count: 1 });
+              competencyMap[compCode].items.push({ label: item.label, checked: isOk ? 1 : 0, count: 1 });
             } else {
               existingItem.count++;
-              if (item.ok) existingItem.checked++;
+              if (isOk) existingItem.checked++;
             }
           });
         });
@@ -763,8 +1162,10 @@
 
   /* ═══════════════════════════════════════════
      CORE LOGIC: Calculate ratings
+     FFS-crew: pilotKey='Cpt'|'Fo' выбирает item.okCpt или item.okFo.
+     LINE: pilotKey опциональный (читает item.ok).
      ═══════════════════════════════════════════ */
-  function calculateRatings() {
+  function calculateRatings(pilotKey) {
     var reportHtml = '<div class="checkride-rating-summary"><h3>\u0421\u0432\u043E\u0434\u043D\u0430\u044F \u043E\u0446\u0435\u043D\u043A\u0430</h3>';
 
     _data.checklists.forEach(function(mainSec) {
@@ -774,15 +1175,24 @@
 
       mainSec.sections.forEach(function(sec) {
         var groups = sec.groups || [{ items: sec.items || [] }];
+        /* FFS: если секция «Техника пилотирования.» и pilotKey ≠ PF → SKIP radio-items
+           (PM не оценивается по технике пилотирования; null→score 2 исказил бы средний балл PM). */
+        var isPiloting = (sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.');
+        var skipPilotingForPilot = false;
+        if (pilotKey && isPiloting && sec.pf && pilotKey.toLowerCase() !== sec.pf) {
+          skipPilotingForPilot = true;
+        }
         groups.forEach(function(g) { g.items.forEach(function(i) {
+          if (skipPilotingForPilot && i.type === 'radio') return;
+          var val = pilotKey ? i['ok' + pilotKey] : i.ok;
           if (i.type === 'radio') {
             hasPilotingSection = true;
-            var score = i.ok ? (5 - i.options.indexOf(i.ok)) : 2;
+            var score = val ? (5 - i.options.indexOf(val)) : 2;
             piloting.push(score < 2 ? 2 : score);
           } else if (i.type === 'select') {
-            /* \u041E\u0446\u0435\u043D\u043A\u0438 2-5 \u0443\u0447\u0430\u0442\u0441\u044F \u0432 \u0441\u0440\u0435\u0434\u043D\u0435\u043C, na/\u043D\u0435 \u043E\u0446\u0435\u043D\u043E\u043A\u043E \u2014 \u043D\u0435 \u0443\u0447\u0438\u0442\u044B\u0432\u0430\u044E\u0442\u0441\u044F */
-            if (i.ok === '2' || i.ok === '3' || i.ok === '4' || i.ok === '5') {
-              gradeValues.push(parseInt(i.ok, 10));
+            /* Оценки 2-5 учитываются в среднем, na/не оценено — не учитываются */
+            if (val === '2' || val === '3' || val === '4' || val === '5') {
+              gradeValues.push(parseInt(val, 10));
             }
           }
         }); });
@@ -791,7 +1201,7 @@
       var pRes = piloting.length ? (piloting.indexOf(2) !== -1 ? 2 : Math.round(piloting.reduce(function(a,b){return a+b;},0)/piloting.length)) : '-';
       var gRes = gradeValues.length ? Math.round(gradeValues.reduce(function(a,b){return a+b;},0)/gradeValues.length) : '-';
 
-      var ratingLine = '<div class="checkride-rating-block"><b>' + mainSec.name + '</b>';
+      var ratingLine = '<div class="checkride-rating-block"><b>' + app.escapeHtml(mainSec.name) + '</b>';
       if (hasPilotingSection) {
         ratingLine += ' | \u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F: <span class="checkride-score-val">' + pRes + '</span>';
       }
@@ -803,13 +1213,13 @@
     });
 
     /* Competencies in summary */
-    var competencies = calculateCompetencies();
+    var competencies = calculateCompetencies(pilotKey ? pilotKey.toLowerCase() : undefined);
     if (Object.keys(competencies).length > 0) {
       reportHtml += '<div class="checkride-competencies-rating-divider">';
       reportHtml += '<div class="checkride-competencies-rating-title">\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438:</div>';
       for (var code in competencies) {
         var cLabel = getCompetencyLabel(code);
-        reportHtml += '<div class="checkride-rating-block"><b>' + code + '</b> — ' + cLabel + ': <span class="checkride-score-val">' + competencies[code].score + '</span></div>';
+        reportHtml += '<div class="checkride-rating-block"><b>' + app.escapeHtml(code) + '</b> — ' + app.escapeHtml(cLabel) + ': <span class="checkride-score-val">' + competencies[code].score + '</span></div>';
       }
       reportHtml += '</div>';
     }
@@ -819,97 +1229,153 @@
 
   /* ═══════════════════════════════════════════
      CORE LOGIC: Build report
+     FFS-crew: рендерит 2 блока (CPT и F/O) — каждый со своим summary + detailed items + competencies.
+     LINE: один блок (как раньше).
      ═══════════════════════════════════════════ */
   function buildReport() {
     var dataEl = document.getElementById('checkride-report-data');
     if (!dataEl) return;
 
-    dataEl.innerHTML = calculateRatings();
+    var isFfs = (_currentMode === 'ffs');
+    /* FFS: рендерим 2 блока (CPT и F/O); LINE: один блок (pilotKey=undefined) */
+    var pilots = isFfs ? [{ key: 'Cpt', label: 'CPT' }, { key: 'Fo', label: 'F/O' }] : [{ key: null, label: '' }];
 
-    _data.checklists.forEach(function(mainSec) {
-      dataEl.innerHTML += '<h2 class="checkride-report-main-title">' + app.escapeHtml(mainSec.name) + '</h2>';
+    dataEl.innerHTML = '';
+    pilots.forEach(function(p) {
+      if (isFfs) {
+        /* Заголовок блока пилота в FFS */
+        var pilotFio = (p.key === 'Cpt') ? _pilotData.cpt.fio : _pilotData.fo.fio;
+        var pilotLic = (p.key === 'Cpt') ? _pilotData.cpt.license : _pilotData.fo.license;
+        dataEl.innerHTML += '<div class="checkride-report-crew-block">'
+          + '<div class="checkride-report-crew-title">' + p.label + ' — ' + app.escapeHtml(pilotFio || '-') + ' (' + app.escapeHtml('\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F: ' + (pilotLic || '-')) + ')</div>';
+      }
 
-      mainSec.sections.forEach(function(sec) {
-        if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+      dataEl.innerHTML += calculateRatings(p.key);
 
-        var sHtml = '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + app.escapeHtml(sec.subname) + '</h3>';
-        var groups = sec.groups || [{ items: sec.items || [] }];
-        groups.forEach(function(group) {
-          if (group.topitem) sHtml += '<h4 class="checkride-report-topitem">' + getCompetencyLabel(group.topitem) + '</h4>';
-          group.items.forEach(function(item) {
-            if (item.type === 'divider') return;
-            if (item.type === 'select') {
-              /* \u041E\u0442\u0447\u0451\u0442: \u043E\u0446\u0435\u043D\u043A\u0430 \u0432\u043C\u0435\u0441\u0442\u043E OK/\u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435 */
-              var gVal = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
-              var gradeRes = '';
-              if (gVal === '2' || gVal === '3' || gVal === '4' || gVal === '5') {
-                gradeRes = '<span class="checkride-score-val">\u041E\u0446\u0435\u043D\u043A\u0430: ' + gVal + '</span>';
-              } else if (gVal === 'na') {
-                gradeRes = '<span class="checkride-grade-na">\u2717 \u043D\u0435 \u043F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F</span>';
-              } else {
-                gradeRes = '<span class="checkride-grade-na">\u2014 \u043D\u0435 \u043E\u0446\u0435\u043D\u0435\u043D\u043E</span>';
-              }
-              sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + gradeRes + '</div></div>';
-            } else if (item.type === 'checkbox') {
-              var res = item.ok
-                ? '<span class="checkride-icon-ok">\u2713 OK</span>'
-                : '<span class="checkride-icon-fail">\u2717 \u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435</span>';
-              sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + res + '</div></div>';
-            } else if (item.type === 'radio') {
-              var scoreValue = item.ok || '2 (\u043D/\u0434)';
-              var scoreIndex = item.ok ? item.options.indexOf(item.ok) : -1;
-              var actualScore = scoreIndex >= 0 ? (5 - scoreIndex) : 2;
-              sHtml += '<div class="checkride-report-item-row checkride-report-radio-item">'
-                + '<p class="checkride-radio-label-bold"' + renderRuText(item.label) + '</p>'
-                + '<div class="checkride-radio-score-indent"><b>\u041E\u0446\u0435\u043D\u043A\u0430:</b> ' + actualScore + ' - ' + scoreValue + '</div>'
+      _data.checklists.forEach(function(mainSec) {
+        dataEl.innerHTML += '<h2 class="checkride-report-main-title">' + app.escapeHtml(mainSec.name) + '</h2>';
+
+        mainSec.sections.forEach(function(sec) {
+          if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+
+          var sHtml = '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + app.escapeHtml(sec.subname) + '</h3>';
+          /* FFS: метка PF для секции «Техника пилотирования.» */
+          if (p.key && sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.' && sec.pf) {
+            sHtml += '<p class="checkride-report-pf"><b>PF:</b> ' + (sec.pf === 'cpt' ? 'CPT' : 'F/O') + '</p>';
+          }
+          /* FFS: PM-пилот в «Технике пилотирования.» — одна метка «{pilotLabel}: PM для этого упражнения»,
+             items не перечисляем (PM по технике пилотирования не оценивается). */
+          var isPmForSection = (p.key && sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.' && sec.pf && p.key.toLowerCase() !== sec.pf);
+          if (isPmForSection) {
+            sHtml += '<p class="checkride-pm-mark">' + app.escapeHtml(p.label + ': PM \u0434\u043B\u044F \u044D\u0442\u043E\u0433\u043E \u0443\u043F\u0440\u0430\u0436\u043D\u0435\u043D\u0438\u044F') + '</p>';
+            if (sec.note || sec.img) {
+              sHtml += '<div class="checkride-report-comment">'
+                + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> <span' + renderRuText(sec.note) + '</span></p>' : '')
+                + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">' : '')
               + '</div>';
             }
+            dataEl.innerHTML += sHtml + '</div>';
+            return;
+          }
+          var groups = sec.groups || [{ items: sec.items || [] }];
+          groups.forEach(function(group) {
+            if (group.topitem) sHtml += '<h4 class="checkride-report-topitem">' + app.escapeHtml(getCompetencyLabel(group.topitem)) + '</h4>';
+            group.items.forEach(function(item) {
+              if (item.type === 'divider') return;
+              var val = p.key ? item['ok' + p.key] : item.ok;
+              if (item.type === 'select') {
+                /* Отчёт: оценка вместо OK/Нарушение */
+                var gVal = (val === false || val === null || val === undefined) ? '' : String(val);
+                var gradeRes = '';
+                if (gVal === '2' || gVal === '3' || gVal === '4' || gVal === '5') {
+                  gradeRes = '<span class="checkride-score-val">\u041E\u0446\u0435\u043D\u043A\u0430: ' + gVal + '</span>';
+                } else if (gVal === 'na') {
+                  gradeRes = '<span class="checkride-grade-na">\u2717 \u043D\u0435 \u043F\u0440\u0438\u043C\u0435\u043D\u044F\u0435\u0442\u0441\u044F</span>';
+                } else {
+                  gradeRes = '<span class="checkride-grade-na">\u2014 \u043D\u0435 \u043E\u0446\u0435\u043D\u0435\u043D\u043E</span>';
+                }
+                sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + gradeRes + '</div></div>';
+              } else if (item.type === 'checkbox') {
+                var res = val
+                  ? '<span class="checkride-icon-ok">\u2713 OK</span>'
+                  : '<span class="checkride-icon-fail">\u2717 \u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435</span>';
+                sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + res + '</div></div>';
+              } else if (item.type === 'radio') {
+                var scoreValue = val || '2 (\u043D/\u0434)';
+                var scoreIndex = val ? item.options.indexOf(val) : -1;
+                var actualScore = scoreIndex >= 0 ? (5 - scoreIndex) : 2;
+                sHtml += '<div class="checkride-report-item-row checkride-report-radio-item">'
+                  + '<p class="checkride-radio-label-bold"' + renderRuText(item.label) + '</p>'
+                  + '<div class="checkride-radio-score-indent"><b>\u041E\u0446\u0435\u043D\u043A\u0430:</b> ' + actualScore + ' - ' + app.escapeHtml(scoreValue) + '</div>'
+                + '</div>';
+              }
+            });
           });
+          if (sec.note || sec.img) {
+            sHtml += '<div class="checkride-report-comment">'
+              + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> <span' + renderRuText(sec.note) + '</span></p>' : '')
+              + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">' : '')
+            + '</div>';
+          }
+          dataEl.innerHTML += sHtml + '</div>';
         });
-        if (sec.note || sec.img) {
-          sHtml += '<div class="checkride-report-comment">'
-            + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> <span' + renderRuText(sec.note) + '</span></p>' : '')
-            + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">' : '')
-          + '</div>';
-        }
-        dataEl.innerHTML += sHtml + '</div>';
       });
-    });
 
-    /* Detailed competencies */
-    var competencies = calculateCompetencies();
-    var compHtml = '<div class="checkride-competencies-divider">';
-    compHtml += '<h2 class="checkride-competencies-title">\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438:</h2>';
-    for (var code in competencies) {
-      var items = competencies[code].items;
-      compHtml += '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + code + ' \u2014 ' + getCompetencyLabel(code) + '</h3>';
-      items.forEach(function(item) {
-        var percent = item.count > 0 ? (item.checked / item.count) * 100 : 0;
-        var score = 2;
-        if (percent >= 80) score = 5;
-        else if (percent >= 50) score = 4;
-        else if (percent >= 10) score = 3;
-        var prefix = '';
-        var colorClass = '';
-        if (score === 5) prefix = '\u0412\u0441\u0435\u0433\u0434\u0430';
-        else if (score === 4) prefix = '\u0420\u0435\u0433\u0443\u043B\u044F\u0440\u043D\u043E';
-        else if (score === 3) { prefix = '\u0418\u043D\u043E\u0433\u0434\u0430'; colorClass = 'checkride-comp-yellow'; }
-        else { prefix = '\u0420\u0435\u0434\u043A\u043E'; colorClass = 'checkride-comp-red'; }
-        var labelText = item.label.charAt(0).toLowerCase() + item.label.slice(1);
-        compHtml += '<div class="checkride-competency-item ' + colorClass + '">- ' + prefix + ' ' + labelText + '</div>';
-      });
+      /* Detailed competencies — параметризуем по пилоту */
+      var competencies = calculateCompetencies(p.key ? p.key.toLowerCase() : undefined);
+      var compHtml = '<div class="checkride-competencies-divider">';
+      compHtml += '<h2 class="checkride-competencies-title">\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438:</h2>';
+      for (var code in competencies) {
+        var items = competencies[code].items;
+        compHtml += '<div class="checkride-report-section"><h3 class="checkride-report-subname">' + app.escapeHtml(code) + ' \u2014 ' + app.escapeHtml(getCompetencyLabel(code)) + '</h3>';
+        items.forEach(function(item) {
+          var percent = item.count > 0 ? (item.checked / item.count) * 100 : 0;
+          var score = 2;
+          if (percent >= 80) score = 5;
+          else if (percent >= 50) score = 4;
+          else if (percent >= 10) score = 3;
+          var prefix = '';
+          var colorClass = '';
+          if (score === 5) prefix = '\u0412\u0441\u0435\u0433\u0434\u0430';
+          else if (score === 4) prefix = '\u0420\u0435\u0433\u0443\u043B\u044F\u0440\u043D\u043E';
+          else if (score === 3) { prefix = '\u0418\u043D\u043E\u0433\u0434\u0430'; colorClass = 'checkride-comp-yellow'; }
+          else { prefix = '\u0420\u0435\u0434\u043A\u043E'; colorClass = 'checkride-comp-red'; }
+          var labelText = item.label.charAt(0).toLowerCase() + item.label.slice(1);
+          compHtml += '<div class="checkride-competency-item ' + colorClass + '">- ' + prefix + ' ' + labelText + '</div>';
+        });
+        compHtml += '</div>';
+      }
       compHtml += '</div>';
-    }
-    compHtml += '</div>';
-    var compEl = document.getElementById('checkride-competencies');
-    if (compEl) compEl.innerHTML = compHtml;
+      dataEl.innerHTML += compHtml;
 
-    /* Meta fields — из _pilotData, НЕ из DOM (кроме flight_time — это input) */
-    var metaFields = ['fio', 'license', 'instructor', 'route', 'ac_number'];
-    metaFields.forEach(function(f) {
-      var target = document.getElementById('r_' + f);
-      if (target) target.innerText = _pilotData[f] || '-';
+      if (isFfs) {
+        dataEl.innerHTML += '</div>';  /* закрытие .checkride-report-crew-block */
+      }
     });
+
+    var compEl = document.getElementById('checkride-competencies');
+    if (compEl) compEl.innerHTML = '';  /* в FFS competencies уже встроены в блоки пилотов; в LINE — тоже (внутри dataEl) */
+
+    /* Meta fields — FFS: r_cpt_fio/r_cpt_license/r_fo_fio/r_fo_license/r_instructor; LINE: r_fio/r_license/r_instructor/r_route/r_ac_number */
+    if (isFfs) {
+      var cptFioEl = document.getElementById('r_cpt_fio');
+      if (cptFioEl) cptFioEl.innerText = _pilotData.cpt.fio || '-';
+      var cptLicEl = document.getElementById('r_cpt_license');
+      if (cptLicEl) cptLicEl.innerText = _pilotData.cpt.license || '-';
+      var foFioEl = document.getElementById('r_fo_fio');
+      if (foFioEl) foFioEl.innerText = _pilotData.fo.fio || '-';
+      var foLicEl = document.getElementById('r_fo_license');
+      if (foLicEl) foLicEl.innerText = _pilotData.fo.license || '-';
+      var instrEl = document.getElementById('r_instructor');
+      if (instrEl) instrEl.innerText = _pilotData.instructor || '-';
+    } else {
+      var metaFields = ['fio', 'license', 'instructor', 'route', 'ac_number'];
+      metaFields.forEach(function(f) {
+        var val = (f === 'fio') ? _pilotData.cpt.fio : (f === 'license' ? _pilotData.cpt.license : _pilotData[f]);
+        var target = document.getElementById('r_' + f);
+        if (target) target.innerText = val || '-';
+      });
+    }
     var dateEl = document.getElementById('r_date');
     if (dateEl) dateEl.innerText = (_data && _data.savedDate) ? _data.savedDate : new Date().toLocaleString();
     var modeEl = document.getElementById('r_mode');
@@ -1002,11 +1468,12 @@
 
   /* ═══════════════════════════════════════════
      CORE LOGIC: Save to localStorage
+     FFS-crew: запись {cpt:{fio,license}, fo:{fio,license}, instructor, ...}; LINE: cpt содержит fio/license
      ═══════════════════════════════════════════ */
   function saveToLocalStorage() {
     var entry = {
-      fio:         _pilotData.fio,
-      license:     _pilotData.license,
+      cpt:         { fio: _pilotData.cpt.fio, license: _pilotData.cpt.license },
+      fo:          { fio: _pilotData.fo.fio,  license: _pilotData.fo.license },
       instructor:  _pilotData.instructor,
       route:       _pilotData.route,
       ac_number:   _pilotData.ac_number,
@@ -1032,6 +1499,7 @@
 
   /* ═══════════════════════════════════════════
      CORE LOGIC: View saved report
+     Backward compat: старая запись {fio, license, ...} (LINE-only) → мигрирует в cpt.{fio,license}
      ═══════════════════════════════════════════ */
   function viewSavedReport(i) {
     var history = [];
@@ -1043,14 +1511,24 @@
     if (!history[i]) return;
     var h = history[i];
 
-    /* Восстанавливаем данные пилота из записи истории */
-    _pilotData.fio         = h.fio || '';
-    _pilotData.license     = h.license || '';
-    _pilotData.instructor  = h.instructor || '';
-    _pilotData.route       = h.route || '';
-    _pilotData.ac_number   = h.ac_number || '';
-    _pilotData.flight_time = h.flight_time || '';
-    _pilotData.signature   = h.signature || null;  // Task 41: восстанавливаем подпись
+    /* Backward compat: старая запись без cpt → мигрирует fio/license в cpt */
+    if (!h.cpt) {
+      h.cpt = { fio: h.fio || '', license: h.license || '' };
+    }
+    if (!h.fo) {
+      h.fo = { fio: '', license: '' };
+    }
+
+    /* Восстанавливаем данные экипажа из записи истории */
+    _pilotData.cpt.fio        = h.cpt.fio || '';
+    _pilotData.cpt.license    = h.cpt.license || '';
+    _pilotData.fo.fio         = h.fo.fio || '';
+    _pilotData.fo.license     = h.fo.license || '';
+    _pilotData.instructor     = h.instructor || '';
+    _pilotData.route          = h.route || '';
+    _pilotData.ac_number      = h.ac_number || '';
+    _pilotData.flight_time    = h.flight_time || '';
+    _pilotData.signature      = h.signature || null;  // Task 41: восстанавливаем подпись
 
     _data = h.fullData;
     _data.savedDate = h.date;
@@ -1123,134 +1601,174 @@
 
   /* ═══════════════════════════════════════════
      CORE LOGIC: Build full report text (for copy + email body)
+     FFS-crew: текст разделяется на 2 секции (CPT и F/O); LINE — один блок.
      ═══════════════════════════════════════════ */
   function buildReportText() {
-    var fio        = _pilotData.fio;
-    var license    = _pilotData.license;
     var instructor = _pilotData.instructor;
-    var route      = _pilotData.route;
-    var acNumber   = _pilotData.ac_number;
-    var flightTime = _pilotData.flight_time;
     var date = '';
     var dateEl = document.getElementById('r_date');
     if (dateEl) date = dateEl.innerText;
 
+    var isFfs = (_currentMode === 'ffs');
     var lines = [];
     lines.push('ОТЧЕТ ПО ПРОВЕРКЕ');
     lines.push('=================');
     lines.push('');
-    lines.push('Проверяемый: ' + fio);
-    lines.push('Лицензия: ' + license);
-    lines.push('Дата: ' + date);
-    lines.push('Режим: ' + _currentMode.toUpperCase());
-    if (route)      lines.push('Маршрут: ' + route);
-    if (acNumber)   lines.push('Номер ВС: ' + acNumber);
-    if (flightTime) lines.push('Полётное время: ' + flightTime);
-    lines.push('Проверяющий: ' + instructor);
+    if (isFfs) {
+      lines.push('CPT: ' + (_pilotData.cpt.fio || '-'));
+      lines.push('CPT Лицензия: ' + (_pilotData.cpt.license || '-'));
+      lines.push('F/O: ' + (_pilotData.fo.fio || '-'));
+      lines.push('F/O Лицензия: ' + (_pilotData.fo.license || '-'));
+      lines.push('Дата: ' + date);
+      lines.push('Режим: ' + _currentMode.toUpperCase());
+      lines.push('Проверяющий: ' + instructor);
+    } else {
+      var fio        = _pilotData.cpt.fio;
+      var license    = _pilotData.cpt.license;
+      var route      = _pilotData.route;
+      var acNumber   = _pilotData.ac_number;
+      var flightTime = _pilotData.flight_time;
+      lines.push('Проверяемый: ' + fio);
+      lines.push('Лицензия: ' + license);
+      lines.push('Дата: ' + date);
+      lines.push('Режим: ' + _currentMode.toUpperCase());
+      if (route)      lines.push('Маршрут: ' + route);
+      if (acNumber)   lines.push('Номер ВС: ' + acNumber);
+      if (flightTime) lines.push('Полётное время: ' + flightTime);
+      lines.push('Проверяющий: ' + instructor);
+    }
     lines.push('');
 
-    /* ─── СВОДНАЯ ОЦЕНКА (Task 9 Правка 2) ─── синхронизировано с calculateRatings L754-807.
-       Дублирование логики расчёта piloting/gradeValues/competencies — осознанное:
-       текстовый формат vs HTML-формат имеют разную презентацию, общая бизнес-логика
-       НЕ вынесена в helper чтобы минимизировать риск регрессии в copyReport/sendEmail. */
     if (_data && _data.checklists) {
-      lines.push('СВОДНАЯ ОЦЕНКА');
-      lines.push('===============');
-      _data.checklists.forEach(function(mainSec) {
-        var piloting = [];
-        var hasPilotingSection = false;
-        var gradeValues = [];
-        mainSec.sections.forEach(function(sec) {
-          var groups = sec.groups || [{ items: sec.items || [] }];
-          groups.forEach(function(g) { g.items.forEach(function(i) {
-            if (i.type === 'radio') {
-              hasPilotingSection = true;
-              var score = i.ok ? (5 - i.options.indexOf(i.ok)) : 2;
-              piloting.push(score < 2 ? 2 : score);
-            } else if (i.type === 'select') {
-              if (i.ok === '2' || i.ok === '3' || i.ok === '4' || i.ok === '5') {
-                gradeValues.push(parseInt(i.ok, 10));
-              }
+      /* FFS: 2 блока (CPT и F/O); LINE: один блок */
+      var pilots = isFfs ? [{ key: 'Cpt', label: 'CPT' }, { key: 'Fo', label: 'F/O' }] : [{ key: null, label: '' }];
+      pilots.forEach(function(p) {
+        if (isFfs) {
+          lines.push('');
+          lines.push('###### ' + p.label + ' ######');
+          lines.push('');
+        }
+
+        /* ─── СВОДНАЯ ОЦЕНКА ─── (синхронизировано с calculateRatings, но в текстовом формате). */
+        lines.push('СВОДНАЯ ОЦЕНКА');
+        lines.push('===============');
+        _data.checklists.forEach(function(mainSec) {
+          var piloting = [];
+          var hasPilotingSection = false;
+          var gradeValues = [];
+          mainSec.sections.forEach(function(sec) {
+            var groups = sec.groups || [{ items: sec.items || [] }];
+            /* FFS: SKIP radio-items из «Техника пилотирования.» для PM-пилота */
+            var isPilotingT = (sec.subname === 'Техника пилотирования.');
+            var skipPilotingForPilotT = false;
+            if (p.key && isPilotingT && sec.pf && p.key.toLowerCase() !== sec.pf) {
+              skipPilotingForPilotT = true;
             }
-          }); });
-        });
-        var pRes = piloting.length ? (piloting.indexOf(2) !== -1 ? 2 : Math.round(piloting.reduce(function(a,b){return a+b;},0)/piloting.length)) : '-';
-        var gRes = gradeValues.length ? Math.round(gradeValues.reduce(function(a,b){return a+b;},0)/gradeValues.length) : '-';
-        var line = mainSec.name;
-        if (hasPilotingSection) line += ' | Техника пилотирования: ' + pRes;
-        if (gradeValues.length) line += ' | Стандартные процедуры: ' + gRes;
-        lines.push(line);
-      });
-      /* Компетенции в сводке (сводный балл) */
-      var summaryComps = calculateCompetencies();
-      if (Object.keys(summaryComps).length > 0) {
-        lines.push('');
-        lines.push('Компетенции:');
-        for (var sc in summaryComps) {
-          lines.push('  ' + sc + ' — ' + getCompetencyLabel(sc) + ': оценка ' + summaryComps[sc].score
-            + ' (' + Math.round(summaryComps[sc].percent) + '%)');
-        }
-      }
-      lines.push('');
-      lines.push('');
-
-      _data.checklists.forEach(function(mainSec) {
-        lines.push('');
-        lines.push('### ' + mainSec.name + ' ###');
-        mainSec.sections.forEach(function(sec) {
-          if (sec.subname === 'Компетенции.') return;
-          lines.push('');
-          lines.push('— ' + sec.subname + ' —');
-          var groups = sec.groups || [{ items: sec.items || [] }];
-          groups.forEach(function(group) {
-            if (group.topitem) lines.push('  [' + getCompetencyLabel(group.topitem) + ']');
-            group.items.forEach(function(item) {
-              if (item.type === 'divider') return;
-              var label = item.label || '';
-              if (item.type === 'select') {
-                var gv = (item.ok === false || item.ok === null || item.ok === undefined) ? '' : String(item.ok);
-                var gLabel = gv === 'na' ? 'н/п' : (gv || '—');
-                lines.push('  • ' + label + ' — оценка: ' + gLabel);
-              } else if (item.type === 'checkbox') {
-                lines.push('  ' + (item.ok ? '[x]' : '[ ]') + ' ' + label);
-              } else if (item.type === 'radio') {
-                lines.push('  • ' + label + ' — оценка: ' + (item.ok || 'не указано'));
+            groups.forEach(function(g) { g.items.forEach(function(i) {
+              if (skipPilotingForPilotT && i.type === 'radio') return;
+              var val = p.key ? i['ok' + p.key] : i.ok;
+              if (i.type === 'radio') {
+                hasPilotingSection = true;
+                var score = val ? (5 - i.options.indexOf(val)) : 2;
+                piloting.push(score < 2 ? 2 : score);
+              } else if (i.type === 'select') {
+                if (val === '2' || val === '3' || val === '4' || val === '5') {
+                  gradeValues.push(parseInt(val, 10));
+                }
               }
-            });
+            }); });
           });
-          if (sec.note) {
-            lines.push('  Комментарий: ' + sec.note);
-          }
+          var pRes = piloting.length ? (piloting.indexOf(2) !== -1 ? 2 : Math.round(piloting.reduce(function(a,b){return a+b;},0)/piloting.length)) : '-';
+          var gRes = gradeValues.length ? Math.round(gradeValues.reduce(function(a,b){return a+b;},0)/gradeValues.length) : '-';
+          var line = mainSec.name;
+          if (hasPilotingSection) line += ' | Техника пилотирования: ' + pRes;
+          if (gradeValues.length) line += ' | Стандартные процедуры: ' + gRes;
+          lines.push(line);
         });
-      });
-
-      // Компетенции в конце — сводный балл + детальные items (Task 9 Правка 2)
-      // Логика percent→score→prefix синхронизирована с buildReport L876-888.
-      var competencies = calculateCompetencies();
-      if (Object.keys(competencies).length > 0) {
-        lines.push('');
-        lines.push('=== КОМПЕТЕНЦИИ ===');
-        for (var code in competencies) {
+        /* Компетенции в сводке (сводный балл) */
+        var summaryComps = calculateCompetencies(p.key ? p.key.toLowerCase() : undefined);
+        if (Object.keys(summaryComps).length > 0) {
           lines.push('');
-          lines.push(code + ' — ' + getCompetencyLabel(code) + ': оценка ' + competencies[code].score
-            + ' (' + Math.round(competencies[code].percent) + '%)');
-          /* Детальные items по компетенции */
-          competencies[code].items.forEach(function(item) {
-            var itemPercent = item.count > 0 ? (item.checked / item.count) * 100 : 0;
-            var itemScore = 2;
-            if (itemPercent >= 80) itemScore = 5;
-            else if (itemPercent >= 50) itemScore = 4;
-            else if (itemPercent >= 10) itemScore = 3;
-            var prefix = '';
-            if (itemScore === 5) prefix = 'Всегда';
-            else if (itemScore === 4) prefix = 'Регулярно';
-            else if (itemScore === 3) prefix = 'Иногда';
-            else prefix = 'Редко';
-            var labelText = item.label.charAt(0).toLowerCase() + item.label.slice(1);
-            lines.push('  - ' + prefix + ' ' + labelText);
-          });
+          lines.push('Компетенции:');
+          for (var sc in summaryComps) {
+            lines.push('  ' + sc + ' — ' + getCompetencyLabel(sc) + ': оценка ' + summaryComps[sc].score
+              + ' (' + Math.round(summaryComps[sc].percent) + '%)');
+          }
         }
-      }
+        lines.push('');
+        lines.push('');
+
+        _data.checklists.forEach(function(mainSec) {
+          lines.push('');
+          lines.push('### ' + mainSec.name + ' ###');
+          mainSec.sections.forEach(function(sec) {
+            if (sec.subname === 'Компетенции.') return;
+            lines.push('');
+            lines.push('— ' + sec.subname + ' —');
+            /* FFS: метка PF для секции «Техника пилотирования.» */
+            if (p.key && sec.subname === 'Техника пилотирования.' && sec.pf) {
+              lines.push('  PF: ' + (sec.pf === 'cpt' ? 'CPT' : 'F/O'));
+            }
+            /* FFS: PM-пилот в «Технике пилотирования.» — одна метка, items не перечисляем */
+            var isPmForSectionT = (p.key && sec.subname === 'Техника пилотирования.' && sec.pf && p.key.toLowerCase() !== sec.pf);
+            if (isPmForSectionT) {
+              lines.push('  ' + p.label + ': PM для этого упражнения');
+              if (sec.note) {
+                lines.push('  Комментарий: ' + sec.note);
+              }
+              return;
+            }
+            var groups = sec.groups || [{ items: sec.items || [] }];
+            groups.forEach(function(group) {
+              if (group.topitem) lines.push('  [' + getCompetencyLabel(group.topitem) + ']');
+              group.items.forEach(function(item) {
+                if (item.type === 'divider') return;
+                var label = item.label || '';
+                var val = p.key ? item['ok' + p.key] : item.ok;
+                if (item.type === 'select') {
+                  var gv = (val === false || val === null || val === undefined) ? '' : String(val);
+                  var gLabel = gv === 'na' ? 'н/п' : (gv || '—');
+                  lines.push('  • ' + label + ' — оценка: ' + gLabel);
+                } else if (item.type === 'checkbox') {
+                  lines.push('  ' + (val ? '[x]' : '[ ]') + ' ' + label);
+                } else if (item.type === 'radio') {
+                  lines.push('  • ' + label + ' — оценка: ' + (val || 'не указано'));
+                }
+              });
+            });
+            if (sec.note) {
+              lines.push('  Комментарий: ' + sec.note);
+            }
+          });
+        });
+
+        // Компетенции в конце — сводный балл + детальные items
+        var competencies = calculateCompetencies(p.key ? p.key.toLowerCase() : undefined);
+        if (Object.keys(competencies).length > 0) {
+          lines.push('');
+          lines.push('=== КОМПЕТЕНЦИИ ===');
+          for (var code in competencies) {
+            lines.push('');
+            lines.push(code + ' — ' + getCompetencyLabel(code) + ': оценка ' + competencies[code].score
+              + ' (' + Math.round(competencies[code].percent) + '%)');
+            /* Детальные items по компетенции */
+            competencies[code].items.forEach(function(item) {
+              var itemPercent = item.count > 0 ? (item.checked / item.count) * 100 : 0;
+              var itemScore = 2;
+              if (itemPercent >= 80) itemScore = 5;
+              else if (itemPercent >= 50) itemScore = 4;
+              else if (itemPercent >= 10) itemScore = 3;
+              var prefix = '';
+              if (itemScore === 5) prefix = 'Всегда';
+              else if (itemScore === 4) prefix = 'Регулярно';
+              else if (itemScore === 3) prefix = 'Иногда';
+              else prefix = 'Редко';
+              var labelText = item.label.charAt(0).toLowerCase() + item.label.slice(1);
+              lines.push('  - ' + prefix + ' ' + labelText);
+            });
+          }
+        }
+      });
     }
 
     return lines.join('\n');
@@ -1301,7 +1819,10 @@
        Level 3: clipboard + mailto: short body (full text in clipboard)
      ═══════════════════════════════════════════ */
   function sendEmail() {
-    var fio = _pilotData.fio;
+    /* FFS-crew: subject/preview текст показывает CPT + F/O; LINE: проверяемого */
+    var fio = (_currentMode === 'ffs')
+      ? ('CPT ' + _pilotData.cpt.fio + ' / F/O ' + _pilotData.fo.fio)
+      : _pilotData.cpt.fio;
     var date = '';
     var dateEl = document.getElementById('r_date');
     if (dateEl) date = dateEl.innerText;
@@ -1569,6 +2090,22 @@
           handleSectionFile(fileInput, parseInt(parts[0], 10), parseInt(parts[1], 10));
           return;
         }
+        /* PF-селектор для «Техника пилотирования.» — смена PF вызывает re-render экрана
+           (radio появляются/исчезают в зависимости от PF). Сохраняем state ДО re-render.
+           Сохраняем scroll position до re-render, восстанавливаем после — чтобы экран
+           не улетал наверх при смене PF (renderTestScreen по умолчанию scroll to top). */
+        var pfSelect = e.target.closest('[data-cr-pf]');
+        if (pfSelect && _screen === 'test') {
+          var screenEl = document.getElementById('checkrideScreen');
+          var savedScreen = screenEl ? screenEl.scrollTop : 0;
+          var savedWindow = window.scrollY || 0;
+          saveState();
+          saveInspectionState();
+          renderAll();
+          if (screenEl) screenEl.scrollTop = savedScreen;
+          window.scrollTo(0, savedWindow);
+          return;
+        }
         /* Checkbox / Radio → немедленное сохранение в кеш */
         if (_screen === 'test' && (e.target.type === 'checkbox' || e.target.type === 'radio' || e.target.classList.contains('checkride-grade-select'))) {
           saveState();
@@ -1584,15 +2121,25 @@
       /* Автосохранение полей формы и комментариев при вводе */
       container.addEventListener('input', function(e) {
         var el = e.target;
-        /* Поля формы регистрации */
+        /* Поля формы регистрации: LINE (cr_fio, cr_license, cr_instructor, cr_route, cr_ac_number)
+           и FFS-crew (cr_cpt_fio, cr_cpt_license, cr_fo_fio, cr_fo_license, cr_instructor) */
         if (el.id && el.id.indexOf('cr_') === 0) {
-          var field = el.id.replace('cr_', '');
-          if (_pilotData.hasOwnProperty(field)) {
-            _pilotData[field] = el.value;
-            savePilotToCache();
+          var id = el.id;
+          if (id === 'cr_fio')         _pilotData.cpt.fio = el.value;
+          else if (id === 'cr_license') _pilotData.cpt.license = el.value;
+          else if (id === 'cr_cpt_fio')    _pilotData.cpt.fio = el.value;
+          else if (id === 'cr_cpt_license') _pilotData.cpt.license = el.value;
+          else if (id === 'cr_fo_fio')     _pilotData.fo.fio = el.value;
+          else if (id === 'cr_fo_license') _pilotData.fo.license = el.value;
+          else {
+            var field = id.replace('cr_', '');
+            if (_pilotData.hasOwnProperty(field) && field !== 'cpt' && field !== 'fo') {
+              _pilotData[field] = el.value;
+            }
           }
+          savePilotToCache();
         }
-        /* Поле полётного времени в отчёте */
+        /* Поле полётного времени в отчёте (LINE only) */
         if (el.id === 'r_flight_time') {
           _pilotData.flight_time = el.value;
           savePilotToCache();

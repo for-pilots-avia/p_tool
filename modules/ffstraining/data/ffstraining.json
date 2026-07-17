@@ -247,30 +247,205 @@
         "layout": "group",
         "children": [
           {
-            "id": "ffs-0100",
-            "title": "1 LOS ULLI - UMKK. {{badge:info:PF – CPT or FO}}",
-            "duration": "00.00 - 00.35",
-            "layout": "card",
+            "id": "ffs-day1-0",
+            "title": "{{badge:info:REFRESH 1}}",
+            "layout": "divider"
+          },
+          {
+            "id": "ffs-0201",
+            "title": "1 WINDSHEAR, LDG, VIS APP (RAW DATA), EGPWS.",
+            "duration": "00.00 - 00.55 {{badge:normal:PF – CPT}}",
+            "layout": "detail",
             "blocks": [
               {
                 "type": "items",
-                "key": "{{items:normal}}"
+                "key": "{{items:info:FFS settings (Ульяновск)}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "table-file",
+                "index": 1
               },
               {
                 "type": "child-ref",
                 "index": 0
               },
               {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:normal:Radio script}}"
+              },
+              {
                 "type": "child-ref",
                 "index": 1
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:Failures}}"
+              },
+              {
+                "type": "child-ref",
+                "index": 2
+              },
+              {
+                "type": "child-ref",
+                "index": 3
+              },
+              {
+                "type": "child-ref",
+                "index": 4
+              },
+              {
+                "type": "child-ref",
+                "index": 5
+              },
+              {
+                "type": "child-ref",
+                "index": 6
+              },
+              {
+                "type": "child-ref",
+                "index": 7
+              },
+              {
+                "type": "child-ref",
+                "index": 8
+              },
+              {
+                "type": "child-ref",
+                "index": 9
+              },
+              {
+                "type": "child-ref",
+                "index": 10
+              },
+              {
+                "type": "child-ref",
+                "index": 11
+              },
+              {
+                "type": "child-ref",
+                "index": 12
+              },
+              {
+                "type": "child-ref",
+                "index": 13
+              },
+              {
+                "type": "child-ref",
+                "index": 14
+              },
+              {
+                "type": "child-ref",
+                "index": 15
+              },
+              {
+                "type": "child-ref",
+                "index": 16
+              },
+              {
+                "type": "child-ref",
+                "index": 17
+              },
+              {
+                "type": "child-ref",
+                "index": 18
               }
             ],
-            "{{items:normal}}": "{{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
+            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/20KT 6000 +25/+20 OVC 2500 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R1.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-1.html"
+              }
+            ],
             "children": [
               {
-                "id": "ffs-0100a",
-                "title": "Отказ двигателя на V1",
-                "duration": "1 ч",
+                "id": "ffs-navig",
+                "title": "Схемы Antalia",
+                "duration": "ATIS",
+                "layout": "card",
+                "sticky": true,
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY.jpg",
+                    "caption": "Заход RNP Y",
+                    "alt": "Заход RNP Y"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY_L.jpg",
+                    "caption": "Минимумы RNP Y",
+                    "alt": "Минимумы RNP Y"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  },
+                  {
+                    "type": "images",
+                    "index": 3
+                  }
+                ]
+              },
+              {
+                "id": "ffs-text-3-6-day1",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Стандартная подготовка тренажёра и кабины к тренировке.\nLanding Gear Lever Will Not Move Up After Takeoff – до взлёта активируется отказ AIR/Ground Sensor.\nПосле взлёта - сдвиг ветра."
+              },
+              {
+                "id": "ffs-refr1-1",
+                "title": "1 WINDSHEAR",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-1__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-0201a",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -286,22 +461,40 @@
                     "key": "{{items:emergency:Memory items}}"
                   },
                   {
+                    "type": "child-ref",
+                    "index": 0
+                  },
+                  {
                     "type": "items",
                     "key": "{{items:success:Критерии}}"
                   },
                   {
-                    "type": "items",
-                    "key": "{{items:emergency:Instructor Notes}}"
+                    "type": "references"
                   },
                   {
                     "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "{{items:normal}}": "RESERVED.",
+                "{{items:abnormal}}": "RESERVED",
+                "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
+                "children": [
+                  {
+                    "id": "ffs-text-3-6-day1-2",
+                    "layout": "text",
+                    "blocks": [
+                      {
+                        "type": "items",
+                        "key": "{{items:normal}}"
+                      }
+                    ],
+                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                  }
+                ],
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ],
                 "documents": [
                   {
                     "title": "QRH — Engine Failure стр. 22",
@@ -311,9 +504,73 @@
                 ]
               },
               {
-                "id": "ffs-0100b",
-                "title": "LOFT-сценарий",
-                "duration": "1 ч",
+                "id": "ffs-text-3-6-day1-3",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "После выхода из сдвига ветра полёт в зону ожидания (точка зоны ожидания на усмотрение инструктора), обработка отказа, выполнение NNC и принятие решения о возврате на аэродром вылета."
+              },
+              {
+                "id": "ffs-refr1-1-2",
+                "title": "2 LANDING GEARS",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-1-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-sysa",
+                "title": "QRH",
+                "duration": "Landing Gear Lever Will Not Move Up After Takeoff",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH_sysa_1.png",
+                    "caption": "1",
+                    "alt": "1"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_sysa_2.png",
+                    "caption": "2",
+                    "alt": "2"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH_sysa_3.png",
+                    "caption": "3",
+                    "alt": "3"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  }
+                ]
+              },
+              {
+                "id": "ffs-0201a-2",
+                "title": "INFO",
+                "duration": "РПП, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -322,46 +579,918 @@
                   },
                   {
                     "type": "items",
+                    "key": "{{items:abnormal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Memory items}}"
+                  },
+                  {
+                    "type": "child-ref",
+                    "index": 0
+                  },
+                  {
+                    "type": "items",
                     "key": "{{items:success:Критерии}}"
                   },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:normal}}": "RESERVED.",
+                "{{items:abnormal}}": "RESERVED",
+                "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
+                "children": [
+                  {
+                    "id": "ffs-text-3-6-day2",
+                    "layout": "text",
+                    "blocks": [
+                      {
+                        "type": "items",
+                        "key": "{{items:normal}}"
+                      }
+                    ],
+                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                  }
+                ],
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ],
+                "documents": [
+                  {
+                    "title": "QRH — Engine Failure стр. 22",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr1-1-3",
+                "title": "3 VIS APP",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-1-3__after",
+                "layout": "text",
+                "blocks": [
                   {
                     "type": "items",
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-4",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Визуальный заход на полосу 36R\nУход на второй круг непосредственно перед касанием - GA ≤ 50 (любая удобная причина)\nСмена погоды: CAT I\nПосле выполнения процедуры GA и AFTER T/O C/L – REPOSITION RW36R 6 NM."
+              },
+              {
+                "id": "ffs-refr1-1-4",
+                "title": "3 ILS APP (RAW DATA)",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-1-4__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-5",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "ILS APP RW36R RAW DATA (FD FAIL) – RAW DATA опционально на усмотрение инструктора."
+              },
+              {
+                "id": "ffs-refr1-1-5",
+                "title": "5 EGPWS",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-1-5__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-6",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "EGPWS WARNING at DA."
               }
-            ]
+            ],
+            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
+            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\".",
+            "{{items:success:Failures}}": "{{badge:abnormal:Landing Gear Lever Will Not Move Up After Takeoff.}}\nУльяновск:\n• ATA 32 -> AIR/GND SENSOR FAIL IN POSITION – MAIN GEAR -> L1 + L2\nС.-Петербург:\n• ATA 32 -> 9 AIR/GROUND ->AIR/GROUND SENSOR FAIL -> FAIL"
           },
           {
-            "id": "ffs-0150",
-            "title": "Повторная квалификация A320",
-            "duration": "4 ч",
-            "layout": "card",
+            "id": "ffs-0201-2",
+            "title": "2 TAIL STRIKE, HYDRAULIC, ENG FAIL.",
+            "duration": "00.55 - 02.00 {{badge:normal:PF – F/O}}",
+            "layout": "detail",
             "blocks": [
               {
                 "type": "items",
-                "key": "{{items:normal}}"
+                "key": "{{items:info:FFS settings (Ульяновск)}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "table-file",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 0
               },
               {
                 "type": "items",
-                "key": "{{items:success:Критерии}}"
+                "key": "{{items:success:FMS Memory}}"
               },
               {
                 "type": "items",
-                "key": "{{items:info:FFS settings}}"
+                "key": "{{items:normal:Radio script}}"
               },
               {
-                "type": "items",
-                "key": "{{items:emergency:Instructor Notes}}"
+                "type": "child-ref",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 2
+              },
+              {
+                "type": "child-ref",
+                "index": 3
+              },
+              {
+                "type": "child-ref",
+                "index": 4
+              },
+              {
+                "type": "child-ref",
+                "index": 5
+              },
+              {
+                "type": "child-ref",
+                "index": 6
+              },
+              {
+                "type": "child-ref",
+                "index": 7
+              },
+              {
+                "type": "child-ref",
+                "index": 8
+              },
+              {
+                "type": "child-ref",
+                "index": 9
               }
             ],
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:FFS settings}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/20KT CAT I +25/+20 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R1.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-1.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-2",
+                "title": "Схемы Antalia",
+                "duration": "ATIS",
+                "layout": "card",
+                "sticky": true,
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY.jpg",
+                    "caption": "Заход RNP Y",
+                    "alt": "Заход RNP Y"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY_L.jpg",
+                    "caption": "Минимумы RNP Y",
+                    "alt": "Минимумы RNP Y"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  },
+                  {
+                    "type": "images",
+                    "index": 3
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr1-2",
+                "title": "1 TAIL STRIKE",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-7",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "После взлёта проводники с задней \"кухни\" сообщают, что почувствовали отчётливое касание хвостовой частью фюзеляжа о ВПП, диспетчер сообщает, что видел искры в районе хвостовой части ВС в момент отрыва ВС от полосы.\nSYS B HYD PUMP OVERHEAT.\nATA 29 -> ELECTRIC PUMP OVERHEAT –> EMDP 1-B"
+              },
+              {
+                "id": "ffs-refr1-2-2",
+                "title": "2 HYDRAULIC",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-2-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-8",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Полёт в зону ожидания, обработка отказа, выполнение NNC и принятия решения о возврате на аэродром вылета.\nILS APP RW36R, при подходе к DA – уход на второй круг (по любой причине)\nПосле выполнения манёвра GA – ENG 2 SEVER DAMAGE (R ENG)\nНа данном этапе полностью отсутствует гидросистема B, экипажу необходимо прочитать NNC LOSS OF SYS B\nПосле выполнения NNC LOS OF SYS B и подготовки к посадке REPOSITION RW36R 6 NM"
+              },
+              {
+                "id": "ffs-refr1-2-3",
+                "title": "3 ENG FAIL ILS APP",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-2-3__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-9",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "ONE ENG RW36R."
+              }
+            ],
+            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
+            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+          },
+          {
+            "id": "ffs-day1-0-2",
+            "title": "{{badge:info:REFRESH 2}}",
+            "layout": "divider"
+          },
+          {
+            "id": "ffs-0201-3",
+            "title": "3 ENG FAIL, ONE ENG ILS (GA).",
+            "duration": "02.10 - 02.40 {{badge:normal:PF – CPT}}",
+            "layout": "detail",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:info:FFS settings (Ульяновск)}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "table-file",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:normal:Radio script}}"
+              },
+              {
+                "type": "child-ref",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 2
+              },
+              {
+                "type": "child-ref",
+                "index": 3
+              },
+              {
+                "type": "child-ref",
+                "index": 4
+              },
+              {
+                "type": "child-ref",
+                "index": 5
+              },
+              {
+                "type": "child-ref",
+                "index": 6
+              }
+            ],
+            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT CAT II +25/+25 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R1.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-1.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-3",
+                "title": "Схемы Antalia",
+                "duration": "ATIS",
+                "layout": "card",
+                "sticky": true,
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY.jpg",
+                    "caption": "Заход RNP Y",
+                    "alt": "Заход RNP Y"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY_L.jpg",
+                    "caption": "Минимумы RNP Y",
+                    "alt": "Минимумы RNP Y"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  },
+                  {
+                    "type": "images",
+                    "index": 3
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr1-3",
+                "title": "1 ENG FAILURE",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-3__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-10",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Взлёт отказ двигателя (любой приводящий к потере тяги) после V1.\nВыполнение EOSID\nСмена погоды: CAT I"
+              },
+              {
+                "id": "ffs-refr1-3-2",
+                "title": "2 ONE ENG ILS (GA)",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-3-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-11",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Заход на посаду ILS APP RW36R ONE ENG CAT I\nУход на второй круг на высоте DA (по любой причине)\nREPOSITION 6 NM RW36R\nПовторный заход ILS APP RW36R ONE ENG CAT I"
+              }
+            ],
+            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
+            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+          },
+          {
+            "id": "ffs-0201-4",
+            "title": "4 ENG FAIL, RTO, CARGO FIRE, EGPWS, HYD FAIL.",
+            "duration": "02.40 - 03.40 {{badge:normal:PF – F/O}}",
+            "layout": "detail",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:info:FFS settings (Ульяновск)}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "table-file",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:normal:Radio script}}"
+              },
+              {
+                "type": "child-ref",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 2
+              },
+              {
+                "type": "child-ref",
+                "index": 3
+              },
+              {
+                "type": "child-ref",
+                "index": 4
+              },
+              {
+                "type": "child-ref",
+                "index": 5
+              },
+              {
+                "type": "child-ref",
+                "index": 6
+              },
+              {
+                "type": "child-ref",
+                "index": 7
+              },
+              {
+                "type": "child-ref",
+                "index": 8
+              },
+              {
+                "type": "child-ref",
+                "index": 9
+              },
+              {
+                "type": "child-ref",
+                "index": 10
+              },
+              {
+                "type": "child-ref",
+                "index": 11
+              },
+              {
+                "type": "child-ref",
+                "index": 12
+              },
+              {
+                "type": "child-ref",
+                "index": 13
+              },
+              {
+                "type": "child-ref",
+                "index": 14
+              },
+              {
+                "type": "child-ref",
+                "index": 15
+              }
+            ],
+            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT CAT II +25/+25 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R1.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-1.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-4",
+                "title": "Схемы Antalia",
+                "duration": "ATIS",
+                "layout": "card",
+                "sticky": true,
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY.jpg",
+                    "caption": "Заход RNP Y",
+                    "alt": "Заход RNP Y"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY_L.jpg",
+                    "caption": "Минимумы RNP Y",
+                    "alt": "Минимумы RNP Y"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  },
+                  {
+                    "type": "images",
+                    "index": 3
+                  }
+                ]
+              },
+              {
+                "id": "ffs-refr1-4",
+                "title": "1 RTO",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-4__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-12",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Взлёт, отказ двигателя до V1(любой отказ, приводящий к потере тяги двигателя) – RTO\nПовторный взлёт RW36С\nСмена погоды: CAT I"
+              },
+              {
+                "id": "ffs-refr1-4-2",
+                "title": "2 ENG FAIL",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-4-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-13",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "EGPWS WARNING at DA."
+              },
+              {
+                "id": "ffs-refr1-4-3",
+                "title": "3 CARGO FIRE",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-4-3__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-14",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "Повторный взлёт – CARGO FIRE (гасимый) после взлёта.\nATA 26 -> CARGO FIRE -> FWD (AFT)\nВыполнение NNC, принятие решения на возврат на а/д вылета, подготовка к посадке.\nILS X APP RW36R RAW DATA (FD FAIL) - RAW DATA опционально на усмотрение инструктора\nПри подходе к DA – EGPWS WARNING\nATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON"
+              },
+              {
+                "id": "ffs-refr1-4-4",
+                "title": "4 EGPWS",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-4-4__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-15",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "После завершения манёвра – REPOSITION 6 NM RW36R\nILS X APP RW 36R (FD FAIL) - RAW DATA опционально на усмотрение инструктора"
+              },
+              {
+                "id": "ffs-refr1-4-5",
+                "title": "5 HYD FAIL",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-4-5__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
+              },
+              {
+                "id": "ffs-text-3-6-day1-16",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "НЕТ в программе."
+              }
+            ],
+            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
+            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+          },
+          {
+            "id": "ffs-0201-5",
+            "title": "5 LANDING MISHANDLING CORRECTION.",
+            "duration": "03.40 - 03.55 {{badge:normal:PF – CPT}}",
+            "layout": "detail",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:info:FFS settings (Ульяновск)}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "table-file",
+                "index": 1
+              },
+              {
+                "type": "child-ref",
+                "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:normal:Radio script}}"
+              },
+              {
+                "type": "child-ref",
+                "index": 1
+              }
+            ],
+            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C 8NM\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT VIS 3000 OVC 800 +25/+20 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/perf_R1.html"
+              },
+              {
+                "src": "modules/ffstraining/data/tables/br_R-1.html"
+              }
+            ],
+            "children": [
+              {
+                "id": "ffs-navig-5",
+                "title": "Схемы Antalia",
+                "duration": "ATIS",
+                "layout": "card",
+                "sticky": true,
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/AER_ALT.jpg",
+                    "caption": "Radar minimum",
+                    "alt": "Radar minimum"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_IRGIT1C.jpg",
+                    "caption": "SID RW20",
+                    "alt": "SID RW20"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY.jpg",
+                    "caption": "Заход RNP Y",
+                    "alt": "Заход RNP Y"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/AER_02_RNPY_L.jpg",
+                    "caption": "Минимумы RNP Y",
+                    "alt": "Минимумы RNP Y"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  },
+                  {
+                    "type": "images",
+                    "index": 3
+                  }
+                ]
+              },
+              {
+                "id": "ffs-text-3-6-day1-17",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": "LDG mishandling corrections (высокое выравнивание, взмывание, отделение ВС, \"подныривание\" под глиссаду, не выпуск спойлеров в автоматическом режиме)"
+              }
+            ],
+            "{{items:success:FMS Memory}}": "LTAI RW36C 8NM",
+            "{{items:normal:Radio script}}": "<b>ATC</b>: NWS, RW36C cleared to land."
           }
         ],
         "blocks": [
@@ -372,6 +1501,34 @@
           {
             "type": "child-ref",
             "index": 1
+          },
+          {
+            "type": "child-ref",
+            "index": 2
+          },
+          {
+            "type": "child-ref",
+            "index": 3
+          },
+          {
+            "type": "child-ref",
+            "index": 4
+          },
+          {
+            "type": "child-ref",
+            "index": 5
+          },
+          {
+            "type": "child-ref",
+            "index": 6
+          },
+          {
+            "type": "child-ref",
+            "index": 7
+          },
+          {
+            "type": "child-ref",
+            "index": 8
           }
         ]
       },
@@ -383,11 +1540,11 @@
         "children": [
           {
             "id": "ffs-day2-0",
-            "title": "{{badge:info:REFRESH}}",
+            "title": "{{badge:info:REFRESH 3}}",
             "layout": "divider"
           },
           {
-            "id": "ffs-0201",
+            "id": "ffs-0201-6",
             "title": "6 LOSS OF HYD, WHEEL WELL FIRE, RNP APP.",
             "duration": "00.00 - 00.45 {{badge:normal:PF – CPT}}",
             "layout": "detail",
@@ -481,6 +1638,10 @@
                 "index": 15
               },
               {
+                "type": "items",
+                "key": "{{items:emergency:Instructor Notes}}"
+              },
+              {
                 "type": "child-ref",
                 "index": 16
               }
@@ -496,7 +1657,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig",
+                "id": "ffs-navig-6",
                 "title": "Схемы Сочи",
                 "duration": "ATIS",
                 "layout": "card",
@@ -543,12 +1704,12 @@
                 ]
               },
               {
-                "id": "ffs-refr1-1",
+                "id": "ffs-refr1-1-6",
                 "title": "1 HYDRAULIC FAILURE",
                 "layout": "divider"
               },
               {
-                "id": "ffs-refr1-1__after",
+                "id": "ffs-refr1-1-6__after",
                 "layout": "text",
                 "blocks": [
                   {
@@ -561,10 +1722,10 @@
                   }
                 ],
                 "{{items:success:Failures}}": "• <u>После уборки шасси</u> - {{badge:emergency:LOSS OF HYD SYS A.}}\nУльяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде."
+                "{{items:emergency:Instructor Notes}}": "RESERVED."
               },
               {
-                "id": "ffs-sysa",
+                "id": "ffs-sysa-2",
                 "title": "QRH",
                 "duration": "LOSS OF SYSTEM A",
                 "layout": "card",
@@ -601,7 +1762,7 @@
                 ]
               },
               {
-                "id": "ffs-0201a",
+                "id": "ffs-0201a-3",
                 "title": "INFO",
                 "duration": "РПП, FCTM",
                 "layout": "child",
@@ -621,6 +1782,16 @@
                   {
                     "type": "child-ref",
                     "index": 0
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:Критерии}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
                   }
                 ],
                 "{{items:normal}}": "RESERVED.",
@@ -628,42 +1799,36 @@
                 "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
                 "children": [
                   {
-                    "id": "ffs-text-3-6-day2",
+                    "id": "ffs-text-3-6-day2-2",
                     "layout": "text",
-                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками",
                     "blocks": [
                       {
                         "type": "items",
-                        "key": "{{items:success:Критерии}}"
-                      },
-                      {
-                        "type": "references"
-                      },
-                      {
-                        "type": "documents"
+                        "key": "{{items:normal}}"
                       }
                     ],
-                    "{{items:success:Критерии}}": "RESERVED",
-                    "references": [
-                      "FCOM Vol. 1 — Takeoff Performance"
-                    ],
-                    "documents": [
-                      {
-                        "title": "QRH — Engine Failure стр. 22",
-                        "src": "modules/docs/AOMB.pdf",
-                        "page": 22
-                      }
-                    ]
+                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                  }
+                ],
+                "{{items:success:Критерии}}": "RESERVED",
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ],
+                "documents": [
+                  {
+                    "title": "QRH — Engine Failure стр. 22",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
                   }
                 ]
               },
               {
-                "id": "ffs-refr1-2",
+                "id": "ffs-refr1-2-4",
                 "title": "2 FIRE PROTECTION",
                 "layout": "divider"
               },
               {
-                "id": "ffs-refr1-2__after",
+                "id": "ffs-refr1-2-4__after",
                 "layout": "text",
                 "blocks": [
                   {
@@ -676,7 +1841,7 @@
                   }
                 ],
                 "{{items:success:Failures}}": "• <u>После уборки механизации</u> - {{badge:emergency:WHEEL WELL FIRE.}}\nУльяновск:\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\nС.-Петербург:\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR",
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на"
               },
               {
                 "id": "ffs-fire",
@@ -722,14 +1887,18 @@
                 ]
               },
               {
-                "id": "ffs-refr1-3",
-                "title": "3 LOSS OF HYD SYS B - ВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}",
+                "id": "ffs-refr1-3-3",
+                "title": "3 LOSS OF HYD SYS B",
                 "layout": "divider"
               },
               {
-                "id": "ffs-refr1-3__after",
+                "id": "ffs-refr1-3-3__after",
                 "layout": "text",
                 "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  },
                   {
                     "type": "items",
                     "key": "{{items:success:Failures}}"
@@ -739,6 +1908,7 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
+                "{{items:info}}": "- ВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}",
                 "{{items:success:Failures}}": "Ульяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B",
                 "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
               },
@@ -840,21 +2010,20 @@
                 ]
               },
               {
-                "id": "ffs-refr1-4",
+                "id": "ffs-refr1-4-6",
                 "title": "4 RNP APP",
                 "layout": "divider"
               },
               {
-                "id": "ffs-text-3-6-day2-2",
+                "id": "ffs-text",
                 "layout": "text",
-                "{{items:success}}": "• <u>По окончанию всех необходимых NNC</u> – Reposition 8 nm RNP Y APP RW02",
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:emergency:Instructor Notes}}"
+                    "key": "{{items:success}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+                "{{items:success}}": "• <u>По окончанию всех необходимых NNC</u> – Reposition 8 nm RNP Y APP RW02"
               },
               {
                 "id": "ffs-0200b-3",
@@ -883,7 +2052,8 @@
             ],
             "{{items:success:FMS Memory}}": "URSS RW20 взлёт",
             "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 20, cleared for T/O\".",
-            "{{items:success:Weather}}": "Смена погоды: 020/10KT vis 8000 km +30/+25 OVC 5000 ft"
+            "{{items:success:Weather}}": "Смена погоды: 020/10KT vis 8000 km +30/+25 OVC 5000 ft",
+            "{{items:emergency:Instructor Notes}}": "В процессе выполнения\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
           },
           {
             "id": "ffs-0202",
@@ -983,7 +2153,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig-2",
+                "id": "ffs-navig-7",
                 "title": "Схемы Шереметьево",
                 "layout": "card",
                 "sticky": true,
@@ -1022,6 +2192,12 @@
               {
                 "id": "ffs-text-3-6-day2-3",
                 "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:success}}"
+                  }
+                ],
                 "{{items:success}}": "• <u>После взлёта</u> – сдвиг ветра"
               },
               {
@@ -1242,6 +2418,12 @@
               {
                 "id": "ffs-text-3-6-day2-4",
                 "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
                 "{{items:info}}": "Полёт в зону ожидания, обработка отказа. Принятие решение о возврате а а/д вылета. Если экипаж принимает решение продолжать полёт – указание компании через диспетчера: вернуться на аэродром вылета.\nILS APP RW24C – Partial Gear Up Landing.\nОбратить внимание, что экипаж должен провести брифинг с проводниками и вероятной эвакуации после посадки."
               },
               {
@@ -1252,6 +2434,12 @@
               {
                 "id": "ffs-text-3-6-day2-5",
                 "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:success}}"
+                  }
+                ],
                 "{{items:success}}": "RESERVED"
               }
             ],
@@ -1320,7 +2508,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig-3",
+                "id": "ffs-navig-8",
                 "title": "Схемы Шереметьево",
                 "layout": "card",
                 "sticky": true,
@@ -1511,7 +2699,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig-4",
+                "id": "ffs-navig-9",
                 "title": "Схемы Сочи",
                 "layout": "card",
                 "sticky": true,
@@ -1559,6 +2747,12 @@
               {
                 "id": "ffs-text-3-6-day2-6",
                 "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:success}}"
+                  }
+                ],
                 "{{items:success}}": "• <u>После взлёта</u> – сдвиг ветра"
               },
               {
@@ -1733,7 +2927,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig-5",
+                "id": "ffs-navig-10",
                 "title": "Схемы Сочи",
                 "layout": "card",
                 "sticky": true,
@@ -1849,7 +3043,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig-6",
+                "id": "ffs-navig-11",
                 "title": "Схемы Сочи",
                 "layout": "card",
                 "sticky": true,
@@ -2008,7 +3202,7 @@
             ],
             "children": [
               {
-                "id": "ffs-navig-7",
+                "id": "ffs-navig-12",
                 "title": "Схемы Шереметьево",
                 "layout": "card",
                 "sticky": true,

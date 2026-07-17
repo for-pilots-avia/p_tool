@@ -5,9 +5,70 @@
 /* ── Модульные CSS-переменные (привязаны к контейнеру, не :root) ── */
 #checkrideContainer {
   --cr-color-dark-surface: #1a1a1a;
+  /* Красный акцент: светлая тема — --color-danger (#cd202c);
+     тёмная тема — #6b1219 (как --color-header-bg в dark, тёмно-красный). */
+  --cr-color-red: var(--color-danger);
 }
 body.dark-theme #checkrideContainer {
   --cr-color-dark-surface: #2a2a2a;
+  --cr-color-red: #6b1219;
+}
+
+/* ═══════════════════════════════════════════
+   Кастомные чекбоксы (appearance: none)
+   Светло-серый фон невыбранный (var(--color-bg-hover)),
+   тёмно-серый выбранный (var(--color-text-secondary)) + белая галочка.
+   §7: var() для цветов/радиусов, шрифты не используются (чистая геометрия).
+   ═══════════════════════════════════════════ */
+#checkrideContainer .checkride-check-item input[type="checkbox"],
+#checkrideContainer .checkride-crew-grade input[type="checkbox"],
+#checkrideContainer .checkride-competency-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-xs);
+  background: var(--color-bg-hover);
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: background var(--transition-speed) var(--transition-ease),
+              border-color var(--transition-speed) var(--transition-ease);
+}
+
+#checkrideContainer .checkride-competency-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+}
+
+#checkrideContainer .checkride-check-item input[type="checkbox"]:checked,
+#checkrideContainer .checkride-crew-grade input[type="checkbox"]:checked,
+#checkrideContainer .checkride-competency-check input[type="checkbox"]:checked {
+  background: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
+}
+
+#checkrideContainer .checkride-check-item input[type="checkbox"]:checked::after,
+#checkrideContainer .checkride-crew-grade input[type="checkbox"]:checked::after,
+#checkrideContainer .checkride-competency-check input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--color-text-white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+#checkrideContainer .checkride-competency-check input[type="checkbox"]:checked::after {
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
 }
 
 /* ─── Start Screen ─── */
@@ -269,9 +330,8 @@ body.dark-theme #checkrideContainer {
 }
 
 .checkride-check-item input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
-  accent-color: var(--color-primary);
+  /* Размер/фон/border — заданы в общем блоке appearance:none в начале CSS.
+     Здесь только flex-окружение. */
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -753,7 +813,7 @@ body.dark-theme #checkrideContainer {
 }
 
 #checkrideContainer .checkride-competency-count .ring-fill {
-  stroke: var(--color-danger);
+  stroke: var(--cr-color-red);
   /* Custom animation: 0.45s + кастомный cubic-bezier (отличается от --transition-ease-out
      0.0,0.0,0.2,1 → 0.4,0.0,0.2,1) — намеренно для плавного заполнения кольца прогресса
      компетенции. Исключение §7 v4.9 «сложные custom-анимации, где переменные не подходят». */
@@ -828,11 +888,10 @@ body.dark-theme #checkrideContainer {
 }
 
 .checkride-competency-check input[type="checkbox"] {
+  /* Размер/фон/border — заданы в общем блоке appearance:none в начале CSS.
+     Здесь только flex-окружение. */
   flex-shrink: 0;
   margin-top: 3px;
-  accent-color: var(--color-primary);
-  width: 18px;
-  height: 18px;
   cursor: pointer;
 }
 
@@ -868,7 +927,7 @@ body.dark-theme #checkrideContainer {
 }
 
 .checkride-comp-red {
-  border-left: 2px solid var(--color-danger);
+  border-left: 2px solid var(--cr-color-red);
   padding-left: 16px;
 }
 
@@ -1121,6 +1180,25 @@ body.dark-theme #checkride-signature {
   background: var(--cr-color-dark-surface);
 }
 
+/* Dark theme: красный акцент (var(--color-primary) в заголовках/границах) — затемнить до --cr-color-red
+   (как --color-header-bg в dark, #6b1219). Соответствует замечанию: «красные границы делать темнее
+   при переключении на темную тему (по типу хедера)». */
+body.dark-theme #checkrideContainer .checkride-report-main-title {
+  border-bottom-color: var(--cr-color-red);
+}
+
+body.dark-theme #checkrideContainer .checkride-report-pf {
+  border-left-color: var(--cr-color-red);
+}
+
+body.dark-theme #checkrideContainer .checkride-divider-title {
+  border-left-color: var(--cr-color-red);
+}
+
+body.dark-theme #checkrideContainer .checkride-competency-section-title {
+  border-left-color: var(--cr-color-red);
+}
+
 /* ─── Print styles ─── */
 /* @media print — осознанное исключение из §7 v4.7 шкалы breakpoints.
    print не входит в список разрешённых (min-width:768/900/1024/1100,
@@ -1193,4 +1271,324 @@ body.dark-theme #checkride-signature {
   overflow-wrap: break-word;
   word-break: break-word;
   hyphens: auto;
+}
+
+/* ═══════════════════════════════════════════
+   FFS-CREW: 2-пилотная раскладка (CPT + F/O)
+   §7: цвета/шрифты через var(--*), @media max-width:560px из разрешённой шкалы
+   ═══════════════════════════════════════════ */
+
+/* Блок CPT или F/O на стартовом экране */
+.checkride-crew-section {
+  margin-bottom: 16px;
+}
+
+.checkride-crew-role {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 8px;
+  letter-spacing: 0.04em;
+}
+
+/* Ряд из двух полей (ФИО + Лицензия) */
+.checkride-crew-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.checkride-crew-row .checkride-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Поле ввода с подписью сверху (FFS start screen — аналогично LINE) */
+.checkride-crew-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 560px) {
+  /* На узких экранах — перенос столбиком */
+  .checkride-crew-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .checkride-crew-row .checkride-input {
+    width: 100%;
+  }
+}
+
+/* Ряд из 2 контролов (CPT + F/O) в test screen для checkbox/radio/select */
+.checkride-crew-grade-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.checkride-crew-grade {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+}
+
+.checkride-crew-grade input[type="checkbox"],
+.checkride-crew-grade input[type="radio"] {
+  flex-shrink: 0;
+}
+
+.checkride-crew-grade select {
+  flex: 1;
+  min-width: 80px;
+}
+
+.checkride-crew-grade > span,
+.checkride-crew-grade-label {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  min-width: 28px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  /* На узких — оставляем в ряду, но позволяем перенос, если не помещается */
+  .checkride-crew-grade-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .checkride-crew-group .checkride-crew-grade,
+  .checkride-crew-group-wide .checkride-crew-grade,
+  .checkride-competency-crew .checkride-crew-grade {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 36px;
+  }
+  .checkride-crew-marker-label {
+    min-width: 36px;
+  }
+}
+
+/* Колонка radio-опций (для radio внутри crew-grade-row) */
+.checkride-crew-radio-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Лейбл item внутри competency-crew аккордеона (FFS) */
+.checkride-competency-crew {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.checkride-competency-crew:last-child {
+  border-bottom: none;
+}
+
+/* Чекбоксы CPT+F/O перед label (аналогично LINE) — grade-row без margin-top */
+.checkride-competency-crew .checkride-crew-grade-row {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.checkride-crew-item-label {
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Лейбл для check-item в FFS (когда нет label, только span) */
+.checkride-check-item-label {
+  flex: 1;
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+}
+
+/* Блок пилота в отчёте (FFS — CPT и F/O) */
+.checkride-report-crew-block {
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 16px;
+  background: var(--color-bg-card);
+}
+
+.checkride-report-crew-title {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Разделитель meta в FFS (между ФИО и Лицензией) */
+.checkride-meta-sep {
+  color: var(--color-text-muted);
+  margin: 0 4px;
+}
+
+/* Кольца прогресса в FFS — 2 концентрических */
+.checkride-progress-ring .ring-fill-cpt {
+  /* внешний круг — CPT, цвет задаётся через stroke в HTML */
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.checkride-progress-ring .ring-fill-fo {
+  /* внутренний круг — F/O */
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════
+   PF-селектор и маркер CPT/F/O над блоком (FFS-crew, edit 2026-07-10)
+   §7: цвета/шрифты через var(--*), @media max-width:560px из разрешённой шкалы
+   ═══════════════════════════════════════════ */
+
+/* Маркер CPT/F/O над блоком items — ghost-row: spacer (занимает место label) +
+   grade-row с marker-label. Spacer и label оба flex:1 → grade-row в маркере
+   совпадает по позиции/ширине с grade-row в check-item/grade-item. */
+.checkride-crew-marker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.checkride-crew-marker-spacer {
+  flex: 1;
+}
+
+.checkride-crew-marker-row {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.checkride-crew-marker-label {
+  flex: 0 0 40px;
+  text-align: center;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Маркер внутри competency-аккордеона — grade-row на всю ширину,
+   чекбоксы прижаты влево → маркер тоже влево (без spacer) */
+.checkride-crew-marker-comp {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 4px 0;
+  padding-left: 4px;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.checkride-crew-marker-comp .checkride-crew-marker-label {
+  flex: 0 0 40px;
+  text-align: center;
+}
+
+/* Вариант D аудита: единый источник ширины — класс-предок .checkride-crew-group[-wide].
+   marker-label + crew-grade + radio-col получают flex из ОДНОГО правила.
+   Смешанные группы структурно невозможен рассинхрон. */
+.checkride-crew-group .checkride-crew-grade,
+.checkride-crew-group .checkride-crew-radio-col,
+.checkride-crew-group .checkride-crew-marker-label {
+  flex: 0 0 40px;
+  min-width: 40px;
+  justify-content: center;
+}
+
+.checkride-crew-group-wide .checkride-crew-grade,
+.checkride-crew-group-wide .checkride-crew-radio-col,
+.checkride-crew-group-wide .checkride-crew-marker-label {
+  flex: 0 0 80px;
+  min-width: 80px;
+}
+
+/* Competency-аккордеон — отдельный рендеринг (L587-601), БЕЗ обёртки .checkride-crew-group */
+.checkride-competency-crew .checkride-crew-grade {
+  flex: 0 0 40px;
+  min-width: 40px;
+  justify-content: center;
+}
+
+/* PF-селектор для блока «Техника пилотирования.» в FFS */
+.checkride-pf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+  padding: 8px 12px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+}
+
+.checkride-pf-row label {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.checkride-pf-select {
+  flex: 0 0 auto;
+  min-width: 60px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-bg-card);
+  color: var(--color-text-main);
+  font-size: var(--font-sm);
+}
+
+.checkride-pf-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Метка «— (PM для этого упражнения)» в отчёте для пилота, не являющегося PF */
+.checkride-pm-mark {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: var(--font-sm);
+}
+
+/* Метка PF в отчёте («PF: CPT» или «PF: F/O») */
+.checkride-report-pf {
+  margin: 4px 0 8px;
+  padding: 4px 8px;
+  background: var(--color-bg-card);
+  border-left: 3px solid var(--color-primary);
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+}
+
+@media (max-width: 560px) {
+  .checkride-pf-select {
+    min-width: 60px;
+    flex: 0 0 auto;
+  }
 }
