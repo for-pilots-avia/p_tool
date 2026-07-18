@@ -438,40 +438,8 @@ body.dark-theme #worktimeContainer {
   border: 2px solid var(--color-text-white);
   z-index: 1;
 }
-.wt-timeline-marker--engine-start {
-  background: var(--color-success);
-  z-index: 2;
-}
-.wt-timeline-marker--engine-start::after {
-  content: 'Запуск';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: var(--font-xs);
-  font-family: var(--font-main);
-  font-weight: 600;
-  color: var(--color-success);
-  white-space: nowrap;
-  margin-top: 2px;
-}
-.wt-timeline-marker--engine-stop {
-  background: var(--color-warning);
-  z-index: 2;
-}
-.wt-timeline-marker--engine-stop::after {
-  content: 'Выключ.';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: var(--font-xs);
-  font-family: var(--font-main);
-  font-weight: 600;
-  color: var(--color-warning);
-  white-space: nowrap;
-  margin-top: 2px;
-}
+/* Task 48 #4: маркеры Запуск/Выключение удалены из timeline — инфо есть в карточках сегментов.
+   .wt-timeline-marker--engine-start/stop и ::after убраны. */
 .wt-timeline-marker--report {
   background: var(--color-primary);
   z-index: 3;
@@ -743,7 +711,8 @@ body.dark-theme #worktimeContainer {
   box-shadow: 0 -4px 24px var(--color-shadow-md);
 }
 .wt-settings-sheet.open {
-  transform: translateY(0);
+  /* Task 48 #1: transform:none вместо translateY(0) — устраняет containing block на iPad Safari, который ломал нативный time picker */
+  transform: none;
 }
 
 .wt-settings-header {

@@ -1,466 +1,1916 @@
 [
   {
-    "id": "id",
-    "title": "Timetable FFS 737",
+    "id": "fp-sep-emergency",
+    "title": "1. Emergency briefing.",
     "layout": "divider",
     "collapsible": true,
     "children": [
       {
-        "id": "fp-tt001",
-        "title": "Ульяновск",
-        "duration": "FFS",
-        "layout": "child",
-        "{{items:normal}}": "ИЮЛЬ 2026.",
-        "tables": [
-          {
-            "src": "modules/ffstraining/data/B737_Ульяновск.html"
-          }
-        ]
+        "id": "fp-sep-general",
+        "title": "General",
+        "layout": "divider"
       },
       {
-        "id": "fp-tt002",
-        "title": "Санкт-Петербург",
-        "duration": "FFS",
-        "layout": "child",
-        "{{items:normal}}": "ИЮЛЬ 2026.",
-        "tables": [
-          {
-            "src": "modules/ffstraining/data/B737_Санкт-Петербург.html"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "ffs-sep-instr",
-    "title": "Вступление",
-    "layout": "divider"
-  },
-  {
-    "id": "ffs-instr-notes",
-    "title": "Общая информация для инструктора",
-    "layout": "divider",
-    "collapsible": true,
-    "children": [
-      {
-        "id": "ffs-instr-docs",
-        "title": "Общие требования КТС",
-        "layout": "child",
-        "{{items:normal}}": "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.\nТренажерные сессии периодической подготовки проводятся в течение 2-х последовательных дней. Продолжительность ежедневной подготовки на КТС и времени отдыха должны соответствовать требованиям Главы 7 части А РПП. Подготовка на тренажере проводится инструкторами, допущенными к данному виду подготовки. Устройство имитации полета (тренажер) должно быть одобрено уполномоченным органом в области ГА и соответствовать типу и модификациям ВС, эксплуатируемым в Авиапредприятии. Допускаются отклонения в конфигурации, кабине, типах двигателей, пилотажно- навигационном оборудовании ВС, если это не требует дополнительных навыков в эксплуатации и не оказывает влияние на выполнение тренажерной подготовки в полном объеме.\nДокументация (в том числе для проведения тренажерной подготовки) может быть представлена как в бумажном, так и в электронном виде.\nКВС, допущенные к выполнению полетов с правого пилотского сиденья, и пилоты-инструкторы могут проходить тренажерную подготовку, как с левого, так и с правого пилотского сидения.\nВ случае производственной необходимости допускается прохождение периодической тренировки и проверки на тренажере пилотами равной квалификации (двух вторых пилотов или двух КВС, не имеющих допуск к полетам с правого пилотского сидения) при соблюдении следующих условий:\n- в процессе тренировки и проверки на КТС пилоты выполняют функции пилотирующего (PF), занимая пилотское сидение согласно своей квалификации;\n- при выполнении заходов на посадку и посадок в условиях II/III категории ИКАО и взлетов при видимости на ВПП менее 400 м, допускается выполнение функций пилотирующего пилота с пилотского сидения не своей квалификации.\nВ случае если один из тренируемых пилотов не может продолжать подготовку на тренажере, допускается занятие пилотом-инструктором свободного кресла пилота для завершения подготовки другого пилота.",
-        "references": [
-          "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
-        ]
-      },
-      {
-        "id": "ffs-instr-tech",
-        "title": "Технические требования к исправности оборудования тренажера.",
-        "layout": "child",
-        "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-        "references": [
-          "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
-        ]
-      },
-      {
-        "id": "ffs-instr-mel",
-        "title": "MINIMUM EQUIPMENT OF SIMULATOR: Boeing - 737/777",
-        "layout": "child",
-        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
-      },
-      {
-        "id": "ffs-instr-ebt",
-        "title": "Подготовка, основанная на сценариях.",
-        "layout": "child",
-        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
-      },
-      {
-        "id": "ffs-instr-specials",
-        "title": "Требования по проведению упражнений по эвакуации, аварийному снижению, задымлению.",
-        "layout": "child",
-        "{{items:abnormal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
-      },
-      {
-        "id": "ffs-instr-ban",
-        "title": "Отказ в проведении тренировки / проверки!",
-        "layout": "child",
-        "{{items:emergency}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
-      }
-    ]
-  },
-  {
-    "id": "ffs-instr-marks",
-    "title": "Оценки нв КТС",
-    "layout": "divider",
-    "collapsible": true,
-    "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
-  },
-  {
-    "id": "ffs-instr-brief",
-    "title": "Общий порядок проведения брифинга",
-    "layout": "divider",
-    "collapsible": true,
-    "children": [
-      {
-        "id": "ffs-brief-001",
-        "title": "Общие требования КТС",
-        "layout": "child",
-        "{{items:normal}}": "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.",
-        "references": [
-          "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
-        ]
-      }
-    ]
-  },
-  {
-    "id": "ffs-sep-anual",
-    "title": "Программы ежегодной подготовки",
-    "layout": "divider"
-  },
-  {
-    "id": "ffs-progr-3-6",
-    "title": "Программа 3-6",
-    "layout": "divider",
-    "collapsible": true,
-    "children": [
-      {
-        "id": "ffs-3-6-day1",
-        "title": "3-6 day 1",
-        "duration": "4 ч",
+        "id": "fp-group-maydayorpanpan",
+        "title": "- MAYDAY or PANPAN",
         "layout": "group",
         "children": [
           {
-            "id": "ffs-0100",
-            "title": "1 LOS ULLI - UMKK. {{badge:info:PF – CPT or FO}}",
-            "duration": "00.00 - 00.35",
+            "id": "fp-001",
+            "title": "{{badge:abnormal:PAN PAN}}",
+            "refCode": "SOP-and-AOMA",
             "layout": "card",
-            "{{items:normal}}": "{{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
-            "children": [
+            "blocks": [
               {
-                "id": "ffs-0100a",
-                "title": "Отказ двигателя на V1",
-                "duration": "1 ч",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
-                "documents": [
-                  {
-                    "title": "QRH — Engine Failure стр. 22",
-                    "src": "modules/docs/AOMB.pdf",
-                    "page": 22
-                  }
-                ]
+                "type": "items",
+                "key": "{{items:abnormal}}"
               },
               {
-                "id": "ffs-0100b",
-                "title": "LOFT-сценарий",
-                "duration": "1 ч",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
-              }
-            ]
-          },
-          {
-            "id": "ffs-0150",
-            "title": "Повторная квалификация A320",
-            "duration": "4 ч",
-            "layout": "card",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
-          }
-        ]
-      },
-      {
-        "id": "ffs-3-6-day2",
-        "title": "3-6 day 2",
-        "duration": "4 ч",
-        "layout": "group",
-        "children": [
-          {
-            "id": "ffs-day2-0",
-            "title": "{{badge:normal:REFRESH}}",
-            "layout": "divider"
-          },
-          {
-            "id": "ffs-0201",
-            "title": "6 LOSS OF HYD, WHEEL WELL FIRE, RNP APP.",
-            "duration": "00.00 - 00.45 {{badge:normal:PF – CPT}}",
-            "layout": "card",
-            "tables": [
+                "type": "documents"
+              },
               {
-                "src": "modules/ffstraining/data/Лист1.html"
+                "type": "references"
               }
             ],
-            "children": [
+            "{{items:abnormal}}": [
+              "РПП А. {{badge:abnormal}}\n• отказ двигателя, не приводящий к невозможности продолжения полета на высоте не ниже безопасной;\n• потеря радиосвязи при полете в контролируемом воздушном пространстве;\n• попадание воздушного судна в зону ОЯП;\n• выполнение посадки воздушного судна в условиях ниже минимума для посадки в случаях, не позволяющих продолжать полет до другого аэродрома;\n• ухудшение устойчивости и/или управляемости воздушного судна;\n• внезапное ухудшение состояния здоровья лица на борту воздушного судна, требующее медицинской помощи, которая не может быть оказана на борту воздушного судна;\n• отказы систем ВС, приводящие к невозможности выполнения полета до аэродрома назначения."
+            ],
+            "documents": [
               {
-                "id": "ffs-text-3-6-day2",
-                "layout": "text",
-                "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками",
-                "tables": [
-                  {
-                    "src": "modules/ffstraining/data/TO.html"
-                  }
-                ],
-                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW10L via SUGIN1D, sq 4321.\nATC: \"NWS RW 10L, cleared for T/O\"."
-              },
-              {
-                "id": "ffs-day2-1",
-                "title": "1 HYDRAULIC FAILURE",
-                "layout": "divider"
-              },
-              {
-                "id": "ffs-day2-1__after",
-                "layout": "text",
-                "{{items:success:SYS}}": "После уборки шасси - LOSS OF HYD SYS A.\nУльяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
-              },
-              {
-                "id": "ffs-0201a",
-                "title": "NNC",
-                "duration": "QRH",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
-                "documents": [
-                  {
-                    "title": "QRH — Engine Failure стр. 22",
-                    "src": "modules/docs/AOMB.pdf",
-                    "page": 22
-                  }
-                ]
-              },
-              {
-                "id": "ffs-day2-2",
-                "title": "2 FIRE PROTECTION",
-                "layout": "divider"
-              },
-              {
-                "id": "ffs-day2-2__after",
-                "layout": "text",
-                "{{items:success:SYS}}": "После уборки механизации - WHEEL WELL FIRE.\nУльяновск:\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\nС.-Петербург:\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR",
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!"
-              },
-              {
-                "id": "ffs-0200b",
-                "title": "NNC",
-                "duration": "QRH",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
-              },
-              {
-                "id": "ffs-day2-3",
-                "title": "3 LOSS OF HYD SYS B ВНИМАНИЕ: {{badge:emergency:MANUAL REVERTION}}",
-                "layout": "divider"
-              },
-              {
-                "id": "ffs-day2-3__after",
-                "layout": "text",
-                "{{items:success:SYS}}": "Ульяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B",
-                "{{items:abnormal}}": "{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
-              },
-              {
-                "id": "ffs-day2-4",
-                "title": "4 RNP APP",
-                "layout": "divider"
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
               }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
             ]
           },
           {
-            "id": "ffs-0202",
-            "title": "7 WINDSHEAR, PARTIAL GEAR UP LANDING",
-            "duration": "00.45 - 01.20 {{badge:normal:PF – F/O}}",
+            "id": "fp-002",
+            "title": "{{badge:emergency:MAY DAY}}",
+            "refCode": "SOP-and-AOMA",
             "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
-          },
-          {
-            "id": "ffs-0203",
-            "title": "8 LVO",
-            "duration": "01.20 - 01.55 {{badge:normal:PF – CPT}}",
-            "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
-          },
-          {
-            "id": "ffs-day2-5",
-            "title": "{{badge:emergency:CHECK}}",
-            "layout": "divider"
-          },
-          {
-            "id": "ffs-0204",
-            "title": "1 LANDING GGEARS, WINDSHEAR, FIRE PROTECTION, EGPWS",
-            "duration": "02.00 - 02.45 {{badge:normal:PF – CPT}}",
-            "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
-          },
-          {
-            "id": "ffs-0205",
-            "title": "2 ENG FAIL, ONE ILS APP",
-            "duration": "02.45 - 03.15 {{badge:normal:PF – F/O}}",
-            "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
-          },
-          {
-            "id": "ffs-0206",
-            "title": "3 WINDSHEAR, HYD SYS FAIL, EGPWS",
-            "duration": "03.15 - 03.40 {{badge:normal:PF – F/O}}",
-            "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
-          },
-          {
-            "id": "ffs-0207",
-            "title": "8 LVO",
-            "duration": "03.40 - 04.00 {{badge:normal:PF – CPT}}",
-            "layout": "card",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus.",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:emergency}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:emergency}}": [
+              "РПП А. {{badge:abnormal:Внимание}}\n• пожар на воздушном судне;\n• отказ двигателя (двигателей), приводящий к невозможности продолжения полета на высоте не ниже безопасной;\n• захват воздушного судна;\n• угроза взрыва на борту воздушного судна;\n• вынужденная посадка вне аэродрома;\n• экстренное снижение;\n• нарушение прочности воздушного судна;\n• полная потеря устойчивости и/или управляемости ВС;\n• потеря ориентировки."
+            ],
+            "references": [
+              "РПП ч.А — Windshear"
+            ]
           }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "ffs-sep-special",
-    "title": "Программы специальной подготовки",
-    "layout": "divider"
-  },
-  {
-    "id": "ffs-progr-picus",
-    "title": "Программа PICUS | 8 ч",
-    "layout": "divider",
-    "collapsible": true,
-    "children": [
-      {
-        "id": "ffs-picus-day1",
-        "title": "PICUS day 1",
-        "duration": "4 ч",
-        "layout": "group",
-        "children": [
+        ],
+        "blocks": [
           {
-            "id": "ffs-00100",
-            "title": "1 Cockpit preparations; Engine start.",
-            "duration": "00.00 - 00.35",
-            "layout": "card",
-            "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
-            "children": [
-              {
-                "id": "ffs-00100a",
-                "title": "Отказ двигателя на V1",
-                "duration": "1 ч",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
-                "documents": [
-                  {
-                    "title": "QRH — Engine Failure стр. 22",
-                    "src": "modules/docs/AOMB.pdf",
-                    "page": 22
-                  }
-                ]
-              },
-              {
-                "id": "ffs-00100b",
-                "title": "LOFT-сценарий",
-                "duration": "1 ч",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
-              }
-            ]
+            "type": "child-ref",
+            "index": 0
           },
           {
-            "id": "ffs-00150",
-            "title": "Повторная квалификация A320",
-            "duration": "4 ч",
-            "layout": "card",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            "type": "child-ref",
+            "index": 1
           }
         ]
       },
       {
-        "id": "ffs-picus-day2",
-        "title": "PICUS day 2",
-        "duration": "4 ч",
+        "id": "fp-group-evacuaiton",
+        "title": "- EVACUATION",
         "layout": "group",
         "children": [
           {
-            "id": "ffs-00200",
-            "title": "1 Cockpit preparations; Engine start.",
-            "duration": "00.00 - 00.35",
+            "id": "fp-003",
+            "title": "Evacuation",
+            "refCode": "SOP-and-AOMA",
             "layout": "card",
-            "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
-            "children": [
+            "blocks": [
               {
-                "id": "ffs-00200a",
-                "title": "Отказ двигателя на V1",
-                "duration": "1 ч",
-                "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
-                "documents": [
-                  {
-                    "title": "QRH — Engine Failure стр. 22",
-                    "src": "modules/docs/AOMB.pdf",
-                    "page": 22
-                  }
-                ]
+                "type": "items",
+                "key": "{{items:normal}}"
               },
               {
-                "id": "ffs-00200b",
-                "title": "LOFT-сценарий",
-                "duration": "1 ч",
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "РПП A: EVACUATION\n• При наличии времени для проведения брифинга.\nРекомендуется подготовка к возможной эвакуации в следующих случаях:\n− пожар / дым в кабине летного экипажа, пассажирском салоне или грузовом отсеке;\n− пожар двигателя / ВСУ / шасси;\n− посадка с невыпущенными / частично выпущенными шасси;\n− серьезный отказ органов управления ВС;\n− если существует вероятность выкатывания или серьезного повреждения ВС после посадки;\n− вынужденная посадка вне аэродрома (Ditching);\n− угроза взрыва на борту ВС;\n− любом другом случае по усмотрению КВС.\nПри возникновении в полете аварийной ситуации: КВС PA \"PURSER TO THE COCKPIT\"\n- At 2000 feet AAL - ЛЭ PA: \"FINISH PREPARATION; FINISH PREPARATION\"\n- At 500 feet AAL - ЛЭ PA: \"BRACE FOR IMPACT; BRACE FOR IMPACT\"\n• При отсутствии времени для проведения брифинга.\n- При возникновении в полете аварийной ситуации: КВС PA: \"ATTENTION CREW, AT STATIONS; ATTENTION CREW, AT STATIONS\"\n- At 500 feet AAL - ЛЭ PA: \"BRACE FOR IMPACT; BRACE FOR IMPACT\"\n• Эвакуация рекомендуется в следующих случаях :\n− пожар / дым в кабине летного экипажа, пассажирском салоне или грузовом отсеке;\n− негасимый пожар двигателя / ВСУ / шасси;\n− вынужденная посадка вне аэродрома (Ditching);\n− серьезные повреждения ВС;\n− любом другом случае по усмотрению КВС.\n• При возникновении аварийной ситуации на земле: ЛЭ PA: \"ATTENTION CREW, AT STATIONS ATTENTION CREW, AT STATIONS\"\n• Команда для проведения эвакуации: КВС PA \"EVACUATE; EVACUATE\"\n• Если в проведении эвакуации нет необходимости: КВС PA\"CANCEL ALERT\". За этой командой должно последовать разъяснение, какие действия будут предприняты в дальнейшем.\n• Члены кабинного экипажа могут самостоятельно (не дожидаясь команды от КВС) начать эвакуацию при:\n− посадке на воду;\n− разрушении целостности фюзеляжа;\n− наличии пожара внутри ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-004",
+            "title": "Controlled diembarcarion",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "РПП A: Контролируемое покидание ВС\nВ некоторых случаях пассажиры должны покинуть ВС из предосторожности (например: угроза срабатывания взрывного устройства, выкатывание ВС без разрушения конструкции), однако, не так быстро, как при эвакуации, во избежание получения пассажирами травм.\n• Для начала контролируемого покидания ВС: КВС PA \"CONTROLLED DISEMBARKATION\"\n\nДля этого рекомендуем рассмотреть следующие действия:\n- Порядок выключения двигателей (использование ВСУ);\n- Выполнение Normal CL и NNC;\n- Брифинг с СБП."
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          }
+        ]
+      },
+      {
+        "id": "fp-sep-procedures",
+        "title": "Procedures",
+        "layout": "divider"
+      },
+      {
+        "id": "fp-group-reject",
+        "title": "1) REJECTED Take Off",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-005",
+            "title": "РПП ч.А",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-006",
+            "title": "prior to 80 kts",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "1) Identify the failure:\n• activation of the master caution system;\n• system failure(s);\n• unusual noise or vibration;\n• tire failure;\n• abnormally slow acceleration;\n• takeoff configuration warning;\n• fire or fire warning;\n• engine failure;\n• predictive windshear warning;\n• if a side window opens;\n• if the airplane is unsafe or unable to fly."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Without delay:\n• Simultaneously: thrust levers, autothrottles and  max manual wheel brakes or RTO.\n• If RTO autobrake is selected, monitor system performance and apply manual wheel brakes if the AUTO BRAKE DISARM light illuminates or deceleration is not adequate.\n• Raise SPEED BRAKE lever.\n• Apply reverse thrust IDLE."
+            ],
+            "tables": [
+              {
+                "src": "modules/fprocedures/data/man_reject.html"
+              }
+            ],
+            "documents": [
+              {
+                "title": "SOP — Reject",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 22
+              }
+            ],
+            "references": [
+              "QRH — Reject"
+            ]
+          },
+          {
+            "id": "fp-007",
+            "title": "80 to V1",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items cont.}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "1) Identify the failure:\n1) Identify the failure:\n• fire or fire warning;\n• engine failure;\n• predictive windshear warning;\n• if the airplane is unsafe or unable to fly."
+            ],
+            "{{items:emergency:Memory items cont.}}": [
+              "• Raise SPEED BRAKE lever.\n• Apply reverse thrust up to the maximum amount consistent with conditions.\n• Continue maximum braking until certain the airplane can stop on the runway.\n• When stopping is assured: Start movement of the reverse thrust levers to reach the reverse idle detent before taxi speed. After the engines are at reverse idle, move the reverse thrust levers to full down."
+            ],
+            "tables": [
+              {
+                "src": "modules/fprocedures/data/man_reject.html"
+              }
+            ],
+            "documents": [
+              {
+                "title": "SOP — Reject",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 22
+              }
+            ],
+            "references": [
+              "QRH — Reject"
+            ]
+          },
+          {
+            "id": "fp-008",
+            "title": "after STOP",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:info}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items cont.}}"
+              },
+              {
+                "type": "table-file",
+                "index": 0
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:info}}": [
+              "• Communicate the reject decision to the control tower and cabin as soon as practical.",
+              "Consider the following:\n• Review Brake Cooling Schedule for brake cooling time and precautions (refer to Performance Inflight Chapter.)\n• Completion of Non-Normal checklist (if appropriate) for conditions which caused the RTO.\n• Advising passengers of the need to remain seated or evacuate. \"ATTENTION CREW, AT STATIONS\" … \"CANCEL ALERT\" x 2 times.\n• Wind direction in case of fire.\n• Not setting the parking brake unless passenger evacuation is needed.\n• The possibility of wheel fuse plugs melting.\n• The need to clear the runway.\n• The requirement for remote parking.\n• Alerting fire equipment.\n• Advising the ground crew of the hot brake hazard."
+            ],
+            "{{items:normal}}": [
+              "<b>CPT: Call \"REJECT\" (\"REJECT, I HAVE CONTROL\")</b>"
+            ],
+            "{{items:emergency:Memory items cont.}}": [
+              "• Raise SPEED BRAKE lever.\n• Apply reverse thrust up to the maximum amount consistent with conditions.\n• Continue maximum braking until certain the airplane can stop on the runway.\n• When stopping is assured: Start movement of the reverse thrust levers to reach the reverse idle detent before taxi speed. After the engines are at reverse idle, move the reverse thrust levers to full down."
+            ],
+            "tables": [
+              {
+                "src": "modules/fprocedures/data/man_reject.html"
+              }
+            ],
+            "documents": [
+              {
+                "title": "SOP — Reject",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 22
+              }
+            ],
+            "references": [
+              "QRH — Reject"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "items",
+            "key": "{{items:normal}}"
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          },
+          {
+            "type": "child-ref",
+            "index": 2
+          },
+          {
+            "type": "child-ref",
+            "index": 3
+          }
+        ],
+        "{{items:normal}}": [
+          "<b>CPT: Call \"REJECT\" (\"REJECT, I HAVE CONTROL\")</b>\nIf a malfunction occurs before V1, for which the Captain does not intend to reject the takeoff, he will announce his intention by calling \"GO\". If the decision is to reject the takeoff, the Captain must clearly announce \"REJECT\"."
+        ]
+      },
+      {
+        "id": "fp-group-engout",
+        "title": "2) ENG out takeoff",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-007-2",
+            "title": "Rotation:",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-008-2",
+            "title": "400 ft",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA"
+            ],
+            "{{items:abnormal}}": [
+              "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          }
+        ]
+      },
+      {
+        "id": "fp-group-radiocom",
+        "title": "3) Radiocommunication failure",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-009",
+            "title": "РПП:",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-010",
+            "title": "ICAO",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA"
+            ],
+            "{{items:abnormal}}": [
+              "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          }
+        ]
+      },
+      {
+        "id": "fp-group-driftdown",
+        "title": "4) ENG out driftdown",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-011",
+            "title": "SOP",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-012",
+            "title": "FCTM",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA"
+            ],
+            "{{items:abnormal}}": [
+              "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          },
+          {
+            "id": "fp-013",
+            "title": "Loss of Thrust on Both Engines",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA"
+            ],
+            "{{items:abnormal}}": [
+              "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          },
+          {
+            "type": "child-ref",
+            "index": 2
+          }
+        ]
+      },
+      {
+        "id": "fp-group-emdescent",
+        "title": "5) Emergency descent / RAPID DECOMPRESSION",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-014",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              },
+              {
+                "title": "FCOM Vol. 1 — Takeoff",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 12
+              }
+            ],
+            "references": [
+              "FCOM Vol. 1 — Normal Procedures: Takeoff",
+              "SOP — Standard Takeoff Profile"
+            ]
+          },
+          {
+            "id": "fp-015",
+            "title": "ICAO",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ]
+          },
+          {
+            "id": "fp-016",
+            "title": "Differenceses",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA"
+            ],
+            "{{items:abnormal}}": [
+              "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          },
+          {
+            "type": "child-ref",
+            "index": 2
+          }
+        ]
+      },
+      {
+        "id": "fp-group-unrul",
+        "title": "6) Угроза захвата ВС / Недисциплинированный пассажир",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-017",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          }
+        ]
+      },
+      {
+        "id": "fp-group-medical",
+        "title": "7) Medical Emergency",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-018",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "children": [
+              {
+                "id": "fp-018a",
+                "title": "Взлёт с ограниченной ВПП",
+                "refCode": "SOP-TO-SHORT",
                 "layout": "child",
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:abnormal}}"
+                  },
+                  {
+                    "type": "references"
+                  }
+                ],
+                "{{items:normal}}": [
+                  "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+                ],
+                "{{items:abnormal}}": [
+                  "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp"
+                ],
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              }
+            ],
+            "blocks": [
+              {
+                "type": "child-ref",
+                "index": 0
+              }
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          }
+        ]
+      },
+      {
+        "id": "fp-group-lost",
+        "title": "8) Потеря местоположения",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-019",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "{{items:abnormal}}": [
+              "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          }
+        ]
+      },
+      {
+        "id": "fp-group-intercept",
+        "title": "9) Перехват ВС",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-020",
+            "title": "РПП",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMB",
+                "src": "modules/docs/AOMB.pdf",
+                "page": 1
+              }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "child-ref",
+        "index": 0
+      },
+      {
+        "type": "child-ref",
+        "index": 1
+      },
+      {
+        "type": "child-ref",
+        "index": 2
+      },
+      {
+        "type": "child-ref",
+        "index": 3
+      },
+      {
+        "type": "child-ref",
+        "index": 4
+      },
+      {
+        "type": "child-ref",
+        "index": 5
+      },
+      {
+        "type": "child-ref",
+        "index": 6
+      },
+      {
+        "type": "child-ref",
+        "index": 7
+      },
+      {
+        "type": "child-ref",
+        "index": 8
+      },
+      {
+        "type": "child-ref",
+        "index": 9
+      },
+      {
+        "type": "child-ref",
+        "index": 10
+      },
+      {
+        "type": "child-ref",
+        "index": 11
+      },
+      {
+        "type": "child-ref",
+        "index": 12
+      },
+      {
+        "type": "child-ref",
+        "index": 13
+      },
+      {
+        "type": "child-ref",
+        "index": 14
+      }
+    ]
+  },
+  {
+    "id": "fp-sep-predeparture",
+    "title": "2. Pre-departure preparations.",
+    "layout": "divider",
+    "collapsible": true,
+    "children": [
+      {
+        "id": "fp-group-predeparture",
+        "title": "РПП",
+        "refCode": "Предполетная подготовка",
+        "layout": "group",
+        "children": [
+          {
+            "id": "fp-021",
+            "title": "РПП 1",
+            "refCode": "SOP-and-AOMA",
+            "layout": "card",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Предполетная подготовка начинается как минимум:\n- за 1 час до запланированного времени отправления перед первым полетом полетной смены;\n- за 30 минут до запланированного времени отправления перед каждым последующим полетом одной полетной смены (кроме полетной смены, разделенной на части);\n- за 1 час до запланированного времени отправления для полетной смены, разделенной на части.\nПри этом перед первым полетом полетной смены продолжительность предполетной подготовки должна составлять не менее 1 часа.\nФактическую продолжительность предполетной подготовки определяет командир ВС фиксируя в задании на полет (электронном отчете о рейсе) время начала полетной смены.\nВ любом случае, полетная смена не должна начинаться ранее окончания требуемого времени отдыха.\nВремя прибытия летного экипажа на ВС определяется в соответствии с технологическим графиком обслуживания ВС, но не может составлять менее чем 40 минут для ВС Airbus A321 и Boeing 737."
+            ],
+            "documents": [
+              {
+                "title": "SOP — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ],
+            "references": [
+              "SOP — Standard Takeoff Profile"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          }
+        ]
+      },
+      {
+        "id": "fp-022",
+        "title": "CPT: ОБЯЗАННОСТИ И ОТВЕТСТВЕННОСТЬ ЧЛЕНОВ ЭКИПАЖА ВС",
+        "refCode": "SOP-and-AOMA",
+        "layout": "card",
+        "children": [
+          {
+            "id": "fp-022a",
+            "title": "Заданиена полет",
+            "refCode": "TO-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:abnormal}}": [
+              "КВС проверяет и подписывает задание на полет (бумажную версию и в электронном отчете о рейсе).",
+              "Лещинский П. А. В последнее время при проверке полетных заданий выявляются факты незаполнения граф в ЭПЗ ( Duty comments ) и в бумажных заданиях ( Особые отметки )  при отличиях расчетного времени от фактического. Напоминаю, что это необходимо выполнять, обязательно с  указанием причины продления.\nВ случае превышения фактического полетного времени над расчетным* более чем на 20 минут для оплаты полетного времени по факту, необходимо в электронном задании на полет (раздел Duty comments) и на обратной стороне бумажного задания (в случае невозможности заполнения ЭПЗ) (\"Особые отметки\") сделать отметку \"ОПЛАТА ПО ФАКТУ\".\n* (п.8.1 Положения об оплате труда…) Расчетное время к оплате за каждый выполненный рейс включает в себя:\n• расчетное летное время, определенное в CFP и соответствующее времени, указанному в Dispatch Release (Диспетчерском разрешении на выполнение полета), подготовленное полетным диспетчером;\n• время на руление, составляющее: для Boeing-737, Аirbus-320, 321 – 20 минут."
+            ],
+            "{{items:normal}}": [
+              "Задание на полет экипажа является основным документом, дающим право экипажу на выполнение полета, и, кроме того, служит отчетом о выполненном полете (рейсе).\nСтаршим на борту является пилот-инструктор или КВС, фамилия которого напечатана в задании на полет первой.\nИзменения в задании на полёт могут быть внесены от руки <b>печатными буквами и заверяются подписью КВС</b>.\nВсе записи и подписи в задании на полет оформляются <b>чернилами синего цвета>/b&lt;.\nПеред вылетом из аэропортов, где предполетный медицинский осмотр не проводится, решение о допуске экипажа к полету принимает КВС. В этом случае в графе \"Допуск экипажа по решению КВС\", делается запись:&lt;b&gt;Экипаж в количестве ___ человек к полету допущен.</b>\nуказывается общее количество членов летного и кабинного экипажа, ставится подпись КВС и время UTC.\nОбратная сторона задания на полет экипажем оформляется только, если нет возможности заполнить электронный отчет о рейсе. Подпись КВС на обратной стороне задания заверяет все внесенные данные.\nОформленное задание на полет со всеми необходимыми подписями, штампами и записями прикладывается к полетной документации, фотографируется и прикладывается к электронному полетному заданию.\nНа увеличенный экипаж оформляется единое задание на полет. При этом указывается наиболее низкий минимум для взлета и посадки экипажа из числа членов экипажа ВС, включенных в задание на полет."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А 13.3.1. Задание на полёт",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1283
+              },
+              {
+                "title": "РПП ч.А 4.3. ВЫПОЛНЕНИЕ ПОЛЕТОВ УВЕЛИЧЕННЫМ СОСТАВОМ ЭКИПАЖА",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 277
+              },
+              {
+                "title": "РПП ч.А 4.6. ПОРЯДОК ВКЛЮЧЕНИЯ В ЗАДАНИЕ НА ПОЛЕТ ПЕРСОНАЛА, НЕ ЯВЛЯЮЩИМИСЯ ЧЛЕНАМИ ЭКИПАЖА",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 287
               }
             ]
           },
           {
-            "id": "ffs-00250",
-            "title": "Повторная квалификация A320",
-            "duration": "4 ч",
-            "layout": "card",
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:Оборудование}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            "id": "fp-022b",
+            "title": "Личные документы",
+            "refCode": "TO-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "− убедиться в наличии у членов летного экипажа личных документов, необходимых для выполнения полетного задания;"
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-2",
+            "title": "EFB, Навигация",
+            "refCode": "SOP-Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "− получить информацию о состоянии аэродромов вылета, назначения и запасных;\n− получить информацию об аэронавигационном обеспечении на аэродромах и по трассе;"
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-3",
+            "title": "DDL",
+            "refCode": "SOP-Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-4",
+            "title": "NOTAMs",
+            "refCode": "SOP-Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "изучить информацию NOTAM по аэропортам вылета, назначения, запасных и по маршруту полета"
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-5",
+            "title": "Метео",
+            "refCode": "SOP-Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "− изучить метеорологическую обстановку на аэродроме вылета, по маршруту полета, аэродроме назначения и запасных аэродромах."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-6",
+            "title": "Топливо",
+            "refCode": "SOP-TO-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "определить необходимую заправку топливом (при отличии от расчетной заправки сообщить ПДС);"
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-7",
+            "title": "Загрузка",
+            "refCode": "SOP-Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-8",
+            "title": "CFP",
+            "refCode": "Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "проверить правильность расчета и подписать рабочий план полета (CFP) (подпись требуется на первой странице бумажной версии и в электронном отчете о рейсе)."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-9",
+            "title": "Dispatch release",
+            "refCode": "TO-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "− принять предварительное решение на выполнение полета, подписать Dispatch Release и оставить подписанный бланк \"Dispatch Release\" в пункте вылета представителю Авиапредприятия / агенту обслуживающей компании или уполномоченному лицу аэропорта."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-10",
+            "title": "Инструктаж ЛЭ КЭ",
+            "refCode": "SOP-TO-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "− провести инструктаж с летным и кабинным экипажами в отношении действий в случае возникновения аварийной ситуации при перевозке опасных грузов;"
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-11",
+            "title": "Медконтроль",
+            "refCode": "TO-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          },
+          {
+            "id": "fp-022b-12",
+            "title": "Транспортная (ав) безопасность",
+            "refCode": "Resp-AOM",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "documents"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "documents": [
+              {
+                "title": "РПП ч.А — AOMA",
+                "src": "modules/docs/AOMA.pdf",
+                "page": 1
+              }
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          },
+          {
+            "type": "child-ref",
+            "index": 2
+          },
+          {
+            "type": "child-ref",
+            "index": 3
+          },
+          {
+            "type": "child-ref",
+            "index": 4
+          },
+          {
+            "type": "child-ref",
+            "index": 5
+          },
+          {
+            "type": "child-ref",
+            "index": 6
+          },
+          {
+            "type": "child-ref",
+            "index": 7
+          },
+          {
+            "type": "child-ref",
+            "index": 8
+          },
+          {
+            "type": "child-ref",
+            "index": 9
+          },
+          {
+            "type": "child-ref",
+            "index": 10
+          },
+          {
+            "type": "child-ref",
+            "index": 11
+          },
+          {
+            "type": "child-ref",
+            "index": 12
           }
         ]
+      },
+      {
+        "id": "fp-023",
+        "title": "FO: ОБЯЗАННОСТИ И ОТВЕТСТВЕННОСТЬ ЧЛЕНОВ ЭКИПАЖА ВС",
+        "refCode": "SOP-and-AOMA",
+        "layout": "card",
+        "children": [
+          {
+            "id": "fp-023a",
+            "title": "DDL",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          },
+          {
+            "id": "fp-023b",
+            "title": "Метео и Навигация",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          }
+        ],
+        "blocks": [
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "child-ref",
+        "index": 0
+      },
+      {
+        "type": "child-ref",
+        "index": 1
+      },
+      {
+        "type": "child-ref",
+        "index": 2
+      }
+    ]
+  },
+  {
+    "id": "fp-group-normal",
+    "title": "Взлёт и заход",
+    "layout": "group",
+    "children": [
+      {
+        "id": "fp-0010",
+        "title": "Стандартный взлёт",
+        "refCode": "SOP-TO-STD",
+        "layout": "card",
+        "blocks": [
+          {
+            "type": "items",
+            "key": "{{items:normal}}"
+          },
+          {
+            "type": "images",
+            "index": 0
+          },
+          {
+            "type": "images",
+            "index": 1
+          },
+          {
+            "type": "images",
+            "index": 2
+          },
+          {
+            "type": "items",
+            "key": "{{items:abnormal}}"
+          },
+          {
+            "type": "items",
+            "key": "{{items:emergency:Memory items}}"
+          },
+          {
+            "type": "documents"
+          },
+          {
+            "type": "references"
+          },
+          {
+            "type": "child-ref",
+            "index": 0
+          },
+          {
+            "type": "child-ref",
+            "index": 1
+          }
+        ],
+        "{{items:normal}}": [
+          "Стандартная процедура взлёта по SOP. {{badge:normal}} Применяется при нормальных условиях, отсутствии ограничений и исправных системах ВС."
+        ],
+        "images": [
+          {
+            "src": "modules/flightprocedures/data/ext_walk1.png",
+            "caption": "Внешний осмотр — вид слева",
+            "alt": "Внешний осмотр — вид слева"
+          },
+          {
+            "src": "modules/flightprocedures/data/ext_walk1.png",
+            "caption": "Внешний осмотр — вид справа",
+            "alt": "Внешний осмотр — вид справа"
+          },
+          {
+            "src": "modules/flightprocedures/data/ext_walk1.png",
+            "caption": "Внешний осмотр — вид спереди",
+            "alt": "Внешний осмотр — вид спереди"
+          }
+        ],
+        "{{items:abnormal}}": [
+          "Выполнить Before Takeoff Checklist\nУбедиться в установке взлётной конфигурации (flaps, trim, stabilizer)\nПолучить clearance на выруливание и взлёт\nНа ВПП: установить тормоза, вывести двигатели на 50% N1, проверить параметры\nОтпустить тормоза, установить TAKEOFF THRUST (FLX или TOGA)\nМониторинг параметров двигателей до V1\nПри V1: PF — руки на штурвале, решение \"Взлёт продолжаем\"\nПри VR: PF — плавный тангаж +15°, отрыв"
+        ],
+        "{{items:emergency:Memory items}}": [
+          "Throttle — TOGA\nPitch — 15° minimum"
+        ],
+        "documents": [
+          {
+            "title": "SOP — AOMB",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 1
+          },
+          {
+            "title": "FCOM Vol. 1 — Takeoff",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 12
+          }
+        ],
+        "references": [
+          "FCOM Vol. 1 — Normal Procedures: Takeoff",
+          "SOP — Standard Takeoff Profile"
+        ],
+        "children": [
+          {
+            "id": "fp-001a",
+            "title": "Взлёт с ограниченной ВПП",
+            "refCode": "SOP-TO-SHORT",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Взлёт с короткой ВПП. {{badge:abnormal}} Требует точного расчёта V-скоростей."
+            ],
+            "{{items:abnormal}}": [
+              "Рассчитать V1/VR/V2 для фактической длины ВПП\nПодтвердить takeoff data: TOW, CG, flex temp"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Takeoff Performance"
+            ]
+          },
+          {
+            "id": "fp-0010b",
+            "title": "Взлёт в условиях сдвига ветра",
+            "refCode": "SOP-TO-WS",
+            "layout": "child",
+            "blocks": [
+              {
+                "type": "items",
+                "key": "{{items:normal}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:emergency:Memory items}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:abnormal}}"
+              },
+              {
+                "type": "references"
+              }
+            ],
+            "{{items:normal}}": [
+              "Процедура взлёта при прогнозируемом сдвиге ветра. {{badge:abnormal:Внимание}} Требует повышенной бдительности."
+            ],
+            "{{items:emergency:Memory items}}": [
+              "Windshear — DETECT (GPWS or visual)\nPitch — 15° minimum\nThrust — TOGA"
+            ],
+            "{{items:abnormal}}": [
+              "Получить информацию о windshear от ATC / EDR\nПри обнаружении windshear на разбеге: TOGA, продолжить взлёт"
+            ],
+            "references": [
+              "FCOM Vol. 1 — Windshear"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fp-0020",
+        "title": "Заход на посадку по ILS",
+        "refCode": "SOP-APP-ILS",
+        "layout": "card",
+        "blocks": [
+          {
+            "type": "items",
+            "key": "{{items:normal}}"
+          },
+          {
+            "type": "items",
+            "key": "{{items:abnormal}}"
+          },
+          {
+            "type": "documents"
+          },
+          {
+            "type": "references"
+          }
+        ],
+        "{{items:normal}}": [
+          "Стандартная процедура точного захода на посадку по ILS Category I. {{badge:normal}}"
+        ],
+        "{{items:abnormal}}": [
+          "Получить ATIS и подтвердить тип захода (ILS)\nУстановить частоту ILS и курс на MCP, подтвердить идентификатор морзянкой\nВыполнить Approach Briefing: runway, DH, missed approach procedure"
+        ],
+        "documents": [
+          {
+            "title": "SOP — ILS Approach",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 5
+          }
+        ],
+        "references": [
+          "FCOM Vol. 1 — Approach Procedures"
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "child-ref",
+        "index": 0
+      },
+      {
+        "type": "child-ref",
+        "index": 1
+      }
+    ]
+  },
+  {
+    "id": "fp-maneuvers",
+    "title": "Маневры",
+    "refCode": "MANEUVERS",
+    "layout": "card",
+    "blocks": [
+      {
+        "type": "items",
+        "key": "{{items:normal}}"
+      },
+      {
+        "type": "table-file",
+        "index": 0
+      },
+      {
+        "type": "references"
+      }
+    ],
+    "{{items:normal}}": [
+      "Процедуры выполнения маневров — Stall Recovery. {{badge:abnormal:Внимание}} Срыв может произойти при <b>любом</b> угле атаки и любой скорости."
+    ],
+    "tables": [
+      {
+        "src": "modules/flightprocedures/data/maneuvers_stall.html"
+      }
+    ],
+    "references": [
+      "FCOM Vol. 1 — Stall Recovery",
+      "QRH — Stall Warning Procedure"
+    ]
+  },
+  {
+    "id": "fp-sep-non-normal",
+    "title": "Ненормальные процедуры",
+    "layout": "divider"
+  },
+  {
+    "id": "fp-failures",
+    "title": "Отказы",
+    "layout": "divider",
+    "collapsible": true,
+    "children": [
+      {
+        "id": "fp-0040",
+        "title": "Отказ двигателя после V1",
+        "refCode": "ECAM-ENG-FAIL-AV1",
+        "layout": "card",
+        "blocks": [
+          {
+            "type": "items",
+            "key": "{{items:normal}}"
+          },
+          {
+            "type": "items",
+            "key": "{{items:emergency:Memory items}}"
+          },
+          {
+            "type": "items",
+            "key": "{{items:abnormal}}"
+          },
+          {
+            "type": "documents"
+          },
+          {
+            "type": "references"
+          }
+        ],
+        "{{items:normal}}": [
+          "Действия экипажа при отказе двигателя на скорости V1 и выше. {{badge:abnormal}} Взлёт продолжается на одном двигателе. См. также: {{link:ffstraining:ffs-001a:Отработка EFATO в FFS}}."
+        ],
+        "{{items:emergency:Memory items}}": [
+          "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}"
+        ],
+        "{{items:abnormal}}": [
+          "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1 {{badge:abnormal}}\nPF: удерживать направление по оси ВПП (rudder)\nПри VR: оторвать, установить тангаж +15° (V2 + 10 kt)"
+        ],
+        "documents": [
+          {
+            "title": "QRH — Eng Failure Takeoff",
+            "src": "modules/docs/AOMB.pdf",
+            "page": 22
+          }
+        ],
+        "references": [
+          "FCOM Vol. 3 — ENG FAIL After V1",
+          "QRH — Engine Failure During Takeoff"
+        ]
+      },
+      {
+        "id": "fp-0080",
+        "title": "Двойной отказ двигателей",
+        "refCode": "ECAM-ENG-DUAL-FAIL",
+        "layout": "card",
+        "blocks": [
+          {
+            "type": "items",
+            "key": "{{items:normal}}"
+          },
+          {
+            "type": "items",
+            "key": "{{items:emergency:Memory items}}"
+          },
+          {
+            "type": "items",
+            "key": "{{items:abnormal}}"
+          },
+          {
+            "type": "references"
+          }
+        ],
+        "{{items:normal}}": [
+          "Отказ обоих двигателей. {{badge:emergency}} Экстренная ситуация. <b>Немедленно</b> выполнить авторотацию (если применимо) или вынужденную посадку."
+        ],
+        "{{items:emergency:Memory items}}": [
+          "Speed — Vseo (best glide)\nMAYDAY — declare emergency"
+        ],
+        "{{items:abnormal}}": [
+          "Установить скорость планирования (Vseo)\nВыбрать площадку для вынужденной посадки\nСообщить ATC \"Mayday, Mayday, Mayday\""
+        ],
+        "references": [
+          "QRH — Dual Engine Failure"
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "child-ref",
+        "index": 0
+      },
+      {
+        "type": "child-ref",
+        "index": 1
       }
     ]
   }

@@ -677,6 +677,83 @@
                 "2",
                 "na"
               ]
+            },
+            {
+              "id": "div_3",
+              "type": "divider",
+              "label": "Взаимодействие со службами"
+            },
+            {
+              "id": "Preflight_pf_21",
+              "type": "select",
+              "label": "ЦУП (ПДС).",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_22",
+              "type": "select",
+              "label": "Центровка.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_23",
+              "type": "select",
+              "label": "Flight Dispatch.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_24",
+              "type": "select",
+              "label": "MCC / Maintrol.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_25",
+              "type": "select",
+              "label": "Представители АК.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Preflight_pf_26",
+              "type": "select",
+              "label": "Граница / Таможня.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
             }
           ]
         },
@@ -1101,7 +1178,7 @@
             {
               "id": "Cruise_crs_9",
               "type": "select",
-              "label": "SP: Turbulance.",
+              "label": "SP: Cold weather.",
               "options": [
                 "5",
                 "4",
@@ -1113,7 +1190,7 @@
             {
               "id": "Cruise_crs_10",
               "type": "select",
-              "label": "Взаимодействие с БП.",
+              "label": "SP: Turbulance.",
               "options": [
                 "5",
                 "4",
@@ -1125,7 +1202,7 @@
             {
               "id": "Cruise_crs_11",
               "type": "select",
-              "label": "Взаимодействие с пассажирами.",
+              "label": "Взаимодействие с БП.",
               "options": [
                 "5",
                 "4",
@@ -1137,7 +1214,7 @@
             {
               "id": "Cruise_crs_12",
               "type": "select",
-              "label": "Предпосадочный брифинг.",
+              "label": "Взаимодействие с пассажирами.",
               "options": [
                 "5",
                 "4",
@@ -1149,7 +1226,7 @@
             {
               "id": "Cruise_crs_13",
               "type": "select",
-              "label": "Ведение радиосвязи.",
+              "label": "Предпосадочный брифинг.",
               "options": [
                 "5",
                 "4",
@@ -1161,7 +1238,7 @@
             {
               "id": "Cruise_crs_14",
               "type": "select",
-              "label": "Запонение документации (бумажная, EFB).",
+              "label": "Ведение радиосвязи.",
               "options": [
                 "5",
                 "4",
@@ -1173,7 +1250,7 @@
             {
               "id": "Cruise_crs_15",
               "type": "select",
-              "label": "Знание систем, ограничений ВС.",
+              "label": "Запонение документации (бумажная, EFB).",
               "options": [
                 "5",
                 "4",
@@ -1184,6 +1261,18 @@
             },
             {
               "id": "Cruise_crs_16",
+              "type": "select",
+              "label": "Знание систем, ограничений ВС.",
+              "options": [
+                "5",
+                "4",
+                "3",
+                "2",
+                "na"
+              ]
+            },
+            {
+              "id": "Cruise_crs_17",
               "type": "select",
               "label": "Знание и использование нормативно-летной документации.",
               "options": [
@@ -1548,7 +1637,7 @@
             {
               "id": "Approach_and_Landing_lg_28",
               "type": "select",
-              "label": "Использование TERRAIN.",
+              "label": "Использование EGPWS.",
               "options": [
                 "5",
                 "4",
@@ -1736,7 +1825,7 @@
             {
               "id": "Postflght_pst_9",
               "type": "select",
-              "label": "Проверка навыков пилота-инструктора/",
+              "label": "Проверка навыков пилота-инструктора.",
               "options": [
                 "5",
                 "4",

@@ -567,7 +567,7 @@
       + ' aria-label="Открыть PDF, стр. ' + page + '">'
       + '<span class="' + CSS_PREFIX + '-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>'
       + '<span class="' + CSS_PREFIX + '-ref-text"' + window.app.langAttr(label) + '>' + _renderRichText(label) + '</span>'
-      + '<span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
+      + ' <span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
       + '</div>';
   }
 
@@ -642,17 +642,22 @@
 
   /* ─── renderItemsBlock: унифицированный текстовый блок с палитрой ───
      Используется для {{items:PALETTE[:TITLE]}} в Variant B.
-     content — строка ИЛИ массив (массив → join с \n).
+     content — строка ИЛИ массив (массив → render каждый элемент как ОТДЕЛЬНЫЙ items-block,
+     симметрично documents[] в renderBlockReferenceList).
      Текст проходит через renderRichText: \n → <br>, теги whitelist, {{badge:}}, {{link:}}.
      Никакого авто-<ul> — пользователь сам пишет •, - или что угодно. */
   function renderItemsBlock(palette, title, content) {
     palette = resolvePalette(palette);
-    var text = '';
+    // СИСТЕМНЫЙ ФИКС (Task 62): Array content → render каждый элемент как ОТДЕЛЬНЫЙ items-block
+    // (как DOC: 3 DOC → 3 отдельных блока). Симметрично documents[] в renderBlockReferenceList.
     if (Array.isArray(content)) {
-      text = content.join('\n');
-    } else if (content !== null && content !== undefined) {
-      text = String(content);
+      var out = '';
+      for (var i = 0; i < content.length; i++) {
+        out += renderItemsBlock(palette, title, content[i]);
+      }
+      return out;
     }
+    var text = (content !== null && content !== undefined) ? String(content) : '';
     var html = '<div class="items-block items-block--' + palette + '" data-palette="' + palette + '">';
     if (title) {
       html += '<div class="items-block-title"' + window.app.langAttr(title) + '>' + _renderRichText(title) + '</div>';
@@ -666,7 +671,12 @@
     var items = b.items || [];
     var html = '<div data-block="reference-list"' + styleAttr(b.style)
       + ' class="' + CSS_PREFIX + '-refs">';
-    html += '<div class="' + CSS_PREFIX + '-refs-title">Ссылки</div>';
+    // СИСТЕМНЫЙ ФИКС (Task 63): заголовок «Ссылки» только при !b.suppressTitle.
+    // Вызывающая сторона передаёт suppressTitle=true для consecutive reference-list
+    // (REF + DOC в одном элементе) — устраняет дублирование «ССЫЛКИ ССЫЛКИ».
+    if (!b.suppressTitle) {
+      html += '<div class="' + CSS_PREFIX + '-refs-title">Ссылки</div>';
+    }
     html += '<ul class="' + CSS_PREFIX + '-refs-list">';
     for (var i = 0; i < items.length; i++) {
       var it = items[i];
@@ -684,7 +694,7 @@
           + ' aria-label="Открыть PDF, стр. ' + page + '">'
           + '<span class="' + CSS_PREFIX + '-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>'
           + '<span class="' + CSS_PREFIX + '-ref-text"' + window.app.langAttr(label) + '>' + _renderRichText(label) + '</span>'
-          + '<span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
+          + ' <span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
           + '</li>';
       } else if (it && it.text) {
         html += '<li class="' + CSS_PREFIX + '-ref">' + _renderRichText(it.text) + '</li>';
@@ -745,8 +755,81 @@
   */
   function renderItemBody(item, ctx) {
     var html = '';
-    var keys = Object.keys(item);
     var itemsRegex = /^\{\{items:(\w+)(?::([^}]+))?\}\}$/;
+
+    // blocks[] priority — точный порядок элементов (interleave fields + children)
+    if (item.blocks && item.blocks.length) {
+      // СИСТЕМНЫЙ ФИКС (Task 63): отслеживать consecutive reference-list блоков,
+      // чтобы подавить дублирование заголовка «Ссылки» (REF + DOC в одном элементе).
+      var prevWasRefList = false;
+      for (var bi = 0; bi < item.blocks.length; bi++) {
+        var block = item.blocks[bi];
+        if (block.type === 'items') {
+          var im = block.key.match(itemsRegex);
+          if (im && item[block.key]) {
+            html += renderItemsBlock(im[1], im[2], item[block.key]);
+          }
+          prevWasRefList = false;
+        } else if (block.type === 'table-file') {
+          if (item.tables && item.tables[block.index]) {
+            html += renderBlockTableFile({ src: item.tables[block.index].src }, ctx);
+          }
+          prevWasRefList = false;
+        } else if (block.type === 'image') {
+          if (item.image) {
+            html += renderBlockImage({ src: item.image, alt: item.title || '' }, ctx);
+          }
+          prevWasRefList = false;
+        } else if (block.type === 'images') {
+          // Рендерим ВСЕ изображения ОДНОЙ галереей при первом вхождении (grid + PhotoSwipe ←/→).
+          // Последующие blocks {type:'images', index:N>0} пропускаем — галерея уже отрисована.
+          // Восстанавливает поведение fallback-ветки (см. ниже, ключ 'images') для пути blocks[].
+          if (block.index === 0 && item.images && item.images.length) {
+            html += renderBlockImage({ images: item.images, alt: item.title || '' }, ctx);
+          }
+          prevWasRefList = false;
+        } else if (block.type === 'references') {
+          if (item.references && item.references.length) {
+            var textRefs = [];
+            for (var ri = 0; ri < item.references.length; ri++) {
+              var ref = item.references[ri];
+              if (typeof ref === 'string') textRefs.push(ref);
+              else if (ref && ref.text) textRefs.push({ text: ref.text });
+            }
+            if (textRefs.length) {
+              html += renderBlockReferenceList({ items: textRefs, suppressTitle: prevWasRefList }, ctx);
+              prevWasRefList = true;
+            }
+          }
+        } else if (block.type === 'documents') {
+          if (item.documents && item.documents.length) {
+            var docRefs = [];
+            for (var di = 0; di < item.documents.length; di++) {
+              var doc = item.documents[di];
+              if (doc && (doc.src || doc.file)) {
+                docRefs.push({ src: doc.src || doc.file, page: doc.page || 1, title: doc.title || 'Открыть PDF' });
+              }
+            }
+            if (docRefs.length) {
+              html += renderBlockReferenceList({ items: docRefs, suppressTitle: prevWasRefList }, ctx);
+              prevWasRefList = true;
+            }
+          }
+        } else if (block.type === 'child-ref') {
+          if (item.children && item.children[block.index]) {
+            html += renderItem(item.children[block.index], (ctx.depth || 0) + 1);
+          }
+          prevWasRefList = false;
+        }
+      }
+      return html;
+    }
+
+    // Fallback: flat keys iteration (для JSON без blocks[])
+    var keys = Object.keys(item);
+    // СИСТЕМНЫЙ ФИКС (Task 63): отслеживать consecutive reference-list (documents/references),
+    // чтобы подавить дублирование заголовка «Ссылки» при REF+DOC в одном элементе.
+    var _lastWasRefList = false;
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
       var val = item[key];
@@ -756,6 +839,7 @@
       var m = key.match(itemsRegex);
       if (m) {
         html += renderItemsBlock(m[1], m[2], val);
+        _lastWasRefList = false;
         continue;
       }
 
@@ -765,6 +849,7 @@
           ? { images: val, alt: item.title || '' }
           : { src: val, alt: item.title || '' };
         html += renderBlockImage(imgBlock, ctx);
+        _lastWasRefList = false;
         continue;
       }
 
@@ -775,12 +860,14 @@
             html += renderBlockTableFile({ src: val[t].src }, ctx);
           }
         }
+        _lastWasRefList = false;
         continue;
       }
 
       // 3b. tableFile (legacy backward-compat: одна строка-путь)
       if (key === 'tableFile' && val) {
         html += renderBlockTableFile({ src: val }, ctx);
+        _lastWasRefList = false;
         continue;
       }
 
@@ -794,7 +881,8 @@
           }
         }
         if (docRefs.length) {
-          html += renderBlockReferenceList({ items: docRefs }, ctx);
+          html += renderBlockReferenceList({ items: docRefs, suppressTitle: _lastWasRefList }, ctx);
+          _lastWasRefList = true;
         }
         continue;
       }
@@ -813,7 +901,8 @@
           }
         }
         if (textRefs.length) {
-          html += renderBlockReferenceList({ items: textRefs }, ctx);
+          html += renderBlockReferenceList({ items: textRefs, suppressTitle: _lastWasRefList }, ctx);
+          _lastWasRefList = true;
         }
         continue;
       }
@@ -824,8 +913,18 @@
         continue;
       }
 
-      // 7. Пропускаемые ключи (header/meta/children)
-      // id, title, refCode, duration, category, children, layout
+      // 7. children — interleave в позиции ключа (а не всегда последним)
+      if (key === 'children' && val && val.length) {
+        html += '<div class="' + CSS_PREFIX + '-nested">';
+        for (var c = 0; c < val.length; c++) {
+          html += renderItem(val[c], ctx.depth + 1);
+        }
+        html += '</div>';
+        continue;
+      }
+
+      // 8. Пропускаемые ключи (header/meta)
+      // id, title, refCode, duration, category, layout
     }
     return html;
   }
@@ -900,6 +999,10 @@
     if (item.layout === 'divider') {
       return renderDividerList(item, depth);
     }
+    // DETAIL: компактный кликабельный заголовок → подпэкран при клике
+    if (item.layout === 'detail') {
+      return renderDetailCard(item, depth);
+    }
     var hasChildren = item.children && item.children.length > 0;
 
     // Layout-based modifier class (group/card/child) для chrome (border, bg).
@@ -908,8 +1011,14 @@
     if (item.layout === 'group' || item.layout === 'card' || item.layout === 'child') {
       layoutMod = ' ' + CSS_PREFIX + '-card--' + item.layout;
     }
+    if (item.sticky) {
+      layoutMod += ' ' + CSS_PREFIX + '-sticky-card';
+    }
 
-    var html = '<div class="' + CSS_PREFIX + '-card' + layoutMod + '" data-depth="' + depth + '" data-id="' + window.app.escapeAttr(item.id || '') + '">';
+    // detail-view: все cards развёрнуты (open) — без аккордеона
+    var openClass = (_detailOpen ? ' open' : '');
+
+    var html = '<div class="' + CSS_PREFIX + '-card' + layoutMod + openClass + '" data-depth="' + depth + '" data-id="' + window.app.escapeAttr(item.id || '') + '">';
 
     // Card header (accordion toggle) — без badge, только title/refCode/duration
     html += '<div class="' + CSS_PREFIX + '-card-header ' + CSS_PREFIX + '-card-header--no-badge">';
@@ -945,14 +1054,7 @@
     // Body: Variant B — итерация по ключам item ({{items:...}}, image, tableFile, documents, references, blocks)
     html += renderItemBody(item, { depth: depth });
 
-    // Nested children (recursive accordion)
-    if (hasChildren) {
-      html += '<div class="' + CSS_PREFIX + '-nested">';
-      for (var ch = 0; ch < item.children.length; ch++) {
-        html += renderItem(item.children[ch], depth + 1);
-      }
-      html += '</div>';
-    }
+    // children уже отрендерены в renderItemBody (interleave в позиции ключа)
 
     html += '</div>'; // card-content
     html += '</div>'; // card-body
@@ -972,17 +1074,102 @@
     // Body: Variant B
     html += renderItemBody(item, { depth: depth });
 
-    // Вложенные дети (рекурсия — могут быть как аккордеонами, так и text-блоками)
-    if (item.children && item.children.length > 0) {
-      html += '<div class="' + CSS_PREFIX + '-nested">';
-      for (var ch = 0; ch < item.children.length; ch++) {
-        html += renderItem(item.children[ch], depth + 1);
-      }
-      html += '</div>';
-    }
+    // children уже отрендерены в renderItemBody (interleave в позиции ключа)
 
     html += '</div>';
     return html;
+  }
+
+  /* ─── DETAIL card: компактный кликабельный заголовок → подпэкран ─── */
+  function renderDetailCard(item, depth) {
+    var id = window.app.escapeAttr(item.id || '');
+    var html = '<div class="' + CSS_PREFIX + '-card ' + CSS_PREFIX + '-card--card ' + CSS_PREFIX + '-detail-card" data-detail-id="' + id + '" data-depth="' + depth + '">';
+    html += '<div class="' + CSS_PREFIX + '-card-header ' + CSS_PREFIX + '-detail-card-header ' + CSS_PREFIX + '-card-header--no-badge">';
+    html += '<div class="' + CSS_PREFIX + '-card-info">';
+    html += '<div class="collapsible-title ' + CSS_PREFIX + '-card-title"' + window.app.langAttr(item.title) + '>' + _renderRichText(item.title) + '</div>';
+    if (item.refCode) {
+      html += '<div class="' + CSS_PREFIX + '-card-ref"' + window.app.langAttr(item.refCode) + '>' + _renderRichText(item.refCode) + '</div>';
+    }
+    if (item.duration) {
+      html += '<div class="' + CSS_PREFIX + '-card-meta">';
+      html += '<span class="' + CSS_PREFIX + '-card-duration"' + window.app.langAttr(item.duration) + '>' + _renderRichText(item.duration) + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  var _detailOpen = false;
+  var _detailScrollPos = 0;
+
+  function findItemById(items, id) {
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === id) return items[i];
+      if (items[i].children) {
+        var found = findItemById(items[i].children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  function openDetail(id) {
+    var item = findItemById(_data, id);
+    if (!item) return;
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+
+    _detailScrollPos = window.scrollY || document.documentElement.scrollTop || 0;
+    var moduleContainer = container.querySelector('.module-container');
+    if (moduleContainer) moduleContainer.style.display = 'none';
+    var detailView = container.querySelector('.' + CSS_PREFIX + '-detail-view');
+    if (!detailView) {
+      detailView = document.createElement('div');
+      detailView.className = CSS_PREFIX + '-detail-view';
+      container.appendChild(detailView);
+    }
+    detailView.innerHTML = '<div class="' + CSS_PREFIX + '-detail-view-body">' + renderItemBody(item, { depth: 0 }) + '</div>';
+    detailView.style.display = 'block';
+    window.app.resetHeader();
+    var left = document.getElementById('headerLeft');
+    if (left) {
+      left.innerHTML = '<button class="icon-btn" aria-label="Назад" id="' + CSS_PREFIX + 'DetailBack">' + (window.ICONS['arrow-left'] || '') + '</button>';
+      var backBtn = document.getElementById(CSS_PREFIX + 'DetailBack');
+      if (backBtn) backBtn.addEventListener('click', closeDetail);
+    }
+    var center = document.getElementById('headerCenter');
+    if (center) {
+      center.innerHTML = '<div class="hc-module"' + window.app.langAttr(item.title) + '>' + _renderRichText(item.title) + '</div>';
+    }
+    loadTableFiles(detailView);
+    _detailOpen = true;
+    detailView.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+
+  function closeDetail() {
+    var container = document.getElementById(CONTAINER_ID);
+    if (!container) return;
+    var detailView = container.querySelector('.' + CSS_PREFIX + '-detail-view');
+    if (detailView) detailView.style.display = 'none';
+    var moduleContainer = container.querySelector('.module-container');
+    if (moduleContainer) moduleContainer.style.display = '';
+    window.app.resetHeader();
+    var left = document.getElementById('headerLeft');
+    if (left) {
+      left.innerHTML = '<button id="menuBtn" class="icon-btn" aria-label="Меню" onclick="window.app.toggleMenu()">'
+        + (window.ICONS.menu || '') + '</button>';
+    }
+    var center = document.getElementById('headerCenter');
+    if (center) {
+      var mod = window.ModuleRegistry.get(MODULE_ID);
+      center.innerHTML = '<div class="hc-module">' + window.app.escapeHtml(mod ? mod.title : '') + '</div>';
+    }
+    _detailOpen = false;
+
+    window.scrollTo(0, _detailScrollPos);
   }
 
   /* ─── Divider-List (data-driven сворачиваемая группа любой глубины) ───
@@ -1033,11 +1220,7 @@
     if (bodyHtml) {
       html += '<div class="divider-list-body" data-depth="' + depth + '">' + bodyHtml + '</div>';
     }
-    if (hasChildren) {
-      for (var ch = 0; ch < item.children.length; ch++) {
-        html += renderItem(item.children[ch], depth + 1);
-      }
-    }
+    // children уже отрендерены в renderItemBody (interleave в позиции ключа)
     html += '</div>';
 
     html += '</div>';
@@ -1193,6 +1376,22 @@
   function openAndScrollTo(id) {
     var container = document.getElementById(CONTAINER_ID);
     if (!container) return;
+    var detailEl = container.querySelector('[data-detail-id="' + id + '"]');
+    if (detailEl) {
+      var el = detailEl.parentElement;
+      while (el && el !== container) {
+        if (el.classList.contains(CSS_PREFIX + '-card')) el.classList.add('open');
+        if (el.classList.contains('divider-list-items')) {
+          el.classList.add('open');
+          var divId = el.dataset.id;
+          var divToggle = container.querySelector('.divider-list-toggle[data-id="' + divId + '"]');
+          if (divToggle) { divToggle.classList.add('is-open'); divToggle.setAttribute('aria-expanded', 'true'); }
+        }
+        el = el.parentElement;
+      }
+      setTimeout(function() { detailEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+      return;
+    }
     var target = container.querySelector('[data-id="' + id + '"]');
     if (!target) return;
 
@@ -1276,6 +1475,17 @@
           var pdfPage = parseInt(refLink.dataset.pdfPage, 10) || 1;
           if (pdfSrc) {
             window.app.openPDFModal(pdfSrc, pdfPage);
+          }
+          return;
+        }
+
+        // DETAIL card click → openDetail (подпэкран)
+        var detailCard = e.target.closest('.' + CSS_PREFIX + '-detail-card-header');
+        if (detailCard) {
+          var detailWrapper = detailCard.closest('.' + CSS_PREFIX + '-detail-card');
+          if (detailWrapper) {
+            var detailId = detailWrapper.getAttribute('data-detail-id');
+            if (detailId) openDetail(detailId);
           }
           return;
         }

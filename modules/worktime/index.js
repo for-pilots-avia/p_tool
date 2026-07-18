@@ -327,8 +327,11 @@
     var html = '<div class="module-container">';
     html += wtRenderDutyCard(results, night, pilotMax, cabinMax, reportMin, landings);
     html += wtRenderSegmentsCard(results);
+    // Task 49 #5: до finalize — только блок «Нарушения:» (если есть), после finalize — полная карточка Итоги рейса
     if (_wtFinalized && results) {
       html += wtRenderResultsCard(results);
+    } else if (!_wtFinalized && results && results.warnings.length > 0) {
+      html += wtRenderWarningsOnly(results);
     }
     html += '</div>';
     container.innerHTML = html;
@@ -394,15 +397,15 @@
 
     // Info-row — compact, uses wt-info-row / wt-info-item classes
     html += '<div class="wt-info-row">';
-    // Статус дня/ночи — бейдж с иконкой (Дневная / Ночная)
-    var dayNightIcon  = night ? window.ICONS.moon : window.ICONS.sun;
-    var dayNightBadge = night ? 'badge-danger' : 'badge-ok';
-    var dayNightText  = night ? 'Ночная' : 'Дневная';
-    html += '<span class="wt-info-item">'
-      + dayNightIcon + ' <span class="' + dayNightBadge + '">' + dayNightText + '</span></span>';
+    // Task 49 #2: порядок — сначала Явка, потом иконка времени суток
     html += '<span class="wt-info-item">'
       + window.ICONS.clock + ' <strong>Явка:</strong>'
       + '<span class="ct-mono-time">' + (_wtSettings.reportTime || '--:--') + '</span></span>';
+    // Статус дня/ночи — только иконка в бейдже (Task 48 #2: текст убран, достаточно иконки)
+    var dayNightIcon  = night ? window.ICONS.moon : window.ICONS.sun;
+    var dayNightBadge = night ? 'badge-danger' : 'badge-ok';
+    html += '<span class="wt-info-item">'
+      + '<span class="' + dayNightBadge + '">' + dayNightIcon + '</span></span>';
     if (_wtSettings.splitMode) {
       // В раздельном режиме — бейдж «Разделенная полетная смена» вместо «Посадки»
       html += '<span class="wt-info-item">'
@@ -818,10 +821,8 @@
         + ' style="--pct:' + sPct.toFixed(3) + '%;--fill:' + wPct.toFixed(3) + '%;"'
         + ' title="Сег. ' + (s + 1) + ': ' + wtFormatTime(seg.engineStart) + '–' + wtFormatTime(seg.engineStop) + '">'
         + '</div>';
-      html += '<div class="wt-timeline-marker wt-timeline-marker--engine-start" style="--pct:' + sPct.toFixed(3) + '%;"'
-        + ' title="Запуск: ' + wtFormatTime(seg.engineStart) + '"></div>';
-      html += '<div class="wt-timeline-marker wt-timeline-marker--engine-stop" style="--pct:' + esPct.toFixed(3) + '%;"'
-        + ' title="Выключение: ' + wtFormatTime(seg.engineStop) + '"></div>';
+      // Task 48 #4: маркеры Запуск/Выключение убраны — инфо есть в карточках сегментов.
+      // Цветные блоки сегментов (выше) показывают длительность полёта.
     }
 
     /* ── Маркер правого края — только в двух случаях:
@@ -887,6 +888,21 @@
     return html;
   }
 
+  /* ─── Карточка «Нарушения» (compact, до finalize) — Task 49 #5 ─── */
+
+  function wtRenderWarningsOnly(results) {
+    var html = '<div class="app-card wt-card--warnings-only">';
+    html += '<div class="wt-warning-block wt-flex-col-gap">';
+    html += '<div class="wt-warning-header">'
+      + window.ICONS['alert-triangle'] + ' <strong>Нарушения:</strong></div>';
+    for (var i = 0; i < results.warnings.length; i++) {
+      html += '<div class="wt-indent">' + results.warnings[i] + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
   /* ─── Карточка «Итоги рейса» ─── */
 
   function wtRenderResultsCard(results) {
@@ -922,7 +938,7 @@
     if (!allOk) {
       html += '<div class="wt-warning-block wt-flex-col-gap">';
       html += '<div class="wt-warning-header">'
-        + window.ICONS['alert-triangle'] + ' <strong>Нарушения FTL</strong></div>';
+        + window.ICONS['alert-triangle'] + ' <strong>Нарушения:</strong></div>';
       for (var i = 0; i < results.warnings.length; i++) {
         html += '<div class="wt-indent">' + results.warnings[i] + '</div>';
       }
@@ -1165,8 +1181,9 @@
       var report = wtParseTime(_wtSettings.reportTime);
       defaultStart = report !== null ? wtFormatTime((report + 60) % 1440) : '10:00';
       defaultTakeoff = report !== null ? wtFormatTime((report + 75) % 1440) : '10:30';
-      defaultLanding = report !== null ? wtFormatTime((report + 255) % 1440) : '13:45';
-      defaultStop  = report !== null ? wtFormatTime((report + 270) % 1440) : '14:00';
+      // Task 48 #3: default duration 3ч→0ч (takeoff+120=landing, landing+15=stop)
+      defaultLanding = report !== null ? wtFormatTime((report + 195) % 1440) : '12:45';
+      defaultStop  = report !== null ? wtFormatTime((report + 210) % 1440) : '13:00';
 
       if (_wtAddingShift === 2 && _wtSettings.splitMode && _wtSettings.reportTime2) {
         // Smart defaults для сегмента смены 2: явка 2 + 60 мин как база
@@ -1183,8 +1200,9 @@
         var startMin = lastSeg.engineStop + 30;
         defaultStart = wtFormatTime(startMin % 1440);
         defaultTakeoff = wtFormatTime((startMin + 15) % 1440);
-        defaultLanding = wtFormatTime((startMin + 195) % 1440);
-        defaultStop  = wtFormatTime((startMin + 210) % 1440);
+        // Task 48 #3: default duration 3ч→0ч для последующих сегментов
+        defaultLanding = wtFormatTime((startMin + 135) % 1440);
+        defaultStop  = wtFormatTime((startMin + 150) % 1440);
       }
     }
 
@@ -1219,7 +1237,8 @@
 
   function wtTimeInput(id, label, placeholder) {
     return '<div><label class="wt-field-label">' + label + '</label>'
-      + '<input id="' + id + '" type="time" class="wt-field-input" value="' + placeholder + '">'
+      // Task 48 #1: step="60" для iPad compatibility
+      + '<input id="' + id + '" type="time" step="60" class="wt-field-input" value="' + placeholder + '">'
       + '</div>';
   }
 
@@ -1381,15 +1400,8 @@
       return;
     }
 
-    // Валидация: не менее 1 ч от явки до запуска двигателей
-    var _reportForValidation = (_wtAddingShift === 2 && _wtSettings.splitMode)
-      ? wtParseTime(_wtSettings.reportTime2)
-      : wtParseTime(_wtSettings.reportTime);
-    if (_reportForValidation !== null && wtDiffTime(_reportForValidation, engineStart) < 60) {
-      app.showToast('Запуск двигателей должен быть не ранее чем через 1 час после явки');
-      return;
-    }
-
+    // Task 48 #5: блокирующая валидация 1ч убрана — теперь non-blocking warning
+    // в wtCalcSingleShift (строка 183), показывается в «Нарушения:»
     if (wtCheckOverlap(engineStart, engineStop, _wtSegments, _wtEditSegmentIdx)) {
       app.showToast('Сегмент пересекается по времени с существующим');
       return;

@@ -564,7 +564,7 @@
       + ' aria-label="Открыть PDF, стр. ' + page + '">'
       + '<span class="' + CSS_PREFIX + '-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>'
       + '<span class="' + CSS_PREFIX + '-ref-text"' + window.app.langAttr(label) + '>' + _renderRichText(label) + '</span>'
-      + '<span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
+      + ' <span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
       + '</div>';
   }
 
@@ -639,17 +639,22 @@
 
   /* ─── renderItemsBlock: унифицированный текстовый блок с палитрой ───
      Используется для {{items:PALETTE[:TITLE]}} в Variant B.
-     content — строка ИЛИ массив (массив → join с \n).
+     content — строка ИЛИ массив (массив → render каждый элемент как ОТДЕЛЬНЫЙ items-block,
+     симметрично documents[] в renderBlockReferenceList).
      Текст проходит через renderRichText: \n → <br>, теги whitelist, {{badge:}}, {{link:}}.
      Никакого авто-<ul> — пользователь сам пишет •, - или что угодно. */
   function renderItemsBlock(palette, title, content) {
     palette = resolvePalette(palette);
-    var text = '';
+    // СИСТЕМНЫЙ ФИКС (Task 62): Array content → render каждый элемент как ОТДЕЛЬНЫЙ items-block
+    // (как DOC: 3 DOC → 3 отдельных блока). Симметрично documents[] в renderBlockReferenceList.
     if (Array.isArray(content)) {
-      text = content.join('\n');
-    } else if (content !== null && content !== undefined) {
-      text = String(content);
+      var out = '';
+      for (var i = 0; i < content.length; i++) {
+        out += renderItemsBlock(palette, title, content[i]);
+      }
+      return out;
     }
+    var text = (content !== null && content !== undefined) ? String(content) : '';
     var html = '<div class="items-block items-block--' + palette + '" data-palette="' + palette + '">';
     if (title) {
       html += '<div class="items-block-title"' + window.app.langAttr(title) + '>' + _renderRichText(title) + '</div>';
@@ -663,7 +668,12 @@
     var items = b.items || [];
     var html = '<div data-block="reference-list"' + styleAttr(b.style)
       + ' class="' + CSS_PREFIX + '-refs">';
-    html += '<div class="' + CSS_PREFIX + '-refs-title">Ссылки</div>';
+    // СИСТЕМНЫЙ ФИКС (Task 63): заголовок «Ссылки» только при !b.suppressTitle.
+    // Вызывающая сторона передаёт suppressTitle=true для consecutive reference-list
+    // (REF + DOC в одном элементе) — устраняет дублирование «ССЫЛКИ ССЫЛКИ».
+    if (!b.suppressTitle) {
+      html += '<div class="' + CSS_PREFIX + '-refs-title">Ссылки</div>';
+    }
     html += '<ul class="' + CSS_PREFIX + '-refs-list">';
     for (var i = 0; i < items.length; i++) {
       var it = items[i];
@@ -681,7 +691,7 @@
           + ' aria-label="Открыть PDF, стр. ' + page + '">'
           + '<span class="' + CSS_PREFIX + '-ref-icon">' + (window.ICONS['file-text'] || '') + '</span>'
           + '<span class="' + CSS_PREFIX + '-ref-text"' + window.app.langAttr(label) + '>' + _renderRichText(label) + '</span>'
-          + '<span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
+          + ' <span class="' + CSS_PREFIX + '-ref-page">стр.&nbsp;' + page + '</span>'
           + '</li>';
       } else if (it && it.text) {
         html += '<li class="' + CSS_PREFIX + '-ref">' + _renderRichText(it.text) + '</li>';
@@ -746,6 +756,9 @@
 
     // blocks[] priority — точный порядок элементов (interleave fields + children)
     if (item.blocks && item.blocks.length) {
+      // СИСТЕМНЫЙ ФИКС (Task 63): отслеживать consecutive reference-list блоков,
+      // чтобы подавить дублирование заголовка «Ссылки» (REF + DOC в одном элементе).
+      var prevWasRefList = false;
       for (var bi = 0; bi < item.blocks.length; bi++) {
         var block = item.blocks[bi];
         if (block.type === 'items') {
@@ -753,14 +766,17 @@
           if (im && item[block.key]) {
             html += renderItemsBlock(im[1], im[2], item[block.key]);
           }
+          prevWasRefList = false;
         } else if (block.type === 'table-file') {
           if (item.tables && item.tables[block.index]) {
             html += renderBlockTableFile({ src: item.tables[block.index].src }, ctx);
           }
+          prevWasRefList = false;
         } else if (block.type === 'image') {
           if (item.image) {
             html += renderBlockImage({ src: item.image, alt: item.title || '' }, ctx);
           }
+          prevWasRefList = false;
         } else if (block.type === 'images') {
           // Рендерим ВСЕ изображения ОДНОЙ галереей при первом вхождении (grid + PhotoSwipe ←/→).
           // Последующие blocks {type:'images', index:N>0} пропускаем — галерея уже отрисована.
@@ -768,6 +784,7 @@
           if (block.index === 0 && item.images && item.images.length) {
             html += renderBlockImage({ images: item.images, alt: item.title || '' }, ctx);
           }
+          prevWasRefList = false;
         } else if (block.type === 'references') {
           if (item.references && item.references.length) {
             var textRefs = [];
@@ -776,7 +793,10 @@
               if (typeof ref === 'string') textRefs.push(ref);
               else if (ref && ref.text) textRefs.push({ text: ref.text });
             }
-            if (textRefs.length) html += renderBlockReferenceList({ items: textRefs }, ctx);
+            if (textRefs.length) {
+              html += renderBlockReferenceList({ items: textRefs, suppressTitle: prevWasRefList }, ctx);
+              prevWasRefList = true;
+            }
           }
         } else if (block.type === 'documents') {
           if (item.documents && item.documents.length) {
@@ -787,12 +807,16 @@
                 docRefs.push({ src: doc.src || doc.file, page: doc.page || 1, title: doc.title || 'Открыть PDF' });
               }
             }
-            if (docRefs.length) html += renderBlockReferenceList({ items: docRefs }, ctx);
+            if (docRefs.length) {
+              html += renderBlockReferenceList({ items: docRefs, suppressTitle: prevWasRefList }, ctx);
+              prevWasRefList = true;
+            }
           }
         } else if (block.type === 'child-ref') {
           if (item.children && item.children[block.index]) {
             html += renderItem(item.children[block.index], (ctx.depth || 0) + 1);
           }
+          prevWasRefList = false;
         }
       }
       return html;
@@ -800,6 +824,9 @@
 
     // Fallback: flat keys iteration (для JSON без blocks[])
     var keys = Object.keys(item);
+    // СИСТЕМНЫЙ ФИКС (Task 63): отслеживать consecutive reference-list (documents/references),
+    // чтобы подавить дублирование заголовка «Ссылки» при REF+DOC в одном элементе.
+    var _lastWasRefList = false;
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
       var val = item[key];
@@ -809,6 +836,7 @@
       var m = key.match(itemsRegex);
       if (m) {
         html += renderItemsBlock(m[1], m[2], val);
+        _lastWasRefList = false;
         continue;
       }
 
@@ -818,6 +846,7 @@
           ? { images: val, alt: item.title || '' }
           : { src: val, alt: item.title || '' };
         html += renderBlockImage(imgBlock, ctx);
+        _lastWasRefList = false;
         continue;
       }
 
@@ -828,12 +857,14 @@
             html += renderBlockTableFile({ src: val[t].src }, ctx);
           }
         }
+        _lastWasRefList = false;
         continue;
       }
 
       // 3b. tableFile (legacy backward-compat: одна строка-путь)
       if (key === 'tableFile' && val) {
         html += renderBlockTableFile({ src: val }, ctx);
+        _lastWasRefList = false;
         continue;
       }
 
@@ -847,7 +878,8 @@
           }
         }
         if (docRefs.length) {
-          html += renderBlockReferenceList({ items: docRefs }, ctx);
+          html += renderBlockReferenceList({ items: docRefs, suppressTitle: _lastWasRefList }, ctx);
+          _lastWasRefList = true;
         }
         continue;
       }
@@ -866,7 +898,8 @@
           }
         }
         if (textRefs.length) {
-          html += renderBlockReferenceList({ items: textRefs }, ctx);
+          html += renderBlockReferenceList({ items: textRefs, suppressTitle: _lastWasRefList }, ctx);
+          _lastWasRefList = true;
         }
         continue;
       }
