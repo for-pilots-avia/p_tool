@@ -129,16 +129,23 @@
       var shiftEnd  = (report2 !== null && r2) ? (report2 + duty2) % 1440 : (report + duty1) % 1440;
       var restEnd   = (report + duty + restHours * 60) % 1440;
 
+      // Task 50 #4: Отдых между сменами (от shift1End до явки 2)
+      var shift1EndAbs = (report + duty1) % 1440;
+      var restBetweenShifts = (report2 !== null && r1 && duty1 > 0)
+        ? wtDiffTime(shift1EndAbs, report2)
+        : 0;
+
       var totalFlight = (r1 ? r1.totalFlight : 0) + (r2 ? r2.totalFlight : 0);
       var totalAir    = (r1 ? r1.totalAir    : 0) + (r2 ? r2.totalAir    : 0);
 
       return {
         night: night, pilotMax: pilotMax, cabinMax: cabinMax,
         duty: duty, duty1: duty1, duty2: duty2,
-        shift1End: (report + duty1) % 1440,
+        shift1End: shift1EndAbs,
         shift2End: shiftEnd,
         shiftEnd: shiftEnd,
         restHours: restHours, restEnd: restEnd,
+        restBetweenShifts: restBetweenShifts,
         totalFlight: totalFlight, totalAir: totalAir,
         warnings: warnings, landings: landings,
         splitMode: true
@@ -471,7 +478,7 @@
     html += '<div class="app-card-header">';
     html += '<div class="wt-flex-center-gap">';
     html += '<div class="wt-card-icon wt-card-icon--segments">' + window.ICONS.plane + '</div>';
-    html += '<h2 class="ct-heading-md">' + (splitMode ? 'Смены (раздельный режим)' : 'Сегменты полёта') + '</h2>';
+    html += '<h2 class="ct-heading-md">' + (splitMode ? 'Смены (разделенная)' : 'Сегменты полёта') + '</h2>';
     html += '</div>';
     // Plus icon — скрыт после завершения. В splitMode скрыт также после ввода
     // сегмента смены 2 (каждая смена = ровно 1 сегмент — добавление недоступно).
@@ -677,32 +684,30 @@
     /* ── Длительность шкалы ──
      *  Обычный режим (не finalized):  от явки до engineStop посл. сегм. (БЕЗ postflight)
      *  Обычный режим (finalized):     results.duty (явка + весь duty = engineStop + postflight)
-     *  Раздельный режим (и finalized, и не-finalized): от явки 1 до конца смены 2
-     *    (если есть сегменты 2-й смены) — шкала ВКЛЮЧАЕТ rest-gap между сменами,
-     *    чтобы обе смены оставались видны и после нажатия «Завершить рейс».
-     *    Если явка 2 не задана → до конца смены 1.
+     *  Раздельный режим: от явки 1 до конца смены 2, БЕЗ rest-gap между сменами
+     *    (Task 50 #1: вырезать время отдыха — шкала = duty1 + duty2, сегменты 2-й смены
+     *     позиционируются со сдвигом -restGap. Если явка 2 не задана → до конца смены 1.)
      */
     var timelineDuration;
     var splitSegEnd = isSplit && !_wtFinalized; /* показывать «Конец сегмента» только до finalize */
+    var _restGapMin = 0; /* Task 50 #1: rest-gap для вырезания из шкалы */
     if (isSplit && results && results.duty1 !== undefined) {
-      /* И finalized, И не-finalized — шкала от явки 1 до конца смены 2.
-       * Если есть сегменты 2-й смены → до shift2End (= явка2 + duty2).
-       * Если явка 2 задана, но сегментов 2-й ещё нет → до явки 2
-       *   (чтобы был виден промежуток отдыха между сменами + маркер «Явка 2»).
-       * Если явка 2 не задана → до конца смены 1.
-       * ВАЖНО: после finalize шкала НЕ схлопывается в duty1+duty2 — иначе
-       * сегменты 2-й смены (позиционируемые по абсолютному времени) уезжают
-       * за 100% и становятся невидимыми. */
+      /* Task 50 #1: timeline = duty1 + duty2 (БЕЗ rest-gap).
+       * Сегменты 2-й смены позиционируются со сдвигом -restGap.
+       * Если duty2 > 0 → duty1 + duty2.
+       * Если явка 2 задана, но сегментов 2-й ещё нет → до duty1 (только смена 1, отдых не показываем).
+       * Если явка 2 не задана → до duty1. */
       var _r2min = wtParseTime(_wtSettings.reportTime2);
-      var splitEnd;
-      if (results.duty2 > 0 && results.shift2End !== undefined) {
-        splitEnd = results.shift2End;
-      } else if (_r2min !== null) {
-        splitEnd = _r2min;
+      if (results.duty2 > 0) {
+        timelineDuration = results.duty1 + results.duty2;
+        /* restGap = от shift1End до явки 2 (вырезаем из шкалы) */
+        if (_r2min !== null && results.shift1End !== undefined) {
+          _restGapMin = wtDiffTime(results.shift1End, _r2min);
+        }
       } else {
-        splitEnd = (reportMin + results.duty1) % 1440;
+        /* Сегментов 2-й смены ещё нет — шкала только по смене 1 */
+        timelineDuration = results.duty1;
       }
-      timelineDuration = wtDiffTime(reportMin, splitEnd);
     } else if (results && _wtFinalized) {
       timelineDuration = results.duty;
     } else {
@@ -711,7 +716,7 @@
       timelineDuration = wtDiffTime(reportMin, lastStop);
     }
     if (timelineDuration < 60) timelineDuration = 60; // минимум 1 ч
-    var timelineEnd = reportMin + timelineDuration;
+    var timelineEnd = reportMin + timelineDuration + _restGapMin; /* реальный конец (с отдыхом, для меток) */
 
     /* ── Шаг сетки ── */
     var step;
@@ -720,14 +725,19 @@
     else if (timelineDuration <= 900)  step = 120;
     else                               step = 180;
 
-    /* ── Позиция относительно начала шкалы (поддержка перехода через полночь) ── */
-    function timelineOffset(absMin) {
+    /* ── Позиция относительно начала шкалы (поддержка перехода через полночь) ──
+     *  Task 50 #1: для shift 2 — вычесть restGap (вырезаем отдых из шкалы) */
+    function timelineOffset(absMin, isShift2) {
       var offset = absMin - reportMin;
       if (offset < 0) offset += 1440;
+      if (isShift2 && _restGapMin > 0) {
+        offset -= _restGapMin;
+        if (offset < 0) offset = 0;
+      }
       return offset;
     }
-    function timelinePct(absMin) {
-      return (timelineOffset(absMin) / timelineDuration * 100);
+    function timelinePct(absMin, isShift2) {
+      return (timelineOffset(absMin, isShift2) / timelineDuration * 100);
     }
 
     /* ── Метка времени (без суффикса +1) ── */
@@ -796,26 +806,18 @@
     html += '<div class="wt-timeline-marker wt-timeline-marker--report" style="--pct:0%;"'
       + ' title="Явка: ' + _wtSettings.reportTime + '"></div>';
 
-    /* ── Маркер «Явка 2» (раздельный режим, до finalize) ──
-     *  Позиционируется по проценту шкалы. Виден только когда задана явка 2,
-     *  чтобы пользователь видел начало второй смены на графике. */
-    if (isSplit && !_wtFinalized) {
-      var _r2Min = wtParseTime(_wtSettings.reportTime2);
-      if (_r2Min !== null) {
-        var _r2Pct = Math.min(timelinePct(_r2Min), 100);
-        html += '<div class="wt-timeline-marker wt-timeline-marker--report2" style="--pct:' + _r2Pct.toFixed(2) + '%;"'
-          + ' title="Явка 2: ' + _wtSettings.reportTime2 + '"></div>';
-      }
-    }
+    /* Task 50 #1: маркер «Явка 2» убран — отдых вырезан из шкалы,
+     *  явка 2 идёт сразу после смены 1 (без визуального промежутка). */
 
     /* ── Сегменты и маркеры Запуск/Выключение ── */
     var COLORS = 5;
     for (var s = 0; s < segments.length; s++) {
       var seg = segments[s];
-      var sPct  = timelinePct(seg.engineStart);
+      var _isSh2 = (seg.shift === 2); /* Task 50 #1: сдвиг для shift 2 */
+      var sPct  = timelinePct(seg.engineStart, _isSh2);
       var wPct  = Math.max(seg.flightTime / timelineDuration * 100, 0.3);
       var colorIdx = s % COLORS;
-      var esPct = timelinePct(seg.engineStop);
+      var esPct = timelinePct(seg.engineStop, _isSh2);
 
       html += '<div class="wt-timeline-segment wt-segment-color-' + colorIdx + '"'
         + ' style="--pct:' + sPct.toFixed(3) + '%;--fill:' + wPct.toFixed(3) + '%;"'
@@ -925,11 +927,15 @@
 
     html += '<div class="wt-results-grid wt-results-border">';
     // Строка 1 — Рабочее время (полное) — на всю ширину
-    var dutyLabel = results.splitMode ? 'Рабочее время (полное за обе смены)' : 'Фактическое рабочее время';
+    var dutyLabel = results.splitMode ? 'Рабочее время' : 'Фактическое рабочее время';
     html += wtResultItemFull(window.ICONS.timer, dutyLabel, wtFmtMin(results.duty));
     // Строка 2 — Полётное + Лётное (итог за обе смены)
     html += wtResultItem(window.ICONS.plane, 'Полётное время', wtFmtMin(results.totalFlight));
     html += wtResultItem(window.ICONS['circle-dot'], 'Лётное время', wtFmtMin(results.totalAir));
+    // Task 50 #4: Отдых между сменами (только splitMode)
+    if (results.splitMode && results.restBetweenShifts > 0) {
+      html += wtResultItem(window.ICONS.moon, 'Отдых между сменами', wtFmtMin(results.restBetweenShifts));
+    }
     // Строка 3 — Минимальный отдых + Окончание отдыха
     html += wtResultItem(window.ICONS.moon, 'Минимальный отдых', results.restHours + ' ч');
     html += wtResultItem(window.ICONS.clock, 'Окончание отдыха', wtFormatTime(results.restEnd));
@@ -1122,7 +1128,7 @@
     if (!overlay || !sheet) return;
 
     if (closeBtn) closeBtn.innerHTML = window.ICONS.x || window.ICONS.close;
-    if (titleEl) titleEl.textContent = (shift === 2) ? 'Новый сегмент смены 2' : 'Новый сегмент';
+    if (titleEl) titleEl.textContent = (shift === 2) ? 'Новый сегмент • Смена 2' : 'Новый сегмент';
     if (saveBtn) saveBtn.textContent = 'Сохранить сегмент';
     if (actionsEl) actionsEl.style.display = 'flex'; // Show Save Segment button
 

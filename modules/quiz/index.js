@@ -69,7 +69,19 @@
     questionStartTime: 0,
     questionTimes: [],
     timerInterval: 0,
-    inited: false
+    inited: false,
+    /* v2: работа над ошибками с сохранением в history.
+       isStopped — true когда тест прекращён через #modalBtnStop (не first-run, не обычный retry).
+       retryMode — 'first' (обычный тест с оценкой) | 'retry' (цикл работы над ошибками)
+                | 'stopped' (тест прекращён, результат без оценки). */
+    isStopped: false,
+    retryMode: 'first',
+    /* v3: sourceRecordDate — date записи-источника для retry-цикла.
+       Когда retry-цикл завершается, showResults вызывает replaceResult(record, sourceRecordDate):
+       запись с этой date УДАЛЯЕТСЯ из history, новая — добавляется в начало.
+       Предотвращает накопление цепочек retry-блоков.
+       null = не из retry (новый тест или first run) → обычный pushResult. */
+    sourceRecordDate: null
   };
 
   /* ── DOM helpers (internal screen visibility) ── */
@@ -143,6 +155,26 @@
     saveHistory(items);
   }
 
+  /* v3: replaceResult — замена записи-источника в history.
+     Используется при retry-цикле: исходная запись (first/stopped/предыдущий retry,
+     идентифицируемая по sourceDate) удаляется, новая retry-запись добавляется в начало.
+     Предотвращает накопление цепочек retry-блоков в history.
+     Если sourceDate не найден (источник уже удалён) — fallback на обычный unshift. */
+  function replaceResult(r, sourceDate) {
+    var items = loadHistory();
+    if (sourceDate) {
+      var beforeLen = items.length;
+      items = items.filter(function (it) { return it.date !== sourceDate; });
+      /* Если ничего не удалилось — источник не найден, fallback к pushResult-логике. */
+      if (items.length === beforeLen) {
+        /* Источник не найден — добавляем как обычную новую запись. */
+      }
+    }
+    items.unshift(r);
+    if (items.length > MAX_HISTORY) items.length = MAX_HISTORY;
+    saveHistory(items);
+  }
+
   function clearHistory() {
     localStorage.removeItem(HISTORY_KEY);
     renderHistory();
@@ -172,7 +204,7 @@
     if (!isBuiltin) saveCustomTests();
   }
 
-  function retryFromHistory(wrongQuestions) {
+  function retryFromHistory(wrongQuestions, sourceDate) {
     var qs = JSON.parse(JSON.stringify(wrongQuestions));
     if (S.shuffle) qs = shuffleArr(qs);
     S.questions = qs;
@@ -180,6 +212,10 @@
     S.score = 0;
     S.wrongQs = [];
     S.isFirstRun = false;
+    S.isStopped = false;
+    S.retryMode = 'retry';
+    /* v3: запоминаем date записи-источника для замены в history. */
+    S.sourceRecordDate = sourceDate || null;
     S.answered = false;
     startTimer();
     setScreen('quiz');
@@ -204,32 +240,58 @@
 
     items.forEach(function (item) {
       var hasErrors = item.score < item.total && item.wrongQuestions && item.wrongQuestions.length > 0;
+      /* v2: retryMode определяет показ — 'first' (или undefined для старых записей) /
+         'retry' (работа над ошибками) / 'stopped' (прекращён). */
+      var mode = item.retryMode || 'first';
+      var isRetry = (mode === 'retry');
+      var isStopped = (mode === 'stopped');
+
       var row = document.createElement('div');
-      row.className = 'history-row' + (hasErrors ? ' history-row-clickable' : '');
+      row.className = 'history-row' + (hasErrors ? ' history-row-clickable' : '') +
+        (isRetry ? ' history-row--retry' : '') +
+        (isStopped ? ' history-row--stopped' : '');
 
       var dateStr = new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+      /* v2: в первом блоке — grade для first, бейдж для retry/stopped. */
+      var gradeBlock;
+      if (isRetry) {
+        gradeBlock = '<div class="history-grade history-grade--badge" data-mode="retry">' +
+          ico('refresh-ccw') + ' <span class="history-grade-label">\u0420\u0430\u0431\u043E\u0442\u0430 \u043D\u0430\u0434 \u043E\u0448\u0438\u0431\u043A\u0430\u043C\u0438</span>'; /* Работа над ошибками */
+      } else if (isStopped) {
+        gradeBlock = '<div class="history-grade history-grade--badge" data-mode="stopped">' +
+          ico('x') + ' <span class="history-grade-label">\u0422\u0435\u0441\u0442 \u043F\u0440\u0435\u043A\u0440\u0430\u0449\u0451\u043D</span>'; /* Тест прекращён */
+      } else {
+        gradeBlock = '<div class="history-grade" data-grade="' + window.app.escapeAttr(String(item.grade)) + '">' +
+          window.app.escapeHtml(item.grade);
+      }
+      gradeBlock += '</div>';
+
+      /* v2: meta — для retry/stopped не показываем pct% (нерепрезентативно). */
+      var metaLine = '<span class="history-meta-score">' + window.app.escapeHtml(item.score) + '</span>/' + window.app.escapeHtml(item.total);
+      if (!isRetry && !isStopped) {
+        metaLine += ' \u00B7 ' + window.app.escapeHtml(item.pct) + '%';  /* · ...% */
+      }
+      metaLine += ' \u00B7 ' + fmtTime(item.time) + ' \u00B7 ' + dateStr;
+
       row.innerHTML =
-        '<div class="history-grade" data-grade="' + window.app.escapeAttr(String(item.grade)) + '">' + window.app.escapeHtml(item.grade) + '</div>' +
+        gradeBlock +
         '<div class="history-info">' +
           '<div class="history-test-name"' + window.app.langAttr(item.testName) + '>' + window.app.escapeHtml(item.testName) + '</div>' +
-          '<div class="history-meta">' +
-            '<span class="history-meta-score">' + window.app.escapeHtml(item.score) + '</span>/' + window.app.escapeHtml(item.total) +
-            ' \u00B7 ' + window.app.escapeHtml(item.pct) + '%' +
-            ' \u00B7 ' + fmtTime(item.time) +
-            ' \u00B7 ' + dateStr +
-          '</div>' +
-        '</div>' +
-        (hasErrors ? '<div class="history-retry-hint">' + ico('refresh-ccw') + '</div>' : '');
+          '<div class="history-meta">' + metaLine + '</div>' +
+        '</div>';
+      /* v2: иконка .history-retry-hint убрана — кликабельность через row click handler,
+         бейдж слева уже показывает тип записи (grade / «Работа над ошибками» / «Тест прекращён»). */
 
       if (hasErrors) {
         row.setAttribute('role', 'button');
         row.setAttribute('tabindex', '0');
         row.setAttribute('aria-label', '\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C: ' + item.testName); /* Повторить */
-        (function (wq) {
-          row.addEventListener('click', function () { retryFromHistory(wq); });
-          row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); retryFromHistory(wq); } });
-        })(item.wrongQuestions);
+        /* v3: передаём item.date как sourceDate — для замены записи в history. */
+        (function (wq, srcDate) {
+          row.addEventListener('click', function () { retryFromHistory(wq, srcDate); });
+          row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); retryFromHistory(wq, srcDate); } });
+        })(item.wrongQuestions, item.date);
       }
 
       list.appendChild(row);
@@ -338,17 +400,19 @@
 
       /* Stop test button — confirm before aborting.
          Сначала закрываем модалку настроек (z-index 9999/10000 перекрывает
-         globalConfirmOverlay z-index 2100), затем показываем confirm. */
+         globalConfirmOverlay z-index 2100), затем показываем confirm.
+         v2: результат НЕ теряется — показывается экран работы над ошибками
+         с сохранением в history (retryMode='stopped'). */
       if (target.closest('#modalBtnStop')) {
         closeSettings();
         if (window.app && typeof window.app.showConfirm === 'function') {
           window.app.showConfirm(
-            '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C \u0442\u0435\u0441\u0442? \u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u0431\u0443\u0434\u0435\u0442 \u043F\u043E\u0442\u0435\u0440\u044F\u043D.',
-            function () { goStart(); },
+            '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C \u0442\u0435\u0441\u0442? \u0411\u0443\u0434\u0435\u0442 \u043F\u043E\u043A\u0430\u0437\u0430\u043D \u044D\u043A\u0440\u0430\u043D \u0440\u0430\u0431\u043E\u0442\u044B \u043D\u0430\u0434 \u043E\u0448\u0438\u0431\u043A\u0430\u043C\u0438.',
+            function () { stopTest(); },
             '\u041F\u0440\u0435\u043A\u0440\u0430\u0442\u0438\u0442\u044C'
           );
         } else {
-          goStart();
+          stopTest();
         }
         return;
       }
@@ -619,6 +683,9 @@
     S.score = 0;
     S.wrongQs = [];
     S.isFirstRun = true;
+    S.isStopped = false;
+    S.retryMode = 'first';
+    S.sourceRecordDate = null;
     S.answered = false;
 
     startTimer();
@@ -634,6 +701,14 @@
     S.score = 0;
     S.wrongQs = [];
     S.isFirstRun = false;
+    S.isStopped = false;
+    S.retryMode = 'retry';
+    /* v3: запоминаем date последней записи в history (это запись, из которой
+       запустили retry — first/stopped/предыдущий retry). После завершения retry
+       showResults вызовет replaceResult(record, sourceRecordDate) — запись-источник
+       будет удалена, новая retry-запись добавлена в начало. */
+    var lastItem = loadHistory()[0];
+    S.sourceRecordDate = lastItem ? lastItem.date : null;
     S.answered = false;
 
     startTimer();
@@ -644,11 +719,25 @@
   function goStart() {
     stopTimer();
     S.isFirstRun = true;
+    S.isStopped = false;
+    S.retryMode = 'first';
+    S.sourceRecordDate = null;
     S.wrongQs = [];
     S.questions = [];
     S.questionTimes = [];
     setScreen('start');
     renderHistory();
+  }
+
+  /* stopTest — прекращение теста с сохранением результатов в history.
+     v2: вместо goStart (который всё сбрасывал) — показываем экран результатов
+     с retryMode='stopped'. S.questions НЕ обнуляем (нужны для showResults). */
+  function stopTest() {
+    stopTimer();
+    S.isStopped = true;
+    S.retryMode = 'stopped';
+    S.isFirstRun = false;  /* чтобы showResults скрыл grade */
+    showResults();
   }
 
 
@@ -919,11 +1008,14 @@
      ═══════════════════════════════════════════════════════════ */
   function showResults() {
     stopTimer();
-    if (S.questionTimes.length < S.questions.length) {
+    if (S.questionTimes.length < S.questions.length && S.questionStartTime > 0) {
       S.questionTimes.push(Date.now() - S.questionStartTime);
     }
 
-    var total = S.questions.length;
+    /* v2: total при stopped = количеству отвеченных вопросов (S.idx),
+       иначе = S.questions.length (как раньше). */
+    var total = S.isStopped ? S.idx : S.questions.length;
+    if (total < S.score) total = S.score;  /* защита от отрицательного fail */
     var pct = total > 0 ? Math.round((S.score / total) * 100) : 0;
     var grade = getGrade(pct);
     var totalTime = Date.now() - S.quizStartTime;
@@ -941,29 +1033,53 @@
     var resultTotalTime = container.querySelector('#resultTotalTime');
     var resultAvgTime = container.querySelector('#resultAvgTime');
 
+    /* v2: 3 режима показа — first / retry / stopped */
     if (S.isFirstRun) {
+      /* Первый прогон — с оценкой */
       if (resultTitle) resultTitle.textContent = '\u0412\u0430\u0448\u0430 \u043E\u0446\u0435\u043D\u043A\u0430'; /* Ваша оценка */
       if (gradeDisplay) { gradeDisplay.textContent = grade; show(gradeDisplay); }
       if (resultScoreInfo) resultScoreInfo.textContent = '\u0412\u0435\u0440\u043D\u043E: ' + S.score + ' \u0438\u0437 ' + total + ' (' + pct + '%)'; /* Верно: ... из ... (...%) */
+    } else if (S.isStopped) {
+      /* Тест прекращён — без оценки, показываем прогресс */
+      if (resultTitle) resultTitle.textContent = '\u0422\u0435\u0441\u0442 \u043F\u0440\u0435\u043A\u0440\u0430\u0449\u0451\u043D'; /* Тест прекращён */
+      if (gradeDisplay) hide(gradeDisplay);
+      if (resultScoreInfo) {
+        resultScoreInfo.textContent = '\u041E\u0442\u0432\u0435\u0447\u0435\u043D\u043E: ' + total + ' \u0438\u0437 ' + S.questions.length +
+          ' \u00B7 \u0418\u0441\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E: ' + S.score; /* Отвечено: ... из ... · Исправлено: ... */
+      }
     } else {
+      /* Работа над ошибками — без оценки */
       if (resultTitle) resultTitle.textContent = '\u0420\u0430\u0431\u043E\u0442\u0430 \u043D\u0430\u0434 \u043E\u0448\u0438\u0431\u043A\u0430\u043C\u0438'; /* Работа над ошибками */
       if (gradeDisplay) hide(gradeDisplay);
       if (resultScoreInfo) resultScoreInfo.textContent = '\u0418\u0441\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E: ' + S.score + ' \u0438\u0437 ' + total; /* Исправлено: ... из ... */
     }
 
     if (resultMsg) {
-      resultMsg.textContent = S.isFirstRun
-        ? (S.wrongQs.length === 0
+      if (S.isFirstRun) {
+        resultMsg.textContent = S.wrongQs.length === 0
           ? '\u041E\u0442\u043B\u0438\u0447\u043D\u043E! \u041E\u0448\u0438\u0431\u043E\u043A \u043D\u0435\u0442!' /* Отлично! Ошибок нет! */
-          : '\u041E\u0448\u0438\u0431\u043E\u043A: ' + S.wrongQs.length + '. \u041C\u043E\u0436\u043D\u043E \u043F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u0438\u0445.') /* Ошибок: ... Можно повторить их. */
-        : (S.wrongQs.length === 0
+          : '\u041E\u0448\u0438\u0431\u043E\u043A: ' + S.wrongQs.length + '. \u041C\u043E\u0436\u043D\u043E \u043F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u0438\u0445.'; /* Ошибок: ... Можно повторить их. */
+      } else if (S.isStopped) {
+        resultMsg.textContent = S.wrongQs.length === 0
+          ? '\u041E\u0448\u0438\u0431\u043E\u043A \u043D\u0435 \u043E\u0441\u0442\u0430\u043B\u043E\u0441\u044C.' /* Ошибок не осталось. */
+          : '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u043E\u0448\u0438\u0431\u043E\u043A: ' + S.wrongQs.length + '. \u041C\u043E\u0436\u043D\u043E \u043F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C \u0438\u0445.'; /* Осталось ошибок: ... Можно повторить их. */
+      } else {
+        resultMsg.textContent = S.wrongQs.length === 0
           ? '\u041F\u043E\u0437\u0434\u0440\u0430\u0432\u043B\u044F\u044E! \u0412\u0441\u0435 \u043E\u0448\u0438\u0431\u043A\u0438 \u0438\u0441\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u044B!' /* Поздравляю! Все ошибки исправлены! */
-          : '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u043E\u0448\u0438\u0431\u043E\u043A: ' + S.wrongQs.length + '. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u0435\u0449\u0451 \u0440\u0430\u0437.'); /* Осталось ошибок: ... Повторите ещё раз. */
+          : '\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u043E\u0448\u0438\u0431\u043E\u043A: ' + S.wrongQs.length + '. \u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u0435 \u0435\u0449\u0451 \u0440\u0430\u0437.'; /* Осталось ошибок: ... Повторите ещё раз. */
+      }
     }
 
     if (resultStatOk) resultStatOk.textContent = String(S.score);
     if (resultStatFail) resultStatFail.textContent = String(total - S.score);
-    if (resultStatPct) resultStatPct.textContent = pct + '%';
+    /* При stopped — процент нерепрезентативен, скрываем */
+    if (resultStatPct) {
+      if (S.isStopped) {
+        resultStatPct.textContent = '\u2014'; /* — */
+      } else {
+        resultStatPct.textContent = pct + '%';
+      }
+    }
     if (resultTotalTime) resultTotalTime.innerHTML = ico('clock') + ' ' + fmtTime(totalTime);
     if (resultAvgTime) resultAvgTime.textContent = '\u0421\u0440. ' + fmtTime(avgTime) + '/\u0432\u043E\u043F\u0440.'; /* Ср. .../вопр. */
 
@@ -994,19 +1110,29 @@
       resultScreen.classList.add('animate-fade-in');
     }
 
-    /* Save result to history (first run only) */
-    if (S.isFirstRun) {
-      var testName = (S.customTests.find(function (t) { return t.name === S.selectedTest; }) || {}).name || '\u0422\u0435\u0441\u0442'; /* Тест */
-      pushResult({
-        testName: testName,
-        date: Date.now(),
-        score: S.score,
-        total: total,
-        pct: pct,
-        grade: grade,
-        time: totalTime,
-        wrongQuestions: S.wrongQs.length > 0 ? JSON.parse(JSON.stringify(S.wrongQs)) : undefined
-      });
+    /* v2: сохраняем ВСЕГДА — first/retry/stopped — с правильным retryMode.
+       v3: при retry-цикле — ЗАМЕНЯЕМ запись-источник (sourceRecordDate),
+       а не добавляем новую. Предотвращает накопление цепочек retry-блоков.
+       Старые записи (без retryMode) трактуются как 'first' в renderHistory. */
+    var testName = (S.customTests.find(function (t) { return t.name === S.selectedTest; }) || {}).name || '\u0422\u0435\u0441\u0442'; /* Тест */
+    var newRecord = {
+      testName: testName,
+      date: Date.now(),
+      score: S.score,
+      total: total,
+      pct: S.isStopped ? 0 : pct,  /* при stopped — 0 (не репрезентативно) */
+      grade: S.isStopped ? null : grade,  /* при stopped — без оценки */
+      time: totalTime,
+      wrongQuestions: S.wrongQs.length > 0 ? JSON.parse(JSON.stringify(S.wrongQs)) : undefined,
+      retryMode: S.retryMode  /* 'first' | 'retry' | 'stopped' */
+    };
+    if (S.retryMode === 'retry' && S.sourceRecordDate) {
+      /* Retry цикл — заменить исходную запись (first/stopped/предыдущий retry). */
+      replaceResult(newRecord, S.sourceRecordDate);
+      S.sourceRecordDate = null;  /* сброс после использования */
+    } else {
+      /* first run или stopped — обычное добавление. */
+      pushResult(newRecord);
     }
   }
 

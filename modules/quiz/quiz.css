@@ -485,6 +485,39 @@ body.dark-theme #quizContainer {
   flex-shrink: 0;
   color: var(--grade-color, var(--color-text-main));
 }
+/* v2: badge для retry/stopped записей — вместо grade.
+   Не переопределяем --grade-color, используем semantic colors через [data-mode]. */
+.history-grade--badge {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: var(--border-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.history-grade--badge[data-mode="retry"] {
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-light);
+}
+.history-grade--badge[data-mode="stopped"] {
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+.history-grade--badge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.history-grade-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
 .history-info {
   flex: 1;
   min-width: 0;
