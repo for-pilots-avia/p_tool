@@ -662,9 +662,45 @@
     if (title) {
       html += '<div class="items-block-title"' + window.app.langAttr(title) + '>' + _renderRichText(title) + '</div>';
     }
-    html += '<div class="items-block-content"' + window.app.langAttr(text) + '>' + _renderRichText(text) + '</div>';
+    // Task 66: mixed render — inline <table> (sanitizeHtml) + {{table:path}} (renderBlockTableFile) + text
+    html += '<div class="items-block-content"' + window.app.langAttr(text) + '>' + _renderItemsContent(text) + '</div>';
     html += '</div>';
     return html;
+  }
+
+  /* ─── _renderItemsContent (Task 66): mixed render text с встроенными таблицами ───
+     - {{table:path}} плейсхолдер → renderBlockTableFile (fetch внешнего файла)
+     - <table>...</table> inline → sanitizeHtml (SANITIZER_TAGS whitelist)
+     - text без таблиц → _renderRichText (\n→<br>, {{badge:}}, {{link:}})
+     Симметрично: {{badge:}}/{{link:}} — плейсхолдеры в text. */
+  function _renderItemsContent(text) {
+    if (!text) return '';
+    // Сначала разбить по {{table:path}} плейсхолдерам (внешние таблицы)
+    var parts = text.split(/(\{\{table:[^}]+\}\})/gi);
+    var out = '';
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      var m = p.match(/^\{\{table:([^}]+)\}\}$/i);
+      if (m) {
+        // Внешняя таблица — renderBlockTableFile (fetch + sanitize)
+        out += renderBlockTableFile({ src: m[1] }, { depth: 0 });
+      } else if (p.indexOf('<table') >= 0) {
+        // Inline таблица — разбить по <table>...</table>
+        var subparts = p.split(/(<table[\s\S]*?<\/table>)/gi);
+        for (var j = 0; j < subparts.length; j++) {
+          if (subparts[j].indexOf('<table') === 0) {
+            // Task 67: обернуть через renderBlockTable → div[data-block=table]...-table-inline
+            // (применяются CSS: border/padding/background для th/td)
+            out += renderBlockTable({ content: subparts[j] }, { depth: 0 });
+          } else if (subparts[j]) {
+            out += _renderRichText(subparts[j]);
+          }
+        }
+      } else if (p) {
+        out += _renderRichText(p);
+      }
+    }
+    return out;
   }
 
   function renderBlockReferenceList(b, ctx) {
@@ -775,6 +811,12 @@
             html += renderBlockTableFile({ src: item.tables[block.index].src }, ctx);
           }
           prevWasRefList = false;
+        } else if (block.type === 'table') {
+          // СИСТЕМНЫЙ ФИКС (Task 65): inline HTML-таблица (tableHtml).
+          if (item.tableHtml) {
+            html += renderBlockTable({ content: item.tableHtml }, ctx);
+          }
+          prevWasRefList = false;
         } else if (block.type === 'image') {
           if (item.image) {
             html += renderBlockImage({ src: item.image, alt: item.title || '' }, ctx);
@@ -867,6 +909,13 @@
       // 3b. tableFile (legacy backward-compat: одна строка-путь)
       if (key === 'tableFile' && val) {
         html += renderBlockTableFile({ src: val }, ctx);
+        _lastWasRefList = false;
+        continue;
+      }
+
+      // 3c. tableHtml (inline HTML-таблица, Task 65)
+      if (key === 'tableHtml' && val) {
+        html += renderBlockTable({ content: val }, ctx);
         _lastWasRefList = false;
         continue;
       }

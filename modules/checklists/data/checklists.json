@@ -53,23 +53,22 @@
                   "note": "⬩ Багаж экипажа;\n⬩ Коммерческая загрузка;\n⬩ Опасные грузы.",
                   "required": true },
                 { "id": "brief8",
-                  "label": "Operational Flight Plan (OFP)",
-                  "note": "КВС: ⬩ подписывает;\nF/O ⬩ проверяет равильность расчёта (- маршрут;- эшелоны;.",
-                  "required": true },
-                { "id": "brief9",
                   "label": "Правильность расчёта топлива",
                   "note": "Trip fuel (топливо на маршрут)\nContingency fuel (резерв на непредвиденные обстоятельства)/nAlternate fuel (топливо на запасной)\nFinal reserve fuel (конечный резерв — 30 мин для HELS или 45 мин для PBN)\nExtra fuel (дополнительное топливо)\nTaxi fuel (топливо на руление)\nETOPS fuel (при необходимости).",
                   "required": true },
-                { "id": "brief10", "label": "OFP подписан КВС", "required": true },
-                { "id": "brief11",
+                { "id": "brief9",
+                  "label": "Operational Flight Plan (OFP)",
+                  "note": "КВС: ⬩ подписывает;\nF/O ⬩ проверяет равильность расчёта (- маршрут;- эшелоны;.",
+                  "required": true },
+                { "id": "brief10",
                   "label": "Trip Info",
                   "note": "КВС: ⬩ подписывает;\nF/O: ⬩ заполняет.",
                   "required": true },
-                { "id": "brief12",
+                { "id": "brief11",
                   "label": "Dispatch Release",
                   "note": "КВС: ⬩ подписывает.",
                   "required": true },
-                { "id": "brief13",
+                { "id": "brief12",
                   "label": "Мед. контроль",
                   "note": "КВС вправе - допустить членов экипажа (не только летного) к полёту, если предполётный контроль не проводится (запись в ПЗ)\n- подтвердить отсутствие признаков недееспособности.",
                   "required": true }
@@ -79,7 +78,7 @@
         {
             "id": "ac_docs",
             "title": "3. ДОКУМЕНТАЦИЯ ВС",
-            "note": "⬩ наличие;\n⬩ документы находятся в установленном месте.",
+            "note": "⬩ наличие;\n⬩ документы находятся в чемодане и опечатаны.",
             "items": [
                 { "id": "adocs1", "label": "Certificate of Registration", "required": true },
                 { "id": "adocs2", "label": "Certificate of Airworthiness", "required": true },
@@ -111,7 +110,7 @@
             "items": [
                 { "id": "atl1", "label": "TLB (Technical Log Book) на борту", "required": true },
                 { "id": "atl2", "label": "Maintenance Release действителен", "required": true },
-                { "id": "atl3", "label": "Выполнена запись о предполётном обслуживании", "required": true },
+                { "id": "atl3", "label": "Выполнена запись о предполётном обслуживании (Daily check)", "required": true },
                 { "id": "atl4", "label": "Проверены отложенные дефекты (MEL/CDL)", "required": true },
                 { "id": "atl5", "label": "Проверен Aircraft Status Report", "required": true },
                 { "id": "atl6", "label": "Все дефекты задокументированы", "required": true },
@@ -125,31 +124,31 @@
             "note": "Проверить наличие и исправность:",
             "items": [
                 { "id": "equip1", "label": "Привязные ремни экипажа", "required": true },
-                { "id": "equip2", "label": "Maintenance Release действителен", "required": true },
-                { "id": "equip3", "label": "Спасательные жилеты", "required": true },
-                { "id": "equip4", "label": "Кислородные маски", "required": true },
-                { "id": "equip5", "label": "Давление кислорода", "required": true },
-                { "id": "equip6", "label": "Переносные фонари", "required": true },
-                { "id": "equip7", "label": "Личные фонарики экипажа", "required": true },
-                { "id": "equip8", "label": "ACAS / TCAS", "required": true },
-                { "id": "equip9", "label": "TAWS / EGPWS", "required": true },
-                { "id": "equip10", "label": "RNAV", "required": true },
-                { "id": "equip11", "label": "RVSM", "required": true },
-                { "id": "equip12", "label": "CVR", "required": true },
-                { "id": "equip13", "label": "MNPS (если применимо)", "required": false }
+                { "id": "equip2", "label": "Спасательные жилеты", "required": true },
+                { "id": "equip3", "label": "Кислородные маски", "required": true },
+                { "id": "equip4", "label": "Давление кислорода", "required": true },
+                { "id": "equip5", "label": "Переносные фонари", "required": true },
+                { "id": "equip6", "label": "Личные фонарики экипажа", "required": true },
+                { "id": "equip7", "label": "ACAS / TCAS", "required": true },
+                { "id": "equip8", "label": "TAWS / EGPWS", "required": true },
+                { "id": "equip9", "label": "RNAV / RVSM", "required": true },
+                { "id": "equip10", "label": "CVR", "required": true },
+                { "id": "equip11", "label": "MNPS (если применимо)", "required": false }
             ]
         },
         {
             "id": "asp",
-            "title": "7. АВАРИЙНО-СПАСАТЕЛЬНОЕ ОБОРУДОВАНИЕ",
+            "title": "7. АВАРИЙНО-СПАСАТЕЛЬНОЕ ОБОРУДОВАНИЕ САЛОНА",
             "note": "Проверить наличие и исправность.\nДавление и срок годности, пломбы целы.\nДоступность оборудования.",
             "items": [
                 { "id": "asp1", "label": "Ручные огнетушители", "required": true },
                 { "id": "asp2", "label": "Переносные аварийные фонари", "required": true },
                 { "id": "asp3", "label": "Спасательные жилеты", "required": true },
-                { "id": "asp4", "label": "Smoke Huds", "required": true },
-                { "id": "asp5", "label": "Crash axe", "required": true },
-                { "id": "asp6", "label": "Smoke goggles", "required": true }
+                { "id": "asp4", "label": "Спасательный плот", "required": false },
+                { "id": "asp5", "label": "Smoke Huds", "required": true },
+                { "id": "asp6", "label": "Crash axe", "required": true },
+                { "id": "asp7", "label": "Smoke goggles", "required": true },
+                { "id": "asp8", "label": "ELT", "required": true }
             ]
         },
         {
@@ -157,17 +156,17 @@
             "title": "8. EFB И ЭЛЕКТРОННЫЕ ДАННЫЕ",
             "note": "Проверять NOTAM по всем аэропортам маршрута: вылет, назначение, запасные.",
             "items": [
-                { "id": "efb1", "label": "Наличие служебного iPad", "required": true },
-                { "id": "efb2", "label": "Заряд батареи ≥ 75%", "required": true },
-                { "id": "efb3", "label": "Наличие зарядного устройства", "required": true },
-                { "id": "efb4", "label": "Обновлённый контент EFB", "required": true },
-                { "id": "efb5", "label": "Обновлены Jeppesen FD Pro и Documents", "required": true },
-                { "id": "efb6",
-                  "label": "EFB",
+                { "id": "efb1",
+                  "label": "Наличие служебного iPad",
+                  "note": "Заряд батареи ≥ 75%",
+                  "required": true },
+                { "id": "efb2", "label": "Наличие зарядного устройства", "required": true },
+                { "id": "efb3",
+                  "label": "Обновлённый контент EFB",
                   "note": "⬩ OPT;\n⬩ SkyBag;\n⬩ Documents;.",
                   "required": true },
-                { "id": "efb7", "label": "Актуальная база данных FMS", "required": true },
-                { "id": "efb8", "label": "Актуальный AIRAC cycle", "required": true }
+                { "id": "efb4", "label": "Актуальная база данных FMS", "required": true },
+                { "id": "efb5", "label": "Актуальный AIRAC cycle", "required": false }
             ]
         },
         {

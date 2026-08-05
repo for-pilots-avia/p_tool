@@ -417,6 +417,28 @@ body.dark-theme #worktimeContainer {
   width: 2px;
   opacity: 0.7;
 }
+/* Task 52: gridlines только для широких экранов (Вариант B).
+   На узких (max-width:560px) — скрыть (Вариант A: только метки событий). */
+@media (max-width: 560px) {
+  .wt-timeline-gridline--bg {
+    display: none;
+  }
+}
+/* Task 52: стили для меток событий (Явка, Запуск, Выключение, Конец смены) */
+.wt-timeline-label--event {
+  font-weight: 600;
+  color: var(--color-text-main);
+  white-space: nowrap;
+}
+.wt-timeline-label--start {
+  color: var(--color-success);
+}
+.wt-timeline-label--stop {
+  color: var(--color-warning);
+}
+.wt-timeline-label--end {
+  color: var(--color-primary);
+}
 .wt-timeline-segment {
   position: absolute;
   top: 2px;

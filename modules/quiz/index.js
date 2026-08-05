@@ -175,6 +175,17 @@
     saveHistory(items);
   }
 
+  /* v3: deleteResult — удалить запись из history по sourceDate.
+     Используется при retry-цикле, когда все ошибки исправлены (wrongQs=0):
+     source-запись удаляется БЕЗ добавления новой (больше нечего повторять).
+     Если sourceDate не найден — no-op (источник уже удалён). */
+  function deleteResult(sourceDate) {
+    if (!sourceDate) return;
+    var items = loadHistory();
+    items = items.filter(function (it) { return it.date !== sourceDate; });
+    saveHistory(items);
+  }
+
   function clearHistory() {
     localStorage.removeItem(HISTORY_KEY);
     renderHistory();
@@ -253,14 +264,16 @@
 
       var dateStr = new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
 
-      /* v2: в первом блоке — grade для first, бейдж для retry/stopped. */
+      /* v2: в первом блоке — grade для first, бейдж для retry/stopped.
+         v3: бейдж содержит ТОЛЬКО иконку (без текста) — текст убран.
+            title= сохраняет доступность (tooltip + screen readers). */
       var gradeBlock;
       if (isRetry) {
-        gradeBlock = '<div class="history-grade history-grade--badge" data-mode="retry">' +
-          ico('refresh-ccw') + ' <span class="history-grade-label">\u0420\u0430\u0431\u043E\u0442\u0430 \u043D\u0430\u0434 \u043E\u0448\u0438\u0431\u043A\u0430\u043C\u0438</span>'; /* Работа над ошибками */
+        gradeBlock = '<div class="history-grade history-grade--badge" data-mode="retry" title="\u0420\u0430\u0431\u043E\u0442\u0430 \u043D\u0430\u0434 \u043E\u0448\u0438\u0431\u043A\u0430\u043C\u0438">' +
+          ico('refresh-ccw'); /* Работа над ошибками — только иконка, текст в title */
       } else if (isStopped) {
-        gradeBlock = '<div class="history-grade history-grade--badge" data-mode="stopped">' +
-          ico('x') + ' <span class="history-grade-label">\u0422\u0435\u0441\u0442 \u043F\u0440\u0435\u043A\u0440\u0430\u0449\u0451\u043D</span>'; /* Тест прекращён */
+        gradeBlock = '<div class="history-grade history-grade--badge" data-mode="stopped" title="\u0422\u0435\u0441\u0442 \u043F\u0440\u0435\u043A\u0440\u0430\u0449\u0451\u043D">' +
+          ico('x'); /* Тест прекращён — только иконка, текст в title */
       } else {
         gradeBlock = '<div class="history-grade" data-grade="' + window.app.escapeAttr(String(item.grade)) + '">' +
           window.app.escapeHtml(item.grade);
@@ -1127,9 +1140,18 @@
       retryMode: S.retryMode  /* 'first' | 'retry' | 'stopped' */
     };
     if (S.retryMode === 'retry' && S.sourceRecordDate) {
-      /* Retry цикл — заменить исходную запись (first/stopped/предыдущий retry). */
-      replaceResult(newRecord, S.sourceRecordDate);
-      S.sourceRecordDate = null;  /* сброс после использования */
+      if (S.wrongQs.length === 0) {
+        /* v3: все ошибки исправлены → удалить source-record БЕЗ добавления новой записи.
+           Больше нечего повторять — запись-источник больше не релевантна.
+           Результат retry-цикла (1/1 = 100% исправлено) не сохраняется как
+           самостоятельная запись — он был частью work, а не самостоятельного теста. */
+        deleteResult(S.sourceRecordDate);
+        S.sourceRecordDate = null;
+      } else {
+        /* Остались ошибки → заменить source-record на новую retry-запись. */
+        replaceResult(newRecord, S.sourceRecordDate);
+        S.sourceRecordDate = null;  /* сброс после использования */
+      }
     } else {
       /* first run или stopped — обычное добавление. */
       pushResult(newRecord);

@@ -21,8 +21,9 @@
     restType:    'nonbase',
     reportTime:  '',
     tzOffset:    3,
-    postflight1: 30,
-    postflight2: 30,
+    // Task 53 #1: default postflight 30 → 10 мин
+    postflight1: 10,
+    postflight2: 10,
     splitMode:   false,
     reportTime2: ''
   };
@@ -127,7 +128,10 @@
 
       var restHours = wtCalcRest(duty, settings.restType);
       var shiftEnd  = (report2 !== null && r2) ? (report2 + duty2) % 1440 : (report + duty1) % 1440;
-      var restEnd   = (report + duty + restHours * 60) % 1440;
+      // Task 51: restEnd считается от shift2End (конец послеполётных работ смены 2), НЕ от report+duty.
+      // Раньше было: (report + duty + restHours*60) — не учитывало restBetweenShifts.
+      // Теперь: shift2End + restHours*60. shiftEnd уже = (report2 + duty2) или (report + duty1).
+      var restEnd   = (shiftEnd + restHours * 60) % 1440;
 
       // Task 50 #4: Отдых между сменами (от shift1End до явки 2)
       var shift1EndAbs = (report + duty1) % 1440;
@@ -172,7 +176,15 @@
     }
 
     var lastStop   = segs[segs.length - 1].engineStop;
-    var dutyToStop = wtDiffTime(report, lastStop);
+    var firstStart = segs[0].engineStart;
+    // Task 53 #2: для смены 2 с report2 > lastStop (отдых > 24ч — явка2 после конца смены 2)
+    // duty = от engineStart (не от report), иначе wtDiffTime даёт 23ч через полночь.
+    // Для смены 1 и нормального кейса смены 2 — duty от report (как раньше).
+    // Эвристика: если dutyFromReport > dutyFromStart — аномалия (report2 после lastStop),
+    // выбираем dutyFromStart (только полёт + postflight, без preflight от явки).
+    var _dutyFromReport = wtDiffTime(report, lastStop);
+    var _dutyFromStart  = wtDiffTime(firstStart, lastStop);
+    var dutyToStop = (_dutyFromReport <= _dutyFromStart) ? _dutyFromReport : _dutyFromStart;
     var duty       = dutyToStop + pf;
     var shiftEnd   = (report + duty) % 1440;
     var restHours  = wtCalcRest(duty, settings.restType);
@@ -749,39 +761,59 @@
 
     var html = '<div class="wt-timeline-container">';
 
-    /* ── Заголовок: метки сетки ── */
+    /* ── Заголовок: метки событий (Task 52: только реальные времена) ──
+     *  Узкие экраны (max-width:560px) — Вариант A: только метки событий
+     *  Широкие экраны — Вариант B: gridlines + метки событий (метки сетки убраны) */
     html += '<div class="wt-timeline-header">';
-    var gridMin = reportMin;
-    var lastLabelPct = 0;
-    while (gridMin < timelineEnd + 1) {
-      var pct = timelinePct(gridMin);
-      if (pct > 100.05) break;
-      var clampedPct = Math.min(pct, 100);
-      html += '<span class="wt-timeline-label-pos" style="--pct:' + clampedPct.toFixed(2) + '%;">'
-        + fmtLabel(gridMin) + '</span>';
-      lastLabelPct = clampedPct;
-      gridMin += step;
+
+    // Метки сетки — УБРАНЫ (Task 52), заменены на метки событий ниже
+
+    // Метка «Явка» (слева, всегда)
+    html += '<span class="wt-timeline-label-pos wt-timeline-label--event" style="--pct:0%;">'
+      + fmtLabel(reportMin) + '</span>';
+
+    // Метки Запуск/Выключение для каждого сегмента
+    for (var _si = 0; _si < segments.length; _si++) {
+      var _seg = segments[_si];
+      var _isSh2Ev = (_seg.shift === 2);
+      var _startPct = timelinePct(_seg.engineStart, _isSh2Ev);
+      var _stopPct = timelinePct(_seg.engineStop, _isSh2Ev);
+      if (_startPct >= 0 && _startPct <= 100) {
+        html += '<span class="wt-timeline-label-pos wt-timeline-label--event wt-timeline-label--start" style="--pct:' + _startPct.toFixed(2) + '%;">'
+          + fmtLabel(_seg.engineStart) + '</span>';
+      }
+      if (_stopPct >= 0 && _stopPct <= 100) {
+        html += '<span class="wt-timeline-label-pos wt-timeline-label--event wt-timeline-label--stop" style="--pct:' + _stopPct.toFixed(2) + '%;">'
+          + fmtLabel(_seg.engineStop) + '</span>';
+      }
     }
-    // Метка «Конец» справа — если последняя метка сетки не у правого края (≥98%)
-    if (lastLabelPct < 98) {
-      html += '<span class="wt-timeline-label-end">'
-        + fmtLabel(timelineEnd) + '</span>';
+
+    // Метка «Конец смены» (справа, только после finalize ИЛИ splitSegEnd)
+    if (splitSegEnd && results && results.duty1 !== undefined) {
+      var _seg1EndAbs = reportMin + results.duty1;
+      var _seg1EndPct = Math.min(timelinePct(_seg1EndAbs, false), 100);
+      html += '<span class="wt-timeline-label-pos wt-timeline-label--event wt-timeline-label--end" style="--pct:' + _seg1EndPct.toFixed(2) + '%;">'
+        + fmtLabel(_seg1EndAbs) + '</span>';
+    } else if (_wtFinalized) {
+      var _endMin = (reportMin + timelineDuration + _restGapMin) % 1440;
+      html += '<span class="wt-timeline-label-end wt-timeline-label--event wt-timeline-label--end">'
+        + fmtLabel(_endMin) + '</span>';
     }
     html += '</div>';
 
     /* ── Трек ── */
     html += '<div class="wt-timeline-track">';
 
-    /* ── Линии сетки ── */
+    /* ── Линии сетки (Task 52: только для широких экранов, через CSS .wt-timeline-gridline--bg) ── */
     var _gridPcts = [];          // collect drawn gridline positions
-    gridMin = reportMin;
+    var gridMin = reportMin;
     while (gridMin < timelineEnd + 1) {
       var gPct = timelinePct(gridMin);
       if (gPct > 100.05) break;
       var gClamped = Math.min(gPct, 100);
       var isEdge = (gridMin === reportMin || gridMin >= timelineEnd);
       var isMidnight = (gridMin % 1440 === 0) && !isEdge;
-      var gClass = 'wt-timeline-gridline';
+      var gClass = 'wt-timeline-gridline wt-timeline-gridline--bg';
       if (isMidnight) gClass += ' wt-timeline-gridline--midnight';
       if (isEdge) gClass += ' wt-timeline-gridline--edge';
       html += '<div class="' + gClass + '" style="--pct:' + gClamped.toFixed(2) + '%;"></div>';
@@ -793,11 +825,10 @@
       var midnightOffset = (1440 - reportMin) % 1440;
       if (midnightOffset > 0 && midnightOffset < timelineDuration) {
         var midPct = (midnightOffset / timelineDuration * 100).toFixed(2);
-        // Проверяем что ещё не рисовали на этом месте (±1% допуск)
         var _midNum = parseFloat(midPct);
         var _alreadyDrawn = _gridPcts.some(function(p){ return Math.abs(p - _midNum) < 1; });
         if (!_alreadyDrawn) {
-          html += '<div class="wt-timeline-gridline wt-timeline-gridline--midnight" style="--pct:' + midPct + '%;"></div>';
+          html += '<div class="wt-timeline-gridline wt-timeline-gridline--bg wt-timeline-gridline--midnight" style="--pct:' + midPct + '%;"></div>';
         }
       }
     }

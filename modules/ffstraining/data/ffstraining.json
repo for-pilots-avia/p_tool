@@ -20,7 +20,9 @@
             "index": 0
           }
         ],
-        "{{items:normal}}": "ИЮЛЬ 2026.",
+        "{{items:normal}}": [
+          "АВГУСТ 2026."
+        ],
         "tables": [
           {
             "src": "modules/ffstraining/data/B737_Ульяновск.html"
@@ -42,7 +44,9 @@
             "index": 0
           }
         ],
-        "{{items:normal}}": "ИЮЛЬ 2026.",
+        "{{items:normal}}": [
+          "АВГУСТ 2026. Сессий не запланированно."
+        ],
         "tables": [
           {
             "src": "modules/ffstraining/data/B737_Санкт-Петербург.html"
@@ -85,7 +89,9 @@
             "type": "references"
           }
         ],
-        "{{items:normal}}": "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.\nТренажерные сессии периодической подготовки проводятся в течение 2-х последовательных дней. Продолжительность ежедневной подготовки на КТС и времени отдыха должны соответствовать требованиям Главы 7 части А РПП. Подготовка на тренажере проводится инструкторами, допущенными к данному виду подготовки. Устройство имитации полета (тренажер) должно быть одобрено уполномоченным органом в области ГА и соответствовать типу и модификациям ВС, эксплуатируемым в Авиапредприятии. Допускаются отклонения в конфигурации, кабине, типах двигателей, пилотажно- навигационном оборудовании ВС, если это не требует дополнительных навыков в эксплуатации и не оказывает влияние на выполнение тренажерной подготовки в полном объеме.\nДокументация (в том числе для проведения тренажерной подготовки) может быть представлена как в бумажном, так и в электронном виде.\nКВС, допущенные к выполнению полетов с правого пилотского сиденья, и пилоты-инструкторы могут проходить тренажерную подготовку, как с левого, так и с правого пилотского сидения.\nВ случае производственной необходимости допускается прохождение периодической тренировки и проверки на тренажере пилотами равной квалификации (двух вторых пилотов или двух КВС, не имеющих допуск к полетам с правого пилотского сидения) при соблюдении следующих условий:\n- в процессе тренировки и проверки на КТС пилоты выполняют функции пилотирующего (PF), занимая пилотское сидение согласно своей квалификации;\n- при выполнении заходов на посадку и посадок в условиях II/III категории ИКАО и взлетов при видимости на ВПП менее 400 м, допускается выполнение функций пилотирующего пилота с пилотского сидения не своей квалификации.\nВ случае если один из тренируемых пилотов не может продолжать подготовку на тренажере, допускается занятие пилотом-инструктором свободного кресла пилота для завершения подготовки другого пилота.",
+        "{{items:normal}}": [
+          "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.\nТренажерные сессии периодической подготовки проводятся в течение 2-х последовательных дней. Продолжительность ежедневной подготовки на КТС и времени отдыха должны соответствовать требованиям Главы 7 части А РПП. Подготовка на тренажере проводится инструкторами, допущенными к данному виду подготовки. Устройство имитации полета (тренажер) должно быть одобрено уполномоченным органом в области ГА и соответствовать типу и модификациям ВС, эксплуатируемым в Авиапредприятии. Допускаются отклонения в конфигурации, кабине, типах двигателей, пилотажно- навигационном оборудовании ВС, если это не требует дополнительных навыков в эксплуатации и не оказывает влияние на выполнение тренажерной подготовки в полном объеме.\nДокументация (в том числе для проведения тренажерной подготовки) может быть представлена как в бумажном, так и в электронном виде.\nКВС, допущенные к выполнению полетов с правого пилотского сиденья, и пилоты-инструкторы могут проходить тренажерную подготовку, как с левого, так и с правого пилотского сидения.\nВ случае производственной необходимости допускается прохождение периодической тренировки и проверки на тренажере пилотами равной квалификации (двух вторых пилотов или двух КВС, не имеющих допуск к полетам с правого пилотского сидения) при соблюдении следующих условий:\n- в процессе тренировки и проверки на КТС пилоты выполняют функции пилотирующего (PF), занимая пилотское сидение согласно своей квалификации;\n- при выполнении заходов на посадку и посадок в условиях II/III категории ИКАО и взлетов при видимости на ВПП менее 400 м, допускается выполнение функций пилотирующего пилота с пилотского сидения не своей квалификации.\nВ случае если один из тренируемых пилотов не может продолжать подготовку на тренажере, допускается занятие пилотом-инструктором свободного кресла пилота для завершения подготовки другого пилота."
+        ],
         "references": [
           "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
         ]
@@ -103,7 +109,9 @@
             "type": "references"
           }
         ],
-        "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
+        "{{items:normal}}": [
+          "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур."
+        ],
         "references": [
           "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
         ]
@@ -118,7 +126,9 @@
             "key": "{{items:normal}}"
           }
         ],
-        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        "{{items:normal}}": [
+          "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        ]
       },
       {
         "id": "ffs-instr-ebt",
@@ -130,7 +140,9 @@
             "key": "{{items:normal}}"
           }
         ],
-        "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        "{{items:normal}}": [
+          "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        ]
       },
       {
         "id": "ffs-instr-specials",
@@ -142,7 +154,9 @@
             "key": "{{items:abnormal}}"
           }
         ],
-        "{{items:abnormal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        "{{items:abnormal}}": [
+          "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        ]
       },
       {
         "id": "ffs-instr-ban",
@@ -154,7 +168,9 @@
             "key": "{{items:emergency}}"
           }
         ],
-        "{{items:emergency}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        "{{items:emergency}}": [
+          "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+        ]
       }
     ],
     "blocks": [
@@ -195,7 +211,9 @@
         "key": "{{items:normal}}"
       }
     ],
-    "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+    "{{items:normal}}": [
+      "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+    ]
   },
   {
     "id": "ffs-instr-brief",
@@ -216,7 +234,9 @@
             "type": "references"
           }
         ],
-        "{{items:normal}}": "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности.",
+        "{{items:normal}}": [
+          "Настоящая Инструкция разработана в целях стандартизации, отработки всех необходимых элементов и полного обзора основных систем самолета.\nОсновная цель: поддержание и повышение уровня профессиональной подготовки ЧЛЭ, подготовка к проведению проверки на тренажере. Результатом тренировки и проверки должна стать твердая уверенность ЧЛЭ в своих знаниях и способностях, позволяющих выполнить полет с высоким уровнем безопасности."
+        ],
         "references": [
           "i01-37 Инструкция по проведению тренировок и проверок летного состава на КТС."
         ]
@@ -356,9 +376,15 @@
               {
                 "type": "child-ref",
                 "index": 18
+              },
+              {
+                "type": "child-ref",
+                "index": 19
               }
             ],
-            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/20KT 6000 +25/+20 OVC 2500 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "{{items:info:FFS settings (Ульяновск)}}": [
+              "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/20KT 6000 +25/+20 OVC 2500 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:"
+            ],
             "tables": [
               {
                 "src": "modules/ffstraining/data/tables/perf_R1.html"
@@ -424,7 +450,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Стандартная подготовка тренажёра и кабины к тренировке.\nLanding Gear Lever Will Not Move Up After Takeoff – до взлёта активируется отказ AIR/Ground Sensor.\nПосле взлёта - сдвиг ветра."
+                "{{items:info}}": [
+                  "Стандартная подготовка тренажёра и кабины к тренировке.\nLanding Gear Lever Will Not Move Up After Takeoff – до взлёта активируется отказ AIR/Ground Sensor.\nПосле взлёта - сдвиг ветра."
+                ]
               },
               {
                 "id": "ffs-refr1-1",
@@ -440,28 +468,23 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• \"WINDSHEAR, MAXIMUM THRUST\"\n• Положение рук на штурвале;\n• Тангаж 15°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Выход из WS."
+                ]
               },
               {
-                "id": "ffs-0201a",
-                "title": "INFO",
-                "duration": "РПП, FCTM",
+                "id": "ffs-chk020",
+                "title": "Maneuver",
+                "duration": "Windshear escape",
                 "layout": "child",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_WS.html"
+                  }
+                ],
                 "blocks": [
                   {
-                    "type": "items",
-                    "key": "{{items:normal}}"
-                  },
-                  {
-                    "type": "items",
-                    "key": "{{items:abnormal}}"
-                  },
-                  {
-                    "type": "items",
-                    "key": "{{items:emergency:Memory items}}"
-                  },
-                  {
-                    "type": "child-ref",
+                    "type": "table-file",
                     "index": 0
                   },
                   {
@@ -470,41 +493,55 @@
                   },
                   {
                     "type": "references"
+                  }
+                ],
+                "{{items:success:Критерии}}": [
+                  "RESERVED"
+                ],
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              },
+              {
+                "id": "ffs-chk0200c",
+                "title": "INFO",
+                "duration": "РПП, FCOM, FCTM",
+                "layout": "child",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:SOP}}"
+                  },
+                  {
+                    "type": "references"
                   },
                   {
                     "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "RESERVED.",
-                "{{items:abnormal}}": "RESERVED",
-                "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
-                "children": [
-                  {
-                    "id": "ffs-text-3-6-day1-2",
-                    "layout": "text",
-                    "blocks": [
-                      {
-                        "type": "items",
-                        "key": "{{items:normal}}"
-                      }
-                    ],
-                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками"
-                  }
+                "{{items:normal}}": [
+                  "{{badge:success:FCOM SP 16}} Takeoff\n• Full rated takeoff thrust is recommended, unless the use of a fixed derate is required to meet a dispatch performance requirement;\n• Use flaps 5, 10 or 15 unless limited by obstacle clearance and/or climb gradient;\n• Use the longest suitable runway provided it is clear of areas of known windshear;\n• Consider increasing Vr speed to the performance limited gross weight rotation speed, not to exceed actual gross weight Vr + 20 knots. Set V speeds for the actual gross weight. Rotate at the adjusted (higher) rotation speed. If windshear is encountered at or beyond the actual gross weight Vr, do not attempt to accelerate to the increased Vr but rotate without hesitation;\n• Be alert for any airspeed fluctuations during takeoff and initial climb. Such fluctuations may be the first indication of windshear;\n• Know the all–engine initial climb pitch attitude. Rotate at the normal rate to this attitude for all non–engine failure takeoffs. Minimize reductions from the initial climb pitch attitude until terrain and\nobstruction clearance is assured, unless stick shaker activates;\n• Crew coordination and awareness are very important. Develop an awareness of normal values of airspeed, attitude, vertical speed, and airspeed buildup. Closely monitor vertical flight path instruments such as vertical speed and altimeters. The pilot monitoring should be especially aware of vertical flight path instruments and call out any deviations from normal;\n• Should airspeed fall below the trim airspeed, unusual control column forces may be required to maintain the desired pitch attitude. If stick shaker is encountered, reduce pitch attitude. Do not exceed the Pitch Limit Indication."
                 ],
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:success:SOP}}": [
+                  "{{badge:abnormal:WINDSHEAR CAUTION}}\nFor predictive windshear caution alert: (\"MONITOR RADAR DISPLAY\" aural).\n <table style=\"overflow-wrap:break-word;min-width:0\"><thead><tr>\n<th>Pilot Flying</th>\n<th>Pilot Monitoring</th></tr></thead>\n<tbody><tr><td colspan=\"2\">\nManeuver as needed to avoid the windshear\n</td></tr></tbody></table>\nPredictive windshear warning during takeoff roll: (\"WINDSHEAR AHEAD, WINDSHEAR AHEAD\")\n− Before V1, reject takeoff.\n− After V1, perform the Windshear Escape Maneuver.\nWindshear encountered during takeoff roll:\n− If windshear is encountered before V1, there may not be sufficient runway remaining to stop if an RTO is initiated at V1. At VR, rotate at a normal rate toward a 15 degree pitch attitude. Once airborne, perform the Windshear Escape Maneuver.\n− If windshear is encountered near the normal rotation speed and airspeed suddenly decreases, there may not be sufficient runway left to accelerate back to normal takeoff speed. If there is insufficient runway left to stop, initiate a normal rotation at least 2,000 feet before the end of the runway, even if airspeed is low. Higher than normal attitudes may be needed to lift off in the remaining runway. Ensure maximum thrust is set."
+                ],
                 "references": [
-                  "FCOM Vol. 1 — Takeoff Performance"
+                  "FCTM Windshear — 7.26"
                 ],
                 "documents": [
                   {
-                    "title": "QRH — Engine Failure стр. 22",
+                    "title": "SOP B737 — 4.5.6. Windshear",
                     "src": "modules/docs/AOMB.pdf",
-                    "page": 22
+                    "page": 233
                   }
                 ]
               },
               {
-                "id": "ffs-text-3-6-day1-3",
+                "id": "ffs-text-3-6-day1-2",
                 "layout": "text",
                 "blocks": [
                   {
@@ -512,7 +549,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "После выхода из сдвига ветра полёт в зону ожидания (точка зоны ожидания на усмотрение инструктора), обработка отказа, выполнение NNC и принятие решения о возврате на аэродром вылета."
+                "{{items:info}}": [
+                  "После выхода из сдвига ветра полёт в зону ожидания (точка зоны ожидания на усмотрение инструктора), обработка отказа, выполнение NNC и принятие решения о возврате на аэродром вылета."
+                ]
               },
               {
                 "id": "ffs-refr1-1-2",
@@ -528,7 +567,9 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
                 "id": "ffs-sysa",
@@ -537,17 +578,17 @@
                 "layout": "card",
                 "images": [
                   {
-                    "src": "modules/ffstraining/data/QRH_sysa_1.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_1.png",
                     "caption": "1",
                     "alt": "1"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_sysa_2.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_2.png",
                     "caption": "2",
                     "alt": "2"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_sysa_3.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_3.png",
                     "caption": "3",
                     "alt": "3"
                   }
@@ -568,9 +609,9 @@
                 ]
               },
               {
-                "id": "ffs-0201a-2",
+                "id": "ffs-0201a",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -600,9 +641,15 @@
                     "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "RESERVED.",
-                "{{items:abnormal}}": "RESERVED",
-                "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
+                "{{items:normal}}": [
+                  "RESERVED."
+                ],
+                "{{items:abnormal}}": [
+                  "RESERVED"
+                ],
+                "{{items:emergency:Memory items}}": [
+                  "RESERVED {{badge:abnormal:КРИТ}}"
+                ],
                 "children": [
                   {
                     "id": "ffs-text-3-6-day2",
@@ -613,16 +660,20 @@
                         "key": "{{items:normal}}"
                       }
                     ],
-                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                    "{{items:normal}}": [
+                      "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                    ]
                   }
                 ],
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:success:Критерии}}": [
+                  "RESERVED"
+                ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ],
                 "documents": [
                   {
-                    "title": "QRH — Engine Failure стр. 22",
+                    "title": "QRH — Engine Failure",
                     "src": "modules/docs/AOMB.pdf",
                     "page": 22
                   }
@@ -642,10 +693,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-4",
+                "id": "ffs-text-3-6-day1-3",
                 "layout": "text",
                 "blocks": [
                   {
@@ -653,7 +706,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Визуальный заход на полосу 36R\nУход на второй круг непосредственно перед касанием - GA ≤ 50 (любая удобная причина)\nСмена погоды: CAT I\nПосле выполнения процедуры GA и AFTER T/O C/L – REPOSITION RW36R 6 NM."
+                "{{items:info}}": [
+                  "Визуальный заход на полосу 36R\nУход на второй круг непосредственно перед касанием - GA ≤ 50 (любая удобная причина)\nСмена погоды: CAT I\nПосле выполнения процедуры GA и AFTER T/O C/L – REPOSITION RW36R 6 NM."
+                ]
               },
               {
                 "id": "ffs-refr1-1-4",
@@ -669,10 +724,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-5",
+                "id": "ffs-text-3-6-day1-4",
                 "layout": "text",
                 "blocks": [
                   {
@@ -680,7 +737,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "ILS APP RW36R RAW DATA (FD FAIL) – RAW DATA опционально на усмотрение инструктора."
+                "{{items:info}}": [
+                  "ILS APP RW36R RAW DATA (FD FAIL) – RAW DATA опционально на усмотрение инструктора."
+                ]
               },
               {
                 "id": "ffs-refr1-1-5",
@@ -693,26 +752,70 @@
                 "blocks": [
                   {
                     "type": "items",
+                    "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}}\n• ATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON\n{{badge:info:С.-Петербург}}\n• AIRCRAFT -> ATTITUDE & UPSETS ->EGPWS VIRTUAL MOUNTAIN -> INCREASE"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• Без TO/GA;\n• Тангаж 20°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Определение окончания маневра. (MSA ... )"
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-6",
-                "layout": "text",
+                "id": "ffs-shlq",
+                "title": "Maneuver",
+                "duration": "GPWS Response",
+                "layout": "card",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_GPWS.html"
+                  }
+                ],
                 "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  },
                   {
                     "type": "items",
                     "key": "{{items:info}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
                   }
                 ],
-                "{{items:info}}": "EGPWS WARNING at DA."
+                "{{items:info}}": [
+                  "NOTE: Aft control column force increases as the airspeed decreases. In all cases, the pitch attitude that results in intermittent stick shaker or initial buffet is the upper pitch attitude limit. Flight at intermittent stick shaker may be needed to obtain a positive terrain separation. Use smooth, steady control to avoid a pitch attitude overshoot and stall.\nNOTE: Do not use flight director commands.\nNOTE: *Maximum thrust can be obtained by advancing the thrust levers full forward if the EECs are in the normal mode. If terrain contact is imminent, advance thrust levers full forward.\nNOTE: Except for mountain area, if the RW is in-sight and positive visual verification is made that no obstacle or terrain hazard exists when flying under daylight VMC conditions before a terrain or obstacle warning, the alert may be regarded as cautionary and the approach may be continued.\n\n<b>Предупреждение: при заходе на посадку и срабатывании звуковой сигнализации:\n\"PULL UP\" or \"TERRAIN, TERRAIN PULL UP\" \"PULL UP\" or \"OBSTACLE, OBSTACLE PULL UP\"</b>\n<u>На горном аэродроме</u> – {{badge:info:ВЫПОЛНИТЬ GPWS ESCAPE MANEUVER!}}\nВ остальных случаях, только днём в визуальных метеоусловиях при устойчивой видимости ВПП заход может быть продолжен при условии, что экипаж визуально имел полную уверенность в отсутствии опасности от препятствий до срабатывания сигнализации.\n<u>В случае наличия проблем с сигналом GPS</u> для исключения ложного срабатывания сигнализации GPWS КВС может рассмотреть возможность перевода переключателя \"TERR INHIBIT\" в положение \"TERR INHIBIT\" перед выполнением захода на посадку в следующих случаях:\n– FMC message \"GPS_L/R INVALID\" и/или \"UNABLE REQD NAV PERF – RNP\" и/или \"VERIFY POS: FMC-GPS\";\n– \"TERR POS\" на ND;\n– активация сигнального табло GPS;\n– после ухода на второй круг в случае, если у экипажа имеется обоснованная уверенность в том, что срабатывание сигнализации было ложным (визуальные условия и/или захват LOC & G/S при заходе по ILS)."
+                ],
+                "references": [
+                  "FCTM Terrain Avoidance — 7.18"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.3. Ground Proximity Warning System (GPWS) Response",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 227
+                  }
+                ]
               }
             ],
-            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
-            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\".",
-            "{{items:success:Failures}}": "{{badge:abnormal:Landing Gear Lever Will Not Move Up After Takeoff.}}\nУльяновск:\n• ATA 32 -> AIR/GND SENSOR FAIL IN POSITION – MAIN GEAR -> L1 + L2\nС.-Петербург:\n• ATA 32 -> 9 AIR/GROUND ->AIR/GROUND SENSOR FAIL -> FAIL"
+            "{{items:success:FMS Memory}}": [
+              "LTAI RW36C взлёт"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            ],
+            "{{items:success:Failures}}": [
+              "{{badge:abnormal:Landing Gear Lever Will Not Move Up After Takeoff.}}\n{{badge:info:Ульяновск}}\n• ATA 32 -> AIR/GND SENSOR FAIL IN POSITION – MAIN GEAR -> L1 + L2\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 9 AIR/GROUND ->AIR/GROUND SENSOR FAIL -> FAIL"
+            ]
           },
           {
             "id": "ffs-0201-2",
@@ -781,7 +884,9 @@
                 "index": 9
               }
             ],
-            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/20KT CAT I +25/+20 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "{{items:info:FFS settings (Ульяновск)}}": [
+              "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/20KT CAT I +25/+20 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:"
+            ],
             "tables": [
               {
                 "src": "modules/ffstraining/data/tables/perf_R1.html"
@@ -852,10 +957,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-7",
+                "id": "ffs-text-3-6-day1-5",
                 "layout": "text",
                 "blocks": [
                   {
@@ -863,7 +970,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "После взлёта проводники с задней \"кухни\" сообщают, что почувствовали отчётливое касание хвостовой частью фюзеляжа о ВПП, диспетчер сообщает, что видел искры в районе хвостовой части ВС в момент отрыва ВС от полосы.\nSYS B HYD PUMP OVERHEAT.\nATA 29 -> ELECTRIC PUMP OVERHEAT –> EMDP 1-B"
+                "{{items:info}}": [
+                  "После взлёта проводники с задней \"кухни\" сообщают, что почувствовали отчётливое касание хвостовой частью фюзеляжа о ВПП, диспетчер сообщает, что видел искры в районе хвостовой части ВС в момент отрыва ВС от полосы.\nSYS B HYD PUMP OVERHEAT.\nATA 29 -> ELECTRIC PUMP OVERHEAT –> EMDP 1-B"
+                ]
               },
               {
                 "id": "ffs-refr1-2-2",
@@ -879,10 +988,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-8",
+                "id": "ffs-text-3-6-day1-6",
                 "layout": "text",
                 "blocks": [
                   {
@@ -890,7 +1001,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Полёт в зону ожидания, обработка отказа, выполнение NNC и принятия решения о возврате на аэродром вылета.\nILS APP RW36R, при подходе к DA – уход на второй круг (по любой причине)\nПосле выполнения манёвра GA – ENG 2 SEVER DAMAGE (R ENG)\nНа данном этапе полностью отсутствует гидросистема B, экипажу необходимо прочитать NNC LOSS OF SYS B\nПосле выполнения NNC LOS OF SYS B и подготовки к посадке REPOSITION RW36R 6 NM"
+                "{{items:info}}": [
+                  "Полёт в зону ожидания, обработка отказа, выполнение NNC и принятия решения о возврате на аэродром вылета.\nILS APP RW36R, при подходе к DA – уход на второй круг (по любой причине)\nПосле выполнения манёвра GA – ENG 2 SEVER DAMAGE (R ENG)\nНа данном этапе полностью отсутствует гидросистема B, экипажу необходимо прочитать NNC LOSS OF SYS B\nПосле выполнения NNC LOS OF SYS B и подготовки к посадке REPOSITION RW36R 6 NM"
+                ]
               },
               {
                 "id": "ffs-refr1-2-3",
@@ -906,10 +1019,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-9",
+                "id": "ffs-text-3-6-day1-7",
                 "layout": "text",
                 "blocks": [
                   {
@@ -917,11 +1032,17 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "ONE ENG RW36R."
+                "{{items:info}}": [
+                  "ONE ENG RW36R."
+                ]
               }
             ],
-            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
-            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            "{{items:success:FMS Memory}}": [
+              "LTAI RW36C взлёт"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            ]
           },
           {
             "id": "ffs-day1-0-2",
@@ -983,7 +1104,9 @@
                 "index": 6
               }
             ],
-            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT CAT II +25/+25 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "{{items:info:FFS settings (Ульяновск)}}": [
+              "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT CAT II +25/+25 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:"
+            ],
             "tables": [
               {
                 "src": "modules/ffstraining/data/tables/perf_R1.html"
@@ -1054,10 +1177,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-10",
+                "id": "ffs-text-3-6-day1-8",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1065,7 +1190,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Взлёт отказ двигателя (любой приводящий к потере тяги) после V1.\nВыполнение EOSID\nСмена погоды: CAT I"
+                "{{items:info}}": [
+                  "Взлёт отказ двигателя (любой приводящий к потере тяги) после V1.\nВыполнение EOSID\nСмена погоды: CAT I"
+                ]
               },
               {
                 "id": "ffs-refr1-3-2",
@@ -1081,10 +1208,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-11",
+                "id": "ffs-text-3-6-day1-9",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1092,11 +1221,17 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Заход на посаду ILS APP RW36R ONE ENG CAT I\nУход на второй круг на высоте DA (по любой причине)\nREPOSITION 6 NM RW36R\nПовторный заход ILS APP RW36R ONE ENG CAT I"
+                "{{items:info}}": [
+                  "Заход на посаду ILS APP RW36R ONE ENG CAT I\nУход на второй круг на высоте DA (по любой причине)\nREPOSITION 6 NM RW36R\nПовторный заход ILS APP RW36R ONE ENG CAT I"
+                ]
               }
             ],
-            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
-            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            "{{items:success:FMS Memory}}": [
+              "LTAI RW36C взлёт"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            ]
           },
           {
             "id": "ffs-0201-4",
@@ -1187,9 +1322,15 @@
               {
                 "type": "child-ref",
                 "index": 15
+              },
+              {
+                "type": "child-ref",
+                "index": 16
               }
             ],
-            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT CAT II +25/+25 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "{{items:info:FFS settings (Ульяновск)}}": [
+              "{{badge:success:Position Set}}: LTAI RW36C взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT CAT II +25/+25 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:"
+            ],
             "tables": [
               {
                 "src": "modules/ffstraining/data/tables/perf_R1.html"
@@ -1260,10 +1401,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-12",
+                "id": "ffs-text-3-6-day1-10",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1271,7 +1414,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Взлёт, отказ двигателя до V1(любой отказ, приводящий к потере тяги двигателя) – RTO\nПовторный взлёт RW36С\nСмена погоды: CAT I"
+                "{{items:info}}": [
+                  "Взлёт, отказ двигателя до V1(любой отказ, приводящий к потере тяги двигателя) – RTO\nПовторный взлёт RW36С\nСмена погоды: CAT I"
+                ]
               },
               {
                 "id": "ffs-refr1-4-2",
@@ -1287,10 +1432,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-13",
+                "id": "ffs-text-3-6-day1-11",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1298,7 +1445,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "EGPWS WARNING at DA."
+                "{{items:info}}": [
+                  "EGPWS WARNING at DA."
+                ]
               },
               {
                 "id": "ffs-refr1-4-3",
@@ -1314,10 +1463,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-14",
+                "id": "ffs-text-3-6-day1-12",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1325,7 +1476,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Повторный взлёт – CARGO FIRE (гасимый) после взлёта.\nATA 26 -> CARGO FIRE -> FWD (AFT)\nВыполнение NNC, принятие решения на возврат на а/д вылета, подготовка к посадке.\nILS X APP RW36R RAW DATA (FD FAIL) - RAW DATA опционально на усмотрение инструктора\nПри подходе к DA – EGPWS WARNING\nATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON"
+                "{{items:info}}": [
+                  "Повторный взлёт – CARGO FIRE (гасимый) после взлёта.\nATA 26 -> CARGO FIRE -> FWD (AFT)\nВыполнение NNC, принятие решения на возврат на а/д вылета, подготовка к посадке.\nILS X APP RW36R RAW DATA (FD FAIL) - RAW DATA опционально на усмотрение инструктора\nПри подходе к DA – EGPWS WARNING"
+                ]
               },
               {
                 "id": "ffs-refr1-4-4",
@@ -1338,13 +1491,62 @@
                 "blocks": [
                   {
                     "type": "items",
+                    "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}}\n• ATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON\n{{badge:info:С.-Петербург}}\n• AIRCRAFT -> ATTITUDE & UPSETS ->EGPWS VIRTUAL MOUNTAIN -> INCREASE"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• Без TO/GA;\n• Тангаж 20°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Определение окончания маневра. (MSA ... )"
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-15",
+                "id": "ffs-shlq-2",
+                "title": "Maneuver",
+                "duration": "GPWS Response",
+                "layout": "card",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_GPWS.html"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:info}}": [
+                  "NOTE: Aft control column force increases as the airspeed decreases. In all cases, the pitch attitude that results in intermittent stick shaker or initial buffet is the upper pitch attitude limit. Flight at intermittent stick shaker may be needed to obtain a positive terrain separation. Use smooth, steady control to avoid a pitch attitude overshoot and stall.\nNOTE: Do not use flight director commands.\nNOTE: *Maximum thrust can be obtained by advancing the thrust levers full forward if the EECs are in the normal mode. If terrain contact is imminent, advance thrust levers full forward.\nNOTE: Except for mountain area, if the RW is in-sight and positive visual verification is made that no obstacle or terrain hazard exists when flying under daylight VMC conditions before a terrain or obstacle warning, the alert may be regarded as cautionary and the approach may be continued.\n\n<b>Предупреждение: при заходе на посадку и срабатывании звуковой сигнализации:\n\"PULL UP\" or \"TERRAIN, TERRAIN PULL UP\" \"PULL UP\" or \"OBSTACLE, OBSTACLE PULL UP\"</b>\n<u>На горном аэродроме</u> – {{badge:info:ВЫПОЛНИТЬ GPWS ESCAPE MANEUVER!}}\nВ остальных случаях, только днём в визуальных метеоусловиях при устойчивой видимости ВПП заход может быть продолжен при условии, что экипаж визуально имел полную уверенность в отсутствии опасности от препятствий до срабатывания сигнализации.\n<u>В случае наличия проблем с сигналом GPS</u> для исключения ложного срабатывания сигнализации GPWS КВС может рассмотреть возможность перевода переключателя \"TERR INHIBIT\" в положение \"TERR INHIBIT\" перед выполнением захода на посадку в следующих случаях:\n– FMC message \"GPS_L/R INVALID\" и/или \"UNABLE REQD NAV PERF – RNP\" и/или \"VERIFY POS: FMC-GPS\";\n– \"TERR POS\" на ND;\n– активация сигнального табло GPS;\n– после ухода на второй круг в случае, если у экипажа имеется обоснованная уверенность в том, что срабатывание сигнализации было ложным (визуальные условия и/или захват LOC & G/S при заходе по ILS)."
+                ],
+                "references": [
+                  "FCTM Terrain Avoidance — 7.18"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.3. Ground Proximity Warning System (GPWS) Response",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 227
+                  }
+                ]
+              },
+              {
+                "id": "ffs-text-3-6-day1-13",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1352,7 +1554,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "После завершения манёвра – REPOSITION 6 NM RW36R\nILS X APP RW 36R (FD FAIL) - RAW DATA опционально на усмотрение инструктора"
+                "{{items:info}}": [
+                  "После завершения манёвра – REPOSITION 6 NM RW36R\nILS X APP RW 36R (FD FAIL) - RAW DATA опционально на усмотрение инструктора"
+                ]
               },
               {
                 "id": "ffs-refr1-4-5",
@@ -1368,10 +1572,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-text-3-6-day1-16",
+                "id": "ffs-text-3-6-day1-14",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1379,11 +1585,17 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "НЕТ в программе."
+                "{{items:info}}": [
+                  "НЕТ в программе."
+                ]
               }
             ],
-            "{{items:success:FMS Memory}}": "LTAI RW36C взлёт",
-            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            "{{items:success:FMS Memory}}": [
+              "LTAI RW36C взлёт"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW36C via TEWHE2J, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 36C, cleared for T/O\"."
+            ]
           },
           {
             "id": "ffs-0201-5",
@@ -1420,7 +1632,9 @@
                 "index": 1
               }
             ],
-            "{{items:info:FFS settings (Ульяновск)}}": "{{badge:success:Position Set}}: LTAI RW36C 8NM\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT VIS 3000 OVC 800 +25/+20 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "{{items:info:FFS settings (Ульяновск)}}": [
+              "{{badge:success:Position Set}}: LTAI RW36C 8NM\n{{badge:success:Environtment Set}}: <b>NIGHT, 300/15KT VIS 3000 OVC 800 +25/+20 Q1005, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:"
+            ],
             "tables": [
               {
                 "src": "modules/ffstraining/data/tables/perf_R1.html"
@@ -1478,7 +1692,7 @@
                 ]
               },
               {
-                "id": "ffs-text-3-6-day1-17",
+                "id": "ffs-text-3-6-day1-15",
                 "layout": "text",
                 "blocks": [
                   {
@@ -1486,11 +1700,17 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "LDG mishandling corrections (высокое выравнивание, взмывание, отделение ВС, \"подныривание\" под глиссаду, не выпуск спойлеров в автоматическом режиме)"
+                "{{items:info}}": [
+                  "LDG mishandling corrections (высокое выравнивание, взмывание, отделение ВС, \"подныривание\" под глиссаду, не выпуск спойлеров в автоматическом режиме)"
+                ]
               }
             ],
-            "{{items:success:FMS Memory}}": "LTAI RW36C 8NM",
-            "{{items:normal:Radio script}}": "<b>ATC</b>: NWS, RW36C cleared to land."
+            "{{items:success:FMS Memory}}": [
+              "LTAI RW36C 8NM"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC</b>: NWS, RW36C cleared to land."
+            ]
           }
         ],
         "blocks": [
@@ -1556,10 +1776,6 @@
               {
                 "type": "table-file",
                 "index": 0
-              },
-              {
-                "type": "table-file",
-                "index": 1
               },
               {
                 "type": "child-ref",
@@ -1638,19 +1854,18 @@
                 "index": 15
               },
               {
-                "type": "items",
-                "key": "{{items:emergency:Instructor Notes}}"
+                "type": "child-ref",
+                "index": 16
               },
               {
                 "type": "child-ref",
-                "index": 16
+                "index": 17
               }
             ],
-            "{{items:info:FFS settings}}": "{{badge:success:Position Set}}: URSS RW20 взлёт\n{{badge:success:Environtment Set}}: <b>NIGHT, 200/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}}:",
+            "{{items:info:FFS settings}}": [
+              "{{badge:success:Position Set}}: URSS RW20 взлёт F15\n{{badge:success:Environtment Set}}: <b>NIGHT, 200/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
+            ],
             "tables": [
-              {
-                "src": "modules/ffstraining/data/tables/perf_R2.html"
-              },
               {
                 "src": "modules/ffstraining/data/tables/br_R-6.html"
               }
@@ -1705,7 +1920,7 @@
               },
               {
                 "id": "ffs-refr1-1-6",
-                "title": "1 HYDRAULIC FAILURE",
+                "title": "1 HYDRAULIC FAILURE sys A",
                 "layout": "divider"
               },
               {
@@ -1721,8 +1936,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "• <u>После уборки шасси</u> - {{badge:emergency:LOSS OF HYD SYS A.}}\nУльяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A",
-                "{{items:emergency:Instructor Notes}}": "RESERVED."
+                "{{items:success:Failures}}": [
+                  "• <u>После уборки шасси</u> - {{badge:emergency:LOSS OF HYD SYS A.}}\n{{badge:info:Ульяновск}} • ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\n{{badge:info:С.-Петербург}} • ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
                 "id": "ffs-sysa-2",
@@ -1731,17 +1950,17 @@
                 "layout": "card",
                 "images": [
                   {
-                    "src": "modules/ffstraining/data/QRH_sysa_1.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_1.png",
                     "caption": "1",
                     "alt": "1"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_sysa_2.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_2.png",
                     "caption": "2",
                     "alt": "2"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_sysa_3.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_3.png",
                     "caption": "3",
                     "alt": "3"
                   }
@@ -1762,9 +1981,9 @@
                 ]
               },
               {
-                "id": "ffs-0201a-3",
+                "id": "ffs-0201a-2",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -1785,7 +2004,7 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
@@ -1794,9 +2013,15 @@
                     "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "RESERVED.",
-                "{{items:abnormal}}": "RESERVED",
-                "{{items:emergency:Memory items}}": "RESERVED {{badge:abnormal:КРИТ}}",
+                "{{items:normal}}": [
+                  "RESERVED."
+                ],
+                "{{items:abnormal}}": [
+                  "RESERVED"
+                ],
+                "{{items:emergency:Memory items}}": [
+                  "RESERVED {{badge:abnormal:КРИТ}}"
+                ],
                 "children": [
                   {
                     "id": "ffs-text-3-6-day2-2",
@@ -1807,16 +2032,20 @@
                         "key": "{{items:normal}}"
                       }
                     ],
-                    "{{items:normal}}": "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                    "{{items:normal}}": [
+                      "<b>PF: Call \"REJECT\"</b> — текст между карточками"
+                    ]
                   }
                 ],
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ],
                 "documents": [
                   {
-                    "title": "QRH — Engine Failure стр. 22",
+                    "title": "QRH — Engine Failure",
                     "src": "modules/docs/AOMB.pdf",
                     "page": 22
                   }
@@ -1840,8 +2069,12 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "• <u>После уборки механизации</u> - {{badge:emergency:WHEEL WELL FIRE.}}\nУльяновск:\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\nС.-Петербург:\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR",
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на"
+                "{{items:success:Failures}}": [
+                  "• <u>После уборки механизации</u> - {{badge:emergency:WHEEL WELL FIRE.}}\n{{badge:info:Ульяновск}}\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\n{{badge:info:С.-Петербург}}\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на"
+                ]
               },
               {
                 "id": "ffs-fire",
@@ -1850,7 +2083,7 @@
                 "layout": "card",
                 "images": [
                   {
-                    "src": "modules/ffstraining/data/QRH_wwf.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_wwf.png",
                     "caption": "Wheel well fire",
                     "alt": "Wheel well fire"
                   }
@@ -1863,9 +2096,37 @@
                 ]
               },
               {
+                "id": "ffs-mge",
+                "title": "QRH",
+                "duration": "MANUAL GEAR EXTENSION",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_mge_1.png",
+                    "caption": "1",
+                    "alt": "1"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_mge_2.png",
+                    "caption": "2",
+                    "alt": "2"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  }
+                ]
+              },
+              {
                 "id": "ffs-0200b",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -1874,14 +2135,18 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ]
@@ -1908,9 +2173,15 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:info}}": "- ВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}",
-                "{{items:success:Failures}}": "Ульяновск:\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\nС.-Петербург:\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B",
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+                "{{items:info}}": [
+                  "- ВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}"
+                ],
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения NNC\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+                ]
               },
               {
                 "id": "ffs-fire-2",
@@ -1919,37 +2190,37 @@
                 "layout": "card",
                 "images": [
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_1.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_1.png",
                     "caption": "1",
                     "alt": "1"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_2.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_2.png",
                     "caption": "2",
                     "alt": "2"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_3.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_3.png",
                     "caption": "Inoperative Items",
                     "alt": "Inoperative Items"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_4.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_4.png",
                     "caption": "4",
                     "alt": "4"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_5.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_5.png",
                     "caption": "Alternate Flap Extention",
                     "alt": "Alternate Flap Extention"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_6.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_6.png",
                     "caption": "Manual Gear Extention",
                     "alt": "Manual Gear Extention"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_mr_7.png",
+                    "src": "modules/ffstraining/data/QRH/QRH_mr_7.png",
                     "caption": "7",
                     "alt": "7"
                   }
@@ -1988,7 +2259,7 @@
               {
                 "id": "ffs-0200b-2",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -1997,22 +2268,21 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ]
-              },
-              {
-                "id": "ffs-refr1-4-6",
-                "title": "4 RNP APP",
-                "layout": "divider"
               },
               {
                 "id": "ffs-text",
@@ -2023,7 +2293,27 @@
                     "key": "{{items:success}}"
                   }
                 ],
-                "{{items:success}}": "• <u>По окончанию всех необходимых NNC</u> – Reposition 8 nm RNP Y APP RW02"
+                "{{items:success}}": [
+                  "• <u>По окончанию всех необходимых NNC</u> – Reposition 8 nm RNP Y APP RW02"
+                ]
+              },
+              {
+                "id": "ffs-refr1-4-6",
+                "title": "4 RNP APP",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-refr1-4-6__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения RNP APP\n{{badge:emergency:Check !}}\n• <b>The recommended roll modes for the final approach</b> are:\n• for an RNAV or GPS approach use LNAV\n• for a LOC-BC, VOR or NDB approach use LNAV\n• for a LOC, SDF or LDA approach use LNAV or VOR/LOC.\n──────────────\n• Approximately {{badge:info:3 NM}} before the final approach fix:\n• PM call: \"APPROACHING GLIDE PATH\"\n• set DA(H) or MDA(H) on the MCP;\n• select or verify VNAV;\n• verify VNAV PTH on FMA;\n• select or verify speed intervention, as needed.\n• Approximately {{badge:info:2 NM}} :\n• \"GEAR DOWN\"\n• \"FLAPS 15\";\n• PM call: \"PASSING FAF, ___ FEET\";\n• When at least 300 feet below the missed approach altitude or FAF set MAA.\n<b>Instrument Approach Using V/S</b> :\n• Approximately 300 feet above MDA(H)+50` set MAA.\n• Call: \"RECYCLE FD's\" or as needed.\n• Call \"SET RUNWAY (GO-AROUND) HEADING\"."
+                ]
               },
               {
                 "id": "ffs-0200b-3",
@@ -2037,23 +2327,32 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ]
               }
             ],
-            "{{items:success:FMS Memory}}": "URSS RW20 взлёт",
-            "{{items:normal:Radio script}}": "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 20, cleared for T/O\".",
-            "{{items:success:Weather}}": "Смена погоды: 020/10KT vis 8000 km +30/+25 OVC 5000 ft",
-            "{{items:emergency:Instructor Notes}}": "В процессе выполнения\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+            "{{items:success:FMS Memory}}": [
+              "URSS RW20 взлёт F15"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 20, cleared for T/O\"."
+            ],
+            "{{items:success:Weather}}": [
+              "<u>Смена погоды</u>: 020/10KT vis 8000 km +30/+25 OVC 5000 ft"
+            ]
           },
           {
             "id": "ffs-0202",
@@ -2068,10 +2367,6 @@
               {
                 "type": "table-file",
                 "index": 0
-              },
-              {
-                "type": "table-file",
-                "index": 1
               },
               {
                 "type": "child-ref",
@@ -2142,11 +2437,10 @@
                 "index": 14
               }
             ],
-            "{{items:info:FFS settings}}": "Reposition: UUEE RW24C взлёт\nNIGHT, 150/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET",
+            "{{items:info:FFS settings}}": [
+              "{{badge:success:Position Set}} : Reposition: UUEE RW24C взлёт F15\n{{badge:success:Environtment Set}} : <b>NIGHT, 150/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
+            ],
             "tables": [
-              {
-                "src": "modules/ffstraining/data/tables/perf_R2.html"
-              },
               {
                 "src": "modules/ffstraining/data/tables/br_R-7.html"
               }
@@ -2198,7 +2492,9 @@
                     "key": "{{items:success}}"
                   }
                 ],
-                "{{items:success}}": "• <u>После взлёта</u> – сдвиг ветра"
+                "{{items:success}}": [
+                  "• <u>После взлёта</u> – сдвиг ветра"
+                ]
               },
               {
                 "id": "ffs-refr2-1",
@@ -2214,18 +2510,21 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения!"
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• \"WINDSHEAR, MAXIMUM THRUST\"\n• Положение рук на штурвале;\n• Тангаж 15°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Выход из WS."
+                ]
               },
               {
-                "id": "ffs-0200b-4",
+                "id": "ffs-chk020-2",
                 "title": "Maneuver",
                 "duration": "Windshear escape",
                 "layout": "child",
-                "blocks": [
+                "tables": [
                   {
-                    "type": "items",
-                    "key": "{{items:normal}}"
-                  },
+                    "src": "modules/ffstraining/data/tables/man_WS.html"
+                  }
+                ],
+                "blocks": [
                   {
                     "type": "table-file",
                     "index": 0
@@ -2238,21 +2537,17 @@
                     "type": "references"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "tables": [
-                  {
-                    "src": "modules/ffstraining/data/tables/man_WS.html"
-                  }
+                "{{items:success:Критерии}}": [
+                  "RESERVED"
                 ],
-                "{{items:success:Критерии}}": "RESERVED",
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ]
               },
               {
-                "id": "ffs-0200c",
+                "id": "ffs-chk0200c-2",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -2261,16 +2556,30 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
+                  },
+                  {
+                    "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:normal}}": [
+                  "{{badge:success:FCOM SP 16}} Takeoff\n• Full rated takeoff thrust is recommended, unless the use of a fixed derate is required to meet a dispatch performance requirement;\n• Use flaps 5, 10 or 15 unless limited by obstacle clearance and/or climb gradient;\n• Use the longest suitable runway provided it is clear of areas of known windshear;\n• Consider increasing Vr speed to the performance limited gross weight rotation speed, not to exceed actual gross weight Vr + 20 knots. Set V speeds for the actual gross weight. Rotate at the adjusted (higher) rotation speed. If windshear is encountered at or beyond the actual gross weight Vr, do not attempt to accelerate to the increased Vr but rotate without hesitation;\n• Be alert for any airspeed fluctuations during takeoff and initial climb. Such fluctuations may be the first indication of windshear;\n• Know the all–engine initial climb pitch attitude. Rotate at the normal rate to this attitude for all non–engine failure takeoffs. Minimize reductions from the initial climb pitch attitude until terrain and\nobstruction clearance is assured, unless stick shaker activates;\n• Crew coordination and awareness are very important. Develop an awareness of normal values of airspeed, attitude, vertical speed, and airspeed buildup. Closely monitor vertical flight path instruments such as vertical speed and altimeters. The pilot monitoring should be especially aware of vertical flight path instruments and call out any deviations from normal;\n• Should airspeed fall below the trim airspeed, unusual control column forces may be required to maintain the desired pitch attitude. If stick shaker is encountered, reduce pitch attitude. Do not exceed the Pitch Limit Indication."
+                ],
+                "{{items:success:SOP}}": [
+                  "{{badge:abnormal:WINDSHEAR CAUTION}}\nFor predictive windshear caution alert: (\"MONITOR RADAR DISPLAY\" aural).\n <table style=\"overflow-wrap:break-word;min-width:0\"><thead><tr>\n<th>Pilot Flying</th>\n<th>Pilot Monitoring</th></tr></thead>\n<tbody><tr><td colspan=\"2\">\nManeuver as needed to avoid the windshear\n</td></tr></tbody></table>\nPredictive windshear warning during takeoff roll: (\"WINDSHEAR AHEAD, WINDSHEAR AHEAD\")\n− Before V1, reject takeoff.\n− After V1, perform the Windshear Escape Maneuver.\nWindshear encountered during takeoff roll:\n− If windshear is encountered before V1, there may not be sufficient runway remaining to stop if an RTO is initiated at V1. At VR, rotate at a normal rate toward a 15 degree pitch attitude. Once airborne, perform the Windshear Escape Maneuver.\n− If windshear is encountered near the normal rotation speed and airspeed suddenly decreases, there may not be sufficient runway left to accelerate back to normal takeoff speed. If there is insufficient runway left to stop, initiate a normal rotation at least 2,000 feet before the end of the runway, even if airspeed is low. Higher than normal attitudes may be needed to lift off in the remaining runway. Ensure maximum thrust is set."
+                ],
                 "references": [
-                  "FCOM Vol. 1 — Takeoff Performance"
+                  "FCTM Windshear — 7.26"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.6. Windshear",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 233
+                  }
                 ]
               },
               {
@@ -2295,9 +2604,15 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "После уборки механизации активировать отказ – GEAR DOWN LOCK FAIL – LEFT GEAR.\nУльяновск:\n• ATA 32 -> PARTIAL OR GEAR UP LANDING –> LEFT\nС.-Петербург:\n• ATA 32 -> 10 MAIN GEAR -> DOWN LOCK FAIL -> LEFT MAIN",
-                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\".",
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения NNC !"
+                "{{items:success:Failures}}": [
+                  "<u>После уборки механизации</u> активировать отказ – GEAR DOWN LOCK FAIL – LEFT GEAR.\n{{badge:info:Ульяновск}}\n• ATA 32 -> PARTIAL OR GEAR UP LANDING –> LEFT\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 10 MAIN GEAR -> DOWN LOCK FAIL -> LEFT MAIN"
+                ],
+                "{{items:normal:Radio script}}": [
+                  "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения NNC !"
+                ]
               },
               {
                 "id": "ffs-fire-3",
@@ -2306,24 +2621,24 @@
                 "layout": "card",
                 "images": [
                   {
-                    "src": "modules/ffstraining/data/QRH_lgd_1.png",
-                    "caption": "Radar minimum",
-                    "alt": "Radar minimum"
+                    "src": "modules/ffstraining/data/QRH/QRH_lgd_1.png",
+                    "caption": "1",
+                    "alt": "1"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_lgd_2.png",
-                    "caption": "SID RW20",
-                    "alt": "SID RW20"
+                    "src": "modules/ffstraining/data/QRH/QRH_lgd_2.png",
+                    "caption": "2",
+                    "alt": "2"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_lgd_3.png",
-                    "caption": "Radar minimum",
-                    "alt": "Radar minimum"
+                    "src": "modules/ffstraining/data/QRH/QRH_lgd_3.png",
+                    "caption": "3",
+                    "alt": "3"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_lgd_4.png",
-                    "caption": "SID RW20",
-                    "alt": "SID RW20"
+                    "src": "modules/ffstraining/data/QRH/QRH_lgd_4.png",
+                    "caption": "4",
+                    "alt": "4"
                   }
                 ],
                 "blocks": [
@@ -2352,24 +2667,24 @@
                 "layout": "card",
                 "images": [
                   {
-                    "src": "modules/ffstraining/data/QRH_gul_1.png",
-                    "caption": "Radar minimum",
-                    "alt": "Radar minimum"
+                    "src": "modules/ffstraining/data/QRH/QRH_gul_1.png",
+                    "caption": "1",
+                    "alt": "1"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_gul_2.png",
-                    "caption": "SID RW20",
-                    "alt": "SID RW20"
+                    "src": "modules/ffstraining/data/QRH/QRH_gul_2.png",
+                    "caption": "2",
+                    "alt": "2"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_gul_3.png",
-                    "caption": "Radar minimum",
-                    "alt": "Radar minimum"
+                    "src": "modules/ffstraining/data/QRH/QRH_gul_3.png",
+                    "caption": "3",
+                    "alt": "3"
                   },
                   {
-                    "src": "modules/ffstraining/data/QRH_gul_4.png",
-                    "caption": "SID RW20",
-                    "alt": "SID RW20"
+                    "src": "modules/ffstraining/data/QRH/QRH_gul_4.png",
+                    "caption": "4",
+                    "alt": "4"
                   }
                 ],
                 "blocks": [
@@ -2392,9 +2707,9 @@
                 ]
               },
               {
-                "id": "ffs-0200b-5",
+                "id": "ffs-0200b-4",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -2403,14 +2718,18 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ]
@@ -2424,7 +2743,9 @@
                     "key": "{{items:info}}"
                   }
                 ],
-                "{{items:info}}": "Полёт в зону ожидания, обработка отказа. Принятие решение о возврате а а/д вылета. Если экипаж принимает решение продолжать полёт – указание компании через диспетчера: вернуться на аэродром вылета.\nILS APP RW24C – Partial Gear Up Landing.\nОбратить внимание, что экипаж должен провести брифинг с проводниками и вероятной эвакуации после посадки."
+                "{{items:info}}": [
+                  "Полёт в зону ожидания, обработка отказа. Принятие решение о возврате а а/д вылета. Если экипаж принимает решение продолжать полёт – указание компании через диспетчера: вернуться на аэродром вылета.\nILS APP RW24C – Partial Gear Up Landing.\nОбратить внимание, что экипаж должен провести брифинг с проводниками и вероятной эвакуации после посадки."
+                ]
               },
               {
                 "id": "ffs-refr2-3",
@@ -2440,11 +2761,17 @@
                     "key": "{{items:success}}"
                   }
                 ],
-                "{{items:success}}": "RESERVED"
+                "{{items:success}}": [
+                  "RESERVED"
+                ]
               }
             ],
-            "{{items:success:Failures}}": "Перед взлётом активировать отказ GEAR UP LOCK FAIL – LEFT GEAR.\nУльяновск:\n• ATA 32 -> GEAR UP LOCK FAIL –> LEFT\nС.-Петербург:\n• ATA 32 -> 10 MAIN GEAR -> UP LOCK FAIL -> LEFT MAIN",
-            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+            "{{items:success:Failures}}": [
+              "<u>Перед взлётом</u> активировать отказ GEAR UP LOCK FAIL – LEFT GEAR.\n{{badge:info:Ульяновск}}\n• ATA 32 -> GEAR UP LOCK FAIL –> LEFT\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 10 MAIN GEAR -> UP LOCK FAIL -> LEFT MAIN"
+            ],
+            "{{items:normal:Radio script}}": [
+              "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+            ]
           },
           {
             "id": "ffs-0203",
@@ -2459,10 +2786,6 @@
               {
                 "type": "table-file",
                 "index": 0
-              },
-              {
-                "type": "table-file",
-                "index": 1
               },
               {
                 "type": "child-ref",
@@ -2495,13 +2818,24 @@
               {
                 "type": "child-ref",
                 "index": 6
+              },
+              {
+                "type": "child-ref",
+                "index": 7
+              },
+              {
+                "type": "child-ref",
+                "index": 8
+              },
+              {
+                "type": "child-ref",
+                "index": 9
               }
             ],
-            "{{items:info:FFS settings}}": "Reposition: UUEE RW24C взлёт\nNIGHT, CAT IIIA 150/15KT 15/15 Q1010, RW WET, Для взлёта RVR 125M.",
+            "{{items:info:FFS settings}}": [
+              "{{badge:success:Position Set}} : Reposition: UUEE RW24C взлёт F15\n{{badge:success:Environtment Set}} : <b>NIGHT, CAT IIIA 150/15KT 15/15 Q1010, RW WET, Для взлёта RVR 125M</b>\n{{badge:info:Preset WX EASA}} : LVO TO / CAT IIIa\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
+            ],
             "tables": [
-              {
-                "src": "modules/ffstraining/data/tables/perf_R2.html"
-              },
               {
                 "src": "modules/ffstraining/data/tables/br_R-8.html"
               }
@@ -2560,10 +2894,76 @@
                   {
                     "type": "items",
                     "key": "{{items:normal:Radio script}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "Первый взлёт LVO, до 80kt пропадает видимость, если экипаж продолжает – ENG FAIL до V1.\nВторой взлёт стандартный, без отказов, после взлёта reposition 6nm final.",
-                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+                "{{items:success:Failures}}": [
+                  "- Первый взлёт –> LVO, до 80kt <b>пропадает видимость</b>, если экипаж продолжает – <b>ENG FAIL</b> до V1.\n- Второй взлёт –> стандартный, без отказов, после взлёта reposition 6nm final."
+                ],
+                "{{items:normal:Radio script}}": [
+                  "<b>ATC</b>: \"NWS RW 24C, cleared for T/O\"."
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения разбега проверить правильность принятия решения на прекращение или продолжение взлета; выполнение маневра RTO.\n{{badge:emergency:Check !}}\n• Порядок действий REJECT: ( Speedbrakes then Reversers! );\n• Действия после остановки:\n- Wind for Fire;\n- QRH ( brake cooling, NNC );\n- Взааимодействие с БП, PAX и ATC:\nMake PA: \"ATTENTION CREW, AT STATIONS. ATTENTION CREW, AT STATIONS\"\nMake PA: \"CANCEL ALERT, CANCEL ALERT\"\n\"NWS…MAYDAY or PAN-PAN, REJECTED TAKEOFF, STANDBY\"\n\"NWS…CANCEL DISTRESS\"…\"READY TO VACATE RW\"\n• Принятие решения:\n- Observe maximum quick turnaround limit.\n- РПП А (ATL, телефон)."
+                ]
+              },
+              {
+                "id": "ffs-rto",
+                "title": "Maneuver",
+                "duration": "RTO",
+                "layout": "card",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_RTO.html"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  }
+                ]
+              },
+              {
+                "id": "ffs-rto-2",
+                "title": "INFO",
+                "duration": "РПП, FCOM, FCTM",
+                "layout": "child",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:SOP}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
+                "references": [
+                  "FCTM Rejected Takeoff Decision — 3.24"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.1. Rejected take off",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 225
+                  }
+                ]
               },
               {
                 "id": "ffs-refr3-2",
@@ -2577,9 +2977,50 @@
                   {
                     "type": "items",
                     "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "Ульяновск: • ATA 32\nПервый заход –> Right OB DU,\nесли экипаж продолжат – на DA отсутствует визуальный контакт – GA\nReposition 6nm.\nВторой заход –> FD fail, на выравнивании FLARE mode failure и отказ обоих TO/GA switch failure – GA\nReposition 6 nm."
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}} • ATA 32\n- Первый заход –> <b>Right OB DU</b>, если экипаж продолжат – на DA отсутствует визуальный контакт – GA\nReposition 6nm.\n- Второй заход –> <b>FD fail</b>, на выравнивании <b>FLARE mode failure</b> и отказ обоих <b>TO/GA switch failure</b> – GA\nReposition 6 nm."
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения GA\n{{badge:emergency:Check !}}\n• Выдерживание предписанной схемы;\n• Callouts \"GO-AROUND, FLAPS 15, CHECK THRUST\";\n• Действия 400ft: AP+AT+ROLL, Check Missed Approach Alt;\n• Действия 1000ft: acceleration, PITCH;\n• PM озвучивает FMA и подсказывает;\n• After TO CL;\n• Подготовка к повторному заходу."
+                ]
+              },
+              {
+                "id": "ffs-refr3",
+                "title": "INFO",
+                "duration": "РПП, FCOM, FCTM",
+                "layout": "child",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:SOP}}"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 2.13. LOW VISIBILITY OPERATIONS",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 197
+                  }
+                ]
               },
               {
                 "id": "ffs-refr3-3",
@@ -2595,10 +3036,14 @@
                     "key": "{{items:success:Failures}}"
                   }
                 ],
-                "{{items:success:Failures}}": "Третий заход на прямой отказ A/T, посадка."
+                "{{items:success:Failures}}": [
+                  "- Третий заход на прямой <b>отказ A/T</b>, посадка."
+                ]
               }
             ],
-            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW24C via EMGAS3H, sq 4321.\n<b>ATC</b>: \"NWS RW 24C, cleared for T/O\"."
+            ]
           },
           {
             "id": "ffs-day2-5",
@@ -2618,10 +3063,6 @@
               {
                 "type": "table-file",
                 "index": 0
-              },
-              {
-                "type": "table-file",
-                "index": 1
               },
               {
                 "type": "child-ref",
@@ -2657,11 +3098,7 @@
               },
               {
                 "type": "items",
-                "key": "{{items:success:Критерии}}"
-              },
-              {
-                "type": "items",
-                "key": "{{items:success:Критерии}}"
+                "key": "{{items:success}}"
               },
               {
                 "type": "child-ref",
@@ -2686,15 +3123,38 @@
               {
                 "type": "child-ref",
                 "index": 11
-              }
-            ],
-            "{{items:info:FFS settings}}": "Reposition: URSS RW20 взлёт\nDAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET",
-            "tables": [
-              {
-                "src": "modules/ffstraining/data/tables/perf_C2.html"
               },
               {
-                "src": "modules/ffstraining/data/tables/br_C2-1.html"
+                "type": "child-ref",
+                "index": 12
+              },
+              {
+                "type": "child-ref",
+                "index": 13
+              },
+              {
+                "type": "child-ref",
+                "index": 14
+              },
+              {
+                "type": "child-ref",
+                "index": 15
+              },
+              {
+                "type": "child-ref",
+                "index": 16
+              },
+              {
+                "type": "child-ref",
+                "index": 17
+              }
+            ],
+            "{{items:info:FFS settings}}": [
+              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
+            ],
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/br_C-1.html"
               }
             ],
             "children": [
@@ -2753,7 +3213,9 @@
                     "key": "{{items:success}}"
                   }
                 ],
-                "{{items:success}}": "• <u>После взлёта</u> – сдвиг ветра"
+                "{{items:success}}": [
+                  "• <u>После взлёта</u> – сдвиг ветра"
+                ]
               },
               {
                 "id": "ffs-chk2-1",
@@ -2769,18 +3231,21 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:emergency:Instructor Notes}}": "В процессе выполнения!"
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• \"WINDSHEAR, MAXIMUM THRUST\"\n• Положение рук на штурвале;\n• Тангаж 15°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Выход из WS."
+                ]
               },
               {
-                "id": "ffs-03",
+                "id": "ffs-chk020-3",
                 "title": "Maneuver",
                 "duration": "Windshear escape",
                 "layout": "child",
-                "blocks": [
+                "tables": [
                   {
-                    "type": "items",
-                    "key": "{{items:normal}}"
-                  },
+                    "src": "modules/ffstraining/data/tables/man_WS.html"
+                  }
+                ],
+                "blocks": [
                   {
                     "type": "table-file",
                     "index": 0
@@ -2793,21 +3258,17 @@
                     "type": "references"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "tables": [
-                  {
-                    "src": "modules/ffstraining/data/tables/man_WS.html"
-                  }
+                "{{items:success:Критерии}}": [
+                  "RESERVED"
                 ],
-                "{{items:success:Критерии}}": "RESERVED",
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
                 ]
               },
               {
-                "id": "ffs-0200c-2",
+                "id": "ffs-chk0200c-3",
                 "title": "INFO",
-                "duration": "РПП, FCTM",
+                "duration": "РПП, FCOM, FCTM",
                 "layout": "child",
                 "blocks": [
                   {
@@ -2816,21 +3277,35 @@
                   },
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:SOP}}"
                   },
                   {
                     "type": "references"
+                  },
+                  {
+                    "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} RESERVED",
-                "{{items:success:Критерии}}": "RESERVED",
+                "{{items:normal}}": [
+                  "{{badge:success:FCOM SP 16}} Takeoff\n• Full rated takeoff thrust is recommended, unless the use of a fixed derate is required to meet a dispatch performance requirement;\n• Use flaps 5, 10 or 15 unless limited by obstacle clearance and/or climb gradient;\n• Use the longest suitable runway provided it is clear of areas of known windshear;\n• Consider increasing Vr speed to the performance limited gross weight rotation speed, not to exceed actual gross weight Vr + 20 knots. Set V speeds for the actual gross weight. Rotate at the adjusted (higher) rotation speed. If windshear is encountered at or beyond the actual gross weight Vr, do not attempt to accelerate to the increased Vr but rotate without hesitation;\n• Be alert for any airspeed fluctuations during takeoff and initial climb. Such fluctuations may be the first indication of windshear;\n• Know the all–engine initial climb pitch attitude. Rotate at the normal rate to this attitude for all non–engine failure takeoffs. Minimize reductions from the initial climb pitch attitude until terrain and\nobstruction clearance is assured, unless stick shaker activates;\n• Crew coordination and awareness are very important. Develop an awareness of normal values of airspeed, attitude, vertical speed, and airspeed buildup. Closely monitor vertical flight path instruments such as vertical speed and altimeters. The pilot monitoring should be especially aware of vertical flight path instruments and call out any deviations from normal;\n• Should airspeed fall below the trim airspeed, unusual control column forces may be required to maintain the desired pitch attitude. If stick shaker is encountered, reduce pitch attitude. Do not exceed the Pitch Limit Indication."
+                ],
+                "{{items:success:SOP}}": [
+                  "{{badge:abnormal:WINDSHEAR CAUTION}}\nFor predictive windshear caution alert: (\"MONITOR RADAR DISPLAY\" aural).\n <table style=\"overflow-wrap:break-word;min-width:0\"><thead><tr>\n<th>Pilot Flying</th>\n<th>Pilot Monitoring</th></tr></thead>\n<tbody><tr><td colspan=\"2\">\nManeuver as needed to avoid the windshear\n</td></tr></tbody></table>\nPredictive windshear warning during takeoff roll: (\"WINDSHEAR AHEAD, WINDSHEAR AHEAD\")\n− Before V1, reject takeoff.\n− After V1, perform the Windshear Escape Maneuver.\nWindshear encountered during takeoff roll:\n− If windshear is encountered before V1, there may not be sufficient runway remaining to stop if an RTO is initiated at V1. At VR, rotate at a normal rate toward a 15 degree pitch attitude. Once airborne, perform the Windshear Escape Maneuver.\n− If windshear is encountered near the normal rotation speed and airspeed suddenly decreases, there may not be sufficient runway left to accelerate back to normal takeoff speed. If there is insufficient runway left to stop, initiate a normal rotation at least 2,000 feet before the end of the runway, even if airspeed is low. Higher than normal attitudes may be needed to lift off in the remaining runway. Ensure maximum thrust is set."
+                ],
                 "references": [
-                  "FCOM Vol. 1 — Takeoff Performance"
+                  "FCTM Windshear — 7.26"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.6. Windshear",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 233
+                  }
                 ]
               },
               {
                 "id": "ffs-chk2-1-2",
-                "title": "2 LEVER JAMMED IN DOWN POSITION STANDBY HYDRAULIC LOW QUANTITY",
+                "title": "2 GEAR LEVER WILL NOT MOVE UP & STANDBY HYDRAULIC LOW QUANTITY",
                 "layout": "divider"
               },
               {
@@ -2839,14 +3314,81 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:Failures}}"
                   }
                 ],
-                "{{items:success:Критерии}}": "После выполнения NNC STANDBY HYDRAULIC LOW QUANTITY\nWHEEL WELL FIRE (гасимый)"
+                "{{items:success:Failures}}": [
+                  "<u>После уборки механизации и выполнения NNC GEAR LEVER WILL NOT MOVE UP</u> - STANDBY HYDRAULIC LOW QUANTITY.\n{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY"
+                ]
+              },
+              {
+                "id": "ffs-glwnmu",
+                "title": "QRH",
+                "duration": "GEAR LEVER WILL NOT MOVE UP",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_glwnmu_1.png",
+                    "caption": "1",
+                    "alt": "1"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_glwnmu_2.png",
+                    "caption": "2",
+                    "alt": "2"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_glwnmu_3.png",
+                    "caption": "3",
+                    "alt": "3"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_glwnmu_4.png",
+                    "caption": "4",
+                    "alt": "4"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  },
+                  {
+                    "type": "images",
+                    "index": 3
+                  }
+                ]
+              },
+              {
+                "id": "ffs-shlq-3",
+                "title": "QRH",
+                "duration": "STANDBY HYDRAULIC LOW QUANTITY",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_shlq.png",
+                    "caption": "1",
+                    "alt": "1"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  }
+                ]
               },
               {
                 "id": "ffs-chk2-1-3",
-                "title": "3 EGPWS",
+                "title": "3 WHEEL WELL FIRE",
                 "layout": "divider"
               },
               {
@@ -2855,14 +3397,35 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:Failures}}"
                   }
                 ],
-                "{{items:success:Критерии}}": "После выполнения манёвра – отказ двигателя (любой, приводящий к потере тяги)"
+                "{{items:success:Failures}}": [
+                  "<u>После выполнения NNC STANDBY HYDRAULIC LOW QUANTITY</u> - WHEEL WELL FIRE (гасимый)\n{{badge:info:Ульяновск}}\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\n{{badge:info:С.-Петербург}}\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR"
+                ]
+              },
+              {
+                "id": "ffs-shlq-4",
+                "title": "QRH",
+                "duration": "WHEEL WELL FIRE",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_wwf.png",
+                    "caption": "1",
+                    "alt": "1"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  }
+                ]
               },
               {
                 "id": "ffs-chk2-1-4",
-                "title": "4 ENG failure",
+                "title": "4 GPWS Response",
                 "layout": "divider"
               },
               {
@@ -2871,15 +3434,95 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Критерии}}"
+                    "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Критерии}}": "Обработка отказа, подготовка к заходу.\nПо готовности экипажа к заходу - REPOSITION 6 NM (если позволяет время – без reposition)\nILS Z APP ONE ENG RW02\nGA at DA до выполнения After TO C/L"
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}}\n• ATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON\n{{badge:info:С.-Петербург}}\n• AIRCRAFT -> ATTITUDE & UPSETS ->EGPWS VIRTUAL MOUNTAIN -> INCREASE"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• Без TO/GA;\n• Тангаж 20°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Определение окончания маневра. (MSA ... )"
+                ]
+              },
+              {
+                "id": "ffs-shlq-5",
+                "title": "Maneuver",
+                "duration": "GPWS Response",
+                "layout": "card",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_GPWS.html"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:info}}": [
+                  "NOTE: Aft control column force increases as the airspeed decreases. In all cases, the pitch attitude that results in intermittent stick shaker or initial buffet is the upper pitch attitude limit. Flight at intermittent stick shaker may be needed to obtain a positive terrain separation. Use smooth, steady control to avoid a pitch attitude overshoot and stall.\nNOTE: Do not use flight director commands.\nNOTE: *Maximum thrust can be obtained by advancing the thrust levers full forward if the EECs are in the normal mode. If terrain contact is imminent, advance thrust levers full forward.\nNOTE: Except for mountain area, if the RW is in-sight and positive visual verification is made that no obstacle or terrain hazard exists when flying under daylight VMC conditions before a terrain or obstacle warning, the alert may be regarded as cautionary and the approach may be continued.\n\n<b>Предупреждение: при заходе на посадку и срабатывании звуковой сигнализации:\n\"PULL UP\" or \"TERRAIN, TERRAIN PULL UP\" \"PULL UP\" or \"OBSTACLE, OBSTACLE PULL UP\"</b>\n<u>На горном аэродроме</u> – {{badge:info:ВЫПОЛНИТЬ GPWS ESCAPE MANEUVER!}}\nВ остальных случаях, только днём в визуальных метеоусловиях при устойчивой видимости ВПП заход может быть продолжен при условии, что экипаж визуально имел полную уверенность в отсутствии опасности от препятствий до срабатывания сигнализации.\n<u>В случае наличия проблем с сигналом GPS</u> для исключения ложного срабатывания сигнализации GPWS КВС может рассмотреть возможность перевода переключателя \"TERR INHIBIT\" в положение \"TERR INHIBIT\" перед выполнением захода на посадку в следующих случаях:\n– FMC message \"GPS_L/R INVALID\" и/или \"UNABLE REQD NAV PERF – RNP\" и/или \"VERIFY POS: FMC-GPS\";\n– \"TERR POS\" на ND;\n– активация сигнального табло GPS;\n– после ухода на второй круг в случае, если у экипажа имеется обоснованная уверенность в том, что срабатывание сигнализации было ложным (визуальные условия и/или захват LOC & G/S при заходе по ILS)."
+                ],
+                "references": [
+                  "FCTM Terrain Avoidance — 7.18"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.3. Ground Proximity Warning System (GPWS) Response",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 227
+                  }
+                ]
+              },
+              {
+                "id": "ffs-chk2-1-5",
+                "title": "5 ENG failure",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-chk2-1-5__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success}}"
+                  }
+                ],
+                "{{items:success:Failures}}": [
+                  "<u>После выполнения манёвра <b>GPWS Response</b></u> – отказ двигателя (любой, приводящий к потере тяги)"
+                ],
+                "{{items:success}}": [
+                  "Обработка отказа, подготовка к заходу.\nПо готовности экипажа к заходу - REPOSITION 6 NM (если позволяет время – без reposition)\nILS Z APP ONE ENG RW02\nGA at DA до выполнения After TO C/L"
+                ]
               }
             ],
-            "{{items:success:Failures}}": "До взлёта активировать отказ LANDING GEAR LEVER Solenoid Fail.\nУльяновск:\n• ATA 32 -> GEAR LEVER WILL NOT MOVE UP AFTER T/O –> ON\nС.-Петербург:\n• ATA 32 -> 30 EXT&RETRACT ->GEAR LEVER JAMMED IN DOWN POSITION -> FAIL",
-            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\".",
-            "{{items:success:Критерии}}": "После выполнения NNC STANDBY HYDRAULIC LOW QUANTITY\nWHEEL WELL FIRE (гасимый)"
+            "{{items:success:Failures}}": [
+              "До взлёта активировать отказы:\n1 LANDING GEAR LEVER Solenoid Fail:\n{{badge:info:Ульяновск}}\n• ATA 32 -> AIR/GND SENSOR FAIL IN POSITION – MAIN GEAR -> L1 + L2\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 9 AIR/GROUND ->AIR/GROUND SENSOR FAIL -> FAIL\n\n2 GEAR LEVER WILL NOT MOVE UP:\n{{badge:info:Ульяновск}}\n• ATA 32 -> GEAR LEVER WILL NOT MOVE UP AFTER T/O –> ON\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 30 EXT&RETRACT ->GEAR LEVER JAMMED IN DOWN POSITION -> FAIL"
+            ],
+            "{{items:normal:Radio script}}": [
+              "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b>ATC</b>: \"NWS RW 20, cleared for T/O\"."
+            ],
+            "{{items:success}}": [
+              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT"
+            ]
           },
           {
             "id": "ffs-0205",
@@ -2894,10 +3537,6 @@
               {
                 "type": "table-file",
                 "index": 0
-              },
-              {
-                "type": "table-file",
-                "index": 1
               },
               {
                 "type": "child-ref",
@@ -2916,13 +3555,12 @@
                 "key": "{{items:success}}"
               }
             ],
-            "{{items:info:FFS settings}}": "Reposition: URSS RW20 взлёт\nDAY, 170/10 CAT II 30/30 Q1010, RW WET",
+            "{{items:info:FFS settings}}": [
+              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 CAT II 30/30 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
+            ],
             "tables": [
               {
-                "src": "modules/ffstraining/data/tables/perf_C2.html"
-              },
-              {
-                "src": "modules/ffstraining/data/tables/br_C2-2.html"
+                "src": "modules/ffstraining/data/tables/br_C-2.html"
               }
             ],
             "children": [
@@ -2973,9 +3611,15 @@
                 ]
               }
             ],
-            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\".",
-            "{{items:info}}": "Взлёт, отказ двигателя между V1 and V2 (любой приводящий к потере тяги).\nУльяновск:\nATA 71 -> Любой отказ приводящий к потере тяги двигателя\nС.-Петербург:\nATA 71 -> 0 POWER PLANT -> Любой отказ приводящий к потере тяги двигателя",
-            "{{items:success}}": "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\nONE ENG ILS Z APP RW02\nУход на второй круг на высоте DA (любая причина).\nREPOSITION to 6 nm. RW02\nILS Z APP RW02 ONE ENG INOP"
+            "{{items:normal:Radio script}}": [
+              "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
+            ],
+            "{{items:info}}": [
+              "Взлёт, отказ двигателя между V1 and V2 (любой приводящий к потере тяги).\nУльяновск:\nATA 71 -> Любой отказ приводящий к потере тяги двигателя\nС.-Петербург:\nATA 71 -> 0 POWER PLANT -> Любой отказ приводящий к потере тяги двигателя"
+            ],
+            "{{items:success}}": [
+              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\nONE ENG ILS Z APP RW02\nУход на второй круг на высоте DA (любая причина).\nREPOSITION to 6 nm. RW02\nILS Z APP RW02 ONE ENG INOP"
+            ]
           },
           {
             "id": "ffs-0206",
@@ -2990,10 +3634,6 @@
               {
                 "type": "table-file",
                 "index": 0
-              },
-              {
-                "type": "table-file",
-                "index": 1
               },
               {
                 "type": "child-ref",
@@ -3030,15 +3670,42 @@
               {
                 "type": "child-ref",
                 "index": 6
-              }
-            ],
-            "{{items:info:FFS settings}}": "Reposition: URSS RW20 взлёт\nDAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET",
-            "tables": [
-              {
-                "src": "modules/ffstraining/data/tables/perf_C2.html"
               },
               {
-                "src": "modules/ffstraining/data/tables/br_C2-3.html"
+                "type": "child-ref",
+                "index": 7
+              },
+              {
+                "type": "child-ref",
+                "index": 8
+              },
+              {
+                "type": "child-ref",
+                "index": 9
+              },
+              {
+                "type": "child-ref",
+                "index": 10
+              },
+              {
+                "type": "child-ref",
+                "index": 11
+              },
+              {
+                "type": "child-ref",
+                "index": 12
+              },
+              {
+                "type": "child-ref",
+                "index": 13
+              }
+            ],
+            "{{items:info:FFS settings}}": [
+              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
+            ],
+            "tables": [
+              {
+                "src": "modules/ffstraining/data/tables/br_C-3.html"
               }
             ],
             "children": [
@@ -3089,8 +3756,131 @@
                 ]
               },
               {
+                "id": "ffs-chk2-1-6",
+                "title": "1 WINDSHEAR",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-chk2-1-6__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
+                  }
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• \"WINDSHEAR, MAXIMUM THRUST\"\n• Положение рук на штурвале;\n• Тангаж 15°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Выход из WS."
+                ]
+              },
+              {
+                "id": "ffs-chk020-4",
+                "title": "Maneuver",
+                "duration": "Windshear escape",
+                "layout": "child",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_WS.html"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:Критерии}}"
+                  },
+                  {
+                    "type": "references"
+                  }
+                ],
+                "{{items:success:Критерии}}": [
+                  "RESERVED"
+                ],
+                "references": [
+                  "FCOM Vol. 1 — Takeoff Performance"
+                ]
+              },
+              {
+                "id": "ffs-chk0200c-4",
+                "title": "INFO",
+                "duration": "РПП, FCOM, FCTM",
+                "layout": "child",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:SOP}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:normal}}": [
+                  "{{badge:success:FCOM SP 16}} Takeoff\n• Full rated takeoff thrust is recommended, unless the use of a fixed derate is required to meet a dispatch performance requirement;\n• Use flaps 5, 10 or 15 unless limited by obstacle clearance and/or climb gradient;\n• Use the longest suitable runway provided it is clear of areas of known windshear;\n• Consider increasing Vr speed to the performance limited gross weight rotation speed, not to exceed actual gross weight Vr + 20 knots. Set V speeds for the actual gross weight. Rotate at the adjusted (higher) rotation speed. If windshear is encountered at or beyond the actual gross weight Vr, do not attempt to accelerate to the increased Vr but rotate without hesitation;\n• Be alert for any airspeed fluctuations during takeoff and initial climb. Such fluctuations may be the first indication of windshear;\n• Know the all–engine initial climb pitch attitude. Rotate at the normal rate to this attitude for all non–engine failure takeoffs. Minimize reductions from the initial climb pitch attitude until terrain and\nobstruction clearance is assured, unless stick shaker activates;\n• Crew coordination and awareness are very important. Develop an awareness of normal values of airspeed, attitude, vertical speed, and airspeed buildup. Closely monitor vertical flight path instruments such as vertical speed and altimeters. The pilot monitoring should be especially aware of vertical flight path instruments and call out any deviations from normal;\n• Should airspeed fall below the trim airspeed, unusual control column forces may be required to maintain the desired pitch attitude. If stick shaker is encountered, reduce pitch attitude. Do not exceed the Pitch Limit Indication."
+                ],
+                "{{items:success:SOP}}": [
+                  "{{badge:abnormal:WINDSHEAR CAUTION}}\nFor predictive windshear caution alert: (\"MONITOR RADAR DISPLAY\" aural).\n <table style=\"overflow-wrap:break-word;min-width:0\"><thead><tr>\n<th>Pilot Flying</th>\n<th>Pilot Monitoring</th></tr></thead>\n<tbody><tr><td colspan=\"2\">\nManeuver as needed to avoid the windshear\n</td></tr></tbody></table>\nPredictive windshear warning during takeoff roll: (\"WINDSHEAR AHEAD, WINDSHEAR AHEAD\")\n− Before V1, reject takeoff.\n− After V1, perform the Windshear Escape Maneuver.\nWindshear encountered during takeoff roll:\n− If windshear is encountered before V1, there may not be sufficient runway remaining to stop if an RTO is initiated at V1. At VR, rotate at a normal rate toward a 15 degree pitch attitude. Once airborne, perform the Windshear Escape Maneuver.\n− If windshear is encountered near the normal rotation speed and airspeed suddenly decreases, there may not be sufficient runway left to accelerate back to normal takeoff speed. If there is insufficient runway left to stop, initiate a normal rotation at least 2,000 feet before the end of the runway, even if airspeed is low. Higher than normal attitudes may be needed to lift off in the remaining runway. Ensure maximum thrust is set."
+                ],
+                "references": [
+                  "FCTM Windshear — 7.26"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.6. Windshear",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 233
+                  }
+                ]
+              },
+              {
+                "id": "ffs-chk2-2",
+                "title": "2 STB HYD LOW QUANTITY",
+                "layout": "divider"
+              },
+              {
+                "id": "ffs-chk2-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:success:Failures}}"
+                  }
+                ],
+                "{{items:success:Failures}}": [
+                  "<u>После выхода из сдвига ветра и уборки механизации</u> - STANDBY HYDRAULIC LOW QUANTITY.\n{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY"
+                ]
+              },
+              {
+                "id": "ffs-shlq-6",
+                "title": "QRH",
+                "duration": "STANDBY HYDRAULIC LOW QUANTITY",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_shlq.png",
+                    "caption": "1",
+                    "alt": "1"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  }
+                ]
+              },
+              {
                 "id": "ffs-chk2-3",
-                "title": "STB HYD LOW QUANTITY",
+                "title": "3 LOSS of SYS A",
                 "layout": "divider"
               },
               {
@@ -3099,46 +3889,115 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success}}"
+                    "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success}}": "sys\nУльяновск:\nATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\nС.-Петербург:\nATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY"
+                "{{items:success:Failures}}": [
+                  "• {{badge:emergency:LOSS OF HYD SYS A.}}\n{{badge:info:Ульяновск}} • ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\n{{badge:info:С.-Петербург}} • ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
+                ]
               },
               {
-                "id": "ffs-chk2-3-2",
-                "title": "NNC – LOSS of SYS A",
+                "id": "ffs-sysa-3",
+                "title": "QRH",
+                "duration": "LOSS OF SYSTEM A",
+                "layout": "card",
+                "images": [
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_1.png",
+                    "caption": "1",
+                    "alt": "1"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_2.png",
+                    "caption": "2",
+                    "alt": "2"
+                  },
+                  {
+                    "src": "modules/ffstraining/data/QRH/QRH_sysa_3.png",
+                    "caption": "3",
+                    "alt": "3"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "images",
+                    "index": 0
+                  },
+                  {
+                    "type": "images",
+                    "index": 1
+                  },
+                  {
+                    "type": "images",
+                    "index": 2
+                  }
+                ]
+              },
+              {
+                "id": "ffs-chk2-4",
+                "title": "4 GPWS Response",
                 "layout": "divider"
               },
               {
-                "id": "ffs-chk2-3-2__after",
+                "id": "ffs-chk2-4__after",
                 "layout": "text",
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success}}"
-                  }
-                ],
-                "{{items:success}}": "Ульяновск:\nATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\nС.-Петербург:\nATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A\nВыполнение NNC, принятие решения о возврате на а/д вылета.\nILS Z APP RW02- EGPWS WARNING"
-              },
-              {
-                "id": "ffs-chk2-3-3",
-                "title": "EGPWS",
-                "layout": "divider"
-              },
-              {
-                "id": "ffs-chk2-3-3__after",
-                "layout": "text",
-                "blocks": [
+                    "key": "{{items:success:Failures}}"
+                  },
                   {
                     "type": "items",
-                    "key": "{{items:success}}"
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success}}": "Ульяновск:\nATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON\nС.-Петербург:\nAIRCRAFT -> ATTITUDE & UPSETS ->EGPWS VIRTUAL MOUNTAIN -> INCREASE\nПосле завершения манёвра EGPWS – REPOSITION 6 nm RW02\nILS Z APP RW02"
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}}\n• ATA 34G -> EGPWS FALSE MODE 2 WARNING-> ON\n{{badge:info:С.-Петербург}}\n• AIRCRAFT -> ATTITUDE & UPSETS ->EGPWS VIRTUAL MOUNTAIN -> INCREASE"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}\n• Без TO/GA;\n• Тангаж 20°;\n• Speedbrakes;\n• PM озвучивает FMA и подсказывает;\n• Определение окончания маневра. (MSA ... )"
+                ]
+              },
+              {
+                "id": "ffs-gpws",
+                "title": "Maneuver",
+                "duration": "GPWS Response",
+                "layout": "card",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_GPWS.html"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:info}}"
+                  }
+                ],
+                "{{items:info}}": [
+                  "NOTE: Aft control column force increases as the airspeed decreases. In all cases, the pitch attitude that results in intermittent stick shaker or initial buffet is the upper pitch attitude limit. Flight at intermittent stick shaker may be needed to obtain a positive terrain separation. Use smooth, steady control to avoid a pitch attitude overshoot and stall.\nNOTE: Do not use flight director commands.\nNOTE: *Maximum thrust can be obtained by advancing the thrust levers full forward if the EECs are in the normal mode. If terrain contact is imminent, advance thrust levers full forward.\nNOTE: Except for mountain area, if the RW is in-sight and positive visual verification is made that no obstacle or terrain hazard exists when flying under daylight VMC conditions before a terrain or obstacle warning, the alert may be regarded as cautionary and the approach may be continued.\n\n<b>Предупреждение: при заходе на посадку и срабатывании звуковой сигнализации:\n\"PULL UP\" or \"TERRAIN, TERRAIN PULL UP\" \"PULL UP\" or \"OBSTACLE, OBSTACLE PULL UP\"</b>\n<u>На горном аэродроме</u> – {{badge:info:ВЫПОЛНИТЬ GPWS ESCAPE MANEUVER!}}\nВ остальных случаях, только днём в визуальных метеоусловиях при устойчивой видимости ВПП заход может быть продолжен при условии, что экипаж визуально имел полную уверенность в отсутствии опасности от препятствий до срабатывания сигнализации.\n<u>В случае наличия проблем с сигналом GPS</u> для исключения ложного срабатывания сигнализации GPWS КВС может рассмотреть возможность перевода переключателя \"TERR INHIBIT\" в положение \"TERR INHIBIT\" перед выполнением захода на посадку в следующих случаях:\n– FMC message \"GPS_L/R INVALID\" и/или \"UNABLE REQD NAV PERF – RNP\" и/или \"VERIFY POS: FMC-GPS\";\n– \"TERR POS\" на ND;\n– активация сигнального табло GPS;\n– после ухода на второй круг в случае, если у экипажа имеется обоснованная уверенность в том, что срабатывание сигнализации было ложным (визуальные условия и/или захват LOC & G/S при заходе по ILS)."
+                ]
               }
             ],
-            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\".",
-            "{{items:success}}": "Взлёт RW20\nПосле взлёта – WINDSHEAR\nСмена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\nПосле выходи из сдвига ветра и уборки механизации - STB HYD LOW QUANTITY"
+            "{{items:normal:Radio script}}": [
+              "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
+            ],
+            "{{items:success}}": [
+              "Взлёт RW20\nПосле взлёта – WINDSHEAR",
+              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT",
+              "После завершения манёвра EGPWS – REPOSITION 6 nm RW02\nILS Z APP RW02"
+            ]
           },
           {
             "id": "ffs-0207",
@@ -3189,15 +4048,29 @@
               {
                 "type": "child-ref",
                 "index": 6
+              },
+              {
+                "type": "child-ref",
+                "index": 7
+              },
+              {
+                "type": "child-ref",
+                "index": 8
+              },
+              {
+                "type": "child-ref",
+                "index": 9
               }
             ],
-            "{{items:info:FFS settings}}": "Reposition: UUEE RW24C взлёт\nNIGHT, CAT IIIA 150/15KT 15/15 Q1010, RW WET, Для взлёта RVR 125M.",
+            "{{items:info:FFS settings}}": [
+              "Reposition: UUEE RW24C взлёт\nNIGHT, CAT IIIA 150/15KT 15/15 Q1010, RW WET, Для взлёта RVR 125M."
+            ],
             "tables": [
               {
                 "src": "modules/ffstraining/data/tables/perf_C2.html"
               },
               {
-                "src": "modules/ffstraining/data/tables/br_C2-4.html"
+                "src": "modules/ffstraining/data/tables/br_C-4.html"
               }
             ],
             "children": [
@@ -3254,10 +4127,76 @@
                   {
                     "type": "items",
                     "key": "{{items:normal:Radio script}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "Первый взлёт LVO, до 80kt пропадает видимость, если экипаж продолжает – ENG FAIL до V1.\nВторой взлёт стандартный, без отказов, после взлёта reposition 6nm final.",
-                "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+                "{{items:success:Failures}}": [
+                  "- Первый взлёт –> LVO, до 80kt <b>пропадает видимость</b>, если экипаж продолжает – <b>ENG FAIL</b> до V1.\n- Второй взлёт –> стандартный, без отказов, после взлёта reposition 6nm final."
+                ],
+                "{{items:normal:Radio script}}": [
+                  "<b>ATC</b>: \"NWS RW 24C, cleared for T/O\"."
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения разбега проверить правильность принятия решения на прекращение или продолжение взлета; выполнение маневра RTO.\n{{badge:emergency:Check !}}\n• Порядок действий REJECT: ( Speedbrakes then Reversers! );\n• Действия после остановки:\n- Wind for Fire;\n- QRH ( brake cooling, NNC );\n- Взааимодействие с БП, PAX и ATC:\nMake PA: \"ATTENTION CREW, AT STATIONS. ATTENTION CREW, AT STATIONS\"\nMake PA: \"CANCEL ALERT, CANCEL ALERT\"\n\"NWS…MAYDAY or PAN-PAN, REJECTED TAKEOFF, STANDBY\"\n\"NWS…CANCEL DISTRESS\"…\"READY TO VACATE RW\"\n• Принятие решения:\n- Observe maximum quick turnaround limit.\n- РПП А (ATL, телефон)."
+                ]
+              },
+              {
+                "id": "ffs-rto-3",
+                "title": "Maneuver",
+                "duration": "RTO",
+                "layout": "card",
+                "tables": [
+                  {
+                    "src": "modules/ffstraining/data/tables/man_RTO.html"
+                  }
+                ],
+                "blocks": [
+                  {
+                    "type": "table-file",
+                    "index": 0
+                  }
+                ]
+              },
+              {
+                "id": "ffs-rto-4",
+                "title": "INFO",
+                "duration": "РПП, FCOM, FCTM",
+                "layout": "child",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:SOP}}"
+                  },
+                  {
+                    "type": "references"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
+                "references": [
+                  "FCTM Rejected Takeoff Decision — 3.24"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 4.5.1. Rejected take off",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 225
+                  }
+                ]
               },
               {
                 "id": "ffs-refr3-2-2",
@@ -3271,17 +4210,73 @@
                   {
                     "type": "items",
                     "key": "{{items:success:Failures}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": "Первый заход, в процессе захода отказ OB DU справа, если экипаж продолжат – на DA отсутствует визуальный контакт – GA, reposition 6nm final.\nВторой заход, \"уходят\" FD слева, на выравнивании NO FLARE, отказ обоих кнопок TO/GA – экипаж выполняет GA. Reposition 6 nm."
+                "{{items:success:Failures}}": [
+                  "{{badge:info:Ульяновск}} • ATA 32\n- Первый заход –> <b>Right OB DU</b>, если экипаж продолжат – на DA отсутствует визуальный контакт – GA\nReposition 6nm.\n- Второй заход –> <b>FD fail</b>, на выравнивании <b>FLARE mode failure</b> и отказ обоих <b>TO/GA switch failure</b> – GA\nReposition 6 nm."
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения GA\n{{badge:emergency:Check !}}\n• Выдерживание предписанной схемы;\n• Callouts \"GO-AROUND, FLAPS 15, CHECK THRUST\";\n• Действия 400ft: AP+AT+ROLL, Check Missed Approach Alt;\n• Действия 1000ft: acceleration, PITCH;\n• PM озвучивает FMA и подсказывает;\n• After TO CL;\n• Подготовка к повторному заходу."
+                ]
+              },
+              {
+                "id": "ffs-refr3-4",
+                "title": "INFO",
+                "duration": "РПП, FCOM, FCTM",
+                "layout": "child",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:normal}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:success:SOP}}"
+                  },
+                  {
+                    "type": "documents"
+                  }
+                ],
+                "{{items:normal}}": [
+                  "{{badge:success:FCTM}} RESERVED"
+                ],
+                "{{items:success:SOP}}": [
+                  "RESERVED"
+                ],
+                "documents": [
+                  {
+                    "title": "SOP B737 — 2.13. LOW VISIBILITY OPERATIONS",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 197
+                  }
+                ]
               },
               {
                 "id": "ffs-refr3-3-2",
                 "title": "3 AUTOLAND",
                 "layout": "divider"
+              },
+              {
+                "id": "ffs-refr3-3-2__after",
+                "layout": "text",
+                "blocks": [
+                  {
+                    "type": "items",
+                    "key": "{{items:success:Failures}}"
+                  }
+                ],
+                "{{items:success:Failures}}": [
+                  "- Третий заход на прямой <b>отказ A/T</b>, посадка."
+                ]
               }
             ],
-            "{{items:normal:Radio script}}": "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+            "{{items:normal:Radio script}}": [
+              "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+            ]
           }
         ],
         "blocks": [
@@ -3379,7 +4374,9 @@
                 "index": 1
               }
             ],
-            "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
+            "{{items:normal}}": [
+              "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+            ],
             "children": [
               {
                 "id": "ffs-00100a",
@@ -3411,14 +4408,24 @@
                     "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "{{items:normal}}": [
+                  "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}."
+                ],
+                "{{items:abnormal}}": [
+                  "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°"
+                ],
+                "{{items:emergency:Memory items}}": [
+                  "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}"
+                ],
+                "{{items:success:Критерии}}": [
+                  "Стабильный набор на одном двигателе без отклонений"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "Особое внимание — отказ двигателя на V1, эвакуация по команде."
+                ],
                 "documents": [
                   {
-                    "title": "QRH — Engine Failure стр. 22",
+                    "title": "QRH — Engine Failure",
                     "src": "modules/docs/AOMB.pdf",
                     "page": 22
                   }
@@ -3443,9 +4450,15 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+                "{{items:normal}}": [
+                  "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды."
+                ],
+                "{{items:success:Критерии}}": [
+                  "Успешное завершение LOFT-сценария"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "Оценка CRM и принятия решений."
+                ]
               }
             ]
           },
@@ -3472,10 +4485,18 @@
                 "key": "{{items:emergency:Instructor Notes}}"
               }
             ],
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:FFS settings}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            "{{items:normal}}": [
+              "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур."
+            ],
+            "{{items:success:Критерии}}": [
+              "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            ],
+            "{{items:info:FFS settings}}": [
+              "FFS Level D\nOPC/LPC задания\nEFB интеграция"
+            ],
+            "{{items:emergency:Instructor Notes}}": [
+              "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            ]
           }
         ],
         "blocks": [
@@ -3514,7 +4535,9 @@
                 "index": 1
               }
             ],
-            "{{items:normal}}": "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL.",
+            "{{items:normal}}": [
+              "{{badge:success:Выполнено}} {{badge:info:Boeing 737-800}} Повторная квалификация на ВС Boeing 737-800 в соответствии с требованиями EASA Part-FCL."
+            ],
             "children": [
               {
                 "id": "ffs-00200a",
@@ -3546,14 +4569,24 @@
                     "type": "documents"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}.",
-                "{{items:abnormal}}": "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°",
-                "{{items:emergency:Memory items}}": "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}",
-                "{{items:success:Критерии}}": "Стабильный набор на одном двигателе без отклонений",
-                "{{items:emergency:Instructor Notes}}": "Особое внимание — отказ двигателя на V1, эвакуация по команде.",
+                "{{items:normal}}": [
+                  "{{badge:success:Выполнено}} Отработка процедуры отказа двигателя на скорости V1. Критический элемент. См. процедуру: {{link:flightprocedures:fp-004:Отказ двигателя после V1}}."
+                ],
+                "{{items:abnormal}}": [
+                  "Продолжить взлёт — НЕ ПРЕРЫВАТЬ после V1\nPF: удерживать направление по оси ВПП\nПри VR: оторвать, установить тангаж +15°"
+                ],
+                "{{items:emergency:Memory items}}": [
+                  "Throttle — IDLE (failed engine)\nContinue Takeoff — DO NOT ABORT {{badge:abnormal:КРИТ}}"
+                ],
+                "{{items:success:Критерии}}": [
+                  "Стабильный набор на одном двигателе без отклонений"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "Особое внимание — отказ двигателя на V1, эвакуация по команде."
+                ],
                 "documents": [
                   {
-                    "title": "QRH — Engine Failure стр. 22",
+                    "title": "QRH — Engine Failure",
                     "src": "modules/docs/AOMB.pdf",
                     "page": 22
                   }
@@ -3578,9 +4611,15 @@
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:normal}}": "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды.",
-                "{{items:success:Критерии}}": "Успешное завершение LOFT-сценария",
-                "{{items:emergency:Instructor Notes}}": "Оценка CRM и принятия решений."
+                "{{items:normal}}": [
+                  "{{badge:success:Выполнено}} LOFT-сценарий: полёт с множественными отказами и ухудшением погоды."
+                ],
+                "{{items:success:Критерии}}": [
+                  "Успешное завершение LOFT-сценария"
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "Оценка CRM и принятия решений."
+                ]
               }
             ]
           },
@@ -3607,10 +4646,18 @@
                 "key": "{{items:emergency:Instructor Notes}}"
               }
             ],
-            "{{items:normal}}": "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур.",
-            "{{items:success:Критерии}}": "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL",
-            "{{items:info:FFS settings}}": "FFS Level D\nOPC/LPC задания\nEFB интеграция",
-            "{{items:emergency:Instructor Notes}}": "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            "{{items:normal}}": [
+              "{{badge:abnormal:Предстоит}} {{badge:info:Airbus A320-214}} Ежегодная повторная квалификация на ВС Airbus A320. Отработка стандартных и нестандартных процедур."
+            ],
+            "{{items:success:Критерии}}": [
+              "Успешное прохождение OPC и LPC в соответствии с EASA Part-FCL"
+            ],
+            "{{items:info:FFS settings}}": [
+              "FFS Level D\nOPC/LPC задания\nEFB интеграция"
+            ],
+            "{{items:emergency:Instructor Notes}}": [
+              "Акцент на переход от Normal к Abnormal процедурам. Контроль применения философии Airbus."
+            ]
           }
         ],
         "blocks": [

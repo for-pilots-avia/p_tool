@@ -521,6 +521,61 @@ body.dark-theme #checkrideContainer {
   opacity: 0.8;
 }
 
+/* Task 14: сетка миниатюр прикреплённых фото (несколько фото на секцию) */
+.checkride-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.checkride-photo-thumb {
+  position: relative;
+  border-radius: var(--border-radius-xs);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-main);
+}
+
+.checkride-photo-thumb .checkride-attached-img {
+  max-width: 100%;
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  margin-top: 0;
+  display: block;
+  cursor: pointer;
+}
+
+.checkride-photo-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background var(--transition-speed) var(--transition-ease);
+}
+
+.checkride-photo-delete svg {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.checkride-photo-delete:active {
+  background: var(--color-danger);
+}
+
 /* Task 41: отображение сохранённой подписи инструктора в просмотре истории */
 .checkride-signature-img {
   width: 100%;
@@ -663,6 +718,126 @@ body.dark-theme #checkrideContainer {
   font-size: var(--font-md);
   font-weight: 700;
   margin-bottom: 10px;
+}
+
+/* ─── Task 16: Cross-pilot summary (FFS) ─── */
+.checkride-cross-summary {
+  margin-bottom: 24px;
+}
+
+.checkride-cross-main-block {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.checkride-cross-main-block:last-of-type {
+  border-bottom: none;
+}
+
+.checkride-cross-main-title {
+  color: var(--color-primary);
+  font-size: var(--font-base);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.checkride-cross-pilot-line {
+  padding: 4px 0 4px 12px;
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+  border-left: 3px solid var(--color-border-subtle);
+  margin-left: 4px;
+  margin-bottom: 2px;
+}
+
+.checkride-cross-pilot-line b {
+  color: var(--color-primary);
+  margin-right: 6px;
+}
+
+/* Task 17: select-only exercises (Упр. X day 2) — combined per-pilot line */
+.checkride-cross-exercise-line {
+  padding: 4px 0 4px 12px;
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+  border-left: 3px solid var(--color-primary-light);
+  margin-left: 4px;
+  margin-bottom: 2px;
+}
+
+.checkride-cross-exercise-line b {
+  color: var(--color-primary);
+  margin-right: 4px;
+}
+
+.checkride-cross-comp-block {
+  margin-bottom: 10px;
+  padding-left: 12px;
+  border-left: 3px solid var(--color-primary-light);
+}
+
+.checkride-cross-comp-pilot {
+  color: var(--color-primary);
+  font-size: var(--font-sm);
+  margin-bottom: 4px;
+}
+
+/* ─── Task 16: Remarks and photos section ─── */
+.checkride-remarks-photos-section {
+  background: var(--color-bg-card);
+  padding: 16px 20px;
+  border-radius: var(--border-radius-md);
+  margin-bottom: 24px;
+}
+
+.checkride-remarks-photos-title {
+  color: var(--color-primary);
+  font-size: var(--font-md);
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.checkride-remark-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.checkride-remark-item:last-child {
+  border-bottom: none;
+}
+
+.checkride-remark-location {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.checkride-remark-location b {
+  color: var(--color-text-main);
+}
+
+.checkride-remark-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-main);
+  margin-bottom: 8px;
+}
+
+.checkride-no-remarks {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ─── Task 16: Section divider title (before per-pilot blocks) ─── */
+.checkride-report-section-divider-title {
+  color: var(--color-primary);
+  font-size: var(--font-md);
+  font-weight: 700;
+  margin: 24px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-primary);
 }
 
 /* Report sections */
@@ -1029,6 +1204,27 @@ body.dark-theme #checkrideContainer {
   color: var(--color-text-muted);
 }
 
+/* Task 14: badge объёма фото в записи истории */
+.checkride-history-photos {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--color-primary-ghost);
+  color: var(--color-primary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.checkride-history-photos svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
 .checkride-history-delete {
   flex-shrink: 0;
   width: 36px;
@@ -1176,6 +1372,79 @@ body.dark-theme .checkride-report-comment {
   background: rgba(255,255,255,0.05);
 }
 
+/* ─── Task 16: Dark theme for cross-pilot summary + remarks/photos ─── */
+body.dark-theme .checkride-cross-summary {
+  background: var(--cr-color-dark-surface);
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-cross-main-block {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .checkride-cross-main-title {
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-cross-pilot-line {
+  color: rgba(255, 255, 255, 0.88);
+  border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .checkride-cross-pilot-line b {
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-cross-exercise-line {
+  color: rgba(255, 255, 255, 0.88);
+  border-left-color: var(--cr-color-red);
+}
+
+body.dark-theme .checkride-cross-exercise-line b {
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-cross-comp-block {
+  border-left-color: var(--cr-color-red);
+}
+
+body.dark-theme .checkride-cross-comp-pilot {
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-remarks-photos-section {
+  background: var(--cr-color-dark-surface);
+}
+
+body.dark-theme .checkride-remarks-photos-title {
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-remark-item {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .checkride-remark-location {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.dark-theme .checkride-remark-location b {
+  color: var(--color-text-white);
+}
+
+body.dark-theme .checkride-remark-text {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body.dark-theme .checkride-no-remarks {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.dark-theme .checkride-report-section-divider-title {
+  color: var(--color-text-white);
+  border-bottom-color: var(--cr-color-red);
+}
+
 body.dark-theme #checkride-signature {
   background: var(--cr-color-dark-surface);
 }
@@ -1235,7 +1504,14 @@ body.dark-theme #checkrideContainer .checkride-competency-section-title {
 .checkride-report-comment,
 .checkride-competency-item,
 .checkride-signature-section,
-.checkride-history-info {
+.checkride-history-info,
+.checkride-cross-main-title,
+.checkride-cross-pilot-line,
+.checkride-cross-exercise-line,
+.checkride-remark-location,
+.checkride-remark-text,
+.checkride-no-remarks,
+.checkride-report-section-divider-title {
   overflow-wrap: break-word;
   word-break: break-word;
   hyphens: auto;

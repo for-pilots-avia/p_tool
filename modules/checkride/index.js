@@ -41,6 +41,86 @@
   var STORAGE_PILOT   = 'checkride_pilot';  // автосохранение полей регистрации
   var STORAGE_STATE  = 'checkride_state';   // кэш хода проверки
 
+  /* ═══════════════════════════════════════════
+     STORAGE QUOTA UTILITIES (Task 14)
+     localStorage ~5 MB; каждое фото ~50-150 KB (JPEG 0.6 @ 800px).
+     Применяется ТОЛЬКО предупреждение (не блокировка).
+     ═══════════════════════════════════════════ */
+  var LS_QUOTA_LIMIT    = 5 * 1024 * 1024;        // ~5 MB — лимит localStorage
+  var LS_LOW_SPACE      = 1 * 1024 * 1024;        // <1 MB свободно → предложить очистить историю
+  var LS_WARN_THRESHOLD = 4.5 * 1024 * 1024;      // >4.5 MB занято → toast-предупреждение
+
+  function getLocalStorageUsageBytes() {
+    var total = 0;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (!key) continue;
+        var val = localStorage.getItem(key) || '';
+        total += (key.length + val.length) * 2;  // UTF-16: 2 байта на символ
+      }
+    } catch(e) {}
+    return total;
+  }
+
+  function getPhotosSizeBytes(photos) {
+    if (!photos || !photos.length) return 0;
+    var total = 0;
+    for (var i = 0; i < photos.length; i++) {
+      if (photos[i]) total += String(photos[i]).length * 2;  // UTF-16
+    }
+    return total;
+  }
+
+  /* Объём всех фото в записи истории (fullData.checklists[].sections[].photos[]).
+     Backward compat: поддерживает legacy sec.img (одиночная строка). */
+  function getHistoryEntryPhotosBytes(entry) {
+    if (!entry || !entry.fullData || !entry.fullData.checklists) return 0;
+    var total = 0;
+    entry.fullData.checklists.forEach(function(cl) {
+      cl.sections.forEach(function(sec) {
+        if (sec.photos && sec.photos.length) {
+          total += getPhotosSizeBytes(sec.photos);
+        } else if (sec.img) {
+          total += String(sec.img).length * 2;  // legacy
+        }
+      });
+    });
+    return total;
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+
+  /* Toast-предупреждение при приближении к лимиту (не блокирует действие). */
+  function warnIfStorageNearLimit() {
+    var used = getLocalStorageUsageBytes();
+    if (used >= LS_WARN_THRESHOLD) {
+      var free = LS_QUOTA_LIMIT - used;
+      app.showToast('\u26A0\uFE0F \u041C\u0435\u0441\u0442\u043E \u0432 \u0445\u0440\u0430\u043D\u0438\u043B\u0438\u0449\u0435 \u043F\u043E\u0447\u0442\u0438 \u0437\u0430\u043F\u043E\u043B\u043D\u0435\u043D\u043E (\u0441\u0432\u043E\u0431\u043E\u0434\u043D\u043E ~' + formatBytes(free > 0 ? free : 0) + '). \u0420\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u0442\u0441\u044F \u043E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0438\u0441\u0442\u043E\u0440\u0438\u044E.');
+    }
+  }
+
+  /* Миграция sec.img (одиночная data URL) → sec.photos[] (массив).
+     Вызывается после загрузки state/истории для backward compat (Task 14). */
+  function migratePhotos(data) {
+    if (!data || !data.checklists) return;
+    data.checklists.forEach(function(cl) {
+      cl.sections.forEach(function(sec) {
+        if (sec.img !== undefined && sec.img) {
+          if (!Array.isArray(sec.photos)) sec.photos = [];
+          sec.photos.push(sec.img);
+          delete sec.img;
+        } else if (!Array.isArray(sec.photos)) {
+          sec.photos = [];
+        }
+      });
+    });
+  }
+
   /* ─── Маппинг кодов компетенций (fallback — основные берутся из JSON competencyDefs) ─── */
   var COMPETENCY_LABELS = {
     '\u041F\u041F':  '\u041F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043F\u0440\u043E\u0446\u0435\u0434\u0443\u0440',
@@ -192,6 +272,7 @@
         var state = JSON.parse(raw);
         if (state && state.screen === 'test' && state.data) {
           _data = state.data;
+          migratePhotos(_data);  // Task 14: sec.img → sec.photos[]
           _sectionIndex = state.sectionIndex || 0;
           _currentMode = state.currentMode || 'line';
           _screen = 'test';
@@ -309,6 +390,8 @@
           });
         });
       }
+      /* Task 14: миграция sec.img → sec.photos[] перед сохранением */
+      if (state.data) migratePhotos(state.data);
       try {
         localStorage.setItem(STORAGE_STATE, JSON.stringify(state));
       } catch(e) {}
@@ -406,7 +489,7 @@
       var instrEsc  = app.escapeAttr(_pilotData.instructor || '');
 
       html += '<div class="checkride-crew-section">';
-      html += '<div class="checkride-crew-role">CPT</div>';
+      html += '<div class="checkride-crew-role">CPT (CM 1)</div>';
       html += '<div class="checkride-crew-row">'
         + '<div class="checkride-crew-field">'
         + '<label class="checkride-label" for="cr_cpt_fio">\u0424\u0418\u041E</label>'
@@ -420,7 +503,7 @@
       html += '</div>';
 
       html += '<div class="checkride-crew-section">';
-      html += '<div class="checkride-crew-role">F/O</div>';
+      html += '<div class="checkride-crew-role">F/O (CM 2)</div>';
       html += '<div class="checkride-crew-row">'
         + '<div class="checkride-crew-field">'
         + '<label class="checkride-label" for="cr_fo_fio">\u0424\u0418\u041E</label>'
@@ -807,18 +890,31 @@
         });
       }
 
-      /* Comment/Photo block */
+      /* Comment/Photo block — Task 14: поддерживает несколько фото (массив sec.photos) */
       if (sec.subname !== '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') {
+        var photos = Array.isArray(sec.photos) ? sec.photos : [];
+        var photoGridHtml = '';
+        if (photos.length > 0) {
+          photoGridHtml = '<div class="checkride-photos-grid" data-cr-gallery="' + _sectionIndex + '_' + secIdx + '">';
+          for (var phI = 0; phI < photos.length; phI++) {
+            photoGridHtml += '<div class="checkride-photo-thumb">'
+              + '<img src="' + app.escapeAttr(photos[phI]) + '" class="checkride-attached-img ct-img-dark-invert" data-full-src="' + app.escapeAttr(photos[phI]) + '" data-cr-img-view="' + _sectionIndex + '_' + secIdx + '">'
+              + '<button type="button" class="checkride-photo-delete" data-cr-photo-delete="' + _sectionIndex + '_' + secIdx + '_' + phI + '" aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0444\u043E\u0442\u043E">' + icon('trash', 14) + '</button>'
+              + '</div>';
+          }
+          photoGridHtml += '</div>';
+        }
+        var photoCountStr = photos.length > 0 ? ' (' + photos.length + ')' : '';
         html += '<div class="checkride-detail-item">'
           + '<b class="checkride-comment-label">\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0438:</b>'
           + '<textarea id="sec_n_' + _sectionIndex + '_' + secIdx + '" class="checkride-textarea"' + app.langAttr(sec.note || '') + ' placeholder="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u0435\u043A\u0441\u0442...">' + app.escapeHtml(sec.note || '') + '</textarea>'
           + '<div class="checkride-photo-row">'
           + '<input type="file" accept="image/*" capture="environment" class="checkride-file-input-hidden" data-cr-file="' + _sectionIndex + '_' + secIdx + '">'
           + '<button type="button" class="checkride-photo-btn" data-cr-photo="' + _sectionIndex + '_' + secIdx + '">'
-          + icon('camera', 18) + ' <span>\u0424\u043E\u0442\u043E!</span></button>'
+          + icon('camera', 18) + ' <span>\u0424\u043E\u0442\u043E!' + photoCountStr + '</span></button>'
           + '</div>'
           + '<div id="sec_p_' + _sectionIndex + '_' + secIdx + '">'
-          + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" class="checkride-attached-img ct-img-dark-invert" data-cr-img-view="' + _sectionIndex + '_' + secIdx + '">' : '')
+          + photoGridHtml
           + '</div>'
         + '</div>';
       }
@@ -946,8 +1042,14 @@
       html += '<div class="checkride-history-list">';
       for (var i = 0; i < history.length; i++) {
         var h = history[i];
+        /* Task 14: fio из cpt (новый формат) с fallback на h.fio (старый LINE); объём фото в записи */
+        var entryFio = (h.cpt && h.cpt.fio) ? h.cpt.fio : (h.fio || '-');
+        var photoBytes = getHistoryEntryPhotosBytes(h);
+        var photoSizeStr = photoBytes > 0
+          ? ' <span class="checkride-history-photos">' + icon('camera', 12) + ' ' + formatBytes(photoBytes) + '</span>'
+          : '';
         html += '<div class="checkride-history-card" data-cr-view="' + i + '">'
-          + '<div class="checkride-history-info"><b>' + h.fio + '</b> <small>(' + h.mode + ')</small><br>' + h.date + '</div>'
+          + '<div class="checkride-history-info"><b>' + app.escapeHtml(entryFio) + '</b> <small>(' + h.mode + ')</small><br>' + h.date + photoSizeStr + '</div>'
           + '<button class="checkride-history-delete" data-cr-delete="' + i + '" aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C">' + icon('trash', 16) + '</button>'
         + '</div>';
       }
@@ -981,6 +1083,19 @@
       }
     }
 
+    /* Task 14: проверка лимита localStorage перед началом проверки.
+       Если свободно <1 MB — ТОЛЬКО предупреждение (toast, не блокирует):
+       рекомендуем очистить Историю; проверка продолжается без принуждения. */
+    var usedBytes = getLocalStorageUsageBytes();
+    var freeBytes = LS_QUOTA_LIMIT - usedBytes;
+    if (freeBytes < LS_LOW_SPACE) {
+      app.showToast('\u26A0\uFE0F \u041C\u0430\u043B\u043E \u043C\u0435\u0441\u0442\u0430 \u0432 \u0445\u0440\u0430\u043D\u0438\u043B\u0438\u0449\u0435 (\u0441\u0432\u043E\u0431\u043E\u0434\u043D\u043E ~' + formatBytes(freeBytes > 0 ? freeBytes : 0) + '). \u0420\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u0442\u0441\u044F \u043E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u0418\u0441\u0442\u043E\u0440\u0438\u044E \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A.');
+    }
+    proceedStartInspection();
+  }
+
+  /* Task 14: продолжение startInspection (вынесено для читаемости после квота-проверки). */
+  function proceedStartInspection() {
     var dataToUse = _currentMode === 'ffs' ? _dataFfs : _dataLine;
     if (!dataToUse) {
       app.showToast('\u0414\u0430\u043D\u043D\u044B\u0435 \u043D\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u044B');
@@ -1002,7 +1117,7 @@
     _data.checklists.forEach(function(mainSec) {
       mainSec.sections.forEach(function(sec) {
         sec.note = '';
-        sec.img = null;
+        sec.photos = [];  // Task 14: массив фото (вместо одиночного sec.img)
         /* FFS: PF для «Техника пилотирования.» — null (пользователь выберет на экране) */
         if (isFfs && sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.') {
           sec.pf = null;
@@ -1227,6 +1342,259 @@
     return reportHtml + '</div>';
   }
 
+  /* Task 14: helper — рендер всех фото секции для отчёта (img с data-full-src для PhotoSwipe-галереи).
+     Backward compat: поддерживает legacy sec.img (одиночная строка). */
+  function renderReportPhotosHtml(sec) {
+    var photos = Array.isArray(sec.photos) ? sec.photos : (sec.img ? [sec.img] : []);
+    if (photos.length === 0) return '';
+    var out = '';
+    for (var i = 0; i < photos.length; i++) {
+      out += '<img src="' + app.escapeAttr(photos[i]) + '" data-full-src="' + app.escapeAttr(photos[i]) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">';
+    }
+    return out;
+  }
+
+  function hasSectionPhotos(sec) {
+    return (Array.isArray(sec.photos) ? sec.photos.length > 0 : !!sec.img);
+  }
+
+  /* ═══════════════════════════════════════════
+     Task 17: Helpers for select-only subnames (Упр. X day 2)
+     isSelectOnlySubname: true если ВСЕ items — select (нет radio/checkbox)
+     calcSelectScoreForPilot: собираем select-оценки 2-5 (skip «na»/empty);
+       если любая =2 → 2; иначе average rounded; нет оценок → null
+     ═══════════════════════════════════════════ */
+  function isSelectOnlySubname(sec) {
+    var hasSelect = false;
+    var hasOther = false;
+    var groups = sec.groups || [{ items: sec.items || [] }];
+    groups.forEach(function(g) {
+      (g.items || []).forEach(function(item) {
+        if (item.type === 'select') hasSelect = true;
+        else if (item.type === 'radio' || item.type === 'checkbox') hasOther = true;
+      });
+    });
+    return hasSelect && !hasOther;
+  }
+
+  function calcSelectScoreForPilot(sec, pilotKey) {
+    var grades = [];
+    var groups = sec.groups || [{ items: sec.items || [] }];
+    groups.forEach(function(g) {
+      (g.items || []).forEach(function(item) {
+        if (item.type === 'select') {
+          var val = item['ok' + pilotKey];
+          if (val === '2' || val === '3' || val === '4' || val === '5') {
+            grades.push(parseInt(val, 10));
+          }
+        }
+      });
+    });
+    if (grades.length === 0) return null;
+    if (grades.indexOf(2) !== -1) return 2;
+    return Math.round(grades.reduce(function(a, b) { return a + b; }, 0) / grades.length);
+  }
+
+  /* ═══════════════════════════════════════════
+     Task 16: Cross-pilot summary (FFS only)
+     Сводная оценка по обоим пилотам с разбивкой по subname:
+     - «Подготовка к тренажеру.» (только checkbox) → «полностью/частично/не выполнено»
+     - REFRESH/CHECK → «{pilot} | {subname}: {score} | {subname}: {score}»
+       (subname с radio → средний балл 2-5; subname с checkbox → %→2-5;
+        subname с только select (Упр. X day 2) → отдельная combined-строка
+        «Упр. X day 2: CPT - N; F/O - N»; «Компетенции.» → skip)
+     - «Разбор» → полностью пропускается
+     В конце — Компетенции: CPT / F/O (4 кода с оценками)
+     ═══════════════════════════════════════════ */
+  function buildCrossPilotSummary() {
+    var html = '<div class="checkride-cross-summary checkride-rating-summary">'
+      + '<h3>\u0421\u0432\u043E\u0434\u043D\u0430\u044F \u043E\u0446\u0435\u043D\u043A\u0430</h3>';
+
+    var pilots = [{ key: 'Cpt', label: 'CPT' }, { key: 'Fo', label: 'F/O' }];
+
+    _data.checklists.forEach(function(mainSec) {
+      /* «Разбор» — исключён из оценок */
+      if (mainSec.name === '\u0420\u0430\u0437\u0431\u043E\u0440') return;
+
+      html += '<div class="checkride-cross-main-block">';
+      html += '<div class="checkride-cross-main-title">' + app.escapeHtml(mainSec.name) + '</div>';
+
+      /* Определить тип mainSec: если ВСЕ его секции (кроме «Компетенции.») содержат
+         только checkbox items → binary-режим (полностью/частично).
+         Иначе — graded-режим (subname: score). */
+      var hasGradedItems = false;
+      mainSec.sections.forEach(function(sec) {
+        if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+        var groups = sec.groups || [{ items: sec.items || [] }];
+        groups.forEach(function(g) {
+          (g.items || []).forEach(function(item) {
+            if (item.type === 'radio' || item.type === 'select') hasGradedItems = true;
+          });
+        });
+      });
+
+      if (!hasGradedItems) {
+        /* Binary-режим: «Подготовка к тренажеру.» → полностью/частично/не выполнено */
+        pilots.forEach(function(p) {
+          var totalChecks = 0, checked = 0;
+          mainSec.sections.forEach(function(sec) {
+            var groups = sec.groups || [{ items: sec.items || [] }];
+            groups.forEach(function(g) {
+              (g.items || []).forEach(function(item) {
+                if (item.type === 'checkbox') {
+                  totalChecks++;
+                  if (item['ok' + p.key]) checked++;
+                }
+              });
+            });
+          });
+          var status = (totalChecks === 0) ? '\u2014'
+            : (checked === totalChecks) ? '\u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E'
+            : (checked > 0) ? '\u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E'
+            : '\u043D\u0435 \u0432\u044B\u043F\u043E\u043B\u043D\u0435\u043D\u043E';
+          html += '<div class="checkride-cross-pilot-line">'
+            + '<b>' + app.escapeHtml(p.label) + '</b> ' + app.escapeHtml(status)
+            + '</div>';
+        });
+      } else {
+        /* Graded-режим: collapse subnames; radio→avg; checkbox→%→score; skip select-only subnames */
+        pilots.forEach(function(p) {
+          /* subnameData: { subname: { type: 'radio'|'checkbox', radioScores: [], total, checked } } */
+          var subnameData = {};
+          var subnameOrder = [];
+          mainSec.sections.forEach(function(sec) {
+            if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+            var sn = sec.subname;
+            if (!subnameData[sn]) {
+              subnameData[sn] = { type: null, radioScores: [], total: 0, checked: 0, hasSelect: false, hasRadio: false, hasCheckbox: false };
+              subnameOrder.push(sn);
+            }
+            var groups = sec.groups || [{ items: sec.items || [] }];
+            groups.forEach(function(g) {
+              (g.items || []).forEach(function(item) {
+                if (item.type === 'radio') {
+                  subnameData[sn].hasRadio = true;
+                  var val = item['ok' + p.key];
+                  var score = val ? (5 - item.options.indexOf(val)) : 2;
+                  subnameData[sn].radioScores.push(score < 2 ? 2 : score);
+                } else if (item.type === 'checkbox') {
+                  subnameData[sn].hasCheckbox = true;
+                  subnameData[sn].total++;
+                  if (item['ok' + p.key]) subnameData[sn].checked++;
+                } else if (item.type === 'select') {
+                  subnameData[sn].hasSelect = true;
+                }
+              });
+            });
+          });
+
+          /* Сборка строки: «{pilot} | {subname}: {score} | ...»
+             subname с radio → средний балл; subname с checkbox → %→score;
+             subname с ТОЛЬКО select → skip; trailing точка в subname удаляется. */
+          var parts = [app.escapeHtml(p.label)];
+          subnameOrder.forEach(function(sn) {
+            var d = subnameData[sn];
+            var scoreStr = null;
+            if (d.hasRadio && d.radioScores.length > 0) {
+              var avg = (d.radioScores.indexOf(2) !== -1)
+                ? 2
+                : Math.round(d.radioScores.reduce(function(a,b){return a+b;},0) / d.radioScores.length);
+              scoreStr = String(avg);
+            } else if (d.hasCheckbox && d.total > 0) {
+              var pct = (d.checked / d.total) * 100;
+              var score = 2;
+              if (pct >= 80) score = 5;
+              else if (pct >= 50) score = 4;
+              else if (pct >= 10) score = 3;
+              scoreStr = String(score);
+            }
+            /* skip subname с только select (Упр. X day 2) */
+            if (scoreStr !== null) {
+              var snClean = sn.replace(/\.$/, '');
+              parts.push(app.escapeHtml(snClean) + ': <span class="checkride-score-val">' + scoreStr + '</span>');
+            }
+          });
+          html += '<div class="checkride-cross-pilot-line">' + parts.join(' | ') + '</div>';
+        });
+      }
+
+      /* Task 17: select-only subnames (Упр. X day 2) → combined per-pilot line:
+         «Упр. 6 day 2: CPT - 4; F/O - 4» — одна строка на subname, оба пилота.
+         Calculation: per pilot, collect select grades 2-5 (skip «na»/empty);
+         если любая =2 → 2; иначе average rounded; нет оценок → «—». */
+      mainSec.sections.forEach(function(sec) {
+        if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+        if (!isSelectOnlySubname(sec)) return;
+        var cptSel = calcSelectScoreForPilot(sec, 'Cpt');
+        var foSel = calcSelectScoreForPilot(sec, 'Fo');
+        var cptStrSel = (cptSel === null) ? '\u2014' : String(cptSel);
+        var foStrSel = (foSel === null) ? '\u2014' : String(foSel);
+        html += '<div class="checkride-cross-exercise-line">'
+          + app.escapeHtml(sec.subname) + ': '
+          + '<b>CPT</b> \u2014 <span class="checkride-score-val">' + app.escapeHtml(cptStrSel) + '</span>; '
+          + '<b>F/O</b> \u2014 <span class="checkride-score-val">' + app.escapeHtml(foStrSel) + '</span>'
+          + '</div>';
+      });
+
+      html += '</div>';  /* .checkride-cross-main-block */
+    });
+
+    /* Компетенции: CPT блок + F/O блок (4 кода с оценками) */
+    var cptComps = calculateCompetencies('cpt');
+    var foComps = calculateCompetencies('fo');
+    if (Object.keys(cptComps).length > 0 || Object.keys(foComps).length > 0) {
+      html += '<div class="checkride-competencies-rating-divider">';
+      html += '<div class="checkride-competencies-rating-title">\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438:</div>';
+      [{ label: 'CPT', comps: cptComps }, { label: 'F/O', comps: foComps }].forEach(function(p) {
+        html += '<div class="checkride-cross-comp-block"><div class="checkride-cross-comp-pilot"><b>' + app.escapeHtml(p.label) + '</b></div>';
+        for (var code in p.comps) {
+          var cLabel = getCompetencyLabel(code);
+          html += '<div class="checkride-rating-block"><b>' + app.escapeHtml(code) + '</b> \u2014 '
+            + app.escapeHtml(cLabel) + ': <span class="checkride-score-val">' + p.comps[code].score + '</span></div>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    return html + '</div>';
+  }
+
+  /* ═══════════════════════════════════════════
+     Task 16: Remarks and photos collector
+     Собирает все sec.note + sec.photos из всех секций (кроме «Компетенции.»)
+     для отображения отдельным блоком «Замечания и фото».
+     ═══════════════════════════════════════════ */
+  function buildRemarksAndPhotos() {
+    var html = '<div class="checkride-remarks-photos-section">'
+      + '<h3 class="checkride-remarks-photos-title">\u0417\u0430\u043C\u0435\u0447\u0430\u043D\u0438\u044F \u0438 \u0444\u043E\u0442\u043E</h3>';
+
+    var hasAny = false;
+    _data.checklists.forEach(function(mainSec) {
+      mainSec.sections.forEach(function(sec) {
+        if (sec.subname === '\u041A\u043E\u043C\u043F\u0435\u0442\u0435\u043D\u0446\u0438\u0438.') return;
+        if (sec.note || hasSectionPhotos(sec)) {
+          hasAny = true;
+          html += '<div class="checkride-remark-item">';
+          html += '<div class="checkride-remark-location"><b>'
+            + app.escapeHtml(mainSec.name) + '</b> \u2192 '
+            + app.escapeHtml(sec.subname) + '</div>';
+          if (sec.note) {
+            html += '<div class="checkride-remark-text"><span' + renderRuText(sec.note) + '></span></div>';
+          }
+          html += renderReportPhotosHtml(sec);
+          html += '</div>';
+        }
+      });
+    });
+
+    if (!hasAny) {
+      html += '<p class="checkride-no-remarks">\u041D\u0435\u0442 \u0437\u0430\u043C\u0435\u0447\u0430\u043D\u0438\u0439 \u0438 \u0444\u043E\u0442\u043E</p>';
+    }
+
+    return html + '</div>';
+  }
+
   /* ═══════════════════════════════════════════
      CORE LOGIC: Build report
      FFS-crew: рендерит 2 блока (CPT и F/O) — каждый со своим summary + detailed items + competencies.
@@ -1241,6 +1609,15 @@
     var pilots = isFfs ? [{ key: 'Cpt', label: 'CPT' }, { key: 'Fo', label: 'F/O' }] : [{ key: null, label: '' }];
 
     dataEl.innerHTML = '';
+
+    /* Task 16: FFS — в начале cross-pilot Сводная оценка + Замечания и фото.
+       Per-pilot детальные блоки (calculateRatings + items + competencies) — после, как сейчас. */
+    if (isFfs) {
+      dataEl.innerHTML += buildCrossPilotSummary();
+      dataEl.innerHTML += buildRemarksAndPhotos();
+      dataEl.innerHTML += '<h2 class="checkride-report-section-divider-title">\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u044B\u0435 \u043E\u0446\u0435\u043D\u043A\u0438 \u043F\u043E \u043F\u0438\u043B\u043E\u0442\u0430\u043C</h2>';
+    }
+
     pilots.forEach(function(p) {
       if (isFfs) {
         /* Заголовок блока пилота в FFS */
@@ -1250,7 +1627,11 @@
           + '<div class="checkride-report-crew-title">' + p.label + ' — ' + app.escapeHtml(pilotFio || '-') + ' (' + app.escapeHtml('\u041B\u0438\u0446\u0435\u043D\u0437\u0438\u044F: ' + (pilotLic || '-')) + ')</div>';
       }
 
-      dataEl.innerHTML += calculateRatings(p.key);
+      /* Task 18: FFS — per-pilot «Сводная оценка» УБРАНА (дублирует cross-pilot
+         summary в начале отчёта). LINE — сохраняем (единственная сводная оценка). */
+      if (!isFfs) {
+        dataEl.innerHTML += calculateRatings(p.key);
+      }
 
       _data.checklists.forEach(function(mainSec) {
         dataEl.innerHTML += '<h2 class="checkride-report-main-title">' + app.escapeHtml(mainSec.name) + '</h2>';
@@ -1268,10 +1649,10 @@
           var isPmForSection = (p.key && sec.subname === '\u0422\u0435\u0445\u043D\u0438\u043A\u0430 \u043F\u0438\u043B\u043E\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F.' && sec.pf && p.key.toLowerCase() !== sec.pf);
           if (isPmForSection) {
             sHtml += '<p class="checkride-pm-mark">' + app.escapeHtml(p.label + ': PM \u0434\u043B\u044F \u044D\u0442\u043E\u0433\u043E \u0443\u043F\u0440\u0430\u0436\u043D\u0435\u043D\u0438\u044F') + '</p>';
-            if (sec.note || sec.img) {
+            if (sec.note || hasSectionPhotos(sec)) {
               sHtml += '<div class="checkride-report-comment">'
                 + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> <span' + renderRuText(sec.note) + '</span></p>' : '')
-                + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">' : '')
+                + renderReportPhotosHtml(sec)
               + '</div>';
             }
             dataEl.innerHTML += sHtml + '</div>';
@@ -1301,20 +1682,27 @@
                   : '<span class="checkride-icon-fail">\u2717 \u041D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0435</span>';
                 sHtml += '<div class="checkride-report-item-row"><p' + renderRuText(item.label) + '</p><div class="checkride-flex-row">' + res + '</div></div>';
               } else if (item.type === 'radio') {
-                var scoreValue = val || '2 (\u043D/\u0434)';
-                var scoreIndex = val ? item.options.indexOf(val) : -1;
-                var actualScore = scoreIndex >= 0 ? (5 - scoreIndex) : 2;
-                sHtml += '<div class="checkride-report-item-row checkride-report-radio-item">'
-                  + '<p class="checkride-radio-label-bold"' + renderRuText(item.label) + '</p>'
-                  + '<div class="checkride-radio-score-indent"><b>\u041E\u0446\u0435\u043D\u043A\u0430:</b> ' + actualScore + ' - ' + app.escapeHtml(scoreValue) + '</div>'
-                + '</div>';
+                /* Task 19: если radio не выбран → «— не оценено» (вместо «Оценка: 2 - 2 (н/д)»). */
+                if (val) {
+                  var scoreIndex = item.options.indexOf(val);
+                  var actualScore = scoreIndex >= 0 ? (5 - scoreIndex) : 2;
+                  sHtml += '<div class="checkride-report-item-row checkride-report-radio-item">'
+                    + '<p class="checkride-radio-label-bold"' + renderRuText(item.label) + '</p>'
+                    + '<div class="checkride-radio-score-indent"><b>\u041E\u0446\u0435\u043D\u043A\u0430:</b> ' + actualScore + ' - ' + app.escapeHtml(val) + '</div>'
+                  + '</div>';
+                } else {
+                  sHtml += '<div class="checkride-report-item-row checkride-report-radio-item">'
+                    + '<p class="checkride-radio-label-bold"' + renderRuText(item.label) + '</p>'
+                    + '<div class="checkride-radio-score-indent"><span class="checkride-grade-na">\u2014 \u043D\u0435 \u043E\u0446\u0435\u043D\u0435\u043D\u043E</span></div>'
+                  + '</div>';
+                }
               }
             });
           });
-          if (sec.note || sec.img) {
+          if (sec.note || hasSectionPhotos(sec)) {
             sHtml += '<div class="checkride-report-comment">'
               + (sec.note ? '<p><b>\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439:</b> <span' + renderRuText(sec.note) + '</span></p>' : '')
-              + (sec.img ? '<img src="' + app.escapeAttr(sec.img) + '" data-full-src="' + app.escapeAttr(sec.img) + '" class="checkride-report-img ct-img-dark-invert" data-cr-report-img="1">' : '')
+              + renderReportPhotosHtml(sec)
             + '</div>';
           }
           dataEl.innerHTML += sHtml + '</div>';
@@ -1409,10 +1797,16 @@
           canvas.width = targetW;
           canvas.height = targetH;
           canvas.getContext('2d').drawImage(img, 0, 0, targetW, targetH);
-          _data.checklists[mainIdx].sections[secIdx].img = canvas.toDataURL('image/jpeg', 0.6);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          /* Task 14: добавляем фото в массив (поддержка нескольких фото на секцию) */
+          var sec = _data.checklists[mainIdx].sections[secIdx];
+          if (!Array.isArray(sec.photos)) sec.photos = [];
+          sec.photos.push(dataUrl);
           _screen = 'test';
           renderAll();
           saveInspectionState();
+          /* Task 14: предупреждение при приближении к лимиту (не блокирует) */
+          warnIfStorageNearLimit();
         };
       };
       reader.readAsDataURL(input.files[0]);
@@ -1531,6 +1925,7 @@
     _pilotData.signature      = h.signature || null;  // Task 41: восстанавливаем подпись
 
     _data = h.fullData;
+    migratePhotos(_data);  // Task 14: миграция sec.img → sec.photos[] для старых записей
     _data.savedDate = h.date;
     _currentMode = h.mode;
     _screen = 'report';
@@ -1640,6 +2035,153 @@
     lines.push('');
 
     if (_data && _data.checklists) {
+      /* Task 16: FFS — перед per-pilot блоками добавить cross-pilot сводную + замечания/фото */
+      if (isFfs) {
+        lines.push('СВОДНАЯ ОЦЕНКА (по обоим пилотам)');
+        lines.push('==================================');
+        var crossPilots = [{ key: 'Cpt', label: 'CPT' }, { key: 'Fo', label: 'F/O' }];
+        _data.checklists.forEach(function(mainSec) {
+          if (mainSec.name === 'Разбор') return;
+          lines.push('');
+          lines.push('** ' + mainSec.name + ' **');
+
+          /* Тип mainSec: только checkbox → binary; иначе graded */
+          var hasGradedT = false;
+          mainSec.sections.forEach(function(sec) {
+            if (sec.subname === 'Компетенции.') return;
+            var groups = sec.groups || [{ items: sec.items || [] }];
+            groups.forEach(function(g) {
+              (g.items || []).forEach(function(item) {
+                if (item.type === 'radio' || item.type === 'select') hasGradedT = true;
+              });
+            });
+          });
+
+          crossPilots.forEach(function(p) {
+            if (!hasGradedT) {
+              /* Binary-режим */
+              var totalT = 0, checkedT = 0;
+              mainSec.sections.forEach(function(sec) {
+                var groups = sec.groups || [{ items: sec.items || [] }];
+                groups.forEach(function(g) {
+                  (g.items || []).forEach(function(item) {
+                    if (item.type === 'checkbox') {
+                      totalT++;
+                      if (item['ok' + p.key]) checkedT++;
+                    }
+                  });
+                });
+              });
+              var statusT = (totalT === 0) ? '—'
+                : (checkedT === totalT) ? 'полностью'
+                : (checkedT > 0) ? 'частично'
+                : 'не выполнено';
+              lines.push('  ' + p.label + ' ' + statusT);
+            } else {
+              /* Graded-режим: collapse subnames */
+              var snDataT = {};
+              var snOrderT = [];
+              mainSec.sections.forEach(function(sec) {
+                if (sec.subname === 'Компетенции.') return;
+                var sn = sec.subname;
+                if (!snDataT[sn]) {
+                  snDataT[sn] = { radioScores: [], total: 0, checked: 0, hasRadio: false, hasCheckbox: false };
+                  snOrderT.push(sn);
+                }
+                var groups = sec.groups || [{ items: sec.items || [] }];
+                groups.forEach(function(g) {
+                  (g.items || []).forEach(function(item) {
+                    if (item.type === 'radio') {
+                      snDataT[sn].hasRadio = true;
+                      var valR = item['ok' + p.key];
+                      var scoreR = valR ? (5 - item.options.indexOf(valR)) : 2;
+                      snDataT[sn].radioScores.push(scoreR < 2 ? 2 : scoreR);
+                    } else if (item.type === 'checkbox') {
+                      snDataT[sn].hasCheckbox = true;
+                      snDataT[sn].total++;
+                      if (item['ok' + p.key]) snDataT[sn].checked++;
+                    }
+                  });
+                });
+              });
+              var partsT = [p.label];
+              snOrderT.forEach(function(sn) {
+                var d = snDataT[sn];
+                var scoreStrT = null;
+                if (d.hasRadio && d.radioScores.length > 0) {
+                  var avgT = (d.radioScores.indexOf(2) !== -1)
+                    ? 2
+                    : Math.round(d.radioScores.reduce(function(a,b){return a+b;},0) / d.radioScores.length);
+                  scoreStrT = String(avgT);
+                } else if (d.hasCheckbox && d.total > 0) {
+                  var pctT = (d.checked / d.total) * 100;
+                  var scT = 2;
+                  if (pctT >= 80) scT = 5;
+                  else if (pctT >= 50) scT = 4;
+                  else if (pctT >= 10) scT = 3;
+                  scoreStrT = String(scT);
+                }
+                if (scoreStrT !== null) {
+                  partsT.push(sn.replace(/\.$/, '') + ': ' + scoreStrT);
+                }
+              });
+              lines.push('  ' + partsT.join(' | '));
+            }
+          });
+
+          /* Task 17: select-only subnames (Упр. X day 2) → combined line */
+          mainSec.sections.forEach(function(sec) {
+            if (sec.subname === 'Компетенции.') return;
+            if (!isSelectOnlySubname(sec)) return;
+            var cptSelT = calcSelectScoreForPilot(sec, 'Cpt');
+            var foSelT = calcSelectScoreForPilot(sec, 'Fo');
+            var cptStrT = (cptSelT === null) ? '—' : String(cptSelT);
+            var foStrT = (foSelT === null) ? '—' : String(foSelT);
+            lines.push('  ' + sec.subname + ': CPT - ' + cptStrT + '; F/O - ' + foStrT);
+          });
+        });
+
+        /* Компетенции в cross-pilot сводке */
+        var cptCompsT = calculateCompetencies('cpt');
+        var foCompsT = calculateCompetencies('fo');
+        if (Object.keys(cptCompsT).length > 0 || Object.keys(foCompsT).length > 0) {
+          lines.push('');
+          lines.push('Компетенции:');
+          [{ label: 'CPT', comps: cptCompsT }, { label: 'F/O', comps: foCompsT }].forEach(function(p) {
+            lines.push('  ' + p.label + ':');
+            for (var codeT in p.comps) {
+              lines.push('    ' + codeT + ' — ' + getCompetencyLabel(codeT) + ': ' + p.comps[codeT].score);
+            }
+          });
+        }
+
+        /* Замечания и фото */
+        var hasRemarksT = false;
+        lines.push('');
+        lines.push('ЗАМЕЧАНИЯ И ФОТО');
+        lines.push('=================');
+        _data.checklists.forEach(function(mainSec) {
+          mainSec.sections.forEach(function(sec) {
+            if (sec.subname === 'Компетенции.') return;
+            if (sec.note || hasSectionPhotos(sec)) {
+              hasRemarksT = true;
+              lines.push('');
+              lines.push('[' + mainSec.name + ' → ' + sec.subname + ']');
+              if (sec.note) lines.push('  ' + sec.note);
+              var photosT = Array.isArray(sec.photos) ? sec.photos : (sec.img ? [sec.img] : []);
+              if (photosT.length > 0) {
+                lines.push('  Фото: ' + photosT.length + ' шт.');
+              }
+            }
+          });
+        });
+        if (!hasRemarksT) lines.push('  Нет замечаний и фото');
+
+        lines.push('');
+        lines.push('ПОДРОБНЫЕ ОЦЕНКИ ПО ПИЛОТАМ');
+        lines.push('===========================');
+      }
+
       /* FFS: 2 блока (CPT и F/O); LINE: один блок */
       var pilots = isFfs ? [{ key: 'Cpt', label: 'CPT' }, { key: 'Fo', label: 'F/O' }] : [{ key: null, label: '' }];
       pilots.forEach(function(p) {
@@ -1649,54 +2191,58 @@
           lines.push('');
         }
 
-        /* ─── СВОДНАЯ ОЦЕНКА ─── (синхронизировано с calculateRatings, но в текстовом формате). */
-        lines.push('СВОДНАЯ ОЦЕНКА');
-        lines.push('===============');
-        _data.checklists.forEach(function(mainSec) {
-          var piloting = [];
-          var hasPilotingSection = false;
-          var gradeValues = [];
-          mainSec.sections.forEach(function(sec) {
-            var groups = sec.groups || [{ items: sec.items || [] }];
-            /* FFS: SKIP radio-items из «Техника пилотирования.» для PM-пилота */
-            var isPilotingT = (sec.subname === 'Техника пилотирования.');
-            var skipPilotingForPilotT = false;
-            if (p.key && isPilotingT && sec.pf && p.key.toLowerCase() !== sec.pf) {
-              skipPilotingForPilotT = true;
-            }
-            groups.forEach(function(g) { g.items.forEach(function(i) {
-              if (skipPilotingForPilotT && i.type === 'radio') return;
-              var val = p.key ? i['ok' + p.key] : i.ok;
-              if (i.type === 'radio') {
-                hasPilotingSection = true;
-                var score = val ? (5 - i.options.indexOf(val)) : 2;
-                piloting.push(score < 2 ? 2 : score);
-              } else if (i.type === 'select') {
-                if (val === '2' || val === '3' || val === '4' || val === '5') {
-                  gradeValues.push(parseInt(val, 10));
-                }
+        /* Task 18: FFS — per-pilot «СВОДНАЯ ОЦЕНКА» УБРАНА (дублирует cross-pilot
+           summary). LINE — сохраняем (единственная сводная оценка). */
+        if (!isFfs) {
+          /* ─── СВОДНАЯ ОЦЕНКА ─── (синхронизировано с calculateRatings, но в текстовом формате). */
+          lines.push('СВОДНАЯ ОЦЕНКА');
+          lines.push('===============');
+          _data.checklists.forEach(function(mainSec) {
+            var piloting = [];
+            var hasPilotingSection = false;
+            var gradeValues = [];
+            mainSec.sections.forEach(function(sec) {
+              var groups = sec.groups || [{ items: sec.items || [] }];
+              /* FFS: SKIP radio-items из «Техника пилотирования.» для PM-пилота */
+              var isPilotingT = (sec.subname === 'Техника пилотирования.');
+              var skipPilotingForPilotT = false;
+              if (p.key && isPilotingT && sec.pf && p.key.toLowerCase() !== sec.pf) {
+                skipPilotingForPilotT = true;
               }
-            }); });
+              groups.forEach(function(g) { g.items.forEach(function(i) {
+                if (skipPilotingForPilotT && i.type === 'radio') return;
+                var val = p.key ? i['ok' + p.key] : i.ok;
+                if (i.type === 'radio') {
+                  hasPilotingSection = true;
+                  var score = val ? (5 - i.options.indexOf(val)) : 2;
+                  piloting.push(score < 2 ? 2 : score);
+                } else if (i.type === 'select') {
+                  if (val === '2' || val === '3' || val === '4' || val === '5') {
+                    gradeValues.push(parseInt(val, 10));
+                  }
+                }
+              }); });
+            });
+            var pRes = piloting.length ? (piloting.indexOf(2) !== -1 ? 2 : Math.round(piloting.reduce(function(a,b){return a+b;},0)/piloting.length)) : '-';
+            var gRes = gradeValues.length ? Math.round(gradeValues.reduce(function(a,b){return a+b;},0)/gradeValues.length) : '-';
+            var line = mainSec.name;
+            if (hasPilotingSection) line += ' | Техника пилотирования: ' + pRes;
+            if (gradeValues.length) line += ' | Стандартные процедуры: ' + gRes;
+            lines.push(line);
           });
-          var pRes = piloting.length ? (piloting.indexOf(2) !== -1 ? 2 : Math.round(piloting.reduce(function(a,b){return a+b;},0)/piloting.length)) : '-';
-          var gRes = gradeValues.length ? Math.round(gradeValues.reduce(function(a,b){return a+b;},0)/gradeValues.length) : '-';
-          var line = mainSec.name;
-          if (hasPilotingSection) line += ' | Техника пилотирования: ' + pRes;
-          if (gradeValues.length) line += ' | Стандартные процедуры: ' + gRes;
-          lines.push(line);
-        });
-        /* Компетенции в сводке (сводный балл) */
-        var summaryComps = calculateCompetencies(p.key ? p.key.toLowerCase() : undefined);
-        if (Object.keys(summaryComps).length > 0) {
-          lines.push('');
-          lines.push('Компетенции:');
-          for (var sc in summaryComps) {
-            lines.push('  ' + sc + ' — ' + getCompetencyLabel(sc) + ': оценка ' + summaryComps[sc].score
-              + ' (' + Math.round(summaryComps[sc].percent) + '%)');
+          /* Компетенции в сводке (сводный балл) */
+          var summaryComps = calculateCompetencies(p.key ? p.key.toLowerCase() : undefined);
+          if (Object.keys(summaryComps).length > 0) {
+            lines.push('');
+            lines.push('Компетенции:');
+            for (var sc in summaryComps) {
+              lines.push('  ' + sc + ' — ' + getCompetencyLabel(sc) + ': оценка ' + summaryComps[sc].score
+                + ' (' + Math.round(summaryComps[sc].percent) + '%)');
+            }
           }
+          lines.push('');
+          lines.push('');
         }
-        lines.push('');
-        lines.push('');
 
         _data.checklists.forEach(function(mainSec) {
           lines.push('');
@@ -1732,7 +2278,8 @@
                 } else if (item.type === 'checkbox') {
                   lines.push('  ' + (val ? '[x]' : '[ ]') + ' ' + label);
                 } else if (item.type === 'radio') {
-                  lines.push('  • ' + label + ' — оценка: ' + (val || 'не указано'));
+                  /* Task 19: если radio не выбран → «не оценено» (вместо «не указано»). */
+                  lines.push('  • ' + label + ' — ' + (val ? 'оценка: ' + val : 'не оценено'));
                 }
               });
             });
@@ -2053,10 +2600,29 @@
           return;
         }
 
-        /* Click on attached image → open in PhotoSwipe */
+        /* Task 14: delete single photo from section */
+        var delPhotoBtn = e.target.closest('[data-cr-photo-delete]');
+        if (delPhotoBtn) {
+          var dparts = delPhotoBtn.dataset.crPhotoDelete.split('_');
+          var dmIdx = parseInt(dparts[0], 10);
+          var dsIdx = parseInt(dparts[1], 10);
+          var dpIdx = parseInt(dparts[2], 10);
+          if (_data && _data.checklists[dmIdx] && _data.checklists[dmIdx].sections[dsIdx]) {
+            var dsec = _data.checklists[dmIdx].sections[dsIdx];
+            if (Array.isArray(dsec.photos) && dpIdx >= 0 && dpIdx < dsec.photos.length) {
+              dsec.photos.splice(dpIdx, 1);
+              renderAll();
+              saveInspectionState();
+            }
+          }
+          return;
+        }
+
+        /* Click on attached image → open in PhotoSwipe (gallery mode if inside grid) */
         var imgView = e.target.closest('[data-cr-img-view]');
         if (imgView) {
-          app.openPhotoSwipe(imgView);
+          var photoGallery = imgView.closest('.checkride-photos-grid');
+          app.openPhotoSwipe(imgView, photoGallery || undefined);
           return;
         }
 

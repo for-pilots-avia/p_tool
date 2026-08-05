@@ -1164,7 +1164,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
   background: rgba(23, 162, 184, 0.08);
 }
 .flightprocedures-table-wrap th {
-  padding: 10px 12px;
+  padding: 2px 6px;
   text-align: left;
   font-weight: 700;
   font-size: var(--font-xs);
@@ -1175,7 +1175,7 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
   white-space: nowrap;
 }
 .flightprocedures-table-wrap td {
-  padding: 10px 12px;
+  padding: 2px 6px;
   color: var(--color-text-secondary);
   border-bottom: 1px solid var(--color-border-subtle);
   vertical-align: top;
@@ -1193,6 +1193,26 @@ body.dark-theme #flightproceduresContainer .ct-search-input {
 }
 .flightprocedures-table-wrap li {
   margin-bottom: 2px;
+}
+
+/* ─── Task 69: inline таблица ВНУТРИ items-block-content ───
+   Отключить table-wrap специфичные стили (margin/border/border-radius),
+   чтобы таблица не разрывала визуальный поток items-block (фон/рамка/padding).
+   Применяется только ВНУТРИ .items-block-content; внешние TABLEHTML/TABLE не затронуты. */
+.items-block-content [data-block="table"].flightprocedures-table-wrap,
+.items-block-content [data-block="table"].flightprocedures-table-inline {
+  margin: 4px 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* Task 70: более контрастные границы ячеек для таблиц ВНУТРИ items-block.
+   Таблицы на цветном фоне (success/abnormal/emergency/info) — светло-серый border
+   (#e0e0e0, --color-border) недостаточно контрастен. Используем --color-text-muted
+   (#888888 светлая / #777777 тёмная) — чёткие границы на любом фоне items-block. */
+.items-block-content [data-block="table"] th,
+.items-block-content [data-block="table"] td {
+  border: 1px solid var(--color-text-muted);
 }
 
 /* ─── Table file loading/error ─── */
