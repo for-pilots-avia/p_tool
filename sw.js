@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v53 */
+/* Pilot's Tool — Service Worker v54 */
 
-var CACHE_NAME = 'pilots-tool-v53';
+var CACHE_NAME = 'pilots-tool-v54';
 
 var JSON_MODULE_NAMES = {
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
