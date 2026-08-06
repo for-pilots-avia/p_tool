@@ -1787,6 +1787,10 @@
               },
               {
                 "type": "items",
+                "key": "{{items:success:Failures}}"
+              },
+              {
+                "type": "items",
                 "key": "{{items:normal:Radio script}}"
               },
               {
@@ -1863,7 +1867,7 @@
               }
             ],
             "{{items:info:FFS settings}}": [
-              "{{badge:success:Position Set}}: URSS RW20 взлёт F15\n{{badge:success:Environtment Set}}: <b>NIGHT, 200/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}}:\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
+              "{{badge:success:Position Set}}: URSS RW20 взлёт F15\n{{badge:success:Environtment Set}}: <b>NIGHT, 200/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}}: 1000 - 5km\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
             ],
             "tables": [
               {
@@ -1929,18 +1933,11 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
-                  },
-                  {
-                    "type": "items",
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": [
-                  "• <u>После уборки шасси</u> - {{badge:emergency:LOSS OF HYD SYS A.}}\n{{badge:info:Ульяновск}} • ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\n{{badge:info:С.-Петербург}} • ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
-                ],
                 "{{items:emergency:Instructor Notes}}": [
-                  "RESERVED."
+                  "• определение отказа -\n• принятие решения - FOR DEC, ABC\n• соблюдение обязанностей -\n• связь - <b>PAN PAN</b>\n• навигация - HOLDING in FMC\n• взаимодействие с СБП -"
                 ]
               },
               {
@@ -2062,18 +2059,11 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
-                  },
-                  {
-                    "type": "items",
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": [
-                  "• <u>После уборки механизации</u> - {{badge:emergency:WHEEL WELL FIRE.}}\n{{badge:info:Ульяновск}}\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\n{{badge:info:С.-Петербург}}\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR"
-                ],
                 "{{items:emergency:Instructor Notes}}": [
-                  "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на"
+                  "В процессе выполнения NNC WHEEL WELL FIRE, шасси от GEAR LEVER не выпустятся т.к. нет HYD SYS A – контроль экипажа за выпуском шасси и дальнейшие действия!\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки.\n• определение отказа -\n• принятие решения - FOR DEC, ABC\n• соблюдение обязанностей -\n• связь - <b>MAY DAY</b>\n• навигация - HOLDING in FMC\n• взаимодействие с СБП -"
                 ]
               },
               {
@@ -2138,6 +2128,9 @@
                     "key": "{{items:success:SOP}}"
                   },
                   {
+                    "type": "documents"
+                  },
+                  {
                     "type": "references"
                   }
                 ],
@@ -2146,6 +2139,13 @@
                 ],
                 "{{items:success:SOP}}": [
                   "RESERVED"
+                ],
+                "documents": [
+                  {
+                    "title": "РПП ч.В — Engine Failure",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
                 ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
@@ -2174,13 +2174,13 @@
                   }
                 ],
                 "{{items:info}}": [
-                  "- ВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}"
+                  "После LOSS OF SYSTEM A (и брифинга с СБП) - LOSS OF SYSTEM B\nВНИМАНИЕ! {{badge:emergency:MANUAL REVERTION}}"
                 ],
                 "{{items:success:Failures}}": [
                   "{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS B\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM B"
                 ],
                 "{{items:emergency:Instructor Notes}}": [
-                  "В процессе выполнения NNC\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки."
+                  "В процессе выполнения NNC\n{{badge:emergency:Check !}}\n• определение отказа -\n• принятие решения - FOR DEC, ABC\n• соблюдение обязанностей - <b>PF - CPT</b>\n• связь - <b>MAY DAY</b>\n• навигация - HOLDING in FMC\n• взаимодействие с СБП -"
                 ]
               },
               {
@@ -2312,7 +2312,7 @@
                   }
                 ],
                 "{{items:emergency:Instructor Notes}}": [
-                  "В процессе выполнения RNP APP\n{{badge:emergency:Check !}}\n• <b>The recommended roll modes for the final approach</b> are:\n• for an RNAV or GPS approach use LNAV\n• for a LOC-BC, VOR or NDB approach use LNAV\n• for a LOC, SDF or LDA approach use LNAV or VOR/LOC.\n──────────────\n• Approximately {{badge:info:3 NM}} before the final approach fix:\n• PM call: \"APPROACHING GLIDE PATH\"\n• set DA(H) or MDA(H) on the MCP;\n• select or verify VNAV;\n• verify VNAV PTH on FMA;\n• select or verify speed intervention, as needed.\n• Approximately {{badge:info:2 NM}} :\n• \"GEAR DOWN\"\n• \"FLAPS 15\";\n• PM call: \"PASSING FAF, ___ FEET\";\n• When at least 300 feet below the missed approach altitude or FAF set MAA.\n<b>Instrument Approach Using V/S</b> :\n• Approximately 300 feet above MDA(H)+50` set MAA.\n• Call: \"RECYCLE FD's\" or as needed.\n• Call \"SET RUNWAY (GO-AROUND) HEADING\"."
+                  "В процессе выполнения RNP APP\n{{badge:emergency:Check !}}\n• Выбор минимума -\n• Применение 50 ft -\n• Callouts - \"APPROACHING GLIDE PATH\"\n\"PASSING FAF, ___ FEET\"\n\"RECYCLE FD's\"\n\"SET RUNWAY (GO-AROUND) HEADING\""
                 ]
               },
               {
@@ -2330,6 +2330,9 @@
                     "key": "{{items:success:SOP}}"
                   },
                   {
+                    "type": "documents"
+                  },
+                  {
                     "type": "references"
                   }
                 ],
@@ -2337,7 +2340,14 @@
                   "{{badge:success:FCTM}} RESERVED"
                 ],
                 "{{items:success:SOP}}": [
-                  "RESERVED"
+                  "Выписка из ...\n• <b>The recommended roll modes for the final approach</b> are:\n• for an RNAV or GPS approach use LNAV\n• for a LOC-BC, VOR or NDB approach use LNAV\n• for a LOC, SDF or LDA approach use LNAV or VOR/LOC.\n──────────────\n• Approximately {{badge:info:3 NM}} before the final approach fix:\n• PM call: \"APPROACHING GLIDE PATH\"\n• set DA(H) or MDA(H) on the MCP;\n• select or verify VNAV;\n• verify VNAV PTH on FMA;\n• select or verify speed intervention, as needed.\n• Approximately {{badge:info:2 NM}} :\n• \"GEAR DOWN\"\n• \"FLAPS 15\";\n• PM call: \"PASSING FAF, ___ FEET\";\n• When at least 300 feet below the missed approach altitude or FAF set MAA.\n<b>Instrument Approach Using V/S</b> :\n• Approximately 300 feet above MDA(H)+50` set MAA.\n• Call: \"RECYCLE FD's\" or as needed.\n• Call \"SET RUNWAY (GO-AROUND) HEADING\"."
+                ],
+                "documents": [
+                  {
+                    "title": "РПП ч.В — Engine Failure",
+                    "src": "modules/docs/AOMB.pdf",
+                    "page": 22
+                  }
                 ],
                 "references": [
                   "FCOM Vol. 1 — Takeoff Performance"
@@ -2345,13 +2355,17 @@
               }
             ],
             "{{items:success:FMS Memory}}": [
-              "URSS RW20 взлёт F15"
+              "{{badge:info:7}} URSS DAY2 R6"
+            ],
+            "{{items:success:Failures}}": [
+              "• <u>После уборки шасси</u> - {{badge:abnormal:LOSS OF HYD SYS A.}}\n{{badge:info:Ульяновск}} • ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\n{{badge:info:С.-Петербург}} • ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A",
+              "• <u>После уборки механизации</u> - {{badge:emergency:WHEEL WELL FIRE.}}\n{{badge:info:Ульяновск}}\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\n{{badge:info:С.-Петербург}}\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR"
             ],
             "{{items:normal:Radio script}}": [
-              "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS RW 20, cleared for T/O\"."
+              "<b>ATC clearance</b>: UWKD, RW20, via IRGIT1C climb 6000 ft, sq 4321.\n<b><sup>ATC</sup></b>: \"NWS737, RW 20, cleared for T/O\"."
             ],
             "{{items:success:Weather}}": [
-              "<u>Смена погоды</u>: 020/10KT vis 8000 km +30/+25 OVC 5000 ft"
+              "<u>Смена погоды</u>: <b>020/10KT</b> vis 8000 km +30/+25 OVC 5000 ft"
             ]
           },
           {
@@ -2371,6 +2385,10 @@
               {
                 "type": "child-ref",
                 "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
               },
               {
                 "type": "items",
@@ -2413,6 +2431,10 @@
                 "index": 8
               },
               {
+                "type": "items",
+                "key": "{{items:emergency:Instructor Notes}}"
+              },
+              {
                 "type": "child-ref",
                 "index": 9
               },
@@ -2431,14 +2453,10 @@
               {
                 "type": "child-ref",
                 "index": 13
-              },
-              {
-                "type": "child-ref",
-                "index": 14
               }
             ],
             "{{items:info:FFS settings}}": [
-              "{{badge:success:Position Set}} : Reposition: UUEE RW24C взлёт F15\n{{badge:success:Environtment Set}} : <b>NIGHT, 150/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
+              "{{badge:success:Position Set}} : Reposition: UUEE RW24C взлёт F15\n{{badge:success:Environtment Set}} : <b>NIGHT, 150/15KT vis 4000 km +30/+25 OVC 1200 ft Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} : 1000 - 5km\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>52</b></td><td><b>10</b></td><td><b>25</b></td><td><b>62</b></td></tr></tbody>\n</table>"
             ],
             "tables": [
               {
@@ -2588,30 +2606,16 @@
                 "layout": "divider"
               },
               {
-                "id": "ffs-refr2-2__after",
+                "id": "ffs-text-3-6-day2-4",
                 "layout": "text",
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
-                  },
-                  {
-                    "type": "items",
-                    "key": "{{items:normal:Radio script}}"
-                  },
-                  {
-                    "type": "items",
-                    "key": "{{items:emergency:Instructor Notes}}"
+                    "key": "{{items:info}}"
                   }
                 ],
-                "{{items:success:Failures}}": [
-                  "<u>После уборки механизации</u> активировать отказ – GEAR DOWN LOCK FAIL – LEFT GEAR.\n{{badge:info:Ульяновск}}\n• ATA 32 -> PARTIAL OR GEAR UP LANDING –> LEFT\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 10 MAIN GEAR -> DOWN LOCK FAIL -> LEFT MAIN"
-                ],
-                "{{items:normal:Radio script}}": [
-                  "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
-                ],
-                "{{items:emergency:Instructor Notes}}": [
-                  "В процессе выполнения NNC !"
+                "{{items:info}}": [
+                  "Полёт в зону ожидания, обработка отказа. Принятие решение о возврате а а/д вылета. Если экипаж принимает решение продолжать полёт – указание компании через диспетчера: вернуться на аэродром вылета.\nILS APP RW24C – Partial Gear Up Landing.\nОбратить внимание, что экипаж должен провести брифинг с проводниками и вероятной эвакуации после посадки."
                 ]
               },
               {
@@ -2735,42 +2739,43 @@
                 ]
               },
               {
-                "id": "ffs-text-3-6-day2-4",
-                "layout": "text",
-                "blocks": [
-                  {
-                    "type": "items",
-                    "key": "{{items:info}}"
-                  }
-                ],
-                "{{items:info}}": [
-                  "Полёт в зону ожидания, обработка отказа. Принятие решение о возврате а а/д вылета. Если экипаж принимает решение продолжать полёт – указание компании через диспетчера: вернуться на аэродром вылета.\nILS APP RW24C – Partial Gear Up Landing.\nОбратить внимание, что экипаж должен провести брифинг с проводниками и вероятной эвакуации после посадки."
-                ]
-              },
-              {
                 "id": "ffs-refr2-3",
                 "title": "3 ILS APP",
                 "layout": "divider"
               },
               {
-                "id": "ffs-text-3-6-day2-5",
+                "id": "ffs-refr2-3__after",
                 "layout": "text",
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success}}"
+                    "key": "{{items:normal:Radio script}}"
+                  },
+                  {
+                    "type": "items",
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success}}": [
-                  "RESERVED"
+                "{{items:normal:Radio script}}": [
+                  "ATC: \"NWS, fly direct to, expect ILS app RW \"."
+                ],
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения NNC !\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки.\n• определение отказа -\n• принятие решения - FOR DEC, ABC\n• соблюдение обязанностей -\n• связь - <b>PAN PAN</b>\n• навигация - HOLDING in FMC\n• взаимодействие с СБП -"
                 ]
               }
             ],
+            "{{items:success:FMS Memory}}": [
+              "{{badge:info:8}} URSS DAY2 R7"
+            ],
             "{{items:success:Failures}}": [
-              "<u>Перед взлётом</u> активировать отказ GEAR UP LOCK FAIL – LEFT GEAR.\n{{badge:info:Ульяновск}}\n• ATA 32 -> GEAR UP LOCK FAIL –> LEFT\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 10 MAIN GEAR -> UP LOCK FAIL -> LEFT MAIN"
+              "<u>Перед взлётом</u> активировать отказ GEAR UP LOCK FAIL – LEFT GEAR.\n{{badge:info:Ульяновск}}\n• ATA 32 -> GEAR UP LOCK FAIL –> LEFT\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 10 MAIN GEAR -> UP LOCK FAIL -> LEFT MAIN",
+              "<u>После уборки механизации</u> активировать отказ – GEAR DOWN LOCK FAIL – LEFT GEAR.\n{{badge:info:Ульяновск}}\n• ATA 32 -> PARTIAL OR GEAR UP LANDING –> LEFT\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 10 MAIN GEAR -> DOWN LOCK FAIL -> LEFT MAIN"
             ],
             "{{items:normal:Radio script}}": [
-              "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+              "ATC clearance: UWKD, RW24C, via EMGAS3H climb 6000 ft, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."
+            ],
+            "{{items:emergency:Instructor Notes}}": [
+              "В процессе выполнения NNC !\n{{badge:emergency:Check !}}\n• Обратить внимание на приоретизацию NNC экипажем, распределение нагрузки.\n• определение отказа -\n• принятие решения - FOR DEC, ABC\n• соблюдение обязанностей -\n• связь - <b>PAN PAN</b>\n• навигация - HOLDING in FMC\n• взаимодействие с СБП -"
             ]
           },
           {
@@ -2790,6 +2795,10 @@
               {
                 "type": "child-ref",
                 "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
               },
               {
                 "type": "items",
@@ -2984,7 +2993,7 @@
                   }
                 ],
                 "{{items:success:Failures}}": [
-                  "{{badge:info:Ульяновск}} • ATA 32\n- Первый заход –> <b>Right OB DU</b>, если экипаж продолжат – на DA отсутствует визуальный контакт – GA\nReposition 6nm.\n- Второй заход –> <b>FD fail</b>, на выравнивании <b>FLARE mode failure</b> и отказ обоих <b>TO/GA switch failure</b> – GA\nReposition 6 nm."
+                  "{{badge:info:Ульяновск}}\n- Первый заход –> • ATA 31 <b>DU FAIL - ROB</b>, если экипаж продолжат – на DA отсутствует визуальный контакт – GA\nReposition 6nm.\n- Второй заход –> • ATA 22 <b>FD Fail</b>, на выравнивании <b>FLARE mode Fail</b> и отказ обоих <b>TO/GA switch failure</b> – GA\nReposition 6 nm."
                 ],
                 "{{items:emergency:Instructor Notes}}": [
                   "В процессе выполнения GA\n{{badge:emergency:Check !}}\n• Выдерживание предписанной схемы;\n• Callouts \"GO-AROUND, FLAPS 15, CHECK THRUST\";\n• Действия 400ft: AP+AT+ROLL, Check Missed Approach Alt;\n• Действия 1000ft: acceleration, PITCH;\n• PM озвучивает FMA и подсказывает;\n• After TO CL;\n• Подготовка к повторному заходу."
@@ -3037,9 +3046,12 @@
                   }
                 ],
                 "{{items:success:Failures}}": [
-                  "- Третий заход на прямой <b>отказ A/T</b>, посадка."
+                  "- Третий заход на прямой –> • ATA 22 <b>A/T comp Fail</b>, посадка."
                 ]
               }
+            ],
+            "{{items:success:FMS Memory}}": [
+              "{{badge:info:9}} URSS DAY2 R8"
             ],
             "{{items:normal:Radio script}}": [
               "<b>ATC clearance</b>: UWKD, RW24C via EMGAS3H, sq 4321.\n<b>ATC</b>: \"NWS RW 24C, cleared for T/O\"."
@@ -3067,6 +3079,10 @@
               {
                 "type": "child-ref",
                 "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
               },
               {
                 "type": "items",
@@ -3150,7 +3166,7 @@
               }
             ],
             "{{items:info:FFS settings}}": [
-              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
+              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт F15\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} : 800 - 3km\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
             ],
             "tables": [
               {
@@ -3205,7 +3221,7 @@
                 ]
               },
               {
-                "id": "ffs-text-3-6-day2-6",
+                "id": "ffs-text-3-6-day2-5",
                 "layout": "text",
                 "blocks": [
                   {
@@ -3314,11 +3330,11 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": [
-                  "<u>После уборки механизации и выполнения NNC GEAR LEVER WILL NOT MOVE UP</u> - STANDBY HYDRAULIC LOW QUANTITY.\n{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY"
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}"
                 ]
               },
               {
@@ -3397,11 +3413,11 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": [
-                  "<u>После выполнения NNC STANDBY HYDRAULIC LOW QUANTITY</u> - WHEEL WELL FIRE (гасимый)\n{{badge:info:Ульяновск}}\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\n{{badge:info:С.-Петербург}}\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR"
+                "{{items:emergency:Instructor Notes}}": [
+                  "В процессе выполнения маневра\n{{badge:emergency:Check !}}"
                 ]
               },
               {
@@ -3514,14 +3530,17 @@
                 ]
               }
             ],
+            "{{items:success:FMS Memory}}": [
+              "{{badge:info:10}} URSS DAY2 C1"
+            ],
             "{{items:success:Failures}}": [
-              "До взлёта активировать отказы:\n1 LANDING GEAR LEVER Solenoid Fail:\n{{badge:info:Ульяновск}}\n• ATA 32 -> AIR/GND SENSOR FAIL IN POSITION – MAIN GEAR -> L1 + L2\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 9 AIR/GROUND ->AIR/GROUND SENSOR FAIL -> FAIL\n\n2 GEAR LEVER WILL NOT MOVE UP:\n{{badge:info:Ульяновск}}\n• ATA 32 -> GEAR LEVER WILL NOT MOVE UP AFTER T/O –> ON\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 30 EXT&RETRACT ->GEAR LEVER JAMMED IN DOWN POSITION -> FAIL"
+              "До взлёта активировать отказы:\n1 LANDING GEAR LEVER Solenoid Fail:\n{{badge:info:Ульяновск}}\n• ATA 32 -> AIR/GND SENSOR FAIL IN POSITION – MAIN GEAR -> L1 + L2\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 9 AIR/GROUND ->AIR/GROUND SENSOR FAIL -> FAIL\n2 GEAR LEVER WILL NOT MOVE UP:\n{{badge:info:Ульяновск}}\n• ATA 32 -> GEAR LEVER WILL NOT MOVE UP AFTER T/O –> ON\n{{badge:info:С.-Петербург}}\n• ATA 32 -> 30 EXT&RETRACT ->GEAR LEVER JAMMED IN DOWN POSITION -> FAIL\n3 <u>После уборки механизации и выполнения NNC GEAR LEVER WILL NOT MOVE UP</u> - STANDBY HYDRAULIC LOW QUANTITY.\n{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY\n4 <u>После выполнения NNC STANDBY HYDRAULIC LOW QUANTITY</u> - WHEEL WELL FIRE (гасимый)\n{{badge:info:Ульяновск}}\n• ATA 26 -> WHEEL WELL FIRE – CONTROLLABLE -> ON\n{{badge:info:С.-Петербург}}\n• ATA 26 -> 17 WHEEL WELL -> WHEEL WELL FIRE -> MAIN GEAR"
             ],
             "{{items:normal:Radio script}}": [
               "<b>ATC clearance</b>: UWKD, RW20 via IRGIT1C, sq 4321.\n<b>ATC</b>: \"NWS RW 20, cleared for T/O\"."
             ],
             "{{items:success}}": [
-              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT"
+              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\n{{badge:info:Preset WX EASA}} : 1000 - 5km"
             ]
           },
           {
@@ -3544,19 +3563,23 @@
               },
               {
                 "type": "items",
+                "key": "{{items:success:FMS Memory}}"
+              },
+              {
+                "type": "items",
                 "key": "{{items:normal:Radio script}}"
               },
               {
                 "type": "items",
-                "key": "{{items:info}}"
+                "key": "{{items:success:Failures}}"
               },
               {
                 "type": "items",
-                "key": "{{items:success}}"
+                "key": "{{items:info}}"
               }
             ],
             "{{items:info:FFS settings}}": [
-              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 CAT II 30/30 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
+              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт F15\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 CAT II 30/30 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} : CAT II\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
             ],
             "tables": [
               {
@@ -3611,14 +3634,17 @@
                 ]
               }
             ],
-            "{{items:normal:Radio script}}": [
-              "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
+            "{{items:success:FMS Memory}}": [
+              "{{badge:info:11}} URSS DAY2 C2"
             ],
-            "{{items:info}}": [
+            "{{items:normal:Radio script}}": [
+              "ATC clearance: UWKD, RW20, via IRGIT1C climb 6000 ft, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
+            ],
+            "{{items:success:Failures}}": [
               "Взлёт, отказ двигателя между V1 and V2 (любой приводящий к потере тяги).\nУльяновск:\nATA 71 -> Любой отказ приводящий к потере тяги двигателя\nС.-Петербург:\nATA 71 -> 0 POWER PLANT -> Любой отказ приводящий к потере тяги двигателя"
             ],
-            "{{items:success}}": [
-              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\nONE ENG ILS Z APP RW02\nУход на второй круг на высоте DA (любая причина).\nREPOSITION to 6 nm. RW02\nILS Z APP RW02 ONE ENG INOP"
+            "{{items:info}}": [
+              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\n{{badge:info:Preset WX EASA}} : 1000 - 5km\n\nONE ENG ILS Z APP RW02\nУход на второй круг на высоте DA (любая причина).\nREPOSITION to 6 nm. RW02\nILS Z APP RW02 ONE ENG INOP"
             ]
           },
           {
@@ -3638,6 +3664,14 @@
               {
                 "type": "child-ref",
                 "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:Failures}}"
               },
               {
                 "type": "items",
@@ -3701,7 +3735,7 @@
               }
             ],
             "{{items:info:FFS settings}}": [
-              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} :\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
+              "{{badge:success:Position Set}} : Reposition: URSS RW20 взлёт\n{{badge:success:Environtment Set}} : <b>DAY, 170/10 VIS 3000 m OVC 800 ft. 30/28 Q1010, RW WET</b>\n{{badge:info:Preset WX EASA}} : 800 - 3km\n{{badge:success:Aircraft Set}} : <table style=\"overflow-wrap:break-word;min-width:0\">\n<thead><tr> <th>ZFW</th> <th>FUEL</th> <th>CG</th> <th>TOW</th></tr></thead>\n<tbody><tr><td><b>55</b></td><td><b>10</b></td><td><b>25.7</b></td><td><b>65</b></td></tr></tbody>\n</table>"
             ],
             "tables": [
               {
@@ -3852,11 +3886,11 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
+                    "key": "{{items:emergency:Instructor Notes}}"
                   }
                 ],
-                "{{items:success:Failures}}": [
-                  "<u>После выхода из сдвига ветра и уборки механизации</u> - STANDBY HYDRAULIC LOW QUANTITY.\n{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY"
+                "{{items:emergency:Instructor Notes}}": [
+                  "RESERVED."
                 ]
               },
               {
@@ -3889,15 +3923,8 @@
                 "blocks": [
                   {
                     "type": "items",
-                    "key": "{{items:success:Failures}}"
-                  },
-                  {
-                    "type": "items",
                     "key": "{{items:emergency:Instructor Notes}}"
                   }
-                ],
-                "{{items:success:Failures}}": [
-                  "• {{badge:emergency:LOSS OF HYD SYS A.}}\n{{badge:info:Ульяновск}} • ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\n{{badge:info:С.-Петербург}} • ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
                 ],
                 "{{items:emergency:Instructor Notes}}": [
                   "RESERVED."
@@ -3990,12 +4017,18 @@
                 ]
               }
             ],
+            "{{items:success:FMS Memory}}": [
+              "{{badge:info:12}} URSS DAY2 C3"
+            ],
+            "{{items:success:Failures}}": [
+              "<u>После выхода из сдвига ветра и уборки механизации</u> - STANDBY HYDRAULIC LOW QUANTITY.\n{{badge:info:Ульяновск}}\n• ATA 29 -> RESERVOIR LEAK – HIGH RATE -> STBY\n{{badge:info:С.-Петербург}}\n• ATA 29 -> 22 STBY HYD SYS ->FAST LEAKAGE -> STANDBY\n2 {{badge:emergency:LOSS OF HYD SYS A.}}\n{{badge:info:Ульяновск}} • ATA 29 -> RESERVOIR LEAK – HIGH RATE -> SYS A\n{{badge:info:С.-Петербург}} • ATA 29 -> 10 MAIN HYD SYS -> FAST LEAKAGE -> SYSTEM A"
+            ],
             "{{items:normal:Radio script}}": [
-              "ATC clearance: UWKD, RW20 via IRGIT1C, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
+              "ATC clearance: UWKD, RW20, via IRGIT1C climt 6000 ft, sq 4321.\nATC: \"NWS RW 20, cleared for T/O\"."
             ],
             "{{items:success}}": [
-              "Взлёт RW20\nПосле взлёта – WINDSHEAR",
-              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT",
+              "После взлёта – WINDSHEAR",
+              "Смена погоды: Vis 5000 m, OVC 2000 ft. W 100/10 KT\n{{badge:info:Preset WX EASA}} : 1000 - 5km",
               "После завершения манёвра EGPWS – REPOSITION 6 nm RW02\nILS Z APP RW02"
             ]
           },
@@ -4020,6 +4053,10 @@
               {
                 "type": "child-ref",
                 "index": 0
+              },
+              {
+                "type": "items",
+                "key": "{{items:success:FMS Memory}}"
               },
               {
                 "type": "items",
@@ -4273,6 +4310,9 @@
                   "- Третий заход на прямой <b>отказ A/T</b>, посадка."
                 ]
               }
+            ],
+            "{{items:success:FMS Memory}}": [
+              "{{badge:info:9}} URSS DAY2 R8"
             ],
             "{{items:normal:Radio script}}": [
               "ATC clearance: UWKD, RW24C via EMGAS3H, sq 4321.\nATC: \"NWS RW 24C, cleared for T/O\"."

@@ -1024,10 +1024,7 @@ body.dark-theme #notesQuickBtn {
   .module-container { max-width: 768px; }
 }
 @media (min-width: 900px) {
-  .module-container { max-width: 900px; }
-}
-@media (min-width: 1100px) {
-  .module-container { max-width: 1100px; }
+  .module-container { max-width: min(1300px, calc(100% - 32px)); }
 }
 
 /* ─── Module screen containers ─── */
