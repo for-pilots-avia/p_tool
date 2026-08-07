@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v56 */
+/* Pilot's Tool — Service Worker v57 */
 
-var CACHE_NAME = 'pilots-tool-v56';
+var CACHE_NAME = 'pilots-tool-v57';
 
 var JSON_MODULE_NAMES = {
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
@@ -106,6 +106,55 @@ var STATIC_ASSETS = [
   './modules/ffstraining/data/B737_С7Тренинг.html',
   './modules/ffstraining/data/B737_Санкт-Петербург.html',
   './modules/ffstraining/data/B737_Ульяновск.html',
+  // Медиа — ffstraining
+  './modules/ffstraining/data/tables/br_C-1.html',
+  './modules/ffstraining/data/tables/br_C-2.html',
+  './modules/ffstraining/data/tables/br_C-3.html',
+  './modules/ffstraining/data/tables/br_C-4.html',
+  './modules/ffstraining/data/tables/br_R-6.html',
+  './modules/ffstraining/data/tables/br_R-7.html',
+  './modules/ffstraining/data/tables/br_R-8.html',
+  './modules/ffstraining/data/tables/man_GPWS.html',
+  './modules/ffstraining/data/tables/man_RTO.html',
+  './modules/ffstraining/data/tables/man_WS.html',
+  './modules/ffstraining/data/tables/perf_C2.html',
+  './modules/ffstraining/data/tables/perf_R2.html',
+  './modules/ffstraining/data/QRH/QRH_glwnmu_1.webp',
+  './modules/ffstraining/data/QRH/QRH_glwnmu_2.webp',
+  './modules/ffstraining/data/QRH/QRH_glwnmu_3.webp',
+  './modules/ffstraining/data/QRH/QRH_glwnmu_4.webp',
+  './modules/ffstraining/data/QRH/QRH_gul_1.webp',
+  './modules/ffstraining/data/QRH/QRH_gul_2.webp',
+  './modules/ffstraining/data/QRH/QRH_gul_3.webp',
+  './modules/ffstraining/data/QRH/QRH_gul_4.webp',
+  './modules/ffstraining/data/QRH/QRH_lgd_1.webp',
+  './modules/ffstraining/data/QRH/QRH_lgd_2.webp',
+  './modules/ffstraining/data/QRH/QRH_lgd_3.webp',
+  './modules/ffstraining/data/QRH/QRH_lgd_4.webp',
+  './modules/ffstraining/data/QRH/QRH_mge_1.webp',
+  './modules/ffstraining/data/QRH/QRH_mge_2.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_1.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_2.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_3.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_4.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_5.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_6.webp',
+  './modules/ffstraining/data/QRH/QRH_mr_7.webp',
+  './modules/ffstraining/data/QRH/QRH_sysa_1.webp',
+  './modules/ffstraining/data/QRH/QRH_sysa_2.webp',
+  './modules/ffstraining/data/QRH/QRH_sysa_3.webp',
+  './modules/ffstraining/data/QRH/QRH_shlq.webp',
+  './modules/ffstraining/data/QRH/QRH_wwf.webp',
+  './modules/ffstraining/data/B737_Ульяновск.html',
+  './modules/ffstraining/data/AER_02_ILS.jpg',
+  './modules/ffstraining/data/AER_02_ILS_L.jpg',
+  './modules/ffstraining/data/AER_02_RNPY.jpg',
+  './modules/ffstraining/data/AER_02_RNPY_L.jpg',
+  './modules/ffstraining/data/AER_ALT.jpg',
+  './modules/ffstraining/data/AER_IRGIT1C.jpg',
+  './modules/ffstraining/data/SVO_24C_ILS.jpg',
+  './modules/ffstraining/data/SVO_24C_ILS_L.jpg',
+  './modules/ffstraining/data/SVO_EMGAS3H.jpg',
   // Медиа — krs
   './modules/krs/data/krs001.webp',
   './modules/krs/data/krs009_1.webp',
@@ -142,12 +191,12 @@ var STATIC_ASSETS = [
   './libs/pdfjs/pdf.worker.min.js',
   // Фоновые изображения (responsive + webp, контракт SHELL_CONTRACT §7.3)
   './background-mobile.webp',
-  './background-mobile.jpg',
   './background-desktop.webp',
+  './background-mobile.jpg',
   './background-desktop.jpg',
   // Скриншоты PWA (manifest.json screenshots)
-  './screenshots/screenshot-mobile.png',
-  './screenshots/screenshot-desktop.png'
+  './screenshots/screenshot-mobile.webp',
+  './screenshots/screenshot-desktop.webp'
 ];
 
 /* Единый канал для всех сообщений SW → страница */
