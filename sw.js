@@ -1,6 +1,6 @@
-/* Pilot's Tool — Service Worker v58 */
+/* Pilot's Tool — Service Worker v59 */
 
-var CACHE_NAME = 'pilots-tool-v58';
+var CACHE_NAME = 'pilots-tool-v59';
 
 var JSON_MODULE_NAMES = {
   'modules/aviation_sayings.json':                        'Авиационные цитаты',
@@ -22,6 +22,7 @@ var JSON_MODULE_NAMES = {
   'modules/quiz/data/tb_2024.json':                        'Quiz test5',
   'modules/quiz/data/afl-first_aid.json':                  'Quiz test6',
   'modules/quiz/data/kpk_meteorology.json':                'Quiz test7',
+  'modules/limitations/data/limitations.json':              'Limitations',
 };
 
 var STATIC_ASSETS = [
@@ -94,6 +95,7 @@ var STATIC_ASSETS = [
   './modules/phonebook/data/phonebook.json',
   './modules/faq/data/faq.json',
   './modules/aviation_sayings.json',
+  './modules/limitations/data/limitations.json',
   // Документы
   './modules/docs/AOMA.pdf',
   './modules/docs/AOMB.pdf',
@@ -102,11 +104,12 @@ var STATIC_ASSETS = [
   './modules/flightprocedures/data/ext_walk1.png',
   './modules/flightprocedures/data/sop_after_loadsheet_clean.html',
   // Медиа — ffstraining
+  './modules/ffstraining/data/ext_walk1.png',
   './modules/ffstraining/data/tables/man_WS.html',
   './modules/ffstraining/data/B737_С7Тренинг.html',
   './modules/ffstraining/data/B737_Санкт-Петербург.html',
   './modules/ffstraining/data/B737_Ульяновск.html',
-  // Медиа — ffstraining
+  // Медиа — ffstraining (таблицы)
   './modules/ffstraining/data/tables/br_C-1.html',
   './modules/ffstraining/data/tables/br_C-2.html',
   './modules/ffstraining/data/tables/br_C-3.html',
@@ -114,38 +117,9 @@ var STATIC_ASSETS = [
   './modules/ffstraining/data/tables/br_R-6.html',
   './modules/ffstraining/data/tables/br_R-7.html',
   './modules/ffstraining/data/tables/br_R-8.html',
-  './modules/ffstraining/data/tables/man_GPWS.html',
-  './modules/ffstraining/data/tables/man_RTO.html',
-  './modules/ffstraining/data/tables/man_WS.html',
   './modules/ffstraining/data/tables/perf_C2.html',
   './modules/ffstraining/data/tables/perf_R2.html',
-  './modules/ffstraining/data/QRH/QRH_glwnmu_1.webp',
-  './modules/ffstraining/data/QRH/QRH_glwnmu_2.webp',
-  './modules/ffstraining/data/QRH/QRH_glwnmu_3.webp',
-  './modules/ffstraining/data/QRH/QRH_glwnmu_4.webp',
-  './modules/ffstraining/data/QRH/QRH_gul_1.webp',
-  './modules/ffstraining/data/QRH/QRH_gul_2.webp',
-  './modules/ffstraining/data/QRH/QRH_gul_3.webp',
-  './modules/ffstraining/data/QRH/QRH_gul_4.webp',
-  './modules/ffstraining/data/QRH/QRH_lgd_1.webp',
-  './modules/ffstraining/data/QRH/QRH_lgd_2.webp',
-  './modules/ffstraining/data/QRH/QRH_lgd_3.webp',
-  './modules/ffstraining/data/QRH/QRH_lgd_4.webp',
-  './modules/ffstraining/data/QRH/QRH_mge_1.webp',
-  './modules/ffstraining/data/QRH/QRH_mge_2.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_1.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_2.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_3.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_4.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_5.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_6.webp',
-  './modules/ffstraining/data/QRH/QRH_mr_7.webp',
-  './modules/ffstraining/data/QRH/QRH_sysa_1.webp',
-  './modules/ffstraining/data/QRH/QRH_sysa_2.webp',
-  './modules/ffstraining/data/QRH/QRH_sysa_3.webp',
-  './modules/ffstraining/data/QRH/QRH_shlq.webp',
-  './modules/ffstraining/data/QRH/QRH_wwf.webp',
-  './modules/ffstraining/data/B737_Ульяновск.html',
+  // Медиа — ffstraining (снимки экранов)
   './modules/ffstraining/data/AER_02_ILS.jpg',
   './modules/ffstraining/data/AER_02_ILS_L.jpg',
   './modules/ffstraining/data/AER_02_RNPY.jpg',
@@ -172,6 +146,19 @@ var STATIC_ASSETS = [
   './modules/krs/data/krs029.webp',
   './modules/krs/data/page039.pdf',
   './modules/krs/data/krs044.webp',
+  './modules/krs/data/krs055.webp',
+  './modules/krs/data/krs061_1.webp',
+  './modules/krs/data/krs061_2.webp',
+  './modules/krs/data/krs061_3.webp',
+  './modules/krs/data/krs060.pdf',
+  './modules/krs/data/krs058_1.webp',
+  './modules/krs/data/krs058_2.webp',
+  './modules/krs/data/krs058_3.webp',
+  './modules/krs/data/krs058_4.webp',
+  './modules/krs/data/krs058_5.webp',
+  './modules/krs/data/krs058_6.webp',
+  './modules/krs/data/krs058_1.pdf',
+  './modules/krs/data/krs058_2.pdf',
   // Медиа — quiz
   './modules/quiz/data/questions.txt',
   './modules/quiz/data/images/B737NG.jpg',
@@ -191,49 +178,164 @@ var STATIC_ASSETS = [
   './libs/pdfjs/pdf.worker.min.js',
   // Фоновые изображения (responsive + webp, контракт SHELL_CONTRACT §7.3)
   './background-mobile.webp',
-  './background-desktop.webp',
   './background-mobile.jpg',
+  './background-desktop.webp',
   './background-desktop.jpg',
   // Скриншоты PWA (manifest.json screenshots)
-  './screenshots/screenshot-mobile.webp',
-  './screenshots/screenshot-desktop.webp'
+  './screenshots/screenshot-mobile.png',
+  './screenshots/screenshot-desktop.png'
 ];
 
 /* Единый канал для всех сообщений SW → страница */
 var progressChannel = new BroadcastChannel('sw-progress');
 
-/* ── INSTALL — кэширование с прогрессом ── */
+/* ─── F5: Versions table (feature-05-offline-versions.md, Вариант 1) ───
+   Хранится в localStorage['swVersionsTable'] = { file: { lastChecked, changed, prevHash, currHash } }
+   Обновляется при JSON_UPDATED dispatch + при hash-сравнении docs/*.pdf
+   UI читает эту таблицу через app.updateOfflineVersionsUI() */
+var VERSIONS_CACHE_KEY = 'swVersionsTable';
+
+function updateVersionsTable(file, changed, hash) {
+  try {
+    var raw = localStorage.getItem(VERSIONS_CACHE_KEY);
+    var table = raw ? JSON.parse(raw) : {};
+    var prevHash = table[file] ? table[file].currHash : null;
+    table[file] = {
+      lastChecked: Date.now(),
+      changed: changed,
+      prevHash: prevHash,
+      currHash: hash || (table[file] ? table[file].currHash : null)
+    };
+    localStorage.setItem(VERSIONS_CACHE_KEY, JSON.stringify(table));
+  } catch (e) {
+    console.warn('[sw] updateVersionsTable failed', e);
+  }
+}
+
+/* ── INSTALL — кэширование с прогрессом по РАЗМЕРУ файлов ── */
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      var cached = 0;
       var total = STATIC_ASSETS.length;
-
+      var cached = 0;
       var failed = 0;
 
-      return Promise.allSettled(
+      // Фаза 1: получить Content-Length всех файлов (HEAD запросы)
+      // Для файлов без Content-Length — размер 0 (не влияет на прогресс)
+      return Promise.all(
         STATIC_ASSETS.map(function(url) {
-          return cache.add(url)
-            .then(function() {
-              cached++;
+          return fetch(url, { method: 'HEAD' })
+            .then(function(resp) {
+              var len = parseInt(resp.headers.get('Content-Length'), 10);
+              return { url: url, size: (len > 0) ? len : 0 };
             })
-            .catch(function(err) {
-              failed++;
-              console.warn('SW: не удалось кэшировать:', url, err);
-            })
-            .finally(function() {
-              progressChannel.postMessage({
-                type: 'CACHE_PROGRESS',
-                progress: (cached + failed) / total,
-                cached: cached,
-                total: total,
-                failed: failed,
-                url: url
-              });
+            .catch(function() {
+              return { url: url, size: 0 };
             });
         })
-      ).then(function() {
-        progressChannel.postMessage({ type: 'CACHE_DONE', failed: failed });
+      ).then(function(fileInfos) {
+        // Вычислить totalSize (сумма всех известных размеров)
+        var totalSize = 0;
+        var knownFiles = 0;
+        fileInfos.forEach(function(info) {
+          totalSize += info.size;
+          if (info.size > 0) knownFiles++;
+        });
+
+        // Если ни один файл не вернул Content-Length — fallback на count-based
+        if (totalSize === 0) {
+          return Promise.allSettled(
+            STATIC_ASSETS.map(function(url) {
+              return cache.add(url)
+                .then(function() { cached++; })
+                .catch(function(err) {
+                  failed++;
+                  console.warn('SW: не удалось кэшировать:', url, err);
+                })
+                .finally(function() {
+                  progressChannel.postMessage({
+                    type: 'CACHE_PROGRESS',
+                    progress: (cached + failed) / total,
+                    cached: cached, total: total, failed: failed,
+                    url: url
+                  });
+                });
+            })
+          ).then(function() {
+            progressChannel.postMessage({ type: 'CACHE_DONE', failed: failed });
+          });
+        }
+
+        // Фаза 2: загрузка с отслеживанием progress по размеру
+        var loadedSize = 0;
+        var sizeMap = {};
+        fileInfos.forEach(function(info) { sizeMap[info.url] = info.size; });
+
+        return Promise.allSettled(
+          STATIC_ASSETS.map(function(url) {
+            var fileSize = sizeMap[url] || 0;
+
+            return fetch(url)
+              .then(function(response) {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+
+                // Клонировать response для чтения тела (оригинал — для cache.put)
+                var reader = response.clone().body.getReader();
+                var bytesRead = 0;
+
+                function readChunk() {
+                  return reader.read().then(function(chunk) {
+                    if (chunk.done) {
+                      // Файл полностью загружен — обновить прогресс
+                      loadedSize += fileSize;
+                      cached++;
+                      progressChannel.postMessage({
+                        type: 'CACHE_PROGRESS',
+                        progress: totalSize > 0 ? loadedSize / totalSize : (cached + failed) / total,
+                        cached: cached, total: total, failed: failed,
+                        url: url,
+                        loadedSize: loadedSize,
+                        totalSize: totalSize
+                      });
+                      return;
+                    }
+                    bytesRead += chunk.value.length;
+                    // Прогресс во время загрузки файла (частичный)
+                    progressChannel.postMessage({
+                      type: 'CACHE_PROGRESS',
+                      progress: totalSize > 0 ? (loadedSize + bytesRead) / totalSize : (cached + failed) / total,
+                      cached: cached, total: total, failed: failed,
+                      url: url,
+                      loadedSize: loadedSize + bytesRead,
+                      totalSize: totalSize
+                    });
+                    return readChunk();
+                  });
+                }
+
+                // Начать чтение + параллельно положить в cache
+                return Promise.all([
+                  readChunk(),
+                  cache.put(url, response)
+                ]);
+              })
+              .catch(function(err) {
+                failed++;
+                loadedSize += fileSize;  // всё равно добавляем размер для корректного прогресса
+                console.warn('SW: не удалось кэшировать:', url, err);
+                progressChannel.postMessage({
+                  type: 'CACHE_PROGRESS',
+                  progress: totalSize > 0 ? loadedSize / totalSize : (cached + failed) / total,
+                  cached: cached, total: total, failed: failed,
+                  url: url,
+                  loadedSize: loadedSize,
+                  totalSize: totalSize
+                });
+              });
+          })
+        ).then(function() {
+          progressChannel.postMessage({ type: 'CACHE_DONE', failed: failed });
+        });
       });
     }).then(function() {
       return self.skipWaiting();
@@ -293,6 +395,8 @@ self.addEventListener('fetch', function(event) {
                   var relPath = url.pathname.replace(/^\//, '');
                   var moduleName = JSON_MODULE_NAMES[relPath] || relPath;
                   progressChannel.postMessage({ type: 'JSON_UPDATED', module: moduleName });
+                  // F5: обновить versions table
+                  updateVersionsTable(relPath, true, null);
                 }
                 return response;
               });
@@ -316,6 +420,39 @@ self.addEventListener('fetch', function(event) {
           caches.open(CACHE_NAME).then(function(cache) {
             cache.put(event.request, response.clone());
           });
+
+          // F5: hash-сравнение для docs/*.pdf (feature-05)
+          var urlPath = new URL(event.request.url).pathname;
+          if (urlPath.indexOf('/docs/') !== -1 && /\.pdf$/i.test(urlPath)) {
+            response.clone().text().then(function(text) {
+              // Простой hash (djb2) — достаточно для change detection
+              var hash = 5381;
+              for (var i = 0; i < text.length; i++) {
+                hash = ((hash << 5) + hash + text.charCodeAt(i)) | 0;
+              }
+              var hashStr = String(hash);
+              var relPath = urlPath.replace(/^\//, '');
+
+              // Сравнить с предыдущим hash
+              try {
+                var raw = localStorage.getItem(VERSIONS_CACHE_KEY);
+                var table = raw ? JSON.parse(raw) : {};
+                var prev = table[relPath];
+                if (prev && prev.currHash && prev.currHash !== hashStr) {
+                  // PDF изменился — диспатчить JSON_UPDATED
+                  progressChannel.postMessage({
+                    type: 'JSON_UPDATED',
+                    module: 'docs:' + relPath.split('/').pop()
+                  });
+                  updateVersionsTable(relPath, true, hashStr);
+                } else {
+                  updateVersionsTable(relPath, false, hashStr);
+                }
+              } catch (e) {
+                updateVersionsTable(relPath, false, hashStr);
+              }
+            }).catch(function() {});
+          }
         }
         return response;
       }).catch(function() {

@@ -10,7 +10,7 @@
           {
             "id": "sv-airlaw-001",
             "q": "Какие документы обязан иметь при себе пилот гражданского ВС РФ?",
-            "a": "<b>Свидетельство пилота</b>, медицинский сертификат, полётный план (при необходимости), лицензия на радиостанцию. Согласно ФАП-128, п.2.5.",
+            "a": "Свидетельство пилота, медицинский сертификат, полётный план (при необходимости), лицензия на радиостанцию. Согласно ФАП-128, п.2.5.",
             "ref": "ФАП-128 п.2.5"
           },
           {
@@ -476,51 +476,63 @@
         "questions": [
           {
             "id": "sv-practical-001",
-            "q": "Рассчитайте курс и время полёта: расстояние 150 NM, ветер 270°/20 kt, путевая скорость ВС 120 kt, курс полёта 280°.",
-            "a": "Угол сноса (УС) ≈ arcsin(20/120) × sin(270°−280°) = arcsin(0.167) × sin(−10°) ≈ −9.6° × (−0.174) ≈ +1.7°. Поправка: курс ≈ 278.3°. Путевая скорость: 120 + 20 × cos(270°−278.3°) ≈ 120 + 20 × cos(−8.3°) ≈ 120 + 19.8 ≈ 140 kt. Время: 150/140 × 60 ≈ 64 мин.",
-            "ref": "Руководство по навигации"
+            "q": "Расскажите о предназначении Overboard Exahaust Valve (OEV). Какую конфигурацию необходимо создать для улучшения вентиляции при удалении дыма?",
+            "a": "The B737 Overboard Exhaust Valve (OEV) is part of the aircraft's equipment cooling system. It is located in the aft center section of the Equipment and Electrics (E&E) compartment and regulates the exhaust flow of conditioned air used to cool the avionics and flight deck instruments.\n- Overboard exhaust valve is driven open if either pack switch is in high and the right recirculation fan is off. This allows for increased ventilation in the smoke removal configuration.",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-002",
-            "q": "Определите взлётную дистанцию: фактическая масса 2100 кг, температура +30°C, высота аэродрома 2000 футов, встречный ветер 10 kt.",
-            "a": "1) Пересчёт на плотность: при +30°C и 2000 ft плотность ниже стандартной → увеличение дистанции на ~20-25%. 2) Масса выше стандартной → пропорциональное увеличение. 3) Встречный ветер 10 kt → уменьшение дистанции на ~10%. Итого: из графика РЛЭ для стандартных условий берём значение, умножаем на коэффициенты. Важно: итоговая дистанция должна быть ≤ располагаемой (TORA).",
-            "ref": "РЛЭ ВС"
+            "q": "Расскажите о работе системы наддува в Auto Mode Operation на эшелоне.\n<u>Практический вопрос:</u> Самолет летит на эшелоне 370 (в окошке FLT ALT 370), смена эшелона на 380. Что произойдет с высотой в кабине при занятии эшелона 380 и переустановки FLT ALT 380?",
+            "a": "a.) The cruise mode is activated when the airplane climbs to within 0.25 psi of the selected FLT ALT. During cruise the controller maintains the lowest possible cabin altitude based on the differential pressure limits indicated in the table below.\nb.) 28,000 feet to 37,000 feet - 7.80 psid\nAbove 37,000 feet - 8.35 psid\n\n<u>На эшелоне 370:</u> За бортом (на FL370): Давление воздуха в стандартной атмосфере (ISA) составляет всего 3.14 psi (около 162 мм рт. ст.)\nВ кабине: 3.14 + 7.80 = 10.94 psi. Абсолютное давление по барометрической таблице соответствует высоте 8000ft над уровнем моря (2438м)\n<u>На эшелоне 380:</u> Атмосферное давление 2.99\nПерепад 8.35\n2.99+8,35 = 11,34 что соответствует 7000 ft (2130м)\nВывод: Высота в кабине снизится, несмотря на набор высоты!!!",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-003",
-            "q": "Рассчитайте потребное топливо для полёта: расстояние 300 NM, крейсерская скорость 150 kt, расход 35 л/ч, резерв 30 мин + 10% маршрутного.",
-            "a": "Время полёта: 300/150 = 2 ч. Маршрутное топливо: 2 × 35 = 70 л. Резерв 30 мин: 0.5 × 35 = 17.5 л. 10% маршрутного: 7 л. Итого: 70 + 17.5 + 7 = 94.5 л. Минимальная заправка ≈ 95 л (если нет дополнительных требований по запасному аэродрому).",
-            "ref": "ФАП-128 п.5.28"
+            "q": "Расскажите про селекторы на AC and DC metering panel (нормальные значения при каждом положении селектора).",
+            "a": "AC meters:\n• all position of AC meter selector should read 400 ± 10 and 115v ± 5 if everything is normal.\n• INV position lets you monitor the output of the static inverter\n• STBY PWR shows frequency and voltage of AC standby bus.\nDC meters:\n• all meter selector position you are reading a TR output so you should see 28v. Normal range is 24-30v\n• loads indicated only on BAT, TR1, TR2, TR3\n• BAT/AUX BAT 28v (battery charger is working), less than 28v (is not working)\nNote: main BAT may be vary +20 to +40 for short period after APU start\n• STBY PWR shows volts of DC Standby bus",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-004",
-            "q": "Центровка: масса пустого ВС 1200 кг (центровка 2.40 м), пилот 80 кг (2.10 м), топливо 150 л / 108 кг (2.80 м), багаж 30 кг (3.50 м). Определите взлётную центровку.",
-            "a": "Момент пустого: 1200 × 2.40 = 2880. Пилот: 80 × 2.10 = 168. Топливо: 108 × 2.80 = 302.4. Багаж: 30 × 3.50 = 105. Сумма моментов: 3455.4. Взлётная масса: 1200 + 80 + 108 + 30 = 1418 кг. Центровка: 3455.4 / 1418 ≈ 2.44 м. Проверить по графику РЛЭ: в диапазоне? Если да — полёт возможен.",
-            "ref": "РЛЭ ВС"
+            "q": "Расскажите об индикации GEN OFF BUS и APU GEN OFF BUS.",
+            "a": "GEN OFF BUS light:\n• illuminated means IDG is not supplying power to related transfer bus\n• illuminated when GCB (generator control breaker) is open\nAPU GEN OFF BUS light:\n• illuminated means APU is up to speed (95%), frequency is above 380 Hz and ready for load, however, the APU is not power source in use\n• APB (aux power breaker) is open\nNote: after start if light fails to illuminate, the APU may have failed to reach starter cutout speed. A hung start may occur.",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-005",
-            "q": "Отказ двигателя на высоте 3000 футов после взлёта. Ваши действия?",
-            "a": "1) Сохранить управление: тангаж ≈ скорость планирования (Vg). 2) Карбюратор: обогатить смесь, проверить магнето, насос — попытка перезапуска. 3) Выбрать площадку: в секторе ±30°, минимально 300 м, без проводов. 4) MAYDAY на 121.5. 5) Транспондер 7700. 6) Снизиться с курсом на площадку, закрылки по ситуации. 7) При посадке: закрыть топливо, магнето выкл, дверь приоткрыта. ВАЖНО: не пытаться вернуться на ВПП при высоте < 1000 ft (разворот на 180° требует ≥ 500 ft).",
-            "ref": "РЛЭ ВС, ФАП-128"
+            "q": "Расскажите о работе Thrust Reverser с точки зрения работы гидросистем (Normal operation and hydraulic failure).",
+            "a": "Hydraulic pressure for the operation of engine No. 1 and engine No. 2 thrust reversers comes from hydraulic systems A and B, respectively. If hydraulic system A and/or B fails, alternate operation for the affected thrust reverser is available through the standby hydraulic system. When the standby system is used, the affected thrust reverser deploys and retracts at a slower rate and some thrust asymmetry can be anticipated.",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-006",
-            "q": "Как определить эшелон перехода и высоту перехода?",
-            "a": "Высота перехода (TA): фиксированная для аэродрома (обычно 3000 ft или по AIP). Эшелон перехода (TL): зависит от давления QNH. Формула: TL ≥ TA + (1013 − QNH) × 28 ft. Пример: QNH 993 hPa, TA 3000 ft → TL ≥ 3000 + (1013−993)×28 = 3000 + 560 = 3560 ft → FL040. Ниже TL — высота по QNH, выше TA — эшелон по QFE/1013.",
-            "ref": "ФАП-128 п.5.8"
+            "q": "Расскажите о работе Parking Brake с точки зрения работы гидросистем (какую систему использует, будет ли сохраняться давление при выключенных системах А и В, как проконтролировать давление, признаки отказа)?",
+            "a": "The parking brake can be set with either A or B hydraulic systems pressurized. If A and B hydraulic systems are not pressurized, parking brake pressure is maintained by the brake accumulator. Accumulator pressure is shown on the HYD BRAKE PRESS indicator.\nA fault in the parking brake system may cause the ANTISKID INOP light to illuminate.",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-007",
-            "q": "Рассчитайте истинную воздушную скорость (TAS) при IAS 130 kt, высоте 8000 ft, температуре −10°C.",
-            "a": "Поправка на плотность высоты. Стандартная температура на 8000 ft: 15 − 2 × 8 = −1°C. Фактическая −10°C → холоднее стандарта, плотность выше. Упрощённая формула: TAS ≈ IAS × √(ρ₀/ρ). Приблизительно: TAS ≈ IAS + (IAS × 0.02 × высота в тыс. футов) = 130 + (130 × 0.02 × 8) ≈ 130 + 20.8 ≈ 151 kt. Более точный расчёт через E6B: TAS ≈ 148 kt (с учётом температуры).",
-            "ref": "Аэронавигационный справочник"
+            "q": "Расскажите о работе Engine overheat and Fire detection (loop, sensors, location, conditions(temperature)).",
+            "a": "Each engine has eight detectors. The detectors monitor four sections of the engine. In each section, two detectors attach to a support tube and make an assembly. An assembly has one detector from loop A and one from loop B.\nThese are the locations of the engine fire detectors:\n• Two on the upper fan case section - 174°C / 304°C\n• Two on the lower fan case section - 174°C / 304°C\n• Two on the left core section - 343°C / 454°C\n• Two on the right core section - 343°C / 454°C.",
+            "ref": "FCOM B737"
           },
           {
             "id": "sv-practical-008",
-            "q": "Заход на посадку по PAPI: видите 3 красных и 1 белый. Какова ваша позиция относительно глиссады?",
-            "a": "PAPI: 4 огня слева направо. 3 красных + 1 белый = чуть ниже глиссады (slightly below). Нормальная глиссада: 2 красных + 2 белых. 4 красных = значительно ниже (dangerously low). 1 красный + 3 белых = чуть выше. 4 белых = значительно выше. Действие: плавно увеличить тангаж для возврата на глиссаду.",
-            "ref": "Приложение 14 ИКАО, AIP"
+            "q": "Расскажите о работе APU Fire Detection (loop, sensors, location, conditions(temperature)).",
+            "a": "The APU has three detectors. The detectors monitor three sections of the APU. In each section, one detector attaches to a support tube with clamps. There is one loop for the APU fire detection.\nThese are the locations of the APU fire detectors:\n• Upper APU compartment - 232°C\n• APU compartment door - 232°C\n• Tailpipe - 135°C",
+            "ref": "FCOM B737"
+          },
+          {
+            "id": "sv-practical-009",
+            "q": "Расскажите о работе Cargo Fire Warning and Smoke Detection (loop, sensors, location, conditions(temperature)).",
+            "a": "The lower cargo compartments have many cargo smoke detectors and one cargo electronic unit in each compartment.\nThe forward lower cargo compartment has four smoke detectors. The aft lower cargo compartment has six smoke detectors. The detectors are in the ceiling of the compartments.\nThe smoke detectors use photoelectric cells to detect smoke. The smoke detector gives an alarm signal if it senses smoke or if it senses air temperature more than 110°C.",
+            "ref": "FCOM B737"
+          },
+          {
+            "id": "sv-practical-010",
+            "q": "Особенности работы ROLL MODES AFDS на взлете. HDG SEL TO option, условия армирования LNAV перед взлетом. Что покажет FD's по roll до 50', до 400', после 400' в каждом режиме (ограничения по крену)?\n<u>Практический пример:</u> Команда диспетчера: \"На курсе взлета набирайте эшелон(высоту)… After departure maintain RW heading, climb …\". Какой режим работы выберете на MCP? Необходима ли поправка на ветер?",
+            "a": "a.) 313,269,315-319,321 (SB Changes 314) During takeoff, prior to 60 KIAS:\n• the roll command is wings level\n311,312 (SB Changes 314) During takeoff, prior to 60 KIAS:\n• the roll command is HDG SEL\nAt LIFT-OFF:\n313,269,315-319,321 (SB Changes 314) • the roll command maintains wings level.\n73311,73312 (SB Changes 314) • the roll command maintains HDG SEL. Bank angle is limited to 8 degrees below 400 feet, and 10–30 degrees selectable above 400 feet AGL.\n\nLNAV arming criteria on the ground:\n• origin runway in flight plan;\n• active route entered in FMC;\n• track of first leg within 5 degrees of runway heading;\n• both flight director switches have been switched on;\n• LNAV selected prior to TO/GA;\n• LNAV guidance becomes active at 50 feet AGL.\n313,269,315-319,321 (SB Changes VP-313) • bank angle is limited to 8 degrees below 200 feet and 30 degrees above 200 feet AGL.\n311,312,314,315,319 (SB Changes 313) • bank angle is limited to 15 degrees below 200 feet and 30 degrees above 200 feet AGL.\n\nb.) RUNWAY HEADING − The magnetic direction that corresponds with the runway centerline extended, not the painted runway number. When cleared to \"fly or maintain runway heading,\" pilots are expected to fly or maintain the heading that corresponds with the extended centerline of the departure runway. Drift correction must not be applied; e.g., Runway 4, actual magnetic heading of the runway centerline 044, fly 044.\nDoc.: \"FAA Order JO 7110.65BB\"",
+            "ref": "FCOM B737 4.10.15 Lateral Navigation, 4.20.11 Automatic Flight Takeoff and Landing."
           }
         ]
       }
@@ -810,80 +822,86 @@
           {
             "id": "ffs-manuveres-003",
             "q": "3. Расскажите RTO maneuver.",
-            "a": "Before 80 knots, reject the takeoff for any of the following:\n• activation of the master caution system;\n• system failure(s);\n• unusual noise or vibration;\n• tire failure;\n• abnormally slow acceleration;\n• takeoff configuration warning;\n• fire or fire warning;\n• engine failure;\n• predictive windshear warning;\n• if a side window opens;\n• if the airplane is unsafe or unable to fly.\nAbove 80 knots and before V1, reject the takeoff for any of the following:\n• fire or fire warning;\n• engine failure;\n• predictive windshear warning;\n• if the airplane is unsafe or unable to fly.\n\nCaptain: Without delay: Call: \"REJECT (I HAVE CONTROL)\". Simultaneously close the thrust levers, disengage the autothrottles and apply maximum manual wheel brakes or verify operation of RTO autobrake. If RTO autobrake is selected, monitor system performance and apply manual wheel brakes if the AUTO BRAKE DISARM light illuminates or deceleration is not adequate.\nRaise SPEED BRAKE lever.\nApply reverse thrust up to the maximum amount consistent with conditions.\nContinue maximum braking until certain the airplane can stop on the runway. When stopping is assured: start movement of the reverse thrust levers to reach the reverse idle detent before taxi speed. After the engines are at reverse idle, move the reverse thrust levers to full down.\nMake PA: \"ATTENTION CREW, ON STATIONS. ATTENTION CREW, ON STATIONS\".\n\nFirst officer: Verify actions as follows: Thrust levers closed. Autothrottles disengaged.\nMaximum brakes applied.\nVerify SPEED BRAKE lever UP and call \"SPEEDBRAKES UP.\" If SPEED BRAKE lever is not UP, call \"SPEEDBRAKES NOT UP.\"\nReverse thrust applied. When both REV indications are green, call \"REVERSERS NORMAL.\" If there is no REV indication(s) or the indication(s) stays amber, call \"NO REVERSER ENGINE NUMBER 1\", or \"NO REVERSER ENGINE NUMBER 2\", or \"NO REVERSERS\".\nCall out omitted action items.\nCall out 60 knots.\nNotify ATC: \"MAYDAY, MAYDAY, MAYDAY or PAN-PAN, PAN-PAN, PAN-PAN,\nNWS___ REJECTED TAKE-OFF, STANDBY\"\n| (РПП, ч.B Rejected take off)\n\n4. В каком случае Boeing рекомендует освободить ВПП немедленно после прекращения взлета? |\nКогда оказались in fuse plug melt zone после выполнения QRH / Recommended Brake Cooling Schedule.",
-            "ref": "(QRH/Performance Inflight/ Recommended Brake Cooling Schedule)"
+            "a": "Before 80 knots, reject the takeoff for any of the following:\n• activation of the master caution system;\n• system failure(s);\n• unusual noise or vibration;\n• tire failure;\n• abnormally slow acceleration;\n• takeoff configuration warning;\n• fire or fire warning;\n• engine failure;\n• predictive windshear warning;\n• if a side window opens;\n• if the airplane is unsafe or unable to fly.\nAbove 80 knots and before V1, reject the takeoff for any of the following:\n• fire or fire warning;\n• engine failure;\n• predictive windshear warning;\n• if the airplane is unsafe or unable to fly.\n\nCaptain: Without delay: Call: \"REJECT (I HAVE CONTROL)\". Simultaneously close the thrust levers, disengage the autothrottles and apply maximum manual wheel brakes or verify operation of RTO autobrake. If RTO autobrake is selected, monitor system performance and apply manual wheel brakes if the AUTO BRAKE DISARM light illuminates or deceleration is not adequate.\nRaise SPEED BRAKE lever.\nApply reverse thrust up to the maximum amount consistent with conditions.\nContinue maximum braking until certain the airplane can stop on the runway. When stopping is assured: start movement of the reverse thrust levers to reach the reverse idle detent before taxi speed. After the engines are at reverse idle, move the reverse thrust levers to full down.\nMake PA: \"ATTENTION CREW, ON STATIONS. ATTENTION CREW, ON STATIONS\".\n\nFirst officer: Verify actions as follows: Thrust levers closed. Autothrottles disengaged.\nMaximum brakes applied.\nVerify SPEED BRAKE lever UP and call \"SPEEDBRAKES UP.\" If SPEED BRAKE lever is not UP, call \"SPEEDBRAKES NOT UP.\"\nReverse thrust applied. When both REV indications are green, call \"REVERSERS NORMAL.\" If there is no REV indication(s) or the indication(s) stays amber, call \"NO REVERSER ENGINE NUMBER 1\", or \"NO REVERSER ENGINE NUMBER 2\", or \"NO REVERSERS\".\nCall out omitted action items.\nCall out 60 knots.\nNotify ATC: \"MAYDAY, MAYDAY, MAYDAY or PAN-PAN, PAN-PAN, PAN-PAN,\nNWS___ REJECTED TAKE-OFF, STANDBY\"",
+            "ref": "(РПП, ч.B Rejected take off)"
           },
           {
             "id": "ffs-manuveres-004",
+            "q": "4. В каком случае Boeing рекомендует освободить ВПП немедленно после прекращения взлета?",
+            "a": "Когда оказались in fuse plug melt zone после выполнения QRH / Recommended Brake Cooling Schedule.",
+            "ref": "(QRH/Performance Inflight/ Recommended Brake Cooling Schedule)"
+          },
+          {
+            "id": "ffs-manuveres-005",
             "q": "5. Расскажите memory items / conditions ENGINE FIRE or Engine Severe Damage or Separation.",
             "a": "О: Condition: One or more of these occur:\n• Engine fire warning;\n• Airframe vibrations with abnormal engine indications;\n• Engine separation.\n\n1 Autothrottle (if engaged) . . . . . . . . . . Disengage\n2 Thrust lever (affected engine) . . . . Confirm . . . . Close\n3 Engine start lever (affected engine) . . . . Confirm . . . . CUTOFF\n4 Engine fire switch (affected engine) . . . . Confirm . . . . Pull\nTo manually unlock the engine fire switch, press the override and pull.\n5 If the engine fire switch or ENG OVERHEAT light is illuminated:\nEngine fire switch (affected engine) . . . . Rotate to the stop and hold for 1 second.",
             "ref": "(QRH NNC)"
           },
           {
-            "id": "ffs-manuveres-005",
+            "id": "ffs-manuveres-006",
             "q": "6. Расскажите memory items / conditions Engine Limit or Surge or Stall",
             "a": "О: Condition: One or more of these occur:\n• Engine indications are abnormal;\n• Engine indications are rapidly approaching or exceeding limits;\n• Abnormal engine noises are heard, possibly with airframe vibration;\n• There is no response to thrust lever movement or the response is abnormal;\n• Flames in the engine inlet or exhaust are reported.\n1 Autothrottle (if engaged) . . . . Disengage;\n2 Thrust lever (affected engine) . . . Confirm . . . Retard until engine indications stay within limits or the thrust lever is closed.",
             "ref": "(QRH NNC)."
           },
           {
-            "id": "ffs-manuveres-006",
+            "id": "ffs-manuveres-007",
             "q": "7. Расскажите процедуру Windshear Escape Maneuver",
             "a": "PF: Calls \"PULL UP, MAXIMUM THRUST\".\n• Disengage autopilot.\n• Disengage autothrottle.\n• Aggressively apply maximum thrust.\n• Simultaneously roll wings level and rotate to an initial pitch attitude of 20°.\n• Retract speedbrakes.\n• If terrain remains a threat, continue rotation up to the pitch limit indicator (if available) or stick shaker or initial buffet.\n• Do not change gear or flap configuration until terrain separation is assured.\n• Monitor radio altimeter for sustained or increasing terrain separation.\n• When clear of terrain, slowly decrease pitch attitude and accelerate.\nPM:\n• Assure maximum thrust.\n• Verify all needed actions have been completed and call out any omissions.\n• Monitor vertical speed and altitude (radio altitude for terrain clearance and barometric altitude for a minimum safe altitude.)\n• Call out any trend toward terrain contact."
           },
           {
-            "id": "ffs-manuveres-007",
+            "id": "ffs-manuveres-008",
             "q": "8. Расскажите процедуру EGPWS WARNING Response",
             "a": "PF: Calls \"PULL UP, MAXIMUM THRUST\".\n• Disengage autopilot.\n• Disengage autothrottle.\n• Aggressively apply maximum thrust.\n• Simultaneously roll wings level and rotate to an initial pitch attitude of 20°.\n• Retract speedbrakes.\n• If terrain remains a threat, continue rotation up to the pitch limit indicator (if available) or stick shaker or initial buffet.\n• Do not change gear or flap configuration until terrain separation is assured.\n• Monitor radio altimeter for sustained or increasing terrain separation.\n• When clear of terrain, slowly decrease pitch attitude and accelerate.\nPM:\n• Assure maximum thrust.\n• Verify all needed actions have been completed and call out any omissions.\n• Monitor vertical speed and altitude (radio altitude for terrain clearance and barometric altitude for a minimum safe altitude.)\n• Call out any trend toward terrain contact."
           },
           {
-            "id": "ffs-manuveres-008",
+            "id": "ffs-manuveres-009",
             "q": "9. Расскажите memory items / conditions APU FIRE",
             "a": "О: Condition: Fire is detected in the APU.\n• APU fire switch. . . Confirm . . . .Pull, rotate to the stop, and hold for 1 second\n• APU switch . . . . . . . . . . . . . . . . . . . . . . . . OFF"
           },
           {
-            "id": "ffs-manuveres-009",
+            "id": "ffs-manuveres-010",
             "q": "10. Превышение каких параметров полёта обязывает эк4ипаж выполнить манёвр Upset Recovery?",
             "a": "Historically, an upset was defined as unintentionally exceeding one or\nmore of the following conditions:\n• Pitch attitude greater than 25 degrees nose up\n• Pitch attitude greater than 10 degrees nose down\n• Bank angle greater than 45 degrees\n• Less than above parameters but flying at an airspeed inappropriate\nfor the conditions.",
             "ref": "(QRH/NON-NORMAL/Maneuvers/Upset Recovery)"
           },
           {
-            "id": "ffs-manuveres-010",
+            "id": "ffs-manuveres-011",
             "q": "11. Какие параметры полёта свидетельствуют о том, что самолёт находится в режиме STALL?",
             "a": "A stalled condition can exist at any attitude and can be recognized by one or more of the following:\n• Stick shaker\n• Buffet that can be heavy at times\n• Lack of pitch authority\n• Lack of roll control\n• Inability to stop a descent.",
             "ref": "(QRH/NON-NORMAL/Maneuvers/Upset Recovery)"
           },
           {
-            "id": "ffs-manuveres-011",
+            "id": "ffs-manuveres-012",
             "q": "12. Расскажите процедуру Approach to Stall or Stall Recovery",
             "a": "Note: Do not use flight director commands during the recovery.\nPilot Flying: Call \"STALL\"\n• Initiate the recovery: Hold the control column firmly - Disengage autopilot and autothrottle - Smoothly apply nose down elevator to reduce the angle of attack until buffet or stick shaker stops. Nose down stabilizer trim may be needed.\n• Continue the recovery: Roll in the shortest direction to wings level if needed – Advance thrust levers as needed - Retract the speedbrakes - Do not change gear or flap configuration except - During liftoff, if flaps are up, call for flaps 1.\n• Complete the recovery: Check airspeed and adjust thrust as needed - Establish pitch attitude - Return to the desired flight path - Re-engage the autopilot and autothrottle if desired.\nPilot Monitoring:\n• Monitor altitude and airspeed - Verify all needed actions have been done and call out any omissions - Call out any trend toward terrain contact.\nMonitor altitude and airspeed - Verify all needed actions have been done and call out any omissions - Call out any trend toward terrain contact - Set the FLAP lever as directed.\nMonitor altitude and airspeed - Verify all needed actions have - been done and call out any – omissions - Call out any trend toward - terrain contact.",
             "ref": "(РПП ч. В NON-NORMAL MANEUVERS/ Approach to Stall or Stall Recovery)"
           },
           {
-            "id": "ffs-manuveres-012",
+            "id": "ffs-manuveres-013",
             "q": "13. Расскажите процедуру Upset Recovery - Nose High Recovery",
             "a": "Recognize and confirm the developing situation\nPilot Flying: Call \"UPSET RECOVERY\"\nDisengage autopilot - Disengage autothrottle\nRecover: Apply nose-down elevator. - Apply as much elevator as needed to obtain a nose down pitch rate - Apply appropriate nose down stabilizer\nTrim - Reduce thrust - Roll (adjust bank angle) to obtain a nose down pitch rate*\nComplete the recovery: When approaching the horizon, roll to wings level - Check airspeed and adjust thrust - Establish pitch attitude.\nPilot Monitoring\nCall out attitude, airspeed and altitude throughout the recovery. - Verify all needed action have been done and call out any continued deviation.",
             "ref": "(РПП ч. В NON-NORMAL MANEUVERS/ NOSE HIGH RECOVERY)"
           },
           {
-            "id": "ffs-manuveres-013",
+            "id": "ffs-manuveres-014",
             "q": "14. Расскажите процедуру Upset Recovery - Nose Low Recovery",
             "a": "Recognize and confirm the developing situation\nPilot Flying: Call \"UPSET RECOVERY\"\nDisengage autopilot - Disengage autothrottle\nRecover: Recover from stall, if needed - Roll in the shortest direction to wings level - If bank angle is more than 90 degrees, unload and roll.\nComplete the recovery: Apply nose up elevator - Apply nose up trim, if needed - Adjust thrust and drag, if needed.\nPilot Monitoring\nCall out attitude, airspeed and altitude throughout the recovery. - Verify all needed action have been done and call out any continued deviation.",
             "ref": "(РПП ч. В NON-NORMAL MANEUVERS/ NOSE LOW RECOVERY)"
           },
           {
-            "id": "ffs-manuveres-014",
+            "id": "ffs-manuveres-015",
             "q": "15. Расскажите процедуру TCAS RA",
             "a": "Pilot Flying: Call: \"TCAS\" if not announced during TA.\nIf maneuvering is needed, disengage the autopilot and disengage the autothrottle. Smoothly adjust pitch and thrust to satisfy the RA command.\nFollow the planned lateral flight path unless visual contact with the conflicting traffic requires other action.\nPilot Monitoring: Call ATC: \"TCAS RA\".\nBOTH: Attempt to establish visual contact. Call out any conflicting traffic.",
             "ref": "(РПП ч. В NON-NORMAL MANEUVERS/ Traffic Avoidance)"
           },
           {
-            "id": "ffs-manuveres-015",
+            "id": "ffs-manuveres-016",
             "q": "16. Расскажите процедуру TCAS RA climb in landing configuration",
             "a": "Pilot Flying: Call: \" TCAS GO AROUND\"\nDisengage the autopilot and disengage the autothrottle. Advance thrust levers forward to ensure maximum thrust is attained and call \"FLAPS 15\".\nSmoothly adjust pitch to satisfy the RA command. Follow the planned lateral flight path unless visual contact with the conflicting traffic requires other action\nVerify a positive rate of climb on the altimeter and call \"GEAR UP\"\nPilot Monitoring: Call ATC: \"TCAS RA\".\nVerify maximum thrust set. Position flap lever to 15 detent.\nVerify a positive rate of climb on the altimeter and call \"POSITIVE RATE Set the landing gear lever to UP\nBOTH: Attempt to establish visual contact. Call out any conflicting traffic.",
             "ref": "(РПП ч. В NON-NORMAL MANEUVERS/ Traffic Avoidance)"
           },
           {
-            "id": "ffs-manuveres-016",
+            "id": "ffs-manuveres-017",
             "q": "17. Расскажите memory items / conditions EMERGENCY DESCENT",
             "a": "PF\nPM\nCall (first who notices alert or decompression): \"OXYGEN MASK ON\"\nOxygen masks (without control transfer)……………………..……………. Done\nCrew communication…………………..……………………………………... Establish\nCall: \"CABIN ALTITUDE memory items\"\nPerform memory items\nIF CABIN ALTITUDE IS CONTROLLABLE\nCall: \"CABIN ALTITUDE WARNING OR RAPID DEPRESSURIZATION CHECKLIST\"\nCall: \"Cabin Altitude Controllable\"\nPerform CABIN ALTITUDE WARNING or Rapid Depressurization NNC\nIF CABIN ALTITUDE IS UNCONTROLLABLE\nCall: \"Cabin Altitude Uncontrollable\"\nCall: \"EMERGENCY DESCENT MEMORY ITEMS\"\nAlert cabin crew:\n\" EMERGENCY DESCENT, EMERGENCY DESCENT\"\nWithout delay:\nHDG SEL knob ........................................ Turn\nHDG SEL ................................................. Push\nLower altitude on MCP ............................... Set\nLVL CHG ................................................ Push\nTHRUST levers ....................................... Close\nSPEEDBRAKE ............................ Flight detent\nSpeed to MMO/VMO ........................... Adjust\nIf structural integrity is in doubt, limit airspeed and avoid high maneuvering loads\nHEADING ............................................ Adjust\nALTITUDE ........................................... Adjust\nDescend to lowest safe altitude or 10,000 feet, whichever is higher.\nPASS OXYGEN switch ............................. ON\nFASTEN BELTS switch ............................. ON\nLANDING LIGHTS ................................... ON\nENGINE START switches (both) ........ CONT\nATC SQUAWK 7700 ................................. Set\nNotify ATC: \"MAYDAY, MAYDAY, MAYDAY, NWS ___, EMERGENCY DESCENT TO FL ___, HEADING ___ \".\nLowest safe altitude ............................... Check\nAltimeter setting ................................... Obtain",
             "ref": "(РПП ч. В Abnormal and Emergency/EMERGENCY DESCENT)"
@@ -904,65 +922,71 @@
           {
             "id": "ffs-limitations-002",
             "q": "2. Назовите ограничение по Maximum EGT для взлета.",
-            "a": "950. – 5 min\n| (РПП ч. В, General Aircraft Information and Limitations/ Engines and APU)\n\n3. Назовите ограничения по Vmo / Mmo |\n340 / 0.82",
-            "ref": "(AFM Maximum Airspeed Limitations)."
+            "a": "950. – 5 min",
+            "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Engines and APU)"
           },
           {
             "id": "ffs-limitations-003",
+            "q": "3. Назовите ограничения по Vmo / Mmo",
+            "a": "340 / 0.82",
+            "ref": "(AFM Maximum Airspeed Limitations)."
+          },
+          {
+            "id": "ffs-limitations-004",
             "q": "4. Назовите ограничения по углам наклона глиссады для автоматической посадки.",
             "a": "Maximum and minimum glideslope angles for autoland are 3.25 degrees and 2.5\ndegrees respectively",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)"
           },
           {
-            "id": "ffs-limitations-004",
+            "id": "ffs-limitations-005",
             "q": "5. Назовите ограничение по использованию LVL CHG",
             "a": "Do not use LVL CHG on final approach below 1000 feet AAL",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)"
           },
           {
-            "id": "ffs-limitations-005",
+            "id": "ffs-limitations-006",
             "q": "6. Назовите максимальную EGT для запуска двигателя.",
             "a": "725 .С",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)"
           },
           {
-            "id": "ffs-limitations-006",
+            "id": "ffs-limitations-007",
             "q": "7. Назовите значение EGT Maximum Continuous (без ограничения по времени)",
             "a": "925°C\n| (РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)\n\n8. Назовите максимальную температуру масла двигателя, для которой нет ограничения по времени. |\nMaximum oil temperature, continuous operation, is 140 degrees C.",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)"
           },
           {
-            "id": "ffs-limitations-007",
+            "id": "ffs-limitations-008",
             "q": "9. Назовите диапазон температур масла двигателя, для которые есть ограничение по времени. Какое ограничение по времени для данного диапазона температур?",
             "a": "Maximum oil temperature, 45 minute limit, is 140-155 degrees C.",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)"
           },
           {
-            "id": "ffs-limitations-008",
+            "id": "ffs-limitations-009",
             "q": "10. Назовите ограничения по минимальному давлению масла двигателя. Как трактуется \"жёлтый сектор\" давления масла двигателя?",
             "a": "Minimum oil pressure is 13 psi. If engine oil pressure is in the yellow band with\ntakeoff thrust set, do not takeoff.",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Autopilot/Flight Director System)"
           },
           {
-            "id": "ffs-limitations-009",
+            "id": "ffs-limitations-010",
             "q": "11. Назовите минимальный уровень обеспечения средствами спасения и пожарной защиты (ССПЗ) на аэродроме, для B737NG",
             "a": "Required airport category for rescue and firefighting – 7",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Fire Protection)"
           },
           {
-            "id": "ffs-limitations-010",
+            "id": "ffs-limitations-011",
             "q": "12. Назовите ограничения по использованию Speedbrakes",
             "a": "In flight, do not extend the SPEED BRAKE lever beyond the FLIGHT DETENT\nDo not deploy the speedbrakes in flight at radio altitudes less than 1,000 feet",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Flight Controls)"
           },
           {
-            "id": "ffs-limitations-011",
+            "id": "ffs-limitations-012",
             "q": "13. Назовите максимальную температуру топлива",
             "a": "Maximum tank fuel temperature is 49°C.",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Fuel System)"
           },
           {
-            "id": "ffs-limitations-012",
+            "id": "ffs-limitations-013",
             "q": "14. Назовите минимальную температуру топлива, перед взлётом",
             "a": "Minimum tank fuel temperature prior to takeoff and inflight is –43°C, or 3°C above\nthe fuel freezing point temperature, whichever is higher.",
             "ref": "(РПП ч. В, General Aircraft Information and Limitations/ Fuel System)"
